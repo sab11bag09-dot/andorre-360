@@ -80,21 +80,21 @@ export default async function EditorialPage() {
     usedArticleIds.add(editorialLayout.hero.id);
   }
 
-  if (editorialLayout.main) {
-    usedArticleIds.add(editorialLayout.main.id);
-  }
+ if (editorialLayout.feature) {
+  usedArticleIds.add(editorialLayout.feature.id);
+}
 
-  editorialLayout.column.forEach((article) => {
-    usedArticleIds.add(article.id);
-  });
+ editorialLayout.secondary.forEach((article) => {
+  usedArticleIds.add(article.id);
+});
 
   editorialLayout.briefs.forEach((article) => {
     usedArticleIds.add(article.id);
   });
 
-  if (editorialLayout.bottom) {
-    usedArticleIds.add(editorialLayout.bottom.id);
-  }
+  if (editorialLayout.grandFormat) {
+  usedArticleIds.add(editorialLayout.grandFormat.id);
+}
 
   const availableArticles = publishedArticles.filter(
     (article) => !usedArticleIds.has(article.id)
@@ -105,24 +105,24 @@ export default async function EditorialPage() {
     availableArticles.shift() ??
     null;
 
-  const main =
-    editorialLayout.main ??
-    availableArticles.shift() ??
-    null;
+  const feature =
+  editorialLayout.feature ??
+  availableArticles.shift() ??
+  null;
     
 
-  const column = [...editorialLayout.column];
+  const secondary = [...editorialLayout.secondary];
 
-  while (
-    column.length < 3 &&
-    availableArticles.length > 0
-  ) {
-    const article = availableArticles.shift();
+ while (
+  secondary.length < 3 &&
+  availableArticles.length > 0
+) {
+  const article = availableArticles.shift();
 
-    if (article) {
-      column.push(article);
-    }
+  if (article) {
+    secondary.push(article);
   }
+}
 
   const briefs = [...editorialLayout.briefs];
 
@@ -138,9 +138,9 @@ export default async function EditorialPage() {
   }
 
   const bottom =
-    editorialLayout.bottom ??
-    availableArticles[availableArticles.length - 1] ??
-    null;
+  editorialLayout.grandFormat ??
+  availableArticles[availableArticles.length - 1] ??
+  null;
 
   /*
    * Indicateurs du Centre éditorial.
@@ -450,7 +450,7 @@ export default async function EditorialPage() {
 
               <EditorialSlot
                 title="🟨 Grande carte"
-                article={main}
+                article={feature}
                 editionKey="home"
                 zone="main"
                 articles={publishedArticles}
@@ -507,7 +507,7 @@ export default async function EditorialPage() {
                   </h3>
 
                   <span className="text-sm text-gray-500">
-                    {column.filter(Boolean).length}/3
+                    {secondary.filter(Boolean).length}
                   </span>
                 </div>
               </div>
@@ -517,9 +517,9 @@ export default async function EditorialPage() {
                   <EditorialSlot
                     key={`column-${index}`}
                     title={`Carte ${index + 1}`}
-                    article={column[index] ?? null}
+                    article={secondary[index] ?? null}
                     editionKey="home"
-                    zone="column"
+                    zone="secondary"
                     compact
                     articles={publishedArticles}
                   />
@@ -598,7 +598,7 @@ export default async function EditorialPage() {
               title="📍 Bas de page"
               article={bottom}
               editionKey="home"
-              zone="bottom"
+              zone="grand-format"
               articles={publishedArticles}
             />
           </div>
