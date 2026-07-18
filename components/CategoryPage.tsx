@@ -1,51 +1,52 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { articles } from "@/data/articles";
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function getArticleSlug(article: {
-  slug?: string;
-  title: string;
-}): string {
-  return article.slug?.trim() || slugify(article.title);
-}
+import { prisma } from "@/lib/prisma";
 
 type CategoryPageProps = {
   category: string;
   title: string;
 };
 
-export default function CategoryPage({
+export default async function CategoryPage({
   category,
   title,
 }: CategoryPageProps) {
-  const items = articles.filter(
-    (article) => article && article.category === category
-  );
+  const articles = await prisma.article.findMany({
+    where: {
+      category,
+      published: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
-  const featured = items[0];
-  const mainArticle = items[1];
-  const rightCards = items.slice(2, 5);
-  const briefs = items.slice(5, 8);
+  const featured = articles[0];
+  const mainArticle = articles[1];
+  const rightCards = articles.slice(2, 5);
+  const briefs = articles.slice(5, 8);
 
   const bottomCard =
-    items.length > 1 ? items[items.length - 1] : undefined;
+    articles.length > 8 ? articles[articles.length - 1] : undefined;
 
   if (!featured) {
     return (
-      <main className="min-h-screen bg-black p-8 text-white">
-        <h1 className="font-serif text-4xl">
-          Aucun article dans la rubrique {title}
-        </h1>
+      <main className="min-h-screen bg-black px-8 py-20 text-white">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm uppercase tracking-[0.25em] text-yellow-500">
+            {title}
+          </p>
+
+          <h1 className="mt-4 font-serif text-4xl">
+            Aucun article dans la rubrique {title}
+          </h1>
+
+          <p className="mt-4 text-gray-400">
+            Les prochains contenus publiés dans cette rubrique
+            apparaîtront ici.
+          </p>
+        </div>
       </main>
     );
   }
@@ -55,10 +56,10 @@ export default function CategoryPage({
       {/* HERO DE LA RUBRIQUE */}
 
       <Link
-        href={`/article/${getArticleSlug(featured)}`}
+        href={`/article/${featured.slug}`}
         className="block"
       >
-        <section className="relative h-[60vh] overflow-hidden">
+        <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
           <Image
             src={featured.image}
             alt={featured.title}
@@ -70,38 +71,38 @@ export default function CategoryPage({
 
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
-          <div className="absolute bottom-10 left-8 max-w-3xl">
-            <p className="text-sm uppercase tracking-[0.25em] text-yellow-500">
-              {title}
-            </p>
+          <div className="absolute bottom-10 left-0 right-0">
+            <div className="mx-auto max-w-7xl px-8">
+              <div className="max-w-3xl">
+                <p className="text-sm uppercase tracking-[0.25em] text-yellow-500">
+                  {title}
+                </p>
 
-            <h1 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
-              {featured.title}
-            </h1>
+                <h1 className="mt-4 font-serif text-4xl leading-tight md:text-5xl">
+                  {featured.title}
+                </h1>
 
-            <p className="mt-4 max-w-2xl text-gray-200">
-              {featured.description}
-            </p>
+                <p className="mt-4 max-w-2xl text-gray-200">
+                  {featured.description}
+                </p>
 
-            <p className="mt-5 text-sm tracking-widest text-yellow-500">
-              LIRE L’ARTICLE →
-            </p>
+                <p className="mt-5 text-sm tracking-widest text-yellow-500">
+                  LIRE L’ARTICLE →
+                </p>
+              </div>
+            </div>
           </div>
         </section>
       </Link>
 
-      <section className="p-8">
-        {/* ZONE PRINCIPALE */}
-
+      <section className="mx-auto max-w-7xl px-8 py-10">
         <div className="grid gap-8 md:grid-cols-3">
-          {/* COLONNE GAUCHE */}
+          {/* COLONNE PRINCIPALE */}
 
           <div className="md:col-span-2">
-            {/* ARTICLE PRINCIPAL */}
-
             {mainArticle && (
               <Link
-                href={`/article/${getArticleSlug(mainArticle)}`}
+                href={`/article/${mainArticle.slug}`}
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
@@ -136,31 +137,27 @@ export default function CategoryPage({
               </Link>
             )}
 
-            {/* TROIS BRÈVES */}
+            {/* BRÈVES */}
 
             {briefs.length > 0 && (
               <div className="mt-8 grid gap-4 md:grid-cols-3">
-                {briefs.map((article) => {
-                  const articleSlug = getArticleSlug(article);
+                {briefs.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="block"
+                  >
+                    <article className="h-full rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <p className="text-xs uppercase tracking-widest text-yellow-500">
+                        {article.category}
+                      </p>
 
-                  return (
-                    <Link
-                      key={articleSlug}
-                      href={`/article/${articleSlug}`}
-                      className="block"
-                    >
-                      <article className="h-full rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                        <p className="text-xs uppercase tracking-widest text-yellow-500">
-                          {article.category}
-                        </p>
-
-                        <h3 className="mt-2 font-serif leading-snug">
-                          {article.title}
-                        </h3>
-                      </article>
-                    </Link>
-                  );
-                })}
+                      <h3 className="mt-2 font-serif leading-snug">
+                        {article.title}
+                      </h3>
+                    </article>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
@@ -168,52 +165,48 @@ export default function CategoryPage({
           {/* COLONNE DROITE */}
 
           <aside className="space-y-6">
-            {rightCards.map((article) => {
-              const articleSlug = getArticleSlug(article);
+            {rightCards.map((article) => (
+              <Link
+                key={article.id}
+                href={`/article/${article.slug}`}
+                className="block"
+              >
+                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-40">
+                    <Image
+                      src={article.image}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
 
-              return (
-                <Link
-                  key={articleSlug}
-                  href={`/article/${articleSlug}`}
-                  className="block"
-                >
-                  <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                    <div className="relative h-40">
-                      <Image
-                        src={article.image}
-                        alt={article.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
+                  <div className="p-4">
+                    <p className="text-xs uppercase tracking-widest text-yellow-500">
+                      {article.category}
+                    </p>
 
-                    <div className="p-4">
-                      <p className="text-xs uppercase tracking-widest text-yellow-500">
-                        {article.category}
-                      </p>
-
-                      <h3 className="mt-2 font-serif">
-                        {article.title}
-                      </h3>
-                    </div>
-                  </article>
-                </Link>
-              );
-            })}
+                    <h3 className="mt-2 font-serif">
+                      {article.title}
+                    </h3>
+                  </div>
+                </article>
+              </Link>
+            ))}
           </aside>
         </div>
 
-        {/* ARTICLE CENTRÉ EN BAS DE PAGE */}
+        {/* ARTICLE DE BAS DE PAGE */}
 
         {bottomCard && (
           <section className="mt-14">
             <div className="grid grid-cols-1 md:grid-cols-6">
               <Link
-                href={`/article/${getArticleSlug(bottomCard)}`}
+                href={`/article/${bottomCard.slug}`}
                 className="block md:col-span-4 md:col-start-2"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 bg-black transition hover:border-yellow-500">
+                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-72">
                     <Image
                       src={bottomCard.image}

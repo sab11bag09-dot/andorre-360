@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
 
-/* ========================= */
-/* OUTILS DE VALIDATION */
-/* ========================= */
+/* =========================================================
+   OUTILS
+========================================================= */
 
 function getRequiredString(
   formData: FormData,
@@ -71,14 +71,15 @@ async function createUniqueSlug(
   const baseSlug =
     slugify(title) || `contenu-${Date.now()}`;
 
-  const existingArticle = await prisma.article.findUnique({
-    where: {
-      slug: baseSlug,
-    },
-    select: {
-      id: true,
-    },
-  });
+  const existingArticle =
+    await prisma.article.findUnique({
+      where: {
+        slug: baseSlug,
+      },
+      select: {
+        id: true,
+      },
+    });
 
   if (!existingArticle) {
     return baseSlug;
@@ -87,9 +88,9 @@ async function createUniqueSlug(
   return `${baseSlug}-${Date.now()}`;
 }
 
-/* ========================= */
-/* ACTUALISATION DES PAGES */
-/* ========================= */
+/* =========================================================
+   REVALIDATION
+========================================================= */
 
 function revalidatePublicPages(slug?: string) {
   revalidatePath("/");
@@ -99,6 +100,7 @@ function revalidatePublicPages(slug?: string) {
   revalidatePath("/economie");
   revalidatePath("/societe");
   revalidatePath("/culture");
+  revalidatePath("/sports");
   revalidatePath("/montagne");
 
   if (slug) {
@@ -106,180 +108,235 @@ function revalidatePublicPages(slug?: string) {
   }
 }
 
-/* ========================= */
-/* CRÉER UN CONTENU */
-/* ========================= */
+/* =========================================================
+   CRÉATION
+========================================================= */
 
 export async function createArticle(
   formData: FormData
 ) {
   const title = getRequiredString(formData, "title");
+
   const category = getRequiredString(
     formData,
     "category"
   );
+
   const description = getRequiredString(
     formData,
     "description"
   );
+
   const content = getRequiredString(
     formData,
     "content"
   );
-  const image = getRequiredString(formData, "image");
+
+  const image = getRequiredString(
+    formData,
+    "image"
+  );
+
   const author = getRequiredString(
     formData,
     "author"
   );
 
   const contentType =
-    getOptionalString(formData, "contentType") ??
-    "article";
+    getOptionalString(
+      formData,
+      "contentType"
+    ) ?? "article";
 
   const readingTime =
-    getOptionalString(formData, "readingTime") ??
-    "1 min";
+    getOptionalString(
+      formData,
+      "readingTime"
+    ) ?? "1 min";
 
-  const videoUrl = getOptionalString(
-    formData,
-    "videoUrl"
-  );
+  const videoUrl =
+    getOptionalString(
+      formData,
+      "videoUrl"
+    );
 
-  const videoDuration = getOptionalString(
-    formData,
-    "videoDuration"
-  );
+  const videoDuration =
+    getOptionalString(
+      formData,
+      "videoDuration"
+    );
 
-  const socialText = getOptionalString(
-    formData,
-    "socialText"
-  );
+  const socialText =
+    getOptionalString(
+      formData,
+      "socialText"
+    );
 
   const featured =
     formData.get("featured") === "on";
-    const pageKey =
-  getOptionalString(formData, "pageKey") ?? "home";
 
-  /* MISSION ÉDITORIALE */
+  const pageKey =
+    getOptionalString(
+      formData,
+      "pageKey"
+    ) ?? "home";
 
   const channel =
-    getOptionalString(formData, "channel") ?? "site";
+    getOptionalString(
+      formData,
+      "channel"
+    ) ?? "site";
 
   const zone =
-    getOptionalString(formData, "zone") ??
-    "standard";
+    getOptionalString(
+      formData,
+      "zone"
+    ) ?? "standard";
 
   const priorityValue =
-    getOptionalString(formData, "priority") ?? "0";
+    getOptionalString(
+      formData,
+      "priority"
+    ) ?? "0";
 
-  const priority = Number(priorityValue) || 0;
+  const priority =
+    Number(priorityValue) || 0;
 
-  const startsAt = getOptionalDate(
-    formData,
-    "startsAt"
+  const startsAt =
+    getOptionalDate(
+      formData,
+      "startsAt"
+    );
+
+  const endsAt =
+    getOptionalDate(
+      formData,
+      "endsAt"
+    );
+
+  const slug =
+    await createUniqueSlug(title);
+
+  const createdArticle =
+    await prisma.$transaction(
+      async (transaction) => {
+        const article =
+          await transaction.article.create({
+            data: {
+              title,
+              slug,
+              category,
+              description,
+              content,
+              image,
+              author,
+              readingTime,
+              contentType,
+              videoUrl,
+              videoDuration,
+              socialText,
+              featured,
+              published: true,
+            },
+          });
+
+        await transaction.publication.create({
+          data: {
+            articleId: article.id,
+            channel,
+            pageKey,
+            zone,
+            priority,
+            startsAt,
+            endsAt,
+            active: true,
+          },
+        });
+
+        return article;
+      }
+    );
+
+  revalidatePublicPages(
+    createdArticle.slug
   );
 
-  const endsAt = getOptionalDate(
-    formData,
-    "endsAt"
+  redirect(
+    `/article/${createdArticle.slug}`
   );
-
-  const slug = await createUniqueSlug(title);
-
-  /* CRÉATION DU CONTENU ET DE SA DIFFUSION */
-
-  const createdArticle = await prisma.$transaction(
-    async (transaction) => {
-      const article = await transaction.article.create({
-        data: {
-          title,
-          slug,
-          category,
-          description,
-          content,
-          image,
-          author,
-          readingTime,
-          contentType,
-          videoUrl,
-          videoDuration,
-          socialText,
-          featured,
-          published: true,
-        },
-      });
-
-      await transaction.publication.create({
-        data: {
-          articleId: article.id,
-          channel,
-          zone,
-          priority,
-          startsAt,
-          endsAt,
-          active: true,
-          pageKey,
-        },
-      });
-
-      return article;
-    }
-  );
-
-  revalidatePublicPages(createdArticle.slug);
-
-  redirect(`/article/${createdArticle.slug}`);
 }
 
-/* ========================= */
-/* MODIFIER UN CONTENU */
-/* ========================= */
+/* =========================================================
+   MODIFICATION
+========================================================= */
 
 export async function updateArticle(
   articleId: number,
   formData: FormData
 ) {
-  const title = getRequiredString(formData, "title");
+  const title = getRequiredString(
+    formData,
+    "title"
+  );
+
   const category = getRequiredString(
     formData,
     "category"
   );
-  const description = getRequiredString(
-    formData,
-    "description"
-  );
-  const content = getRequiredString(
-    formData,
-    "content"
-  );
-  const image = getRequiredString(formData, "image");
-  const author = getRequiredString(
-    formData,
-    "author"
-  );
+
+  const description =
+    getRequiredString(
+      formData,
+      "description"
+    );
+
+  const content =
+    getRequiredString(
+      formData,
+      "content"
+    );
+
+  const image =
+    getRequiredString(
+      formData,
+      "image"
+    );
+
+  const author =
+    getRequiredString(
+      formData,
+      "author"
+    );
 
   const contentType =
-    getOptionalString(formData, "contentType") ??
-    "article";
+    getOptionalString(
+      formData,
+      "contentType"
+    ) ?? "article";
 
   const readingTime =
-    getOptionalString(formData, "readingTime") ??
-    "1 min";
+    getOptionalString(
+      formData,
+      "readingTime"
+    ) ?? "1 min";
 
-  const videoUrl = getOptionalString(
-    formData,
-    "videoUrl"
-  );
+  const videoUrl =
+    getOptionalString(
+      formData,
+      "videoUrl"
+    );
 
-  const videoDuration = getOptionalString(
-    formData,
-    "videoDuration"
-  );
+  const videoDuration =
+    getOptionalString(
+      formData,
+      "videoDuration"
+    );
 
-  const socialText = getOptionalString(
-    formData,
-    "socialText"
-  );
+  const socialText =
+    getOptionalString(
+      formData,
+      "socialText"
+    );
 
   const featured =
     formData.get("featured") === "on";
@@ -295,32 +352,42 @@ export async function updateArticle(
     });
 
   if (!existingArticle) {
-    throw new Error("Article introuvable.");
+    throw new Error(
+      "Article introuvable."
+    );
   }
 
-  const updatedArticle = await prisma.article.update({
-    where: {
-      id: articleId,
-    },
-    data: {
-      title,
-      category,
-      description,
-      content,
-      image,
-      author,
-      readingTime,
-      contentType,
-      videoUrl,
-      videoDuration,
-      socialText,
-      featured,
-      published,
-    },
-  });
+  const updatedArticle =
+    await prisma.article.update({
+      where: {
+        id: articleId,
+      },
+      data: {
+        title,
+        category,
+        description,
+        content,
+        image,
+        author,
+        readingTime,
+        contentType,
+        videoUrl,
+        videoDuration,
+        socialText,
+        featured,
+        published,
+      },
+    });
 
-  revalidatePublicPages(updatedArticle.slug);
-  revalidatePath(`/admin/articles/${articleId}`);
+  revalidatePublicPages(
+    updatedArticle.slug
+  );
 
-  redirect(`/article/${updatedArticle.slug}`);
+  revalidatePath(
+    `/admin/articles/${articleId}`
+  );
+
+  redirect(
+    `/article/${updatedArticle.slug}`
+  );
 }

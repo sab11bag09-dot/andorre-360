@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { prisma } from "@/lib/prisma";
-import MediaUploadButton from "@/components/admin/MediaUploadButton";
 import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
+import MediaMetadataForm from "@/components/admin/MediaMetadataForm";
+import MediaUploadButton from "@/components/admin/MediaUploadButton";
+import { prisma } from "@/lib/prisma";
 
 export default async function AdminMediaPage() {
   const media = await prisma.media.findMany({
@@ -15,7 +16,7 @@ export default async function AdminMediaPage() {
   return (
     <main className="min-h-screen bg-black px-6 py-10 text-white md:px-10">
       <div className="mx-auto max-w-7xl">
-        <div className="flex flex-col gap-6 border-b border-gray-800 pb-8 md:flex-row md:items-center md:justify-between">
+        <header className="flex flex-col gap-6 border-b border-gray-800 pb-8 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
               ANDORRE 360 Studio
@@ -36,14 +37,12 @@ export default async function AdminMediaPage() {
           >
             Retour au Studio
           </Link>
-        </div>
+        </header>
 
         <section className="py-8">
           <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="font-serif text-2xl">
-                Images
-              </h2>
+              <h2 className="font-serif text-2xl">Images</h2>
 
               <p className="mt-1 text-sm text-gray-500">
                 {media.length} média{media.length > 1 ? "s" : ""}
@@ -75,31 +74,40 @@ export default async function AdminMediaPage() {
                       src={item.path}
                       alt={item.alt || item.originalName}
                       fill
-                      sizes="(max-width:640px) 100vw, (max-width:1024px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-cover"
                     />
                   </div>
 
-                  <div className="space-y-3 p-4">
-                    <h3 className="truncate font-medium">
-                      {item.originalName}
-                    </h3>
+                  <div className="space-y-4 p-4">
+                    <div className="space-y-2">
+                      <h3 className="truncate font-medium">
+                        {item.originalName}
+                      </h3>
 
-                    <p className="truncate text-xs text-gray-500">
-                      {item.path}
-                    </p>
+                      <p
+                        className="truncate text-xs text-gray-500"
+                        title={item.path}
+                      >
+                        {item.path}
+                      </p>
 
-                    <div className="flex items-center justify-between text-xs text-gray-500">
-                      <span>
-                        {(item.size / 1024).toFixed(1)} Ko
-                      </span>
+                      <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
+                        <span>{(item.size / 1024).toFixed(1)} Ko</span>
 
-                      <span>
-                        {item.width && item.height
-                          ? `${item.width} × ${item.height}`
-                          : "Dimensions inconnues"}
-                      </span>
+                        <span className="text-right">
+                          {item.width && item.height
+                            ? `${item.width} × ${item.height}`
+                            : "Dimensions inconnues"}
+                        </span>
+                      </div>
                     </div>
+
+                    <MediaMetadataForm
+                      mediaId={item.id}
+                      initialAlt={item.alt}
+                      initialCaption={item.caption}
+                    />
 
                     <MediaDeleteButton
                       mediaId={item.id}

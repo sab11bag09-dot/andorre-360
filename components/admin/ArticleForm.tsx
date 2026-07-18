@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { createArticle } from "@/actions/articles";
+import MediaPicker from "@/components/admin/MediaPicker";
 
 const CONTENT_TYPES = [
   { value: "article", label: "Article" },
@@ -377,15 +378,17 @@ export default function ArticleForm() {
                 Image de couverture
               </label>
 
-              <input
-                id="image"
-                name="image"
-                value={image}
-                onChange={(event) => setImage(event.target.value)}
-                className={inputClassName}
-                placeholder="/images/articles/mon-image.jpg"
-                required
-              />
+             <input
+  id="image"
+  name="image"
+  type="hidden"
+  value={image}
+/>
+
+<MediaPicker
+  value={image}
+  onChange={setImage}
+/>
 
               <div className="mt-5 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
                 {image ? (
