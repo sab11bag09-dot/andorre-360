@@ -1,10 +1,5 @@
-import CategoryPageDB from "@/components/CategoryPageDB";
+import SocietePageV2 from "@/components/SocietePageV2";
 
 export default function SocietePage() {
-  return (
-    <CategoryPageDB
-      category="SOCIÉTÉ"
-      title="Société"
-    />
-  );
+  return <SocietePageV2 />;
 }

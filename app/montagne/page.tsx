@@ -1,10 +1,5 @@
-import CategoryPage from "@/components/CategoryPage";
+import MontagnePageV2 from "@/components/MontagnePageV2";
 
 export default function MontagnePage() {
-  return (
-    <CategoryPage
-      category="MONTAGNE"
-      title="Montagne"
-    />
-  );
+  return <MontagnePageV2 />;
 }

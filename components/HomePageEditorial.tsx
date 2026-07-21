@@ -75,10 +75,10 @@ export default async function HomePageEditorial() {
     availableArticles.shift() ??
     null;
 
-  const cards =
-    editorialLayout.card.length > 0
-      ? editorialLayout.card
-      : availableArticles.splice(0, 3);
+ const cards =
+  editorialLayout.card.length > 0
+    ? editorialLayout.card
+    : availableArticles.splice(0, 5);
 
   const editorial = editorialLayout.editorial;
 
@@ -174,7 +174,7 @@ export default async function HomePageEditorial() {
                     </h2>
                   </div>
 
-                  <div className="relative mt-7 aspect-[16/8] overflow-hidden">
+                  <div className="relative mt-7 h-[520px] overflow-hidden md:h-[620px]">
                     <Image
                       src={feature.image}
                       alt={feature.title}
@@ -265,15 +265,15 @@ export default async function HomePageEditorial() {
 
                       {/* Photo : deux colonnes à droite */}
 
-                      <div className="relative aspect-[16/10] overflow-hidden md:col-span-2">
-                        <Image
-                          src={grandFormat.image}
-                          alt={grandFormat.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 44vw"
-                          className="object-cover transition duration-500 group-hover:scale-[1.02]"
-                        />
-                      </div>
+                      <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
+  <Image
+    src={grandFormat.image}
+    alt={grandFormat.title}
+    fill
+    sizes="(max-width: 768px) 100vw, 44vw"
+    className="object-cover transition duration-500 group-hover:scale-[1.02]"
+  />
+</div>
                     </div>
                   </article>
                 </Link>
@@ -335,46 +335,60 @@ export default async function HomePageEditorial() {
 
             {/* CARTES ÉDITORIALES */}
 
-            <section>
-              <div className="mb-2 flex items-center justify-between">
-                <h2 className="font-serif text-2xl">
-                  Sélection
-                </h2>
+<section className="border-t-2 border-yellow-500 pt-5">
+  <div className="mb-4">
+  <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
+    La rédaction
+  </span>
 
-                <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
-                  La rédaction
-                </span>
-              </div>
+  <h2 className="mt-1 font-serif text-2xl">
+    Sélection
+  </h2>
+</div>
 
-              <div className="divide-y divide-gray-800">
-                {cards.slice(0, 3).map((article, index) => (
-                  <Link
-                    key={article.id}
-                    href={`/article/${article.slug}`}
-                    className="group grid grid-cols-[54px_1fr] gap-4 py-5"
-                  >
-                    <span className="font-serif text-4xl leading-none text-gray-700">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
+  <div className="divide-y divide-gray-800">
+    {cards.slice(0, 5).map((article, index) => (
+      <Link
+        key={article.id}
+        href={`/article/${article.slug}`}
+        className="group block py-6"
+      >
+        <article className="grid grid-cols-[110px_1fr] gap-4">
+          <div className="relative h-[110px] overflow-hidden">
+            <Image
+              src={article.image}
+              alt={article.title}
+              fill
+              sizes="110px"
+              className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            />
+          </div>
 
-                    <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                        {article.category}
-                      </p>
+          <div>
+            <div className="flex items-start gap-3">
+              <span className="font-serif text-2xl leading-none text-gray-700">
+                {String(index + 1).padStart(2, "0")}
+              </span>
 
-                      <h3 className="mt-2 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
-                        {article.title}
-                      </h3>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
+              <p className="pt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                {article.category}
+              </p>
+            </div>
+
+            <h3 className="mt-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+              {article.title}
+            </h3>
+          </div>
+        </article>
+      </Link>
+    ))}
+  </div>
+</section>
 
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="rounded-xl bg-zinc-900 p-6">
+              <section className="mt-12 rounded-xl bg-zinc-900 p-6">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>

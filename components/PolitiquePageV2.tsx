@@ -5,12 +5,13 @@ import { getArticlesByCategory } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
-export default async function ActualitePage() {
-  const items = await getArticlesByCategory("ACTUALITÉ");
+export default async function PolitiquePageV2() {
+  const items = await getArticlesByCategory("POLITIQUE");
 
   const featured = items[0];
   const mainArticle = items[1];
-  const rightCards = items.slice(2, 6);
+  const questionArticle = items[2];
+  const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
   const bottomCard = items[12];
   const secondBottomCard = items[13];
@@ -92,7 +93,7 @@ export default async function ActualitePage() {
               </Link>
             )}
 
-            {/* TROIS BRÈVES */}
+            {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
               <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -184,6 +185,47 @@ export default async function ActualitePage() {
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2">
+            {/* QUESTION À... */}
+
+            {questionArticle && (
+              <Link
+                href={`/article/${questionArticle.slug}`}
+                className="block"
+              >
+                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-40">
+                    <Image
+                      src={questionArticle.image}
+                      alt={questionArticle.title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                      Question à…
+                    </p>
+
+                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                      {questionArticle.title}
+                    </h2>
+
+                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                      {questionArticle.description}
+                    </p>
+
+                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      Lire l’entretien →
+                    </p>
+                  </div>
+                </article>
+              </Link>
+            )}
+
+            {/* TROIS CARTES CLASSIQUES */}
+
             {rightCards.map((article) => (
               <Link
                 key={article.id}

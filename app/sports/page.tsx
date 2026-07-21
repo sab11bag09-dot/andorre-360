@@ -1,10 +1,5 @@
-import CategoryPage from "@/components/CategoryPage";
+import SportsPageV2 from "@/components/SportsPageV2";
 
-export default function SportsPage() {
-  return (
-    <CategoryPage
-      category="SPORTS"
-      title="Sports"
-    />
-  );
+export default function SportslePage() {
+  return <SportsPageV2 />;
 }

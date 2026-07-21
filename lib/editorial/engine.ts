@@ -81,6 +81,14 @@ export async function buildEditorialLayout(pageKey: string) {
       getZone(EDITORIAL_ZONES.GRAND_FORMAT)[0]?.article ??
       null,
 
+    question:
+      getZone(EDITORIAL_ZONES.QUESTION)[0]?.article ??
+      null,
+
+    goodToKnow: getZone(
+      EDITORIAL_ZONES.GOOD_TO_KNOW
+    ).map((publication) => publication.article),
+
     editorial:
       getZone(EDITORIAL_ZONES.EDITORIAL)[0]?.article ??
       null,

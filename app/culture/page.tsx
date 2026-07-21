@@ -1,10 +1,5 @@
-import CategoryPage from "@/components/CategoryPage";
+import CulturePageV2 from "@/components/CulturePageV2";
 
 export default function CulturePage() {
-  return (
-    <CategoryPage
-      category="CULTURE"
-      title="Culture"
-    />
-  );
+  return <CulturePageV2 />;
 }

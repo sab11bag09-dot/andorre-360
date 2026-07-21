@@ -18,7 +18,7 @@ export async function getArticlesByCategory(category: string) {
       published: true,
     },
     orderBy: {
-      createdAt: "desc",
+      updatedAt: "desc",
     },
   });
 }

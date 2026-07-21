@@ -21,6 +21,10 @@ const CATEGORIES = [
   { value: "CULTURE", label: "Culture" },
   { value: "SPORTS", label: "Sports" },
   { value: "MONTAGNE", label: "Montagne" },
+  { value: "POLITIQUE", label: "Politique" },
+  { value: "IMMOBILIER", label: "Immobilier" },
+  { value: "LIFESTYLE", label: "Lifestyle" },
+  { value: "INTERNATIONAL", label: "International" },
   { value: "ÉDITORIAL", label: "Éditorial" },
 ] as const;
 
@@ -33,6 +37,10 @@ const EDITORIAL_PAGES = [
   { value: "category:SPORTS", label: "Rubrique Sports" },
   { value: "category:MONTAGNE", label: "Rubrique Montagne" },
   { value: "category:ÉDITORIAL", label: "Rubrique Éditorial" },
+    { value: "category:POLITIQUE", label: "Rubrique Politique" },
+  { value: "category:IMMOBILIER", label: "Rubrique Immobilier" },
+  { value: "category:LIFESTYLE", label: "Rubrique Lifestyle" },
+  { value: "category:INTERNATIONAL", label: "Rubrique International" },
 ] as const;
 
 const CHANNELS = [

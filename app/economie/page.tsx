@@ -1,10 +1,5 @@
-import CategoryPageDB from "@/components/CategoryPageDB";
+import EconomiePageV2 from "@/components/EconomiePageV2";
 
 export default function EconomiePage() {
-  return (
-    <CategoryPageDB
-      category="ÉCONOMIE"
-      title="Économie"
-    />
-  );
+  return <EconomiePageV2 />;
 }

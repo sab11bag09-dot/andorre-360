@@ -17,17 +17,54 @@ export default function Navbar() {
         </Link>
 
         <div className="mt-6 flex flex-wrap gap-6 text-sm tracking-widest md:mt-0">
-          <Link href="/actualite">ACTUALITÉ</Link>
+          <Link
+            href="/actualite"
+            className="transition-colors hover:text-yellow-500"
+          >
+            ACTUALITÉ
+          </Link>
 
-          <Link href="/economie">ÉCONOMIE</Link>
+          <Link
+            href="/fil-info"
+            className="transition-colors hover:text-yellow-500"
+          >
+            FIL INFO
+          </Link>
 
-          <Link href="/societe">SOCIÉTÉ</Link>
+          <Link
+            href="/economie"
+            className="transition-colors hover:text-yellow-500"
+          >
+            ÉCONOMIE
+          </Link>
 
-          <Link href="/culture">CULTURE</Link>
+          <Link
+            href="/societe"
+            className="transition-colors hover:text-yellow-500"
+          >
+            SOCIÉTÉ
+          </Link>
 
-          <Link href="/sports">SPORTS</Link>
+          <Link
+            href="/culture"
+            className="transition-colors hover:text-yellow-500"
+          >
+            CULTURE
+          </Link>
 
-          <Link href="/montagne">MONTAGNE</Link>
+          <Link
+            href="/sports"
+            className="transition-colors hover:text-yellow-500"
+          >
+            SPORTS
+          </Link>
+
+          <Link
+            href="/montagne"
+            className="transition-colors hover:text-yellow-500"
+          >
+            MONTAGNE
+          </Link>
         </div>
       </div>
     </nav>

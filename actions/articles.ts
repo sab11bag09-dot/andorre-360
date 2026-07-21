@@ -6,6 +6,12 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 /* =========================================================
+   TYPES
+========================================================= */
+
+type SubmissionIntent = "draft" | "publish";
+
+/* =========================================================
    OUTILS
 ========================================================= */
 
@@ -54,6 +60,14 @@ function getOptionalDate(
   }
 
   return date;
+}
+
+function getSubmissionIntent(
+  formData: FormData
+): SubmissionIntent {
+  const value = formData.get("submissionIntent");
+
+  return value === "draft" ? "draft" : "publish";
 }
 
 function slugify(text: string): string {
@@ -115,7 +129,16 @@ function revalidatePublicPages(slug?: string) {
 export async function createArticle(
   formData: FormData
 ) {
-  const title = getRequiredString(formData, "title");
+  const submissionIntent =
+    getSubmissionIntent(formData);
+
+  const shouldPublish =
+    submissionIntent === "publish";
+
+  const title = getRequiredString(
+    formData,
+    "title"
+  );
 
   const category = getRequiredString(
     formData,
@@ -236,33 +259,47 @@ export async function createArticle(
               videoDuration,
               socialText,
               featured,
-              published: true,
+              published: shouldPublish,
             },
           });
 
-        await transaction.publication.create({
-          data: {
-            articleId: article.id,
-            channel,
-            pageKey,
-            zone,
-            priority,
-            startsAt,
-            endsAt,
-            active: true,
-          },
-        });
+        if (shouldPublish) {
+          await transaction.publication.create({
+            data: {
+              articleId: article.id,
+              channel,
+              pageKey,
+              zone,
+              priority,
+              startsAt,
+              endsAt,
+              active: true,
+            },
+          });
+        }
 
         return article;
       }
     );
 
   revalidatePublicPages(
-    createdArticle.slug
+    shouldPublish
+      ? createdArticle.slug
+      : undefined
   );
 
+  revalidatePath(
+    `/admin/articles/${createdArticle.id}`
+  );
+
+  if (shouldPublish) {
+    redirect(
+      `/article/${createdArticle.slug}`
+    );
+  }
+
   redirect(
-    `/article/${createdArticle.slug}`
+    `/admin/articles/${createdArticle.id}`
   );
 }
 
@@ -387,7 +424,13 @@ export async function updateArticle(
     `/admin/articles/${articleId}`
   );
 
+if (updatedArticle.published) {
   redirect(
     `/article/${updatedArticle.slug}`
   );
+}
+
+redirect(
+  `/admin/articles/${updatedArticle.id}`
+);
 }

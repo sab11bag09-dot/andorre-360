@@ -240,7 +240,7 @@ export default async function DiffusionPage() {
                       {formatDate(publication.startsAt)}
                     </div>
 
-                    <div>
+                    <div>c
                       <span className="text-gray-500">
                         Fin :
                       </span>{" "}

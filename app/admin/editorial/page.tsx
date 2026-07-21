@@ -74,27 +74,35 @@ export default async function EditorialPage() {
    * les emplacements encore vides.
    */
 
-  const usedArticleIds = new Set<number>();
+    const usedArticleIds = new Set<number>();
 
   if (editorialLayout.hero) {
     usedArticleIds.add(editorialLayout.hero.id);
   }
 
- if (editorialLayout.feature) {
-  usedArticleIds.add(editorialLayout.feature.id);
-}
+  if (editorialLayout.feature) {
+    usedArticleIds.add(editorialLayout.feature.id);
+  }
 
- editorialLayout.secondary.forEach((article) => {
-  usedArticleIds.add(article.id);
-});
+  editorialLayout.secondary.forEach((article) => {
+    usedArticleIds.add(article.id);
+  });
 
   editorialLayout.briefs.forEach((article) => {
     usedArticleIds.add(article.id);
   });
 
   if (editorialLayout.grandFormat) {
-  usedArticleIds.add(editorialLayout.grandFormat.id);
-}
+    usedArticleIds.add(editorialLayout.grandFormat.id);
+  }
+
+  if (editorialLayout.question) {
+    usedArticleIds.add(editorialLayout.question.id);
+  }
+
+  editorialLayout.goodToKnow.forEach((article) => {
+    usedArticleIds.add(article.id);
+  });
 
   const availableArticles = publishedArticles.filter(
     (article) => !usedArticleIds.has(article.id)
@@ -106,23 +114,40 @@ export default async function EditorialPage() {
     null;
 
   const feature =
-  editorialLayout.feature ??
-  availableArticles.shift() ??
-  null;
-    
+    editorialLayout.feature ??
+    availableArticles.shift() ??
+    null;
+
+  const question =
+    editorialLayout.question ??
+    availableArticles.shift() ??
+    null;
 
   const secondary = [...editorialLayout.secondary];
 
- while (
-  secondary.length < 3 &&
-  availableArticles.length > 0
-) {
-  const article = availableArticles.shift();
+  while (
+    secondary.length < 2 &&
+    availableArticles.length > 0
+  ) {
+    const article = availableArticles.shift();
 
-  if (article) {
-    secondary.push(article);
+    if (article) {
+      secondary.push(article);
+    }
   }
-}
+
+  const goodToKnow = [...editorialLayout.goodToKnow];
+
+  while (
+    goodToKnow.length < 3 &&
+    availableArticles.length > 0
+  ) {
+    const article = availableArticles.shift();
+
+    if (article) {
+      goodToKnow.push(article);
+    }
+  }
 
   const briefs = [...editorialLayout.briefs];
 
@@ -138,9 +163,9 @@ export default async function EditorialPage() {
   }
 
   const bottom =
-  editorialLayout.grandFormat ??
-  availableArticles[availableArticles.length - 1] ??
-  null;
+    editorialLayout.grandFormat ??
+    availableArticles.shift() ??
+    null;
 
   /*
    * Indicateurs du Centre éditorial.
@@ -503,28 +528,69 @@ export default async function EditorialPage() {
 
                 <div className="mt-1 flex items-center justify-between">
                   <h3 className="font-serif text-2xl">
-                    Colonne de droite
-                  </h3>
-
-                  <span className="text-sm text-gray-500">
-                    {secondary.filter(Boolean).length}
-                  </span>
+  Zones éditoriales
+</h3>
                 </div>
               </div>
 
-              <div className="mt-6 space-y-5">
-                {[0, 1, 2].map((index) => (
-                  <EditorialSlot
-                    key={`column-${index}`}
-                    title={`Carte ${index + 1}`}
-                    article={secondary[index] ?? null}
-                    editionKey="home"
-                    zone="secondary"
-                    compact
-                    articles={publishedArticles}
-                  />
-                ))}
-              </div>
+              <div className="mt-6 space-y-8">
+
+  <div>
+    <h4 className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-yellow-700">
+      🎙 Question à…
+    </h4>
+
+    <EditorialSlot
+      title="Question à…"
+      article={question}
+      editionKey="home"
+      zone="question"
+      compact
+      articles={publishedArticles}
+    />
+  </div>
+
+  <div>
+    <h4 className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-yellow-700">
+      ⭐ Sélection
+    </h4>
+
+    <div className="space-y-4">
+      {[0, 1].map((index) => (
+        <EditorialSlot
+          key={`selection-${index}`}
+          title={`Sélection ${index + 1}`}
+          article={secondary[index] ?? null}
+          editionKey="home"
+          zone="secondary"
+          compact
+          articles={publishedArticles}
+        />
+      ))}
+    </div>
+  </div>
+
+  <div>
+    <h4 className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-yellow-700">
+      💡 Bon à savoir
+    </h4>
+
+    <div className="space-y-4">
+      {[0, 1, 2].map((index) => (
+        <EditorialSlot
+          key={`gtk-${index}`}
+          title={`Bon à savoir ${index + 1}`}
+          article={goodToKnow[index] ?? null}
+          editionKey="home"
+          zone="good-to-know"
+          compact
+          articles={publishedArticles}
+        />
+      ))}
+    </div>
+  </div>
+
+</div>
             </section>
 
             {/* ACTIVITÉ SOCIALE */}
