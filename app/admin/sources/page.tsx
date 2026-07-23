@@ -1,13 +1,14 @@
+import { toggleSource } from "@/app/admin/sources/actions";
 import {
   Badge,
   Button,
+  DataTable,
+  DataTableRow,
   EmptyState,
   PageHeader,
   SectionHeader,
   StatCard,
 } from "@/components/admin/ui";
-
-import { toggleSource } from "@/app/admin/sources/actions";
 import { prisma } from "@/lib/prisma";
 import {
   COLLECTION_MODES,
@@ -15,6 +16,9 @@ import {
   ORGANIZATION_TYPES,
   PUBLICATION_MODES,
 } from "@/lib/sources/constants";
+
+const SOURCE_GRID_TEMPLATE =
+  "minmax(0, 2fr) 150px 140px 140px 110px 180px";
 
 function formatDate(date: Date | null) {
   if (!date) {
@@ -95,6 +99,7 @@ export default async function AdminSourcesPage({
   });
 
   const totalCount = await prisma.source.count();
+
   const activeCount = await prisma.source.count({
     where: {
       active: true,
@@ -111,34 +116,28 @@ export default async function AdminSourcesPage({
     <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-6 md:px-10 md:py-10">
       <div className="mx-auto max-w-7xl">
         <PageHeader
-  backHref="/admin"
-  backLabel="Retour au tableau de bord"
-  eyebrow="ANDORRE 360 Studio"
-  title="Sources"
-  description="Gère les organismes et les flux qui alimenteront la Veille et le Fil Info."
-  actions={
-    <Button href="/admin/sources/nouveau">
-      Ajouter une source
-    </Button>
-  }
-/>
+          backHref="/admin"
+          backLabel="Retour au tableau de bord"
+          eyebrow="ANDORRE 360 Studio"
+          title="Sources"
+          description="Gère les organismes et les flux qui alimenteront la Veille et le Fil Info."
+          actions={
+            <Button href="/admin/sources/nouveau">
+              Ajouter une source
+            </Button>
+          }
+        />
 
         <section className="grid gap-4 py-8 sm:grid-cols-3">
-  <StatCard
-  title="Sources"
-  value={totalCount}
-/>
+          <StatCard title="Sources" value={totalCount} />
 
-<StatCard
-  title="Actives"
-  value={activeCount}
-/>
+          <StatCard title="Actives" value={activeCount} />
 
-<StatCard
-  title="Publication automatique"
-  value={autoCount}
-/>
-</section>
+          <StatCard
+            title="Publication automatique"
+            value={autoCount}
+          />
+        </section>
 
         <section className="border-t border-zinc-800 py-8">
           <form className="grid gap-4 rounded-xl border border-zinc-800 bg-zinc-950 p-5 md:grid-cols-4">
@@ -167,7 +166,10 @@ export default async function AdminSourcesPage({
               <option value="all">Toutes les collectes</option>
 
               {COLLECTION_MODES.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
@@ -184,137 +186,156 @@ export default async function AdminSourcesPage({
                 </option>
 
                 {PUBLICATION_MODES.map((option) => (
-                  <option key={option.value} value={option.value}>
+                  <option
+                    key={option.value}
+                    value={option.value}
+                  >
                     {option.label}
                   </option>
                 ))}
               </select>
 
-              <Button
-  type="submit"
-  variant="secondary"
->
-  Filtrer
-</Button>
+              <Button type="submit" variant="secondary">
+                Filtrer
+              </Button>
             </div>
           </form>
         </section>
-<SectionHeader
-  title="Sources enregistrées"
-  description={`${sources.length} résultat${sources.length > 1 ? "s" : ""}`}
-/>
+
+        <SectionHeader
+          title="Sources enregistrées"
+          description={`${sources.length} résultat${
+            sources.length > 1 ? "s" : ""
+          }`}
+        />
 
         <section>
           {sources.length === 0 ? (
             <EmptyState
-  title="Aucune source"
-  description="Ajoute la première source que la Veille devra surveiller."
-  action={
-    <Button href="/admin/sources/nouveau">
-      Ajouter une source
-    </Button>
-  }
-/>
+              title="Aucune source"
+              description="Ajoute la première source que la Veille devra surveiller."
+              action={
+                <Button href="/admin/sources/nouveau">
+                  Ajouter une source
+                </Button>
+              }
+            />
           ) : (
-            <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
-              <div className="hidden grid-cols-[minmax(0,2fr)_150px_140px_140px_110px_180px] gap-4 border-b border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 xl:grid">
-                <span>Source</span>
-                <span>Organisation</span>
-                <span>Collecte</span>
-                <span>Publication</span>
-                <span>Statut</span>
-                <span className="text-right">Actions</span>
-              </div>
+            <DataTable
+              columns={[
+                {
+                  key: "source",
+                  label: "Source",
+                },
+                {
+                  key: "organization",
+                  label: "Organisation",
+                },
+                {
+                  key: "collection",
+                  label: "Collecte",
+                },
+                {
+                  key: "publication",
+                  label: "Publication",
+                },
+                {
+                  key: "status",
+                  label: "Statut",
+                },
+                {
+                  key: "actions",
+                  label: "Actions",
+                  align: "right",
+                },
+              ]}
+              gridTemplateColumns={SOURCE_GRID_TEMPLATE}
+            >
+              {sources.map((source) => {
+                const toggleAction = toggleSource.bind(
+                  null,
+                  source.id,
+                );
 
-              <div className="divide-y divide-zinc-800">
-                {sources.map((source) => {
-                  const toggleAction = toggleSource.bind(
-                    null,
-                    source.id,
-                  );
+                return (
+                  <DataTableRow
+                    key={source.id}
+                    className="py-5 transition hover:bg-zinc-900/70"
+                  >
+                    <div className="min-w-0">
+                      <h2 className="font-medium text-white">
+                        {source.name}
+                      </h2>
 
-                  return (
-                    <article
-                      key={source.id}
-                      className="grid gap-5 px-5 py-5 transition hover:bg-zinc-900/70 xl:grid-cols-[minmax(0,2fr)_150px_140px_140px_110px_180px] xl:items-center"
-                    >
-                      <div className="min-w-0">
-                        <h2 className="font-medium text-white">
-                          {source.name}
-                        </h2>
+                      <a
+                        href={source.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 block truncate text-xs text-zinc-600 transition hover:text-yellow-500"
+                      >
+                        {source.url}
+                      </a>
 
-                        <a
-                          href={source.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="mt-1 block truncate text-xs text-zinc-600 transition hover:text-yellow-500"
-                        >
-                          {source.url}
-                        </a>
-
-                        <p className="mt-2 text-xs text-zinc-600">
-                          Dernier contrôle :{" "}
-                          {formatDate(source.lastCheckedAt)}
-                        </p>
-                      </div>
-
-                      <p className="text-sm text-zinc-300">
-                        {getOptionLabel(
-                          ORGANIZATION_TYPES,
-                          source.organizationType,
-                        )}
+                      <p className="mt-2 text-xs text-zinc-600">
+                        Dernier contrôle :{" "}
+                        {formatDate(source.lastCheckedAt)}
                       </p>
+                    </div>
 
-                      <p className="text-sm text-zinc-400">
-                        {getOptionLabel(
-                          COLLECTION_MODES,
-                          source.collectionMode,
-                        )}
-                      </p>
+                    <p className="text-sm text-zinc-300">
+                      {getOptionLabel(
+                        ORGANIZATION_TYPES,
+                        source.organizationType,
+                      )}
+                    </p>
 
-                      <p className="text-sm text-zinc-400">
-                        {getOptionLabel(
-                          PUBLICATION_MODES,
-                          source.publicationMode,
-                        )}
-                      </p>
+                    <p className="text-sm text-zinc-400">
+                      {getOptionLabel(
+                        COLLECTION_MODES,
+                        source.collectionMode,
+                      )}
+                    </p>
 
-                      <div>
-  {source.active ? (
-    <Badge variant="success">
-      Active
-    </Badge>
-  ) : (
-    <Badge>
-  Inactive
-</Badge>
-  )}
-</div>
+                    <p className="text-sm text-zinc-400">
+                      {getOptionLabel(
+                        PUBLICATION_MODES,
+                        source.publicationMode,
+                      )}
+                    </p>
 
-                      <div className="flex flex-wrap gap-2 xl:justify-end">
+                    <div>
+                      {source.active ? (
+                        <Badge variant="success">
+                          Active
+                        </Badge>
+                      ) : (
+                        <Badge>Inactive</Badge>
+                      )}
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 xl:justify-end">
+                      <Button
+                        href={`/admin/sources/${source.id}`}
+                        variant="outline"
+                      >
+                        Modifier
+                      </Button>
+
+                      <form action={toggleAction}>
                         <Button
-  href={`/admin/sources/${source.id}`}
-  variant="outline"
->
-  Modifier
-</Button>
-
-                        <form action={toggleAction}>
-  <Button
-    type="submit"
-    variant="outline"
-  >
-    {source.active
-      ? "Désactiver"
-      : "Activer"}
-  </Button>
-</form>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
+                          type="submit"
+                          variant="outline"
+                        >
+                          {source.active
+                            ? "Désactiver"
+                            : "Activer"}
+                        </Button>
+                      </form>
+                    </div>
+                  </DataTableRow>
+                );
+              })}
+            </DataTable>
           )}
         </section>
       </div>

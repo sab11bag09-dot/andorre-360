@@ -1,6 +1,9 @@
 import {
   Button,
+  Input,
   SectionHeader,
+  Select,
+  Textarea,
 } from "@/components/admin/ui";
 
 import {
@@ -30,9 +33,6 @@ type SourceFormProps = {
   initialValues?: SourceFormValues;
 };
 
-const inputClassName =
-  "mt-2 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-700 focus:border-yellow-500";
-
 export default function SourceForm({
   action,
   mode,
@@ -43,64 +43,62 @@ export default function SourceForm({
       <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
         <SectionHeader title="Informations générales" />
 
-<div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <label className="text-sm font-medium text-zinc-300">
             Nom
-            <input
+            <Input
               name="name"
               required
               defaultValue={initialValues.name ?? ""}
-              className={inputClassName}
               placeholder="Gouvernement d’Andorre"
             />
           </label>
 
           <label className="text-sm font-medium text-zinc-300">
             URL
-            <input
+            <Input
               name="url"
               type="url"
               required
               defaultValue={initialValues.url ?? ""}
-              className={inputClassName}
               placeholder="https://www.govern.ad"
             />
           </label>
 
           <label className="text-sm font-medium text-zinc-300 md:col-span-2">
             Description
-            <textarea
+            <Textarea
               name="description"
               rows={4}
               defaultValue={initialValues.description ?? ""}
-              className={inputClassName}
               placeholder="Description facultative de la source."
             />
           </label>
 
           <label className="text-sm font-medium text-zinc-300">
             Type d’organisation
-            <select
+            <Select
               name="organizationType"
               defaultValue={
                 initialValues.organizationType ?? "OTHER"
               }
-              className={inputClassName}
             >
               {ORGANIZATION_TYPES.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
           <label className="text-sm font-medium text-zinc-300">
             Catégorie éditoriale
-            <input
+            <Input
               name="category"
               defaultValue={initialValues.category ?? ""}
-              className={inputClassName}
               placeholder="Politique, montagne, circulation…"
             />
           </label>
@@ -110,69 +108,81 @@ export default function SourceForm({
       <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
         <SectionHeader title="Collecte et publication" />
 
-<div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2">
           <label className="text-sm font-medium text-zinc-300">
             Mode de collecte
-            <select
+            <Select
               name="collectionMode"
-              defaultValue={initialValues.collectionMode ?? "RSS"}
-              className={inputClassName}
+              defaultValue={
+                initialValues.collectionMode ?? "RSS"
+              }
             >
               {COLLECTION_MODES.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
           <label className="text-sm font-medium text-zinc-300">
             Fréquence de contrôle
-            <select
+            <Select
               name="checkIntervalMinutes"
               defaultValue={
                 initialValues.checkIntervalMinutes ?? 15
               }
-              className={inputClassName}
             >
               {CHECK_INTERVALS.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
           <label className="text-sm font-medium text-zinc-300">
             Mode de publication
-            <select
+            <Select
               name="publicationMode"
               defaultValue={
                 initialValues.publicationMode ?? "MANUAL"
               }
-              className={inputClassName}
             >
               {PUBLICATION_MODES.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
 
           <label className="text-sm font-medium text-zinc-300">
             Niveau de confiance
-            <select
+            <Select
               name="trustLevel"
-              defaultValue={initialValues.trustLevel ?? "HIGH"}
-              className={inputClassName}
+              defaultValue={
+                initialValues.trustLevel ?? "HIGH"
+              }
             >
               {TRUST_LEVELS.map((option) => (
-                <option key={option.value} value={option.value}>
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         </div>
 
@@ -183,24 +193,25 @@ export default function SourceForm({
             defaultChecked={initialValues.active ?? true}
             className="h-4 w-4 accent-yellow-500"
           />
+
           Source active
         </label>
       </section>
 
       <div className="flex flex-col-reverse gap-3 border-t border-zinc-800 pt-6 sm:flex-row sm:justify-end">
-  <Button
-    href="/admin/sources"
-    variant="outline"
-  >
-    Annuler
-  </Button>
+        <Button
+          href="/admin/sources"
+          variant="outline"
+        >
+          Annuler
+        </Button>
 
-  <Button type="submit">
-    {mode === "create"
-      ? "Créer la source"
-      : "Enregistrer les modifications"}
-  </Button>
-</div>
+        <Button type="submit">
+          {mode === "create"
+            ? "Créer la source"
+            : "Enregistrer les modifications"}
+        </Button>
+      </div>
     </form>
   );
 }

@@ -1,6 +1,10 @@
 "use client";
 
 import MediaPicker from "@/components/admin/MediaPicker";
+import {
+  Input,
+  SectionHeader,
+} from "@/components/admin/ui";
 
 type Props = {
   image: string;
@@ -24,20 +28,12 @@ export default function ArticleMedia({
   videoDuration,
   setVideoDuration,
 }: Props) {
-  const inputClassName =
-    "w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/10";
-
   return (
     <section className="space-y-7 rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
-      <div className="border-b border-zinc-800 pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-          Médias
-        </p>
-
-        <h2 className="mt-2 font-serif text-2xl text-white">
-          Image et vidéo
-        </h2>
-      </div>
+      <SectionHeader
+        eyebrow="Médias"
+        title="Image et vidéo"
+      />
 
       <div>
         <label
@@ -84,13 +80,15 @@ export default function ArticleMedia({
               URL de la vidéo
             </label>
 
-            <input
+            <Input
               id="videoUrl"
               name="videoUrl"
               type="url"
               value={videoUrl}
-              onChange={(event) => setVideoUrl(event.target.value)}
-              className={inputClassName}
+              onChange={(event) =>
+                setVideoUrl(event.target.value)
+              }
+              className="mt-0"
               placeholder="https://www.youtube.com/watch?v=..."
             />
           </div>
@@ -103,12 +101,14 @@ export default function ArticleMedia({
               Durée
             </label>
 
-            <input
+            <Input
               id="videoDuration"
               name="videoDuration"
               value={videoDuration}
-              onChange={(event) => setVideoDuration(event.target.value)}
-              className={inputClassName}
+              onChange={(event) =>
+                setVideoDuration(event.target.value)
+              }
+              className="mt-0"
               placeholder="Exemple : 3 min 45"
             />
           </div>

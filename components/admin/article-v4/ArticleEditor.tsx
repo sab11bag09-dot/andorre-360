@@ -9,12 +9,18 @@ import ArticleMedia from "@/components/admin/article/ArticleMedia";
 import ArticleSidebar from "@/components/admin/article/ArticleSidebar";
 
 import { submitArticle } from "./submitArticle";
+import {
+  Button,
+  PageHeader,
+  Select,
+} from "@/components/admin/ui";
 
 import {
   type ArticleContentType,
   type ArticleDraft,
   type ArticleEditorMode,
   type ArticleSubmissionIntent,
+  
   EDITORIAL_ZONES,
   calculateArticleReadingTime,
   calculateArticleWordCount,
@@ -192,56 +198,37 @@ export default function ArticleEditor({
       ? "Préparez un nouveau contenu éditorial."
       : "Mettez à jour le contenu et sa diffusion.";
 
-  const inputClassName =
-    "w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none transition focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/10";
-
-  const secondaryButtonClassName =
-    "rounded-xl border border-zinc-700 bg-zinc-900 px-5 py-3 font-semibold text-white transition hover:border-zinc-500 hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50";
-
-  const primaryButtonClassName =
-    "rounded-xl bg-yellow-500 px-5 py-3 font-semibold text-zinc-950 transition hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-50";
-
   return (
     <div className="mx-auto max-w-[1600px]">
-      <header className="mb-8 flex flex-col gap-6 border-b border-zinc-800 pb-8 xl:flex-row xl:items-end xl:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-yellow-500">
-            ANDORRE 360 Studio
-          </p>
+      <PageHeader
+  eyebrow="ANDORRE 360 Studio"
+  title={pageTitle}
+  description={pageDescription}
+  actions={
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => handleIntent("draft")}
+        disabled={isSaving}
+      >
+        {isSaving && activeIntent === "draft"
+          ? "Enregistrement…"
+          : "Enregistrer"}
+      </Button>
 
-          <h1 className="mt-3 font-serif text-4xl text-white md:text-5xl">
-            {pageTitle}
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-zinc-400">
-            {pageDescription}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => handleIntent("draft")}
-            disabled={isSaving}
-            className={secondaryButtonClassName}
-          >
-            {isSaving && activeIntent === "draft"
-              ? "Enregistrement…"
-              : "Enregistrer"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleIntent("publish")}
-            disabled={isSaving}
-            className={primaryButtonClassName}
-          >
-            {isSaving && activeIntent === "publish"
-              ? "Publication…"
-              : "Publier"}
-          </button>
-        </div>
-      </header>
+      <Button
+        type="button"
+        onClick={() => handleIntent("publish")}
+        disabled={isSaving}
+      >
+        {isSaving && activeIntent === "publish"
+          ? "Publication…"
+          : "Publier"}
+      </Button>
+    </>
+  }
+/>
 
       {errorMessage && (
         <div
@@ -277,28 +264,27 @@ export default function ArticleEditor({
                 Format éditorial
               </label>
 
-              <select
-                id="contentType"
-                value={draft.contentType}
-                onChange={(event) =>
-                  updateField(
-                    "contentType",
-                    event.target
-                      .value as ArticleContentType
-                  )
-                }
-                disabled={isSaving}
-                className={inputClassName}
-              >
-                {CONTENT_TYPES.map((contentType) => (
-                  <option
-                    key={contentType.value}
-                    value={contentType.value}
-                  >
-                    {contentType.label}
-                  </option>
-                ))}
-              </select>
+             <Select
+  id="contentType"
+  value={draft.contentType}
+  onChange={(event) =>
+    updateField(
+      "contentType",
+      event.target.value as ArticleContentType
+    )
+  }
+  disabled={isSaving}
+  className="mt-0"
+>
+  {CONTENT_TYPES.map((contentType) => (
+    <option
+      key={contentType.value}
+      value={contentType.value}
+    >
+      {contentType.label}
+    </option>
+  ))}
+</Select>
             </div>
           </section>
 

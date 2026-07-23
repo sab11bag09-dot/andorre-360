@@ -1,5 +1,7 @@
 "use client";
 
+import { SectionHeader } from "@/components/admin/ui";
+
 type Props = {
   contentType: string;
   slug: string;
@@ -22,23 +24,19 @@ export default function ArticleSidebar({
   featured,
   setFeatured,
 }: Props) {
-  const sectionClassName =
-    "rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm";
-
   return (
     <>
-      <section className={sectionClassName}>
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-          Informations
-        </p>
-
-        <h2 className="mt-2 font-serif text-xl text-white">
-          Aperçu technique
-        </h2>
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
+        <SectionHeader
+          eyebrow="Informations"
+          title="Aperçu technique"
+        />
 
         <dl className="mt-6 divide-y divide-zinc-800">
           <div className="flex justify-between gap-4 py-4 first:pt-0">
-            <dt className="text-sm text-zinc-500">Type</dt>
+            <dt className="text-sm text-zinc-500">
+              Type
+            </dt>
 
             <dd className="text-right text-sm font-semibold capitalize text-white">
               {contentType}
@@ -46,7 +44,9 @@ export default function ArticleSidebar({
           </div>
 
           <div className="py-4">
-            <dt className="text-sm text-zinc-500">Slug</dt>
+            <dt className="text-sm text-zinc-500">
+              Slug
+            </dt>
 
             <dd className="mt-2 break-words text-sm font-semibold text-white">
               {slug || "—"}
@@ -95,10 +95,11 @@ export default function ArticleSidebar({
         </dl>
       </section>
 
-      <section className={sectionClassName}>
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-zinc-500">
-          Compatibilité
-        </p>
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
+        <SectionHeader
+  eyebrow="Compatibilité"
+  title="Options héritées"
+/>
 
         <label className="mt-4 flex items-start gap-3">
           <input

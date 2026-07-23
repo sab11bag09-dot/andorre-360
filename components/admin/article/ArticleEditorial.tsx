@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  Input,
+  SectionHeader,
+  Select,
+} from "@/components/admin/ui";
+
+import {
   CHANNELS,
   EDITORIAL_PAGES,
   EDITORIAL_ZONES,
@@ -40,45 +46,39 @@ export default function ArticleEditorial({
   endsAt,
   setEndsAt,
 }: Props) {
-  const inputClassName =
-    "w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-white outline-none transition placeholder:text-zinc-600 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/10";
-
   const selectedZone = EDITORIAL_ZONES.find(
     (editorialZone) => editorialZone.value === zone
   );
 
   return (
     <section className="space-y-6 rounded-2xl border-2 border-yellow-500 bg-zinc-900 p-6 shadow-sm">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-          Mission éditoriale
-        </p>
-
-        <h2 className="mt-2 font-serif text-2xl text-white">
-          Mise en avant
-        </h2>
-
-        <p className="mt-2 text-sm text-zinc-400">
-          Choisissez la page, la place et la durée de diffusion.
-        </p>
-      </div>
+      <SectionHeader
+        eyebrow="Mission éditoriale"
+        title="Mise en avant"
+        description="Choisissez la page, la place et la durée de diffusion."
+      />
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-zinc-200">
           Page concernée
         </label>
 
-        <select
+        <Select
           value={pageKey}
-          onChange={(e) => setPageKey(e.target.value)}
-          className={inputClassName}
+          onChange={(event) =>
+            setPageKey(event.target.value)
+          }
+          className="mt-0"
         >
           {EDITORIAL_PAGES.map((page) => (
-            <option key={page.value} value={page.value}>
+            <option
+              key={page.value}
+              value={page.value}
+            >
               {page.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div>
@@ -86,17 +86,22 @@ export default function ArticleEditorial({
           Mise en avant
         </label>
 
-        <select
+        <Select
           value={zone}
-          onChange={(e) => setZone(e.target.value)}
-          className={inputClassName}
+          onChange={(event) =>
+            setZone(event.target.value)
+          }
+          className="mt-0"
         >
           {EDITORIAL_ZONES.map((item) => (
-            <option key={item.value} value={item.value}>
+            <option
+              key={item.value}
+              value={item.value}
+            >
               {item.label}
             </option>
           ))}
-        </select>
+        </Select>
 
         {selectedZone && (
           <p className="mt-2 text-xs text-zinc-500">
@@ -110,16 +115,18 @@ export default function ArticleEditorial({
           Priorité
         </label>
 
-        <select
+        <Select
           value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          className={inputClassName}
+          onChange={(event) =>
+            setPriority(event.target.value)
+          }
+          className="mt-0"
         >
           <option value="0">Normale</option>
           <option value="10">Importante</option>
           <option value="20">Prioritaire</option>
           <option value="30">Urgente</option>
-        </select>
+        </Select>
       </div>
 
       <div>
@@ -127,17 +134,22 @@ export default function ArticleEditorial({
           Canal principal
         </label>
 
-        <select
+        <Select
           value={channel}
-          onChange={(e) => setChannel(e.target.value)}
-          className={inputClassName}
+          onChange={(event) =>
+            setChannel(event.target.value)
+          }
+          className="mt-0"
         >
           {CHANNELS.map((item) => (
-            <option key={item.value} value={item.value}>
+            <option
+              key={item.value}
+              value={item.value}
+            >
               {item.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div>
@@ -145,11 +157,13 @@ export default function ArticleEditorial({
           Début de diffusion
         </label>
 
-        <input
+        <Input
           type="datetime-local"
           value={startsAt}
-          onChange={(e) => setStartsAt(e.target.value)}
-          className={inputClassName}
+          onChange={(event) =>
+            setStartsAt(event.target.value)
+          }
+          className="mt-0"
         />
       </div>
 
@@ -158,11 +172,13 @@ export default function ArticleEditorial({
           Fin de mise en avant
         </label>
 
-        <input
+        <Input
           type="datetime-local"
           value={endsAt}
-          onChange={(e) => setEndsAt(e.target.value)}
-          className={inputClassName}
+          onChange={(event) =>
+            setEndsAt(event.target.value)
+          }
+          className="mt-0"
         />
       </div>
 
