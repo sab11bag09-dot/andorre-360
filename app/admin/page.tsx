@@ -1,6 +1,13 @@
 import Link from "next/link";
-
 import { prisma } from "@/lib/prisma";
+import {
+  Badge,
+  Button,
+  EmptyState,
+  PageHeader,
+  SectionHeader,
+  StatCard,
+} from "@/components/admin/ui";
 
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("fr-FR", {
@@ -58,6 +65,13 @@ export default async function AdminPage() {
 
   const navigationCards = [
     {
+  title: "Sources",
+  description:
+    "Configurer les organismes et les flux surveillés par la Veille.",
+  href: "/admin/sources",
+  action: "Gérer les sources",
+},
+    {
       title: "Articles",
       description:
         "Créer, consulter et modifier les contenus publiés sur ANDORRE 360.",
@@ -90,98 +104,70 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-6 md:px-10 md:py-10">
       <div className="mx-auto max-w-7xl">
-        <header className="flex flex-col gap-6 border-b border-zinc-800 pb-8 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-              ANDORRE 360 Studio
-            </p>
+        <PageHeader
+  title="Tableau de bord"
+  description="Pilote les contenus, les médias et la mise en avant éditoriale d’ANDORRE 360."
+  actions={
+    <>
+      <Button
+        href="/"
+        variant="outline"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Voir le site
+      </Button>
 
-            <h1 className="mt-3 font-serif text-4xl sm:text-5xl">
-              Tableau de bord
-            </h1>
-
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
-              Pilote les contenus, les médias et la mise en avant éditoriale
-              d’ANDORRE 360.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/"
-              target="_blank"
-              className="inline-flex items-center justify-center rounded-lg border border-zinc-700 px-5 py-3 text-sm font-semibold text-zinc-200 transition hover:border-zinc-500 hover:bg-zinc-900"
-            >
-              Voir le site
-            </Link>
-
-            <Link
-              href="/admin/articles/nouveau"
-              className="inline-flex items-center justify-center rounded-lg bg-yellow-500 px-5 py-3 text-sm font-bold text-black transition hover:bg-yellow-400"
-            >
-              Créer un article
-            </Link>
-          </div>
-        </header>
+      <Button href="/admin/articles/nouveau">
+        Créer un article
+      </Button>
+    </>
+  }
+/>
 
         <section className="grid gap-4 py-8 sm:grid-cols-2 xl:grid-cols-5">
-          <article className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
-            <p className="text-sm text-zinc-500">Articles</p>
-            <p className="mt-3 font-serif text-4xl">{articleCount}</p>
-            <p className="mt-2 text-xs text-zinc-600">
-              Tous les contenus enregistrés
-            </p>
-          </article>
+  <StatCard
+    title="Articles"
+    value={articleCount}
+    description="Tous les contenus enregistrés"
+    href="/admin/articles"
+  />
 
-          <article className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
-            <p className="text-sm text-zinc-500">Publiés</p>
-            <p className="mt-3 font-serif text-4xl text-emerald-400">
-              {publishedArticleCount}
-            </p>
-            <p className="mt-2 text-xs text-zinc-600">
-              Visibles sur le site
-            </p>
-          </article>
+  <StatCard
+    title="Publiés"
+    value={publishedArticleCount}
+    description="Visibles sur le site"
+    valueClassName="text-emerald-400"
+  />
 
-          <article className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
-            <p className="text-sm text-zinc-500">Brouillons</p>
-            <p className="mt-3 font-serif text-4xl text-amber-400">
-              {draftArticleCount}
-            </p>
-            <p className="mt-2 text-xs text-zinc-600">
-              En attente de publication
-            </p>
-          </article>
+  <StatCard
+    title="Brouillons"
+    value={draftArticleCount}
+    description="En attente de publication"
+    valueClassName="text-amber-400"
+  />
 
-          <article className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
-            <p className="text-sm text-zinc-500">Médias</p>
-            <p className="mt-3 font-serif text-4xl">{mediaCount}</p>
-            <p className="mt-2 text-xs text-zinc-600">
-              Images dans la médiathèque
-            </p>
-          </article>
+  <StatCard
+    title="Médias"
+    value={mediaCount}
+    description="Images dans la médiathèque"
+    href="/admin/media"
+  />
 
-          <article className="rounded-xl border border-zinc-800 bg-zinc-950 p-5">
-            <p className="text-sm text-zinc-500">Publications</p>
-            <p className="mt-3 font-serif text-4xl">{publicationCount}</p>
-            <p className="mt-2 text-xs text-zinc-600">
-              Affectations éditoriales
-            </p>
-          </article>
-        </section>
-
+  <StatCard
+    title="Publications"
+    value={publicationCount}
+    description="Affectations éditoriales"
+    href="/admin/diffusion"
+  />
+</section>
         <section className="border-t border-zinc-800 py-8">
-          <div className="mb-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-              Navigation
-            </p>
+          <SectionHeader
+  eyebrow="Navigation"
+  title="Accès rapides"
+/>
 
-            <h2 className="mt-2 font-serif text-3xl">
-              Accès rapides
-            </h2>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
             {navigationCards.map((card) => (
               <Link
                 key={card.href}
@@ -207,42 +193,30 @@ export default async function AdminPage() {
         </section>
 
         <section className="border-t border-zinc-800 py-8">
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                Activité récente
-              </p>
-
-              <h2 className="mt-2 font-serif text-3xl">
-                Derniers articles
-              </h2>
-            </div>
-
-            <Link
-              href="/admin/articles"
-              className="text-sm font-semibold text-zinc-400 transition hover:text-yellow-500"
-            >
-              Voir tous les articles →
-            </Link>
-          </div>
+          <SectionHeader
+  eyebrow="Activité récente"
+  title="Derniers articles"
+  actions={
+    <Button
+      href="/admin/articles"
+      variant="outline"
+      className="px-3 py-2"
+    >
+      Voir tous les articles →
+    </Button>
+  }
+/>
 
           {recentArticles.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-zinc-700 px-6 py-14 text-center">
-              <p className="font-serif text-2xl text-zinc-300">
-                Aucun article
-              </p>
-
-              <p className="mt-2 text-sm text-zinc-500">
-                Crée ton premier article pour commencer à alimenter le Studio.
-              </p>
-
-              <Link
-                href="/admin/articles/nouveau"
-                className="mt-6 inline-flex rounded-lg bg-yellow-500 px-5 py-3 text-sm font-bold text-black transition hover:bg-yellow-400"
-              >
-                Créer un article
-              </Link>
-            </div>
+            <EmptyState
+  title="Aucun article"
+  description="Crée ton premier article pour commencer à alimenter le Studio."
+  action={
+    <Button href="/admin/articles/nouveau">
+      Créer un article
+    </Button>
+  }
+/>
           ) : (
             <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
               <div className="hidden grid-cols-[minmax(0,2fr)_minmax(130px,0.7fr)_minmax(120px,0.7fr)_110px_110px] gap-4 border-b border-zinc-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-zinc-600 lg:grid">
@@ -262,16 +236,22 @@ export default async function AdminPage() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         {article.featured && (
-                          <span className="rounded-full border border-yellow-500/40 bg-yellow-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-yellow-500">
-                            À la une
-                          </span>
-                        )}
+  <Badge
+    variant="highlight"
+    className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider"
+  >
+    À la une
+  </Badge>
+)}
 
                         {article.contentType === "video" && (
-                          <span className="rounded-full border border-sky-500/40 bg-sky-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-sky-400">
-                            Vidéo
-                          </span>
-                        )}
+  <Badge
+    variant="info"
+    className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider"
+  >
+    Vidéo
+  </Badge>
+)}
                       </div>
 
                       <h3 className="mt-2 truncate font-medium text-white">
@@ -310,14 +290,14 @@ export default async function AdminPage() {
                       </p>
 
                       {article.published ? (
-                        <span className="mt-1 inline-flex rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-400 lg:mt-0">
-                          Publié
-                        </span>
-                      ) : (
-                        <span className="mt-1 inline-flex rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-400 lg:mt-0">
-                          Brouillon
-                        </span>
-                      )}
+  <Badge variant="success">
+    Publié
+  </Badge>
+) : (
+  <Badge variant="warning">
+    Brouillon
+  </Badge>
+)}
                     </div>
 
                     <div className="lg:text-right">

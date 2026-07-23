@@ -1,45 +1,15 @@
 import Link from "next/link";
+import {
+  Button,
+  PageHeader,
+  StatCard,
+} from "@/components/admin/ui";
 
 import EditorialSlot from "@/components/editorial/EditorialSlot";
 import { getPublishedArticles } from "@/lib/articles";
 import { buildEditorialLayout } from "@/lib/editorial/engine";
 import { prisma } from "@/lib/prisma";
 
-function StatCard({
-  icon,
-  label,
-  value,
-  detail,
-}: {
-  icon: string;
-  label: string;
-  value: number;
-  detail: string;
-}) {
-  return (
-    <article className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-gray-500">
-            {label}
-          </p>
-
-          <p className="mt-2 text-3xl font-bold text-gray-900">
-            {value}
-          </p>
-        </div>
-
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gray-100 text-xl">
-          {icon}
-        </div>
-      </div>
-
-      <p className="mt-4 text-xs leading-relaxed text-gray-500">
-        {detail}
-      </p>
-    </article>
-  );
-}
 
 export default async function EditorialPage() {
   const now = new Date();
@@ -74,7 +44,7 @@ export default async function EditorialPage() {
    * les emplacements encore vides.
    */
 
-    const usedArticleIds = new Set<number>();
+  const usedArticleIds = new Set<number>();
 
   if (editorialLayout.hero) {
     usedArticleIds.add(editorialLayout.hero.id);
@@ -243,88 +213,59 @@ export default async function EditorialPage() {
       <div className="mx-auto max-w-7xl px-6 py-10">
         {/* EN-TÊTE */}
 
-        <header className="rounded-3xl bg-black px-7 py-8 text-white shadow-xl md:px-10">
-          <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
-            <div>
-              <Link
-                href="/admin"
-                className="text-sm font-semibold text-yellow-400 transition hover:text-yellow-300"
-              >
-                ← Retour au tableau de bord
-              </Link>
-
-              <p className="mt-8 text-xs font-semibold uppercase tracking-[0.3em] text-yellow-500">
-                ANDORRE 360 STUDIO
-              </p>
-
-              <h1 className="mt-3 font-serif text-4xl md:text-6xl">
-                Centre éditorial
-              </h1>
-
-              <p className="mt-4 max-w-2xl leading-relaxed text-gray-300">
-                Visualisez la composition du journal,
-                contrôlez les missions actives et préparez les
-                prochaines diffusions depuis un seul cockpit.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/admin/diffusion"
-                className="rounded-xl border border-white/20 px-5 py-3 text-sm font-semibold transition hover:bg-white/10"
-              >
+        <PageHeader
+          backHref="/admin"
+          backLabel="Retour au tableau de bord"
+          eyebrow="ANDORRE 360 Studio"
+          title="Centre éditorial"
+          description="Visualisez la composition du journal, contrôlez les missions actives et préparez les prochaines diffusions depuis un seul cockpit."
+          actions={
+            <>
+              <Button href="/admin/diffusion" variant="outline">
                 Missions éditoriales
-              </Link>
+              </Button>
 
-              <Link
-                href="/admin/articles/nouveau"
-                className="rounded-xl bg-yellow-500 px-5 py-3 text-sm font-semibold text-black transition hover:bg-yellow-400"
-              >
+              <Button href="/admin/articles/nouveau">
                 + Nouveau contenu
-              </Link>
-            </div>
-          </div>
-        </header>
+              </Button>
+            </>
+          }
+        />
 
         {/* BARRE D’ÉTAT */}
 
         <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <StatCard
-            icon="📰"
-            label="Contenus publiés"
+            title="Contenus publiés"
             value={publishedArticles.length}
-            detail="Tous les contenus actuellement accessibles sur le média."
+            description="Tous les contenus actuellement accessibles sur le média."
           />
 
           <StatCard
-            icon="🟢"
-            label="Missions actives"
+            title="Missions actives"
             value={activePublications.length}
-            detail="Diffusions en cours sur le site et les autres canaux."
+            description="Diffusions en cours sur le site et les autres canaux."
           />
 
           <StatCard
-            icon="📅"
-            label="Programmées"
+            title="Programmées"
             value={scheduledPublications.length}
-            detail="Missions dont la diffusion commencera ultérieurement."
+            description="Missions dont la diffusion commencera ultérieurement."
           />
 
           <StatCard
-            icon="📣"
-            label="Réseaux sociaux"
+            title="Réseaux sociaux"
             value={
               facebookPublications.length +
               whatsappPublications.length
             }
-            detail={`${facebookPublications.length} Facebook · ${whatsappPublications.length} WhatsApp`}
+            description={`${facebookPublications.length} Facebook · ${whatsappPublications.length} WhatsApp`}
           />
 
           <StatCard
-            icon={conflicts > 0 ? "⚠️" : "✅"}
-            label="Conflits"
+            title="Conflits"
             value={conflicts}
-            detail={
+            description={
               conflicts > 0
                 ? "Plusieurs contenus occupent certaines zones."
                 : "Aucun conflit éditorial détecté."

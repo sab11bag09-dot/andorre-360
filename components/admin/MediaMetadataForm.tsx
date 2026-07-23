@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/admin/ui";
 
 type MediaMetadataFormProps = {
   mediaId: number;
@@ -93,13 +94,13 @@ export default function MediaMetadataForm({
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isSaving}
-        className="w-full rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-black hover:bg-yellow-400 disabled:opacity-50"
-      >
-        {isSaving ? "Enregistrement..." : "Enregistrer"}
-      </button>
+      <Button
+  type="submit"
+  disabled={isSaving}
+  className="w-full"
+>
+  {isSaving ? "Enregistrement..." : "Enregistrer"}
+</Button>
 
       {message && (
         <p className="text-center text-xs text-green-400">

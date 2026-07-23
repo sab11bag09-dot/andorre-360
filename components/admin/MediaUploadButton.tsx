@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/admin/ui";
 
 type UploadResponse = {
   message?: string;
@@ -87,16 +88,16 @@ export default function MediaUploadButton() {
         className="hidden"
       />
 
-      <button
-        type="button"
-        onClick={openFileSelector}
-        disabled={isUploading}
-        className="inline-flex min-w-48 items-center justify-center rounded-lg bg-yellow-500 px-5 py-3 text-sm font-semibold text-black transition hover:bg-yellow-400 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isUploading
-          ? "Téléversement..."
-          : "Téléverser une image"}
-      </button>
+      <Button
+  type="button"
+  onClick={openFileSelector}
+  disabled={isUploading}
+  className="min-w-48"
+>
+  {isUploading
+    ? "Téléversement..."
+    : "Téléverser une image"}
+</Button>
 
       {message && (
         <p

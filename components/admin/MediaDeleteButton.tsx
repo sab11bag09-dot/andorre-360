@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/admin/ui";
 
 type MediaDeleteButtonProps = {
   mediaId: number;
@@ -56,14 +57,15 @@ export default function MediaDeleteButton({
 
 return (
   <div className="space-y-2">
-    <button
-      type="button"
-      onClick={handleDelete}
-      disabled={isDeleting}
-      className="inline-flex w-full items-center justify-center rounded-lg border border-red-900 px-4 py-2 text-sm font-semibold text-red-400 transition hover:border-red-500 hover:bg-red-950 hover:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {isDeleting ? "Suppression…" : "Supprimer"}
-    </button>
+   <Button
+  type="button"
+  variant="danger"
+  onClick={handleDelete}
+  disabled={isDeleting}
+  className="w-full"
+>
+  {isDeleting ? "Suppression…" : "Supprimer"}
+</Button>
 
     {error && (
       <p className="text-xs text-red-400">
