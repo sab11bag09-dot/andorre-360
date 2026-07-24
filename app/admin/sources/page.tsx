@@ -5,8 +5,10 @@ import {
   DataTable,
   DataTableRow,
   EmptyState,
+  Input,
   PageHeader,
   SectionHeader,
+  Select,
   StatCard,
 } from "@/components/admin/ui";
 import { prisma } from "@/lib/prisma";
@@ -141,27 +143,27 @@ export default async function AdminSourcesPage({
 
         <section className="border-t border-zinc-800 py-8">
           <form className="grid gap-4 rounded-xl border border-zinc-800 bg-zinc-950 p-5 md:grid-cols-4">
-            <input
+            <Input
               name="q"
               defaultValue={query}
               placeholder="Rechercher une source…"
-              className="rounded-lg border border-zinc-700 bg-black px-4 py-3 text-sm text-white outline-none placeholder:text-zinc-700 focus:border-yellow-500"
+              className="mt-0 bg-black"
             />
 
-            <select
+            <Select
               name="status"
               defaultValue={status}
-              className="rounded-lg border border-zinc-700 bg-black px-4 py-3 text-sm text-white outline-none focus:border-yellow-500"
+              className="mt-0 bg-black"
             >
               <option value="all">Tous les statuts</option>
               <option value="active">Actives</option>
               <option value="inactive">Inactives</option>
-            </select>
+            </Select>
 
-            <select
+            <Select
               name="collection"
               defaultValue={collection}
-              className="rounded-lg border border-zinc-700 bg-black px-4 py-3 text-sm text-white outline-none focus:border-yellow-500"
+              className="mt-0 bg-black"
             >
               <option value="all">Toutes les collectes</option>
 
@@ -173,13 +175,13 @@ export default async function AdminSourcesPage({
                   {option.label}
                 </option>
               ))}
-            </select>
+            </Select>
 
             <div className="flex gap-2">
-              <select
+              <Select
                 name="publication"
                 defaultValue={publication}
-                className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-black px-4 py-3 text-sm text-white outline-none focus:border-yellow-500"
+                className="mt-0 min-w-0 flex-1 bg-black"
               >
                 <option value="all">
                   Toutes les publications
@@ -193,7 +195,7 @@ export default async function AdminSourcesPage({
                     {option.label}
                   </option>
                 ))}
-              </select>
+              </Select>
 
               <Button type="submit" variant="secondary">
                 Filtrer

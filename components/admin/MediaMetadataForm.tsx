@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/admin/ui";
+import {
+  Button,
+  Input,
+  Textarea,
+} from "@/components/admin/ui";
 
 type MediaMetadataFormProps = {
   mediaId: number;
@@ -23,7 +27,7 @@ export default function MediaMetadataForm({
   const [message, setMessage] = useState("");
 
   async function handleSubmit(
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
@@ -46,18 +50,17 @@ export default function MediaMetadataForm({
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Impossible d'enregistrer."
+          data.error || "Impossible d'enregistrer.",
         );
       }
 
       setMessage("Enregistré ✔");
-
       router.refresh();
     } catch (error) {
       setMessage(
         error instanceof Error
           ? error.message
-          : "Erreur inconnue."
+          : "Erreur inconnue.",
       );
     } finally {
       setIsSaving(false);
@@ -70,37 +73,51 @@ export default function MediaMetadataForm({
       className="space-y-3 border-t border-zinc-800 pt-3"
     >
       <div>
-        <label className="mb-1 block text-xs text-zinc-400">
+        <label
+          htmlFor={`media-alt-${mediaId}`}
+          className="mb-1 block text-xs text-zinc-400"
+        >
           Texte alternatif
         </label>
 
-        <input
+        <Input
+          id={`media-alt-${mediaId}`}
           value={alt}
-          onChange={(e) => setAlt(e.target.value)}
-          className="w-full rounded border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white"
+          onChange={(event) =>
+            setAlt(event.target.value)
+          }
+          className="mt-0"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-xs text-zinc-400">
+        <label
+          htmlFor={`media-caption-${mediaId}`}
+          className="mb-1 block text-xs text-zinc-400"
+        >
           Légende
         </label>
 
-        <textarea
+        <Textarea
+          id={`media-caption-${mediaId}`}
           rows={2}
           value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          className="w-full rounded border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-white"
+          onChange={(event) =>
+            setCaption(event.target.value)
+          }
+          className="mt-0"
         />
       </div>
 
       <Button
-  type="submit"
-  disabled={isSaving}
-  className="w-full"
->
-  {isSaving ? "Enregistrement..." : "Enregistrer"}
-</Button>
+        type="submit"
+        disabled={isSaving}
+        className="w-full"
+      >
+        {isSaving
+          ? "Enregistrement..."
+          : "Enregistrer"}
+      </Button>
 
       {message && (
         <p className="text-center text-xs text-green-400">
