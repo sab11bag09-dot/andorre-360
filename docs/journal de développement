@@ -15,3 +15,31 @@
 
 #### Prochaine étape
 - Mise en place de l'authentification avec Auth.js.
+ANDORRE 360 Studio – État d'avancement
+
+Authentification terminée
+Objectif
+
+Finaliser la sécurisation du back-office.
+
+Réalisations
+Configuration d'Auth.js avec le provider Credentials.
+Authentification par e-mail et mot de passe.
+Chiffrement des mots de passe avec bcryptjs.
+Création du premier compte administrateur.
+Mise en place de la page /login.
+Mise en place de la déconnexion.
+Protection de toutes les routes /admin.
+Vérification du rôle ADMIN directement dans la base de données.
+Vérification que le compte est actif.
+Décisions techniques
+Stratégie de session : jwt.
+Aucun callback Auth.js personnalisé afin de conserver une configuration simple et stable.
+Contrôle des autorisations effectué dans app/admin/layout.tsx via une requête Prisma.
+Résultat
+
+Le back-office est désormais accessible uniquement aux utilisateurs actifs ayant le rôle ADMIN.
+
+Prochaine étape
+
+Finaliser le module Articles avant de poursuivre avec la médiathèque et les paramètres du site.

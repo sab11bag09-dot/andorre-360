@@ -17,14 +17,19 @@ import { AdminSidebar } from "./AdminSidebar";
 
 type AdminShellProps = {
   children: ReactNode;
+  userName?: string | null;
 };
 
-export function AdminShell({ children }: AdminShellProps) {
+export function AdminShell({
+  children,
+  userName,
+}: AdminShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-black text-white">
       <AdminHeader
+        userName={userName}
         onToggleMobileMenu={() => setIsMobileMenuOpen(true)}
       />
 
