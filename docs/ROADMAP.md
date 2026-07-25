@@ -19,11 +19,11 @@
 
 ### Authentification
 
-- [ ] Auth.js
-- [ ] Connexion
-- [ ] Déconnexion
+- [x] Auth.js
+- [x] Connexion
+- [x] Déconnexion
 - [ ] Middleware
-- [ ] Protection des routes
+- [x] Protection des routes
 
 ### Utilisateurs
 
@@ -33,7 +33,7 @@
 
 ### Rôles
 
-- [ ] ADMIN
+- [x] ADMIN
 - [ ] EDITOR
 - [ ] WRITER
 
@@ -115,3 +115,4 @@ Notifications
 - [ ] Accessibilité
 - [ ] Tests
 - [ ] Documentation
+

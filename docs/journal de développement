@@ -43,3 +43,24 @@ Le back-office est désormais accessible uniquement aux utilisateurs actifs ayan
 Prochaine étape
 
 Finaliser le module Articles avant de poursuivre avec la médiathèque et les paramètres du site.
+
+## Session – Finalisation de l'authentification du back-office
+
+### Objectif
+Finaliser la sécurisation complète de l'administration.
+
+### Réalisations
+- Auth.js configuré avec le provider Credentials.
+- Authentification par e-mail et mot de passe validée.
+- Vérification des mots de passe avec bcryptjs.
+- Protection de toutes les routes `/admin`.
+- Vérification du rôle `ADMIN` directement en base de données.
+- Vérification que le compte utilisateur est actif.
+- Validation du fonctionnement de la connexion et de la déconnexion.
+- Projet stable, sans erreur de lint (hors avertissements Next.js sur les balises `<img>`).
+
+### Décision
+L'authentification est considérée comme terminée. Aucune évolution ne sera apportée à cette partie tant qu'un nouveau besoin fonctionnel ne le justifiera pas.
+
+### Prochaine étape
+Reprendre le développement du module **Articles**.
