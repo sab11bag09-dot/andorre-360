@@ -102,8 +102,7 @@ export default async function AdminPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-6 md:px-10 md:py-10">
-      <div className="mx-auto max-w-7xl">
+  <>
         <PageHeader
   title="Tableau de bord"
   description="Pilote les contenus, les médias et la mise en avant éditoriale d’ANDORRE 360."
@@ -314,7 +313,6 @@ export default async function AdminPage() {
             </div>
           )}
         </section>
-      </div>
-    </main>
-  );
+        </>
+);
 }

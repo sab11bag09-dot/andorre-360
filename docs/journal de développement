@@ -1,0 +1,17 @@
+## Journal de développement
+
+### Version 0.2.0 — 24/07/2026
+
+#### Réalisé
+- Création de l'architecture de l'administration.
+- Mise en place de `AdminShell`.
+- Création de `AdminHeader`, `AdminSidebar`, `AdminNavigation` et `AdminContent`.
+- Intégration du menu mobile avec `Sheet` (shadcn/ui).
+- Séparation complète entre le site public et l'administration grâce aux Route Groups (`app/(public)`).
+- Déplacement du `Header` et du `Footer` dans le layout public.
+
+#### À valider
+- Navigation mobile sur téléphone réel.
+
+#### Prochaine étape
+- Mise en place de l'authentification avec Auth.js.

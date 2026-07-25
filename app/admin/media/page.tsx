@@ -16,8 +16,7 @@ export default async function AdminMediaPage() {
   });
 
   return (
-    <main className="min-h-screen bg-black px-6 py-10 text-white md:px-10">
-      <div className="mx-auto max-w-7xl">
+  <>
         <PageHeader
   backHref="/admin"
   backLabel="Retour au Studio"
@@ -96,7 +95,6 @@ export default async function AdminMediaPage() {
             </div>
           )}
         </section>
-      </div>
-    </main>
-  );
+        </>
+);
 }

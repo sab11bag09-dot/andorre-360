@@ -115,8 +115,7 @@ export default async function AdminSourcesPage({
   });
 
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-6 md:px-10 md:py-10">
-      <div className="mx-auto max-w-7xl">
+  <>
         <PageHeader
           backHref="/admin"
           backLabel="Retour au tableau de bord"
@@ -340,7 +339,6 @@ export default async function AdminSourcesPage({
             </DataTable>
           )}
         </section>
-      </div>
-    </main>
-  );
+        </>
+);
 }

@@ -209,8 +209,7 @@ export default async function EditorialPage() {
   ).filter((count) => count > 1).length;
 
   return (
-    <main className="min-h-screen bg-[#f5f4f0] text-gray-900">
-      <div className="mx-auto max-w-7xl px-6 py-10">
+  <>
         {/* EN-TÊTE */}
 
         <PageHeader
@@ -622,7 +621,6 @@ export default async function EditorialPage() {
             disparaît jamais.
           </p>
         </footer>
-      </div>
-    </main>
-  );
+       </>
+);
 }
