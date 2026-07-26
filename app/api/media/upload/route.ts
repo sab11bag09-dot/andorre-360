@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        message: "Image téléversée avec succès.",
+        message: "Média téléversé avec succès.",
         media,
       },
       {

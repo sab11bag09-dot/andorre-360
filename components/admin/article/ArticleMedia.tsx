@@ -50,10 +50,11 @@ export default function ArticleMedia({
           value={image}
         />
 
-        <MediaPicker
-          value={image}
-          onChange={setImage}
-        />
+       <MediaPicker
+  value={image}
+  onChange={setImage}
+  type="image"
+/>
 
         <div className="mt-5 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
           {image ? (
@@ -80,17 +81,25 @@ export default function ArticleMedia({
               URL de la vidéo
             </label>
 
-            <Input
-              id="videoUrl"
-              name="videoUrl"
-              type="url"
-              value={videoUrl}
-              onChange={(event) =>
-                setVideoUrl(event.target.value)
-              }
-              className="mt-0"
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
+            <>
+  <MediaPicker
+    value={videoUrl}
+    onChange={setVideoUrl}
+    type="video"
+  />
+
+  <Input
+    id="videoUrl"
+    name="videoUrl"
+    type="url"
+    value={videoUrl}
+    onChange={(event) =>
+      setVideoUrl(event.target.value)
+    }
+    className="mt-4"
+    placeholder="...ou collez directement une URL"
+  />
+</>
           </div>
 
           <div>

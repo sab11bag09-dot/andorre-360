@@ -57,7 +57,7 @@ export default function MediaUploadButton() {
       }
 
       setMessage(
-        data.message || "Image téléversée avec succès.",
+        data.message || "Média téléversé avec succès.",
       );
 
       router.refresh();
@@ -96,7 +96,7 @@ export default function MediaUploadButton() {
 >
   {isUploading
     ? "Téléversement..."
-    : "Téléverser une image"}
+    : "Téléverser un média"}
 </Button>
 
       {message && (
