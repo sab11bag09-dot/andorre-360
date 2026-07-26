@@ -307,9 +307,7 @@ async function createArticle(
     published:
       createdArticle.published,
 
-    redirectTo: shouldPublish
-      ? `/article/${createdArticle.slug}`
-      : `/admin/articles/${createdArticle.id}`,
+    redirectTo: `/admin/articles/${createdArticle.id}`,
   };
 }
 

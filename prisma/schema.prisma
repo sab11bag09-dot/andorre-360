@@ -7,12 +7,6 @@ datasource db {
   provider = "sqlite"
 }
 
-enum UserRole {
-  ADMIN
-  EDITOR
-  JOURNALIST
-}
-
 model User {
   id            String    @id @default(cuid())
   firstName     String
@@ -22,14 +16,13 @@ model User {
   emailVerified DateTime?
   passwordHash  String?
   image         String?
-  role          UserRole  @default(EDITOR)
+  role          UserRole  @default("EDITOR")
   active        Boolean   @default(true)
   lastLoginAt   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  accounts Account[]
-  sessions Session[]
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
@@ -44,8 +37,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([provider, providerAccountId])
 }
@@ -54,8 +46,7 @@ model Session {
   sessionToken String   @id
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
@@ -67,8 +58,8 @@ model VerificationToken {
 }
 
 model Article {
-  id            Int      @id @default(autoincrement())
-  slug          String   @unique
+  id            Int                @id @default(autoincrement())
+  slug          String             @unique
   title         String
   category      String
   description   String
@@ -76,77 +67,55 @@ model Article {
   image         String
   author        String
   readingTime   String
-  contentType   String   @default("article")
+  contentType   String             @default("article")
   videoUrl      String?
   videoDuration String?
   socialText    String?
-  featured      Boolean  @default(false)
-  published     Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  publications Publication[]
-  analytics    ArticleAnalytics[]
-}
-
-model Media {
-  id           Int      @id @default(autoincrement())
-  filename     String
-  originalName String
-  path         String
-  mimeType     String
-  size         Int
-  width        Int?
-  height       Int?
-  alt          String?
-  caption      String?
-  createdAt    DateTime @default(now())
+  featured      Boolean            @default(false)
+  published     Boolean            @default(false)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  analytics     ArticleAnalytics[]
+  publications  Publication[]
 }
 
 model Edition {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique
-  name        String
-  description String?
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  id           Int           @id @default(autoincrement())
+  key          String        @unique
+  name         String
+  description  String?
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   publications Publication[]
 }
 
 model Publication {
-  id        Int     @id @default(autoincrement())
+  id        Int                    @id @default(autoincrement())
   articleId Int
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
+  channel   String
+  pageKey   String                 @default("home")
+  zone      String
+  priority  Int                    @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  active    Boolean                @default(true)
+  createdAt DateTime               @default(now())
   editionId Int?
-  edition   Edition? @relation(fields: [editionId], references: [id])
-
-  channel  String
-  pageKey  String @default("home")
-  zone     String
-  priority Int    @default(0)
-
-  startsAt DateTime?
-  endsAt   DateTime?
-
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-
+  edition   Edition?               @relation(fields: [editionId], references: [id])
+  article   Article                @relation(fields: [articleId], references: [id], onDelete: Cascade)
   analytics PublicationAnalytics[]
 }
 
 model ArticleAnalytics {
-  id        Int     @id @default(autoincrement())
-  articleId Int
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
+  id               Int      @id @default(autoincrement())
+  articleId        Int
   date             DateTime
   views            Int      @default(0)
   uniqueVisitors   Int      @default(0)
   totalReadingTime Int      @default(0)
   completedReads   Int      @default(0)
+  article          Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@unique([articleId, date])
 }
@@ -154,38 +123,82 @@ model ArticleAnalytics {
 model PublicationAnalytics {
   id            Int         @id @default(autoincrement())
   publicationId Int
+  impressions   Int         @default(0)
+  clicks        Int         @default(0)
+  shares        Int         @default(0)
   publication   Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
-
-  impressions Int @default(0)
-  clicks      Int @default(0)
-  shares      Int @default(0)
 }
 
 model Source {
-  id Int @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
+  name                 String
+  description          String?
+  url                  String    @unique
+  organizationType     String    @default("OTHER")
+  collectionMode       String    @default("RSS")
+  checkIntervalMinutes Int       @default(15)
+  active               Boolean   @default(true)
+  publicationMode      String    @default("MANUAL")
+  trustLevel           String    @default("HIGH")
+  category             String?
+  lastCheckedAt        DateTime?
+  lastSuccessAt        DateTime?
+  lastErrorAt          DateTime?
+  lastErrorMessage     String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
 
-  // Identité
-  name             String
-  description      String?
-  url              String  @unique
-  organizationType String  @default("OTHER")
+model Media {
+  id           Int          @id @default(autoincrement())
+  type         MediaType    @default("IMAGE")
+  filename     String
+  originalName String
+  path         String       @unique
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  title        String?
+  alt          String?
+  caption      String?
+  credit       String?
+  copyright    String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+  usages       MediaUsage[]
+}
 
-  // Collecte
-  collectionMode       String  @default("RSS")
-  checkIntervalMinutes Int     @default(15)
-  active               Boolean @default(true)
+model MediaUsage {
+  id         Int             @id @default(autoincrement())
+  mediaId    Int
+  entityType MediaEntityType
+  entityId   Int
+  field      String
+  createdAt  DateTime        @default(now())
+  media      Media           @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
-  // Politique éditoriale
-  publicationMode String  @default("MANUAL")
-  trustLevel      String  @default("HIGH")
-  category        String?
+  @@unique([mediaId, entityType, entityId, field])
+  @@index([entityType, entityId])
+}
 
-  // État du collecteur
-  lastCheckedAt    DateTime?
-  lastSuccessAt    DateTime?
-  lastErrorAt      DateTime?
-  lastErrorMessage String?
+enum UserRole {
+  ADMIN
+  EDITOR
+  JOURNALIST
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+enum MediaEntityType {
+  ARTICLE
+  PAGE
+  EVENT
+  USER
+  EDITION
 }
