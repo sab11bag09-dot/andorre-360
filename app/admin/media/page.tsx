@@ -55,22 +55,30 @@ export default async function AdminMediaPage() {
                   className="overflow-hidden rounded-xl border border-gray-800 bg-zinc-950 transition hover:border-yellow-500"
                 >
                   <div className="relative aspect-[4/3] bg-zinc-900">
-                    <a
-                      href={item.path}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="relative block h-full w-full cursor-zoom-in"
-                      aria-label={`Ouvrir ${item.originalName}`}
-                      title="Ouvrir l’image originale"
-                    >
-                      <Image
-                        src={imageSrc}
-                        alt={item.alt || item.originalName}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover"
-                      />
-                    </a>
+                    {item.type === "VIDEO" ? (
+  <video
+    src={item.path}
+    controls
+    className="h-full w-full object-cover"
+  />
+) : (
+  <a
+    href={item.path}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="relative block h-full w-full cursor-zoom-in"
+    aria-label={`Ouvrir ${item.originalName}`}
+    title="Ouvrir l’image originale"
+  >
+    <Image
+      src={imageSrc}
+      alt={item.alt || item.originalName}
+      fill
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+      className="object-cover"
+    />
+  </a>
+)}
                   </div>
 
                   <div className="space-y-4 p-4">
