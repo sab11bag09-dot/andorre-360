@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef, useState } from "react";
+
 type ImageBlockValue = {
   src: string;
   alt: string;
@@ -11,6 +13,12 @@ type Props = ImageBlockValue & {
   onChange: (value: ImageBlockValue) => void;
 };
 
+type UploadResponse = {
+  success: boolean;
+  src?: string;
+  error?: string;
+};
+
 export default function ImageBlockEditor({
   src,
   alt,
@@ -18,6 +26,11 @@ export default function ImageBlockEditor({
   credit,
   onChange,
 }: Props) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
   function updateField<K extends keyof ImageBlockValue>(
     field: K,
     value: ImageBlockValue[K]
@@ -31,8 +44,85 @@ export default function ImageBlockEditor({
     });
   }
 
+  async function handleFileChange(
+    event: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadError("");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload/image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = (await response.json()) as UploadResponse;
+
+      if (!response.ok || !data.success || !data.src) {
+        throw new Error(
+          data.error || "Impossible d’envoyer l’image."
+        );
+      }
+
+      updateField("src", data.src);
+    } catch (error) {
+      setUploadError(
+        error instanceof Error
+          ? error.message
+          : "Une erreur est survenue pendant l’envoi."
+      );
+    } finally {
+      setIsUploading(false);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  }
+
   return (
     <div className="space-y-5">
+      <div>
+        <p className="mb-2 block text-sm font-semibold text-zinc-200">
+          Importer une image
+        </p>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          disabled={isUploading}
+          className="hidden"
+        />
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+          className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition hover:border-yellow-500 hover:text-yellow-400 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isUploading
+            ? "Envoi en cours…"
+            : "Choisir une image"}
+        </button>
+
+        {uploadError && (
+          <p className="mt-2 text-sm text-red-400">
+            {uploadError}
+          </p>
+        )}
+      </div>
+
       <div>
         <label
           htmlFor="image-src"
