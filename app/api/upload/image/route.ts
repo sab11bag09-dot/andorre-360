@@ -1,28 +1,34 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
+import { prisma } from "@/lib/prisma";
+
+export const runtime = "nodejs";
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-const ALLOWED_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/avif",
-]);
+const IMAGE_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "image/gif": ".gif",
+  "image/avif": ".avif",
+};
 
 function sanitizeFilename(filename: string) {
   return filename
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-zA-Z0-9.-]/g, "-")
+    .replace(/[^a-zA-Z0-9-]/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .toLowerCase();
 }
 
 export async function POST(request: Request) {
+  let filepath: string | null = null;
+
   try {
     const formData = await request.formData();
     const file = formData.get("file");
@@ -39,7 +45,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    const extension = IMAGE_EXTENSIONS[file.type];
+
+    if (!extension) {
       return NextResponse.json(
         {
           success: false,
@@ -76,18 +84,26 @@ export async function POST(request: Request) {
       );
     }
 
-    const extension = path.extname(file.name).toLowerCase();
-    const originalName = path.basename(file.name, extension);
-    const safeName = sanitizeFilename(originalName) || "image";
-    const uniqueSuffix = crypto.randomUUID();
+    const originalExtension = path.extname(file.name);
+    const originalBaseName = path.basename(
+      file.name,
+      originalExtension
+    );
 
-    const filename = `${safeName}-${uniqueSuffix}${extension}`;
+    const safeName =
+      sanitizeFilename(originalBaseName) || "image";
+
+    const filename = `${safeName}-${crypto.randomUUID()}${extension}`;
+
     const uploadDir = path.join(
       process.cwd(),
       "public",
       "uploads"
     );
-    const filepath = path.join(uploadDir, filename);
+
+    filepath = path.join(uploadDir, filename);
+
+    const publicPath = `/uploads/${filename}`;
 
     await mkdir(uploadDir, {
       recursive: true,
@@ -98,12 +114,58 @@ export async function POST(request: Request) {
 
     await writeFile(filepath, buffer);
 
-    return NextResponse.json({
-      success: true,
-      src: `/uploads/${filename}`,
+    const media = await prisma.media.create({
+      data: {
+        type: "IMAGE",
+        filename,
+        originalName: file.name,
+        path: publicPath,
+        mimeType: file.type,
+        size: file.size,
+      },
+      select: {
+        id: true,
+        type: true,
+        filename: true,
+        originalName: true,
+        path: true,
+        mimeType: true,
+        size: true,
+        width: true,
+        height: true,
+        title: true,
+        alt: true,
+        caption: true,
+        credit: true,
+        copyright: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
+
+    return NextResponse.json(
+      {
+        success: true,
+        src: media.path,
+        media,
+      },
+      {
+        status: 201,
+      }
+    );
   } catch (error) {
-    console.error("Erreur pendant l’upload de l’image :", error);
+    if (filepath) {
+      try {
+        await unlink(filepath);
+      } catch {
+        // Le fichier n’existe peut-être pas encore.
+      }
+    }
+
+    console.error(
+      "Erreur pendant l’upload du média :",
+      error
+    );
 
     return NextResponse.json(
       {
