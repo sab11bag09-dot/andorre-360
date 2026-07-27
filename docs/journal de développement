@@ -210,3 +210,38 @@ Je pense que ce journal donnera un bon contexte à la prochaine personne qui rep
 
 
 Contexte du projet : Next.js 16 + React 19 + Prisma 7. Le projet ANDORRE 360 utilise plusieurs pages V2 (SportsPageV2, CulturePageV2, etc.). Le problème restant est la gestion des images : certaines ont image = "", ce qui provoque les erreurs Next.js Image is missing required "src". Un composant SafeImage.tsx existe déjà. L'objectif est maintenant de mettre en place une correction globale (codemod ou autre solution robuste), pas de corriger chaque page manuellement.
+
+
+Journal de développement — Médiathèque
+État actuel
+✅ Recherche dans la médiathèque opérationnelle.
+✅ MediaCard créé et intégré pour les médias et les vidéos externes.
+✅ Build Next.js vert.
+✅ Refactoring sécurisé avec plusieurs commits Git intermédiaires.
+Constat
+
+La médiathèque fonctionne correctement mais chaque carte contient :
+
+l'aperçu du média ;
+le formulaire d'édition (MediaMetadataForm) ;
+le bouton de suppression (MediaDeleteButton).
+
+Cette architecture produit des cartes très hautes et limite le nombre de médias visibles à l'écran.
+
+Direction retenue
+
+Ne pas réécrire MediaMetadataForm ni MediaDeleteButton.
+
+Faire évoluer la médiathèque vers une interface de type bibliothèque DAM :
+
+une grille compacte affichant uniquement les aperçus et les informations essentielles ;
+un média sélectionné à la fois ;
+un panneau de détails affichant les métadonnées, l'édition et la suppression ;
+réutilisation des composants existants pour éviter toute régression.
+État Git
+
+Les dernières modifications sont validées par des commits et le projet compile sans erreur.
+
+Point de reprise
+
+Commencer la conception du panneau de détails de la médiathèque en s'appuyant sur MediaCard, sans casser les fonctionnalités existantes et en procédant étape par étape.
