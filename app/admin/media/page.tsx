@@ -3,6 +3,7 @@ import SafeImage from "@/components/SafeImage";
 import ExternalVideoButton from "@/components/admin/ExternalVideoButton";
 import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
 import MediaMetadataForm from "@/components/admin/MediaMetadataForm";
+import MediaSearch from "@/components/admin/MediaSearch";
 import MediaUploadButton from "@/components/admin/MediaUploadButton";
 import {
   EmptyState,
@@ -83,7 +84,17 @@ function getProviderLabel(provider: string) {
   }
 }
 
-export default async function AdminMediaPage() {
+type AdminMediaPageProps = {
+  searchParams: Promise<{
+    recherche?: string;
+  }>;
+};
+
+export default async function AdminMediaPage({
+  searchParams,
+}: AdminMediaPageProps) {
+  const { recherche = "" } = await searchParams;
+  const normalizedSearch = recherche.trim();
   const [media, externalVideos] = await Promise.all([
     prisma.media.findMany({
       orderBy: {
@@ -98,7 +109,31 @@ export default async function AdminMediaPage() {
   ]);
 
   const totalMedia = media.length + externalVideos.length;
+const filteredMedia = normalizedSearch
+  ? media.filter((item) => {
+      const search = normalizedSearch.toLowerCase();
 
+      return (
+        item.originalName.toLowerCase().includes(search) ||
+        (item.alt ?? "").toLowerCase().includes(search) ||
+        (item.caption ?? "").toLowerCase().includes(search)
+      );
+    })
+  : media;
+
+const filteredExternalVideos = normalizedSearch
+  ? externalVideos.filter((video) => {
+      const search = normalizedSearch.toLowerCase();
+
+      return (
+        (video.title ?? "").toLowerCase().includes(search) ||
+        video.url.toLowerCase().includes(search)
+      );
+    })
+  : externalVideos;
+
+const filteredTotal =
+  filteredMedia.length + filteredExternalVideos.length;
   return (
     <>
       <PageHeader
@@ -111,6 +146,7 @@ export default async function AdminMediaPage() {
 
       <section className="py-8">
         <SectionHeader
+    
           title="Médias"
           description={`${totalMedia} média${totalMedia > 1 ? "s" : ""}`}
           actions={
@@ -120,7 +156,9 @@ export default async function AdminMediaPage() {
             </div>
           }
         />
-
+<div className="mb-6">
+  <MediaSearch initialQuery={normalizedSearch} />
+</div>
         {totalMedia === 0 ? (
           <EmptyState
             title="Aucun média dans la bibliothèque"
@@ -134,14 +172,14 @@ export default async function AdminMediaPage() {
           />
         ) : (
           <div className="space-y-10">
-            {externalVideos.length > 0 && (
+            {filteredExternalVideos.length > 0 && (
               <div>
                 <h2 className="mb-4 text-lg font-semibold">
                   Vidéos externes
                 </h2>
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {externalVideos.map((video) => {
+                  {filteredExternalVideos.map((video) => {
                     const embedUrl = getExternalVideoEmbedUrl(
                       video.url,
                       video.provider,
@@ -207,14 +245,14 @@ export default async function AdminMediaPage() {
               </div>
             )}
 
-            {media.length > 0 && (
+            {filteredMedia.length > 0 && (
               <div>
                 <h2 className="mb-4 text-lg font-semibold">
                   Fichiers téléversés
                 </h2>
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {media.map((item) => {
+                  {filteredMedia.map((item) => {
                     const imageSrc = item.path.startsWith(
                       "/api/media/files/originals/",
                     )
