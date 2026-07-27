@@ -421,11 +421,14 @@ export default function MediaLibrary({
                     </a>
 
                     <MediaMetadataForm
-                      key={`metadata-${selectedMedia.id}`}
-                      mediaId={selectedMedia.id}
-                      initialAlt={selectedMedia.alt}
-                      initialCaption={selectedMedia.caption}
-                    />
+  key={`metadata-${selectedMedia.id}`}
+  mediaId={selectedMedia.id}
+  initialTitle={selectedMedia.title}
+  initialAlt={selectedMedia.alt}
+  initialCaption={selectedMedia.caption}
+  initialCredit={selectedMedia.credit}
+  initialCopyright={selectedMedia.copyright}
+/>
 
                     <MediaDeleteButton
                       key={`delete-${selectedMedia.id}`}

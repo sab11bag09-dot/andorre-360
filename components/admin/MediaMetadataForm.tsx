@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
 import {
   Button,
   Input,
@@ -10,29 +11,46 @@ import {
 
 type MediaMetadataFormProps = {
   mediaId: number;
+  initialTitle: string | null;
   initialAlt: string | null;
   initialCaption: string | null;
+  initialCredit: string | null;
+  initialCopyright: string | null;
 };
 
 export default function MediaMetadataForm({
   mediaId,
+  initialTitle,
   initialAlt,
   initialCaption,
+  initialCredit,
+  initialCopyright,
 }: MediaMetadataFormProps) {
   const router = useRouter();
 
+  const [title, setTitle] = useState(initialTitle ?? "");
   const [alt, setAlt] = useState(initialAlt ?? "");
-  const [caption, setCaption] = useState(initialCaption ?? "");
+  const [caption, setCaption] = useState(
+    initialCaption ?? ""
+  );
+  const [credit, setCredit] = useState(
+    initialCredit ?? ""
+  );
+  const [copyright, setCopyright] = useState(
+    initialCopyright ?? ""
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [hasError, setHasError] = useState(false);
 
   async function handleSubmit(
-    event: React.FormEvent<HTMLFormElement>,
+    event: React.FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
     setIsSaving(true);
     setMessage("");
+    setHasError(false);
 
     try {
       const response = await fetch(`/api/media/${mediaId}`, {
@@ -41,8 +59,11 @@ export default function MediaMetadataForm({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          title,
           alt,
           caption,
+          credit,
+          copyright,
         }),
       });
 
@@ -50,17 +71,18 @@ export default function MediaMetadataForm({
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Impossible d'enregistrer.",
+          data.error || "Impossible d'enregistrer."
         );
       }
 
       setMessage("Enregistré ✔");
       router.refresh();
     } catch (error) {
+      setHasError(true);
       setMessage(
         error instanceof Error
           ? error.message
-          : "Erreur inconnue.",
+          : "Erreur inconnue."
       );
     } finally {
       setIsSaving(false);
@@ -72,6 +94,24 @@ export default function MediaMetadataForm({
       onSubmit={handleSubmit}
       className="space-y-3 border-t border-zinc-800 pt-3"
     >
+      <div>
+        <label
+          htmlFor={`media-title-${mediaId}`}
+          className="mb-1 block text-xs text-zinc-400"
+        >
+          Titre
+        </label>
+
+        <Input
+          id={`media-title-${mediaId}`}
+          value={title}
+          onChange={(event) =>
+            setTitle(event.target.value)
+          }
+          className="mt-0"
+        />
+      </div>
+
       <div>
         <label
           htmlFor={`media-alt-${mediaId}`}
@@ -109,6 +149,42 @@ export default function MediaMetadataForm({
         />
       </div>
 
+      <div>
+        <label
+          htmlFor={`media-credit-${mediaId}`}
+          className="mb-1 block text-xs text-zinc-400"
+        >
+          Crédit
+        </label>
+
+        <Input
+          id={`media-credit-${mediaId}`}
+          value={credit}
+          onChange={(event) =>
+            setCredit(event.target.value)
+          }
+          className="mt-0"
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor={`media-copyright-${mediaId}`}
+          className="mb-1 block text-xs text-zinc-400"
+        >
+          Copyright
+        </label>
+
+        <Input
+          id={`media-copyright-${mediaId}`}
+          value={copyright}
+          onChange={(event) =>
+            setCopyright(event.target.value)
+          }
+          className="mt-0"
+        />
+      </div>
+
       <Button
         type="submit"
         disabled={isSaving}
@@ -120,7 +196,13 @@ export default function MediaMetadataForm({
       </Button>
 
       {message && (
-        <p className="text-center text-xs text-green-400">
+        <p
+          className={`text-center text-xs ${
+            hasError
+              ? "text-red-400"
+              : "text-green-400"
+          }`}
+        >
           {message}
         </p>
       )}
