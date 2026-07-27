@@ -1,6 +1,5 @@
-import SafeImage from "@/components/SafeImage";
-
 import ExternalVideoButton from "@/components/admin/ExternalVideoButton";
+import MediaCard from "@/components/admin/MediaCard";
 import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
 import MediaMetadataForm from "@/components/admin/MediaMetadataForm";
 import MediaSearch from "@/components/admin/MediaSearch";
@@ -9,7 +8,9 @@ import {
   EmptyState,
   PageHeader,
   SectionHeader,
+  Toolbar,
 } from "@/components/admin/ui";
+import SafeImage from "@/components/SafeImage";
 import { prisma } from "@/lib/prisma";
 
 function getExternalVideoEmbedUrl(
@@ -23,7 +24,8 @@ function getExternalVideoEmbedUrl(
       let videoId = "";
 
       if (parsedUrl.hostname.includes("youtu.be")) {
-        videoId = parsedUrl.pathname.split("/").filter(Boolean)[0] ?? "";
+        videoId =
+          parsedUrl.pathname.split("/").filter(Boolean)[0] ?? "";
       } else if (parsedUrl.pathname.startsWith("/shorts/")) {
         videoId = parsedUrl.pathname.split("/")[2] ?? "";
       } else if (parsedUrl.pathname.startsWith("/embed/")) {
@@ -69,16 +71,20 @@ function getExternalVideoEmbedUrl(
   }
 }
 
-function getProviderLabel(provider: string) {
+function getProviderLabel(provider: string): string {
   switch (provider) {
     case "YOUTUBE":
       return "YouTube";
+
     case "VIMEO":
       return "Vimeo";
+
     case "TIKTOK":
       return "TikTok";
+
     case "FACEBOOK":
       return "Facebook";
+
     default:
       return provider;
   }
@@ -95,12 +101,15 @@ export default async function AdminMediaPage({
 }: AdminMediaPageProps) {
   const { recherche = "" } = await searchParams;
   const normalizedSearch = recherche.trim();
+  const lowercaseSearch = normalizedSearch.toLowerCase();
+
   const [media, externalVideos] = await Promise.all([
     prisma.media.findMany({
       orderBy: {
         createdAt: "desc",
       },
     }),
+
     prisma.externalVideo.findMany({
       orderBy: {
         createdAt: "desc",
@@ -109,31 +118,40 @@ export default async function AdminMediaPage({
   ]);
 
   const totalMedia = media.length + externalVideos.length;
-const filteredMedia = normalizedSearch
-  ? media.filter((item) => {
-      const search = normalizedSearch.toLowerCase();
 
-      return (
-        item.originalName.toLowerCase().includes(search) ||
-        (item.alt ?? "").toLowerCase().includes(search) ||
-        (item.caption ?? "").toLowerCase().includes(search)
-      );
-    })
-  : media;
+  const filteredMedia = normalizedSearch
+    ? media.filter((item) => {
+        return (
+          item.originalName
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          item.filename.toLowerCase().includes(lowercaseSearch) ||
+          item.path.toLowerCase().includes(lowercaseSearch) ||
+          (item.alt ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          (item.caption ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch)
+        );
+      })
+    : media;
 
-const filteredExternalVideos = normalizedSearch
-  ? externalVideos.filter((video) => {
-      const search = normalizedSearch.toLowerCase();
+  const filteredExternalVideos = normalizedSearch
+    ? externalVideos.filter((video) => {
+        return (
+          (video.title ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          video.url.toLowerCase().includes(lowercaseSearch) ||
+          video.provider.toLowerCase().includes(lowercaseSearch)
+        );
+      })
+    : externalVideos;
 
-      return (
-        (video.title ?? "").toLowerCase().includes(search) ||
-        video.url.toLowerCase().includes(search)
-      );
-    })
-  : externalVideos;
+  const filteredTotal =
+    filteredMedia.length + filteredExternalVideos.length;
 
-const filteredTotal =
-  filteredMedia.length + filteredExternalVideos.length;
   return (
     <>
       <PageHeader
@@ -146,19 +164,24 @@ const filteredTotal =
 
       <section className="py-8">
         <SectionHeader
-    
           title="Médias"
-          description={`${totalMedia} média${totalMedia > 1 ? "s" : ""}`}
+          description={`${filteredTotal} média${
+            filteredTotal > 1 ? "s" : ""
+          }`}
+        />
+
+        <Toolbar
+          search={
+            <MediaSearch initialQuery={normalizedSearch} />
+          }
           actions={
-            <div className="flex flex-wrap gap-3">
+            <>
               <MediaUploadButton />
               <ExternalVideoButton />
-            </div>
+            </>
           }
         />
-<div className="mb-6">
-  <MediaSearch initialQuery={normalizedSearch} />
-</div>
+
         {totalMedia === 0 ? (
           <EmptyState
             title="Aucun média dans la bibliothèque"
@@ -170,6 +193,11 @@ const filteredTotal =
               </div>
             }
           />
+        ) : filteredTotal === 0 ? (
+          <EmptyState
+            title="Aucun résultat"
+            description={`Aucun média ne correspond à « ${normalizedSearch} ».`}
+          />
         ) : (
           <div className="space-y-10">
             {filteredExternalVideos.length > 0 && (
@@ -180,24 +208,27 @@ const filteredTotal =
 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {filteredExternalVideos.map((video) => {
+                    const providerLabel = getProviderLabel(
+                      video.provider,
+                    );
+
                     const embedUrl = getExternalVideoEmbedUrl(
                       video.url,
                       video.provider,
                     );
 
+                    const videoTitle =
+                      video.title || `Vidéo ${providerLabel}`;
+
                     return (
-                      <article
-                        key={`external-video-${video.id}`}
-                        className="overflow-hidden rounded-xl border border-gray-800 bg-zinc-950 transition hover:border-yellow-500"
+                      <MediaCard
+                        key={`external-${video.id}`}
                       >
                         <div className="relative aspect-video bg-black">
                           {embedUrl ? (
                             <iframe
                               src={embedUrl}
-                              title={
-                                video.title ??
-                                `Vidéo ${getProviderLabel(video.provider)}`
-                              }
+                              title={videoTitle}
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                               allowFullScreen
                               loading="lazy"
@@ -212,13 +243,15 @@ const filteredTotal =
 
                         <div className="space-y-3 p-4">
                           <div className="flex items-center justify-between gap-3">
-                            <h3 className="truncate font-medium">
-                              {video.title ||
-                                `Vidéo ${getProviderLabel(video.provider)}`}
+                            <h3
+                              className="truncate font-medium"
+                              title={videoTitle}
+                            >
+                              {videoTitle}
                             </h3>
 
                             <span className="shrink-0 rounded-full border border-gray-700 px-2 py-1 text-xs text-gray-400">
-                              {getProviderLabel(video.provider)}
+                              {providerLabel}
                             </span>
                           </div>
 
@@ -233,12 +266,12 @@ const filteredTotal =
                             href={video.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex text-sm font-medium text-yellow-400 hover:text-yellow-300"
+                            className="inline-flex text-sm font-medium text-yellow-400 transition hover:text-yellow-300"
                           >
-                            Ouvrir sur {getProviderLabel(video.provider)}
+                            Ouvrir sur {providerLabel}
                           </a>
                         </div>
-                      </article>
+                      </MediaCard>
                     );
                   })}
                 </div>
@@ -263,10 +296,7 @@ const filteredTotal =
                       : `/api/media/files/thumbnails/${item.filename}`;
 
                     return (
-                      <article
-                        key={`media-${item.id}`}
-                        className="overflow-hidden rounded-xl border border-gray-800 bg-zinc-950 transition hover:border-yellow-500"
-                      >
+                      <MediaCard key={`media-${item.id}`}>
                         <div className="relative aspect-[4/3] bg-zinc-900">
                           {item.type === "VIDEO" ? (
                             <video
@@ -286,7 +316,10 @@ const filteredTotal =
                             >
                               <SafeImage
                                 src={imageSrc}
-                                alt={item.alt || item.originalName}
+                                alt={
+                                  item.alt ||
+                                  item.originalName
+                                }
                                 fill
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                                 className="object-cover"
@@ -297,7 +330,10 @@ const filteredTotal =
 
                         <div className="space-y-4 p-4">
                           <div className="space-y-2">
-                            <h3 className="truncate font-medium">
+                            <h3
+                              className="truncate font-medium"
+                              title={item.originalName}
+                            >
                               {item.originalName}
                             </h3>
 
@@ -334,7 +370,7 @@ const filteredTotal =
                             mediaName={item.originalName}
                           />
                         </div>
-                      </article>
+                      </MediaCard>
                     );
                   })}
                 </div>
