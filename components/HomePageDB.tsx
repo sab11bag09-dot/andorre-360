@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import {
@@ -50,7 +50,7 @@ export default async function HomePageDB() {
         className="block"
       >
         <section className="relative h-[75vh] overflow-hidden">
-          <Image
+          <SafeImage
             src={featured.image}
             alt={featured.title}
             fill
@@ -96,7 +96,7 @@ export default async function HomePageDB() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 shadow-lg transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
-                    <Image
+                    <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
                       fill
@@ -162,7 +162,7 @@ export default async function HomePageDB() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 shadow-lg transition hover:border-yellow-500">
                   <div className="relative h-48">
-                    <Image
+                    <SafeImage
                       src={article.image}
                       alt={article.title}
                       fill
@@ -202,7 +202,7 @@ export default async function HomePageDB() {
             >
               <article className="overflow-hidden rounded-xl border border-gray-800 bg-black transition hover:border-yellow-500">
                 <div className="relative h-72">
-                  <Image
+                  <SafeImage
                     src={bottomCard.image}
                     alt={bottomCard.title}
                     fill

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import ReplaceButton from "@/components/editorial/ReplaceButton";
@@ -73,7 +73,7 @@ export default function EditorialSlot({
           >
             {article.image ? (
               <div className="relative h-24 overflow-hidden rounded-xl bg-gray-100">
-                <Image
+                <SafeImage
                   src={article.image}
                   alt={article.title}
                   fill
@@ -118,7 +118,7 @@ export default function EditorialSlot({
         <div>
           {article.image ? (
             <div className="relative h-72 w-full bg-gray-100">
-              <Image
+              <SafeImage
                 src={article.image}
                 alt={article.title}
                 fill

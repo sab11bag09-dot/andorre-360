@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
@@ -60,7 +60,7 @@ export default async function CategoryPage({
         className="block"
       >
         <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
-          <Image
+          <SafeImage
             src={featured.image}
             alt={featured.title}
             fill
@@ -107,7 +107,7 @@ export default async function CategoryPage({
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
-                    <Image
+                    <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
                       fill
@@ -173,7 +173,7 @@ export default async function CategoryPage({
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
-                    <Image
+                    <SafeImage
                       src={article.image}
                       alt={article.title}
                       fill
@@ -208,7 +208,7 @@ export default async function CategoryPage({
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-72">
-                    <Image
+                    <SafeImage
                       src={bottomCard.image}
                       alt={bottomCard.title}
                       fill

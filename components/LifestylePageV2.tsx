@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
@@ -24,7 +24,7 @@ export default async function LifestylePageV2() {
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
           <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
-            <Image
+            <SafeImage
               src={featured.image}
               alt={featured.title}
               fill
@@ -67,7 +67,7 @@ export default async function LifestylePageV2() {
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
-                    <Image
+                    <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
                       fill
@@ -128,7 +128,7 @@ export default async function LifestylePageV2() {
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
-                        <Image
+                        <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
                           fill
@@ -157,7 +157,7 @@ export default async function LifestylePageV2() {
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
-                        <Image
+                        <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
                           fill
@@ -194,7 +194,7 @@ export default async function LifestylePageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
-                    <Image
+                    <SafeImage
                       src={questionArticle.image}
                       alt={questionArticle.title}
                       fill
@@ -234,7 +234,7 @@ export default async function LifestylePageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
-                    <Image
+                    <SafeImage
                       src={article.image}
                       alt={article.title}
                       fill

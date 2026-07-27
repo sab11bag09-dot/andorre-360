@@ -4,10 +4,12 @@ import { signOut } from "next-auth/react";
 import { MobileMenu } from "./MobileMenu";
 
 type AdminHeaderProps = {
+  userName?: string | null;
   onToggleMobileMenu: () => void;
 };
 
 export function AdminHeader({
+  userName,
   onToggleMobileMenu,
 }: AdminHeaderProps) {
   return (
@@ -25,22 +27,28 @@ export function AdminHeader({
         </div>
 
         <div className="flex items-center gap-3">
-  <button
-    type="button"
-    onClick={() => signOut({ callbackUrl: "/login" })}
-    className="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold transition hover:bg-zinc-900 sm:px-4 sm:text-sm"
-  >
-    Déconnexion
-  </button>
+          {userName && (
+            <span className="hidden text-sm text-zinc-400 lg:block">
+              {userName}
+            </span>
+          )}
 
-  <Link
-    href="/admin/articles/nouveau"
-    className="rounded-lg bg-yellow-500 px-3 py-2 text-xs font-semibold text-black transition hover:bg-yellow-400 sm:px-4 sm:text-sm"
-  >
-    <span className="sm:hidden">Créer</span>
-    <span className="hidden sm:inline">Créer un article</span>
-  </Link>
-</div>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="rounded-lg border border-zinc-700 px-3 py-2 text-xs font-semibold transition hover:bg-zinc-900 sm:px-4 sm:text-sm"
+          >
+            Déconnexion
+          </button>
+
+          <Link
+            href="/admin/articles/nouveau"
+            className="rounded-lg bg-yellow-500 px-3 py-2 text-xs font-semibold text-black transition hover:bg-yellow-400 sm:px-4 sm:text-sm"
+          >
+            <span className="sm:hidden">Créer</span>
+            <span className="hidden sm:inline">Créer un article</span>
+          </Link>
+        </div>
       </div>
     </header>
   );

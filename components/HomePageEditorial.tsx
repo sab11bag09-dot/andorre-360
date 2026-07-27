@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getPublishedArticles } from "@/lib/articles";
@@ -118,7 +118,7 @@ export default async function HomePageEditorial() {
         className="block"
       >
         <section className="relative h-[68vh] min-h-[520px] overflow-hidden">
-          <Image
+          <SafeImage
             src={hero.image}
             alt={hero.title}
             fill
@@ -176,7 +176,7 @@ export default async function HomePageEditorial() {
 
                   {feature.image ? (
   <div className="relative mt-7 h-[520px] overflow-hidden md:h-[620px]">
-    <Image
+    <SafeImage
       src={feature.image}
       alt={feature.title}
       fill
@@ -269,7 +269,7 @@ export default async function HomePageEditorial() {
 
                      {grandFormat.image ? (
   <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
-    <Image
+    <SafeImage
       src={grandFormat.image}
       alt={grandFormat.title}
       fill
@@ -359,7 +359,7 @@ export default async function HomePageEditorial() {
       >
         <article className="grid grid-cols-[110px_1fr] gap-4">
           <div className="relative h-[110px] overflow-hidden">
-            <Image
+            <SafeImage
               src={article.image}
               alt={article.title}
               fill

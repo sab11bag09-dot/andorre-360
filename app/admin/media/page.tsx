@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 
 import ExternalVideoButton from "@/components/admin/ExternalVideoButton";
 import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
@@ -246,7 +246,7 @@ export default async function AdminMediaPage() {
                               aria-label={`Ouvrir ${item.originalName}`}
                               title="Ouvrir l’image originale"
                             >
-                              <Image
+                              <SafeImage
                                 src={imageSrc}
                                 alt={item.alt || item.originalName}
                                 fill

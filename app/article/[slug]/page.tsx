@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import { notFound } from "next/navigation";
 
 import { recordArticleView } from "@/lib/analytics";
@@ -99,7 +99,7 @@ export default async function ArticlePage({
     <main className="min-h-screen bg-black text-white">
      {article.image ? (
   <div className="relative h-[500px] w-full">
-    <Image
+    <SafeImage
       src={article.image}
       alt={article.title}
       fill

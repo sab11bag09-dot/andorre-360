@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
@@ -71,7 +71,7 @@ export default async function FilInfoPage() {
                   </div>
 
                   <div className="relative mt-9 aspect-[16/10] overflow-hidden bg-neutral-900 md:aspect-[16/8.4]">
-                    <Image
+                    <SafeImage
                       src={featured.image}
                       alt={featured.title}
                       fill
@@ -147,7 +147,7 @@ export default async function FilInfoPage() {
                     >
                       <article className="flex h-full flex-col border-b border-gray-800 pb-8">
                         <div className="relative aspect-[16/10] overflow-hidden">
-                          <Image
+                          <SafeImage
                             src={article.image}
                             alt={article.title}
                             fill
@@ -207,7 +207,7 @@ export default async function FilInfoPage() {
                   >
                     <article className="grid grid-cols-[120px_1fr] gap-4">
                       <div className="relative aspect-[4/3] overflow-hidden">
-                        <Image
+                        <SafeImage
                           src={article.image}
                           alt={article.title}
                           fill
