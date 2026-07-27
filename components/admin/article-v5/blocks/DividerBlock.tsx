@@ -1,4 +1,3 @@
-<<'EOF'
 "use client";
 
 export default function DividerBlockEditor() {
@@ -8,4 +7,3 @@ export default function DividerBlockEditor() {
     </div>
   );
 }
-EOF

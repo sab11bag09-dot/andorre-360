@@ -1,3 +1,4 @@
+import ArticleRenderer from "@/components/article/ArticleRenderer";
 import SafeImage from "@/components/SafeImage";
 import { notFound } from "next/navigation";
 
@@ -186,9 +187,9 @@ export default async function ArticlePage({
           </div>
         )}
 
-        <div className="mt-10 whitespace-pre-line text-lg leading-relaxed text-gray-300">
-          {article.content}
-        </div>
+       <div className="mt-10">
+  <ArticleRenderer content={article.content} />
+</div>
 
         <div className="mt-12 border-t border-gray-800 pt-6">
           <p className="text-gray-400">

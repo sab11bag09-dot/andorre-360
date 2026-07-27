@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import ArticleContent from "@/components/admin/article/ArticleContent";
+import ArticleContent from "@/components/admin/article-v5/ArticleContent";
 import ArticleEditorial from "@/components/admin/article/ArticleEditorial";
 import ArticleMedia from "@/components/admin/article/ArticleMedia";
 import ArticleSidebar from "@/components/admin/article/ArticleSidebar";

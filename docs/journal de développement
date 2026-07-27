@@ -245,3 +245,174 @@ Les dernières modifications sont validées par des commits et le projet compile
 Point de reprise
 
 Commencer la conception du panneau de détails de la médiathèque en s'appuyant sur MediaCard, sans casser les fonctionnalités existantes et en procédant étape par étape.
+
+
+
+Journal de développement — Éditeur V5
+
+Date : Aujourd'hui
+
+Objectif
+
+Remplacer le champ Textarea de rédaction par un éditeur à blocs, sans modifier la base Prisma.
+
+Architecture retenue
+
+Le contenu reste enregistré dans :
+
+Article.content (String)
+
+Le contenu est désormais stocké sous forme de JSON sérialisé.
+
+Exemple :
+
+{
+  "version": 1,
+  "blocks": [
+    {
+      "id": "...",
+      "type": "paragraph",
+      "text": "..."
+    },
+    {
+      "id": "...",
+      "type": "heading",
+      "level": 2,
+      "text": "..."
+    }
+  ]
+}
+
+Les anciens articles texte restent compatibles grâce au parser.
+
+Nouveaux composants créés
+components/admin/article-v5/
+
+types.ts
+content.ts
+
+ArticleContent.tsx
+BlockEditor.tsx
+BlockCard.tsx
+BlockInserter.tsx
+
+blocks/
+    ParagraphBlock.tsx
+    HeadingBlock.tsx
+    QuoteBlock.tsx
+    DividerBlock.tsx
+Fonctionnalités disponibles
+
+✔ Paragraphe
+
+✔ Intertitre H2 / H3
+
+✔ Citation
+
+✔ Séparateur
+
+✔ Déplacement ↑ ↓
+
+✔ Suppression
+
+✔ Ajout de blocs
+
+✔ Sauvegarde
+
+✔ Réouverture des articles
+
+✔ Compatibilité avec les anciens articles
+
+Affichage public
+
+Création de :
+
+components/article/ArticleRenderer.tsx
+
+Modification de :
+
+app/article/[slug]/page.tsx
+
+Remplacement de :
+
+{article.content}
+
+par
+
+<ArticleRenderer content={article.content} />
+
+Le moteur affiche désormais :
+
+paragraphes
+intertitres
+citations
+séparateurs
+
+sans montrer le JSON.
+
+État actuel
+
+✅ Compilation OK
+
+✅ Édition OK
+
+✅ Sauvegarde OK
+
+✅ Lecture OK
+
+✅ Publication OK
+
+Améliorations prévues
+Priorité 1
+
+Déplacer les fichiers :
+
+article-v5/types.ts
+article-v5/content.ts
+
+vers
+
+lib/article-blocks/
+
+afin que le site public ne dépende plus du dossier admin.
+
+Priorité 2
+
+Remplacer les flèches ↑ ↓ par un glisser-déposer.
+
+Priorité 3
+
+Remplacer le panneau "Ajouter un bloc" par un bouton + entre les blocs (expérience proche de Notion/Gutenberg).
+
+Nouveaux blocs prévus
+Image
+Galerie
+Vidéo
+Carte
+Encadré
+Tableau
+Liste
+Restaurant
+Station de ski
+Point d'intérêt
+Décision importante
+
+L'intertitre est un bloc indépendant.
+
+Structure retenue :
+
+Paragraphe
+
+Intertitre
+
+Paragraphe
+
+Citation
+
+Paragraphe
+
+et non un titre inséré à l'intérieur d'un paragraphe.
+
+Cette architecture facilitera l'ajout de nouveaux blocs sans remettre en cause les contenus existants.
+
+🎉 Fin de la première version de l'éditeur V5 : la boucle complète (édition → sauvegarde → affichage) est désormais opérationnelle.

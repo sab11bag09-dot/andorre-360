@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { createArticle } from "@/actions/articles";
 
-import ArticleContent from "./ArticleContent";
+import ArticleContent from "@/components/admin/article-v5/ArticleContent";
 import ArticleEditorial from "./ArticleEditorial";
 import ArticleMedia from "./ArticleMedia";
 import ArticleSidebar from "./ArticleSidebar";
