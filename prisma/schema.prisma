@@ -62,6 +62,8 @@ model Article {
   slug          String             @unique
   title         String
   category      String
+  categoryId  Int?
+categoryRef Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   description   String
   content       String
   image         String
@@ -77,6 +79,16 @@ model Article {
   updatedAt     DateTime           @updatedAt
   analytics     ArticleAnalytics[]
   publications  Publication[]
+}
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  articles    Article[]
 }
 
 model Edition {

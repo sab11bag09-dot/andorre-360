@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 
+function normalizeImage<T extends { image: string | null }>(article: T): T {
+  return {
+    ...article,
+    image: article.image?.trim() || null,
+  };
+}
+
 export async function getPublishedArticles() {
-  return prisma.article.findMany({
+  const articles = await prisma.article.findMany({
     where: {
       published: true,
     },
@@ -9,10 +16,12 @@ export async function getPublishedArticles() {
       createdAt: "desc",
     },
   });
+
+  return articles.map(normalizeImage);
 }
 
 export async function getArticlesByCategory(category: string) {
-  return prisma.article.findMany({
+  const articles = await prisma.article.findMany({
     where: {
       category,
       published: true,
@@ -21,18 +30,22 @@ export async function getArticlesByCategory(category: string) {
       updatedAt: "desc",
     },
   });
+
+  return articles.map(normalizeImage);
 }
 
 export async function getArticleBySlug(slug: string) {
-  return prisma.article.findUnique({
+  const article = await prisma.article.findUnique({
     where: {
       slug,
     },
   });
+
+  return article ? normalizeImage(article) : null;
 }
 
 export async function getFeaturedArticle() {
-  return prisma.article.findFirst({
+  const article = await prisma.article.findFirst({
     where: {
       featured: true,
       published: true,
@@ -41,4 +54,6 @@ export async function getFeaturedArticle() {
       createdAt: "desc",
     },
   });
+
+  return article ? normalizeImage(article) : null;
 }

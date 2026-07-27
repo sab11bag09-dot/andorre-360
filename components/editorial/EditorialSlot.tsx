@@ -10,7 +10,7 @@ type EditorialSlotArticle = {
   title: string;
   category: string;
   author: string;
-  image: string;
+  image: string | null;
   description: string;
 };
 
@@ -64,16 +64,24 @@ export default function EditorialSlot({
         </div>
       ) : compact ? (
         <div className="p-4">
-          <div className="grid grid-cols-[96px_1fr] gap-4">
-            <div className="relative h-24 overflow-hidden rounded-xl bg-gray-100">
-              <Image
-                src={article.image}
-                alt={article.title}
-                fill
-                sizes="96px"
-                className="object-cover"
-              />
-            </div>
+          <div
+            className={
+              article.image
+                ? "grid grid-cols-[96px_1fr] gap-4"
+                : "grid grid-cols-1 gap-4"
+            }
+          >
+            {article.image ? (
+              <div className="relative h-24 overflow-hidden rounded-xl bg-gray-100">
+                <Image
+                  src={article.image}
+                  alt={article.title}
+                  fill
+                  sizes="96px"
+                  className="object-cover"
+                />
+              </div>
+            ) : null}
 
             <div className="min-w-0">
               <p className="text-xs font-semibold uppercase tracking-widest text-yellow-600">
@@ -108,15 +116,17 @@ export default function EditorialSlot({
         </div>
       ) : (
         <div>
-          <div className="relative h-72 w-full bg-gray-100">
-            <Image
-              src={article.image}
-              alt={article.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 66vw"
-              className="object-cover"
-            />
-          </div>
+          {article.image ? (
+            <div className="relative h-72 w-full bg-gray-100">
+              <Image
+                src={article.image}
+                alt={article.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 66vw"
+                className="object-cover"
+              />
+            </div>
+          ) : null}
 
           <div className="p-6 md:p-8">
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-yellow-600">

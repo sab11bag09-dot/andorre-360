@@ -2,11 +2,14 @@ import type { LucideIcon } from "lucide-react";
 import {
   Images,
   LayoutDashboard,
+  LayoutGrid,
   Newspaper,
   Radio,
   Send,
   Settings,
   Star,
+  Tags,
+  Users,
 } from "lucide-react";
 
 export type AdminNavigationItem = {
@@ -25,6 +28,21 @@ export const adminNavigation: AdminNavigationItem[] = [
     label: "Articles",
     href: "/admin/articles",
     icon: Newspaper,
+  },
+  {
+    label: "Catégories",
+    href: "/admin/categories",
+    icon: LayoutGrid,
+  },
+  {
+    label: "Tags",
+    href: "/admin/tags",
+    icon: Tags,
+  },
+  {
+    label: "Auteurs",
+    href: "/admin/authors",
+    icon: Users,
   },
   {
     label: "Sources",

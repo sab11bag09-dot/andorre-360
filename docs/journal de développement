@@ -64,3 +64,149 @@ L'authentification est considérée comme terminée. Aucune évolution ne sera a
 
 ### Prochaine étape
 Reprendre le développement du module **Articles**.
+
+# Changelog
+
+## Version 0.8.0 – Gestion des vidéos
+
+### Ajout
+- Support des vidéos externes (YouTube, Vimeo, TikTok, Facebook).
+- Nouvelle table `ExternalVideo`.
+- API `GET` et `POST` pour les vidéos externes.
+- Intégration des vidéos externes dans la médiathèque.
+- Sélection des vidéos depuis l'éditeur d'articles.
+- Affichage des vidéos dans les articles publics.
+
+### Améliorations
+- Les articles de type « Vidéo » peuvent être publiés sans image de couverture.
+- Affichage adapté des articles sans image.
+- Correction de l'erreur Next.js liée à `Image` avec un `src` vide.
+
+27/07/2026 – Fin de session
+État du projet
+✅ Terminé
+CRUD complet des catégories.
+Administration des catégories opérationnelle.
+Gestion des vidéos externes.
+Correction de plusieurs erreurs Next.js liées aux images (SportsPageV2, CulturePageV2).
+Problème identifié
+
+Le projet contient de nombreuses pages V2 construites sur le même modèle :
+
+SportsPageV2
+CulturePageV2
+PolitiquePageV2
+EconomiePageV2
+ImmobilierPageV2
+LifestylePageV2
+MontagnePageV2
+SociétéPageV2
+InternationalPageV2
+etc.
+
+Toutes utilisent directement :
+
+<Image src={article.image} ... />
+
+Or certaines images sont stockées sous forme de chaîne vide ("") en base.
+
+Next.js 16 refuse cela et déclenche :
+
+Image is missing required "src"
+
+ou
+
+An empty string ("") was passed to the src attribute.
+Première correction
+
+Création de :
+
+components/SafeImage.tsx
+import Image, { type ImageProps } from "next/image";
+
+type SafeImageProps = Omit<ImageProps, "src"> & {
+  src?: ImageProps["src"] | null;
+};
+
+export default function SafeImage({
+  src,
+  alt,
+  ...props
+}: SafeImageProps) {
+  const safeSrc = typeof src === "string" ? src.trim() : src;
+
+  if (!safeSrc) {
+    return null;
+  }
+
+  return <Image src={safeSrc} alt={alt} {...props} />;
+}
+Ce qu'il reste à faire
+
+Ne pas corriger les pages une par une.
+
+La bonne solution consiste à remplacer automatiquement tous les :
+
+import Image from "next/image";
+
+par
+
+import SafeImage from "@/components/SafeImage";
+
+et
+
+<Image
+
+par
+
+<SafeImage
+
+sans modifier la logique métier.
+
+⚠️ Éviter un simple remplacement texte.
+
+Préférer :
+
+un codemod AST (jscodeshift, ts-morph ou équivalent),
+ou une refactorisation automatisée de l'IDE.
+Deuxième amélioration recommandée
+
+Modifier les fonctions :
+
+getArticles()
+getArticlesByCategory()
+
+pour normaliser :
+
+image: article.image || null
+
+afin de ne plus jamais propager des chaînes vides.
+
+Troisième amélioration
+
+Dans Prisma et dans les formulaires d'administration :
+
+ne plus enregistrer
+
+""
+
+mais
+
+NULL
+
+pour une image absente.
+
+Important
+
+Le script :
+
+scripts/replace-next-image.mjs
+
+a été commencé mais n'a volontairement pas été exécuté, afin d'éviter une modification massive du projet sans vérification.
+
+Il est préférable de mettre en place un codemod robuste plutôt qu'un remplacement texte global.
+
+Je pense que ce journal donnera un bon contexte à la prochaine personne qui reprendra le projet, sans qu'elle ait à reconstituer tout ce qui a été fait. Repose-toi bien, il est largement temps.
+
+
+Contexte du projet : Next.js 16 + React 19 + Prisma 7. Le projet ANDORRE 360 utilise plusieurs pages V2 (SportsPageV2, CulturePageV2, etc.). Le problème restant est la gestion des images : certaines ont image = "", ce qui provoque les erreurs Next.js Image is missing required "src". Un composant SafeImage.tsx existe déjà. L'objectif est maintenant de mettre en place une correction globale (codemod ou autre solution robuste), pas de corriger chaque page manuellement.
