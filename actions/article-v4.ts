@@ -174,6 +174,7 @@ function revalidateArticlePages(
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/articles");
+  revalidatePath("/admin/media");
   revalidatePath(
     `/admin/articles/${articleId}`
   );
@@ -258,6 +259,22 @@ async function createArticle(
                 shouldPublish,
             },
           });
+          const media = await transaction.media.findUnique({
+  where: {
+    path: draft.image,
+  },
+});
+
+if (media) {
+  await transaction.mediaUsage.create({
+    data: {
+      mediaId: media.id,
+      entityType: "ARTICLE",
+      entityId: article.id,
+      field: "image",
+    },
+  });
+}
 
         if (shouldPublish) {
           await transaction.publication.create({
@@ -336,6 +353,7 @@ async function updateArticle(
       select: {
         id: true,
         slug: true,
+        image: true,
       },
     });
 
@@ -404,7 +422,40 @@ async function updateArticle(
               published:
                 shouldPublish,
             },
+            
           });
+          await transaction.mediaUsage.deleteMany({
+  where: {
+    entityType: "ARTICLE",
+    entityId: article.id,
+    field: "image",
+  },
+});
+          const media = await transaction.media.findUnique({
+  where: {
+    path: draft.image,
+  },
+});
+
+if (media) {
+  await transaction.mediaUsage.upsert({
+    where: {
+      mediaId_entityType_entityId_field: {
+        mediaId: media.id,
+        entityType: "ARTICLE",
+        entityId: article.id,
+        field: "image",
+      },
+    },
+    update: {},
+    create: {
+      mediaId: media.id,
+      entityType: "ARTICLE",
+      entityId: article.id,
+      field: "image",
+    },
+  });
+}
           console.log("UPDATED ARTICLE", {
   id: article.id,
   title: article.title,
