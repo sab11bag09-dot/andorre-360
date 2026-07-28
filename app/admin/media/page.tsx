@@ -24,18 +24,21 @@ export default async function AdminMediaPage({
   const lowercaseSearch = normalizedSearch.toLowerCase();
 
   const [media, externalVideos] = await Promise.all([
-    prisma.media.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    }),
+  prisma.media.findMany({
+    include: {
+      usages: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  }),
 
-    prisma.externalVideo.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-    }),
-  ]);
+  prisma.externalVideo.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  }),
+]);
 
   const totalMedia = media.length + externalVideos.length;
 
@@ -84,21 +87,27 @@ export default async function AdminMediaPage({
     filteredMedia.length + filteredExternalVideos.length;
 
   const serializedMedia = filteredMedia.map((item) => ({
-    id: item.id,
-    type: item.type,
-    filename: item.filename,
-    originalName: item.originalName,
-    path: item.path,
-    mimeType: item.mimeType,
-    size: item.size,
-    width: item.width,
-    height: item.height,
-    title: item.title,
-    alt: item.alt,
-    caption: item.caption,
-    credit: item.credit,
-    copyright: item.copyright,
-  }));
+  id: item.id,
+  type: item.type,
+  filename: item.filename,
+  originalName: item.originalName,
+  path: item.path,
+  mimeType: item.mimeType,
+  size: item.size,
+  width: item.width,
+  height: item.height,
+  title: item.title,
+  alt: item.alt,
+  caption: item.caption,
+  credit: item.credit,
+  copyright: item.copyright,
+  usages: item.usages.map((usage) => ({
+    id: usage.id,
+    entityType: usage.entityType,
+    entityId: usage.entityId,
+    field: usage.field,
+  })),
+}));
 
   const serializedExternalVideos =
     filteredExternalVideos.map((video) => ({

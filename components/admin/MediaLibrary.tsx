@@ -7,6 +7,13 @@ import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
 import MediaMetadataForm from "@/components/admin/MediaMetadataForm";
 import SafeImage from "@/components/SafeImage";
 
+type MediaUsageItem = {
+  id: number;
+  entityType: string;
+  entityId: number;
+  field: string;
+};
+
 type MediaItem = {
   id: number;
   type: string;
@@ -22,6 +29,7 @@ type MediaItem = {
   caption: string | null;
   credit: string | null;
   copyright: string | null;
+  usages: MediaUsageItem[];
 };
 
 type ExternalVideoItem = {
@@ -66,6 +74,25 @@ function getProviderLabel(provider: string): string {
   }
 }
 
+function getEntityLabel(entityType: string): string {
+  switch (entityType) {
+    case "ARTICLE":
+      return "Article";
+
+    default:
+      return entityType;
+  }
+}
+
+function getFieldLabel(field: string): string {
+  switch (field) {
+    case "coverImage":
+      return "Image de couverture";
+
+    default:
+      return field;
+  }
+}
 function getExternalVideoEmbedUrl(
   url: string,
   provider: string,
@@ -421,14 +448,46 @@ export default function MediaLibrary({
                     </a>
 
                     <MediaMetadataForm
-  key={`metadata-${selectedMedia.id}`}
-  mediaId={selectedMedia.id}
-  initialTitle={selectedMedia.title}
-  initialAlt={selectedMedia.alt}
-  initialCaption={selectedMedia.caption}
-  initialCredit={selectedMedia.credit}
-  initialCopyright={selectedMedia.copyright}
-/>
+                      key={`metadata-${selectedMedia.id}`}
+                      mediaId={selectedMedia.id}
+                      initialAlt={selectedMedia.alt}
+                      initialCaption={selectedMedia.caption}
+                      initialTitle={selectedMedia.title}
+initialCredit={selectedMedia.credit}
+initialCopyright={selectedMedia.copyright}
+                    />
+
+                   <div className="rounded-lg bg-zinc-900 p-4">
+  <h4 className="text-sm font-semibold">Utilisations</h4>
+
+  <p className="mt-2 text-sm text-zinc-400">
+    {selectedMedia.usages.length} utilisation
+    {selectedMedia.usages.length > 1 ? "s" : ""}
+  </p>
+  {selectedMedia.usages.length === 0 && (
+  <p className="mt-2 text-xs text-zinc-500">
+    Ce média n’est utilisé nulle part.
+  </p>
+)}
+{selectedMedia.usages.length > 0 && (
+  <div className="mt-3 space-y-2">
+    {selectedMedia.usages.map((usage) => (
+      <div
+        key={usage.id}
+        className="rounded-md border border-zinc-800 p-3 text-xs"
+      >
+        <p className="font-medium text-zinc-200">
+          {getEntityLabel(usage.entityType)}
+        </p>
+
+        <p className="mt-1 text-zinc-500">
+          Élément #{usage.entityId} · Champ : {getFieldLabel(usage.field)}
+        </p>sa
+      </div>
+    ))}
+  </div>
+)}
+</div>
 
                     <MediaDeleteButton
                       key={`delete-${selectedMedia.id}`}

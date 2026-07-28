@@ -416,3 +416,122 @@ et non un titre inséré à l'intérieur d'un paragraphe.
 Cette architecture facilitera l'ajout de nouveaux blocs sans remettre en cause les contenus existants.
 
 🎉 Fin de la première version de l'éditeur V5 : la boucle complète (édition → sauvegarde → affichage) est désormais opérationnelle.
+
+
+
+Journal de développement — ANDORRE 360 Studio
+Objectif de la séance
+
+Restaurer la médiathèque complète après une régression, puis reprendre les évolutions de manière sécurisée.
+
+Réalisations
+✅ Restauration de la médiathèque
+restauration de l'ancienne version de app/admin/media/page.tsx
+retour de l'interface complète :
+recherche
+import de médias
+vidéos externes
+galerie
+aperçu
+édition
+suppression
+✅ Vérification
+npm run build passe sans erreur.
+tous les tests fonctionnels sont validés :
+images
+vidéos internes
+vidéos externes
+recherche
+édition des métadonnées
+suppression
+✅ Sauvegarde
+
+Création d'un point Git après restauration.
+
+Amélioration des métadonnées
+
+Audit du modèle Prisma :
+
+Media
+
+Constat :
+
+Le modèle contenait déjà :
+
+title
+alt
+caption
+credit
+copyright
+usages
+
+mais le formulaire n'éditait que :
+
+alt
+caption
+Travaux réalisés
+
+API :
+
+app/api/media/[id]/route.ts
+
+Mise à jour du PATCH pour enregistrer :
+
+title
+alt
+caption
+credit
+copyright
+
+Build validé.
+
+Formulaire :
+
+components/admin/MediaMetadataForm.tsx
+
+Ajout des champs :
+
+Titre
+Texte alternatif
+Légende
+Crédit
+Copyright
+
+Build validé.
+
+Début du chantier MediaUsage
+
+Audit réalisé.
+
+Constat :
+
+MediaUsage existe déjà dans Prisma.
+
+MediaLibrary ne l'utilise pas.
+
+page.tsx ne chargeait pas la relation.
+
+Modification effectuée :
+
+include: {
+    usages: true
+}
+
+Build validé.
+
+Point d'arrêt
+
+Nous nous sommes arrêtés avant l'affichage des usages dans MediaLibrary.
+
+Le prochain travail consistera à :
+
+ajouter usages: MediaUsageItem[] au type MediaItem ;
+transmettre les usages depuis page.tsx ;
+afficher dans le panneau de droite :
+nombre d'utilisations ;
+liste des entités utilisant le média ;
+champ concerné.
+
+Aucune autre fonctionnalité n'a été modifiée.
+
+Bonne coupure, et à la reprise on continuera directement sur l'intégration visuelle de MediaUsage, en gardant la même méthode : une étape, un build, un commit.
