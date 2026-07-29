@@ -1,5 +1,8 @@
 import { FetchHttpClient } from "./http/FetchHttpClient";
-import type { HttpClient } from "./http/HttpClient";
+import type {
+  HttpClient,
+  HttpResponse,
+} from "./http/HttpClient";
 import {
   PrismaSourceRepository,
 } from "./repositories/PrismaSourceRepository";
@@ -15,12 +18,60 @@ export type SourceCheckResult = {
   message: string;
 };
 
+class SourceCheckTimeoutError extends Error {
+  constructor() {
+    super(
+      `La source n'a pas répondu dans le délai de ${
+        SOURCE_CHECK_TIMEOUT_MS / 1000
+      } secondes.`,
+    );
+
+    this.name = "SourceCheckTimeoutError";
+  }
+}
+
 function normalizeErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    return error.message.slice(0, MAX_ERROR_MESSAGE_LENGTH);
+    return error.message
+      .trim()
+      .slice(0, MAX_ERROR_MESSAGE_LENGTH);
   }
 
   return "Une erreur inconnue est survenue.";
+}
+
+async function executeHttpCheck(
+  url: string,
+  httpClient: HttpClient,
+): Promise<HttpResponse> {
+  const controller = new AbortController();
+
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new SourceCheckTimeoutError());
+    }, SOURCE_CHECK_TIMEOUT_MS);
+  });
+
+  try {
+    return await Promise.race([
+      httpClient.get({
+        url,
+        signal: controller.signal,
+      }),
+      timeoutPromise,
+    ]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+}
+
+function getResponseTime(startedAt: number): number {
+  return Math.round(Date.now() - startedAt);
 }
 
 export async function checkSource(
@@ -38,61 +89,27 @@ export async function checkSource(
     throw new Error("Source introuvable.");
   }
 
-  const controller = new AbortController();
+  const startedAt = Date.now();
 
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, SOURCE_CHECK_TIMEOUT_MS);
-
-  const startedAt = performance.now();
+  let response: HttpResponse;
 
   try {
-    const response = await httpClient.get({
-      url: source.url,
-      signal: controller.signal,
-    });
-
-    const responseTimeMs = Math.round(performance.now() - startedAt);
-    const checkedAt = new Date();
-
-    if (!response.ok) {
-      const message = `La source a répondu avec le statut HTTP ${response.status}.`;
-
-      await repository.markUnavailable(
-        source.id,
-        checkedAt,
-        message,
-      );
-
-      return {
-        success: false,
-        status: response.status,
-        responseTimeMs,
-        message,
-      };
-    }
-
-    await repository.markAvailable(
-      source.id,
-      checkedAt,
+    response = await executeHttpCheck(
+      source.url,
+      httpClient,
     );
-
-    return {
-      success: true,
-      status: response.status,
-      responseTimeMs,
-      message: `Source accessible en ${responseTimeMs} ms.`,
-    };
   } catch (error) {
-    const responseTimeMs = Math.round(performance.now() - startedAt);
+    const responseTimeMs = getResponseTime(startedAt);
     const checkedAt = new Date();
+    const isTimeout =
+  error instanceof SourceCheckTimeoutError ||
+  (error instanceof Error && error.name === "AbortError");
 
-    const message =
-      error instanceof Error && error.name === "AbortError"
-        ? `La source n'a pas répondu dans le délai de ${
-            SOURCE_CHECK_TIMEOUT_MS / 1000
-          } secondes.`
-        : normalizeErrorMessage(error);
+const message = isTimeout
+  ? `La source n'a pas répondu dans le délai de ${
+      SOURCE_CHECK_TIMEOUT_MS / 1000
+    } secondes.`
+  : normalizeErrorMessage(error);
 
     await repository.markUnavailable(
       source.id,
@@ -105,7 +122,39 @@ export async function checkSource(
       responseTimeMs,
       message,
     };
-  } finally {
-    clearTimeout(timeout);
   }
+
+  const responseTimeMs = getResponseTime(startedAt);
+  const checkedAt = new Date();
+
+  if (!response.ok) {
+    const message =
+      `La source a répondu avec le statut HTTP ` +
+      `${response.status}.`;
+
+    await repository.markUnavailable(
+      source.id,
+      checkedAt,
+      message,
+    );
+
+    return {
+      success: false,
+      status: response.status,
+      responseTimeMs,
+      message,
+    };
+  }
+
+  await repository.markAvailable(
+    source.id,
+    checkedAt,
+  );
+
+  return {
+    success: true,
+    status: response.status,
+    responseTimeMs,
+    message: `Source accessible en ${responseTimeMs} ms.`,
+  };
 }

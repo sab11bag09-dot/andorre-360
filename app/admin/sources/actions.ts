@@ -2,14 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { checkSource } from "@/lib/source-engine/checkSource";
+
 import {
+  Prisma,
   SourceCollectionMode,
   SourceOrganizationType,
   SourcePublicationMode,
   SourceTrustLevel,
 } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import { checkSource } from "@/lib/source-engine/checkSource";
 import {
   COLLECTION_MODES,
   ORGANIZATION_TYPES,
@@ -17,7 +19,10 @@ import {
   TRUST_LEVELS,
 } from "@/lib/sources/constants";
 
-function getRequiredString(formData: FormData, field: string) {
+function getRequiredString(
+  formData: FormData,
+  field: string,
+): string {
   const value = formData.get(field);
 
   if (typeof value !== "string" || value.trim() === "") {
@@ -27,16 +32,19 @@ function getRequiredString(formData: FormData, field: string) {
   return value.trim();
 }
 
-function getOptionalString(formData: FormData, field: string) {
+function getOptionalString(
+  formData: FormData,
+  field: string,
+): string | null {
   const value = formData.get(field);
 
   if (typeof value !== "string") {
     return null;
   }
 
-  const normalized = value.trim();
+  const normalizedValue = value.trim();
 
-  return normalized === "" ? null : normalized;
+  return normalizedValue === "" ? null : normalizedValue;
 }
 
 function isAllowedValue<T extends string>(
@@ -46,27 +54,64 @@ function isAllowedValue<T extends string>(
   return options.some((option) => option.value === value);
 }
 
+function validateSourceId(sourceId: number): void {
+  if (!Number.isInteger(sourceId) || sourceId < 1) {
+    throw new Error("Identifiant de source invalide.");
+  }
+}
+
+function normalizeSourceUrl(value: string): string {
+  let parsedUrl: URL;
+
+  try {
+    parsedUrl = new URL(value);
+  } catch {
+    throw new Error("L’URL de la source n’est pas valide.");
+  }
+
+  if (
+    parsedUrl.protocol !== "http:" &&
+    parsedUrl.protocol !== "https:"
+  ) {
+    throw new Error(
+      "L’URL doit utiliser le protocole HTTP ou HTTPS.",
+    );
+  }
+
+  parsedUrl.hash = "";
+
+  const normalizedUrl = parsedUrl.toString();
+
+  if (parsedUrl.pathname === "/" && parsedUrl.search === "") {
+    return normalizedUrl.replace(/\/$/, "");
+  }
+
+  return normalizedUrl;
+}
+
 function readSourceForm(formData: FormData) {
   const name = getRequiredString(formData, "name");
-  const url = getRequiredString(formData, "url");
-  const description = getOptionalString(formData, "description");
+  const url = normalizeSourceUrl(
+    getRequiredString(formData, "url"),
+  );
+  const description = getOptionalString(
+    formData,
+    "description",
+  );
   const category = getOptionalString(formData, "category");
 
   const organizationTypeValue = getRequiredString(
     formData,
     "organizationType",
   );
-
   const collectionModeValue = getRequiredString(
     formData,
     "collectionMode",
   );
-
   const publicationModeValue = getRequiredString(
     formData,
     "publicationMode",
   );
-
   const trustLevelValue = getRequiredString(
     formData,
     "trustLevel",
@@ -75,10 +120,6 @@ function readSourceForm(formData: FormData) {
   const intervalValue = Number(
     getRequiredString(formData, "checkIntervalMinutes"),
   );
-
-  if (!URL.canParse(url)) {
-    throw new Error("L’URL de la source n’est pas valide.");
-  }
 
   if (
     !isAllowedValue(
@@ -143,47 +184,120 @@ function readSourceForm(formData: FormData) {
   };
 }
 
-export async function createSource(formData: FormData) {
-  const data = readSourceForm(formData);
+function isUniqueConstraintError(
+  error: unknown,
+): error is Prisma.PrismaClientKnownRequestError {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2002"
+  );
+}
 
-  await prisma.source.create({
-    data,
-  });
-
+function revalidateSourcePages(sourceId?: number): void {
   revalidatePath("/admin");
   revalidatePath("/admin/sources");
 
+  if (sourceId !== undefined) {
+    revalidatePath(`/admin/sources/${sourceId}`);
+  }
+}
+
+export async function createSource(
+  formData: FormData,
+): Promise<void> {
+  const data = readSourceForm(formData);
+
+  const existingSource = await prisma.source.findUnique({
+    where: {
+      url: data.url,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (existingSource) {
+    throw new Error(
+      "Une source utilisant cette URL existe déjà.",
+    );
+  }
+
+  try {
+    await prisma.source.create({
+      data,
+    });
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      throw new Error(
+        "Une source utilisant cette URL existe déjà.",
+      );
+    }
+
+    throw error;
+  }
+
+  revalidateSourcePages();
   redirect("/admin/sources");
 }
 
 export async function updateSource(
   sourceId: number,
   formData: FormData,
-) {
-  if (!Number.isInteger(sourceId) || sourceId < 1) {
-    throw new Error("Identifiant de source invalide.");
-  }
+): Promise<void> {
+  validateSourceId(sourceId);
 
   const data = readSourceForm(formData);
 
-  await prisma.source.update({
+  const existingSource = await prisma.source.findFirst({
     where: {
-      id: sourceId,
+      url: data.url,
+      id: {
+        not: sourceId,
+      },
     },
-    data,
+    select: {
+      id: true,
+    },
   });
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/sources");
-  revalidatePath(`/admin/sources/${sourceId}`);
+  if (existingSource) {
+    throw new Error(
+      "Une autre source utilise déjà cette URL.",
+    );
+  }
 
+  try {
+    await prisma.source.update({
+      where: {
+        id: sourceId,
+      },
+      data,
+    });
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      throw new Error(
+        "Une autre source utilise déjà cette URL.",
+      );
+    }
+
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      throw new Error("Source introuvable.");
+    }
+
+    throw error;
+  }
+
+  revalidateSourcePages(sourceId);
   redirect("/admin/sources");
 }
 
-export async function toggleSource(sourceId: number) {
-  if (!Number.isInteger(sourceId) || sourceId < 1) {
-    throw new Error("Identifiant de source invalide.");
-  }
+export async function toggleSource(
+  sourceId: number,
+): Promise<void> {
+  validateSourceId(sourceId);
 
   const source = await prisma.source.findUnique({
     where: {
@@ -207,19 +321,15 @@ export async function toggleSource(sourceId: number) {
     },
   });
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/sources");
+  revalidateSourcePages(sourceId);
 }
-export async function checkSourceAvailability(sourceId: number) {
-  if (!Number.isInteger(sourceId) || sourceId < 1) {
-    throw new Error("Identifiant de source invalide.");
-  }
 
-  const result = await checkSource(sourceId);
+export async function checkSourceAvailability(
+  sourceId: number,
+): Promise<void> {
+  validateSourceId(sourceId);
 
-  revalidatePath("/admin");
-  revalidatePath("/admin/sources");
-  revalidatePath(`/admin/sources/${sourceId}`);
+  await checkSource(sourceId);
 
-  return result;
+  revalidateSourcePages(sourceId);
 }

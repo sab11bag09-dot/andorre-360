@@ -1,4 +1,7 @@
-import { toggleSource } from "@/app/admin/sources/actions";
+import {
+  checkSourceAvailability,
+  toggleSource,
+} from "@/app/admin/sources/actions";
 import {
   Badge,
   Button,
@@ -12,6 +15,7 @@ import {
   StatCard,
 } from "@/components/admin/ui";
 import {
+  SourceAvailabilityStatus,
   SourceCollectionMode,
   SourcePublicationMode,
 } from "@/lib/generated/prisma/client";
@@ -24,7 +28,7 @@ import {
 } from "@/lib/sources/constants";
 
 const SOURCE_GRID_TEMPLATE =
-  "minmax(0, 2fr) 150px 140px 140px 110px 180px";
+  "minmax(0, 2fr) 150px 140px 140px 110px 260px";
 
 function formatDate(date: Date | null) {
   if (!date) {
@@ -38,6 +42,22 @@ function formatDate(date: Date | null) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
+}
+
+function getAvailabilityBadge(
+  status: SourceAvailabilityStatus,
+) {
+  switch (status) {
+    case SourceAvailabilityStatus.AVAILABLE:
+      return <Badge variant="success">Disponible</Badge>;
+
+    case SourceAvailabilityStatus.UNAVAILABLE:
+      return <Badge>Indisponible</Badge>;
+
+    case SourceAvailabilityStatus.UNKNOWN:
+    default:
+      return <Badge>Non vérifiée</Badge>;
+  }
 }
 
 function isCollectionMode(
@@ -290,6 +310,12 @@ export default async function AdminSourcesPage({
                 source.id,
               );
 
+              const checkAction =
+                checkSourceAvailability.bind(
+                  null,
+                  source.id,
+                );
+
               return (
                 <DataTableRow
                   key={source.id}
@@ -313,6 +339,21 @@ export default async function AdminSourcesPage({
                       Dernier contrôle :{" "}
                       {formatDate(source.lastCheckedAt)}
                     </p>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {getAvailabilityBadge(
+                        source.availabilityStatus,
+                      )}
+
+                      {source.lastErrorMessage ? (
+                        <span
+                          className="max-w-full truncate text-xs text-red-400"
+                          title={source.lastErrorMessage}
+                        >
+                          {source.lastErrorMessage}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
 
                   <p className="text-sm text-zinc-300">
@@ -346,25 +387,32 @@ export default async function AdminSourcesPage({
                     )}
                   </div>
 
-                  <div className="flex flex-wrap gap-2 xl:justify-end">
-                    <Button
-                      href={`/admin/sources/${source.id}`}
-                      variant="outline"
-                    >
-                      Modifier
-                    </Button>
+                  <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+  <form action={checkAction}>
+    <Button
+      type="submit"
+      variant="outline"
+    >
+      Vérifier
+    </Button>
+  </form>
 
-                    <form action={toggleAction}>
-                      <Button
-                        type="submit"
-                        variant="outline"
-                      >
-                        {source.active
-                          ? "Désactiver"
-                          : "Activer"}
-                      </Button>
-                    </form>
-                  </div>
+  <Button
+    href={`/admin/sources/${source.id}`}
+    variant="outline"
+  >
+    Modifier
+  </Button>
+
+  <form action={toggleAction}>
+    <Button
+      type="submit"
+      variant="outline"
+    >
+      {source.active ? "Désactiver" : "Activer"}
+    </Button>
+  </form>
+</div>
                 </DataTableRow>
               );
             })}

@@ -14,8 +14,13 @@ export const ORGANIZATION_TYPES = [
 
 export const COLLECTION_MODES = [
   { value: "RSS", label: "Flux RSS" },
+  { value: "HTML", label: "Site internet" },
   { value: "API", label: "API" },
-  { value: "WEBSITE", label: "Site internet" },
+  { value: "PDF", label: "Document PDF" },
+  { value: "FACEBOOK", label: "Facebook" },
+  { value: "X", label: "X (Twitter)" },
+  { value: "YOUTUBE", label: "YouTube" },
+  { value: "EMAIL", label: "E-mail" },
 ] as const;
 
 export const PUBLICATION_MODES = [
