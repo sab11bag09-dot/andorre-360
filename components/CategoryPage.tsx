@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 type CategoryPageProps = {
   category: string;
-  title: string;
+  title?: string;
 };
 
 export default async function CategoryPage({

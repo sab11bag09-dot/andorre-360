@@ -482,7 +482,7 @@ initialCopyright={selectedMedia.copyright}
 
         <p className="mt-1 text-zinc-500">
           Élément #{usage.entityId} · Champ : {getFieldLabel(usage.field)}
-        </p>sa
+        </p>
       </div>
     ))}
   </div>
