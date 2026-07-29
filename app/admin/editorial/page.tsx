@@ -10,6 +10,8 @@ import { prisma } from "@/lib/prisma";
 import EditorialHealthCard from "@/components/editorial/EditorialHealthCard";
 import EditorialHeader from "@/components/editorial/EditorialHeader";
 import { buildEditorialPageData } from "@/lib/editorial/buildEditorialPageData";
+
+import { buildEditorialStats } from "@/lib/editorial/buildEditorialStats";
 import EditorialLayout from "@/components/editorial/EditorialLayout";
 
 export default async function EditorialPage() {
@@ -58,77 +60,28 @@ export default async function EditorialPage() {
   editorialLayout,
   publishedArticles,
 });
-
+const {
+  activePublications,
+  scheduledPublications,
+  facebookPublications,
+  whatsappPublications,
+  conflicts,
+} = buildEditorialStats({
+  publications,
+  now,
+});
   /*
    * Indicateurs du Centre éditorial.
    */
 
-  const activePublications = publications.filter(
-    (publication) => {
-      if (!publication.active) {
-        return false;
-      }
 
-      if (
-        publication.startsAt &&
-        publication.startsAt > now
-      ) {
-        return false;
-      }
-
-      if (
-        publication.endsAt &&
-        publication.endsAt < now
-      ) {
-        return false;
-      }
-
-      return true;
-    }
-  );
-
-  const scheduledPublications = publications.filter(
-    (publication) =>
-      publication.active &&
-      publication.startsAt !== null &&
-      publication.startsAt > now
-  );
-
-  const facebookPublications =
-    activePublications.filter(
-      (publication) =>
-        publication.channel === "facebook"
-    );
-
-  const whatsappPublications =
-    activePublications.filter(
-      (publication) =>
-        publication.channel === "whatsapp"
-    );
 
   /*
    * Détection simple des conflits :
    * plusieurs missions actives dans une même zone.
    */
 
-  const publicationGroups = new Map<string, number>();
 
-  activePublications.forEach((publication) => {
-    const key = [
-      publication.pageKey,
-      publication.channel,
-      publication.zone,
-    ].join(":");
-
-    publicationGroups.set(
-      key,
-      (publicationGroups.get(key) ?? 0) + 1
-    );
-  });
-
-  const conflicts = Array.from(
-    publicationGroups.values()
-  ).filter((count) => count > 1).length;
 
   return (
   <>
