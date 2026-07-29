@@ -24,24 +24,47 @@ Le cœur du système est donc la Story.
 
 # Source
 
-Une Source est un fournisseur d'informations.
+Une Source est un fournisseur d'informations surveillé par le système.
 
 Exemples :
 
-- Gouvernement
-- Police
-- RSS
-- API
-- Facebook
-- Site web
-- PDF
+- un organisme gouvernemental ;
+- une commune ;
+- un service de police ;
+- un flux RSS ;
+- une API ;
+- une page Facebook ;
+- un site web ;
+- un document PDF.
 
 Une Source possède :
 
-- une origine
-- un niveau de confiance
-- une fréquence de surveillance
-- des règles d'extraction
+- une origine ;
+- un type d'organisation ;
+- un mode de collecte ;
+- un mode de publication ;
+- un niveau de confiance ;
+- une fréquence de surveillance ;
+- des règles d'extraction ;
+- un état d'activation ;
+- un état de disponibilité technique.
+
+L'état de disponibilité d'une Source peut être :
+
+- `UNKNOWN` : la Source n'a jamais été contrôlée ;
+- `AVAILABLE` : le dernier contrôle technique a réussi ;
+- `UNAVAILABLE` : le dernier contrôle technique a échoué.
+
+Une Source conserve également :
+
+- la date de son dernier contrôle ;
+- la date de son dernier contrôle réussi ;
+- la date de sa dernière erreur ;
+- le message de sa dernière erreur.
+
+La disponibilité technique ne détermine pas la confiance éditoriale.
+
+Une Source disponible peut rester peu fiable sur le plan éditorial.
 
 Une Source produit des Observations.
 
@@ -92,6 +115,7 @@ Une Source peut produire plusieurs Observations.
 Une Observation peut contribuer à une ou plusieurs Stories.
 
 Chaque rattachement conserve la provenance de l’information et reste traçable.
+---
 
 # Story
 
@@ -287,28 +311,17 @@ Toutes les décisions sont historisées.
 
 # Relations
 
+```text
 Source
-
-↓
-
+    ↓
+Observation
+    ↓
 Story
-
-↓
-
-Facts
-
-↓
-
+    ↓
+Fact
+    ↓
 Article
-
-↓
-
+    ↓
 Publication
-
-↓
-
+    ↓
 Edition
-
-Les Agents interviennent à chaque étape.
-
-Les journalistes peuvent reprendre le contrôle à tout moment.

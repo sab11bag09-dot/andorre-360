@@ -670,3 +670,584 @@ Tests.
 Documentation.
 
 C'est un peu plus lent au début, mais sur un projet qui peut devenir aussi ambitieux qu'ANDORRE 360, c'est ce qui permet de conserver une architecture cohérente pendant des années. Et je pense que cette vision mérite une base solide dès maintenant.
+
+Passation technique – ANDORRE 360 Studio
+Contexte
+
+Le projet suit une méthodologie stricte :
+
+Vision
+Domaine
+Architecture
+Implémentation
+Tests
+Documentation
+Commit
+
+Nous sommes actuellement à la fin de l'étape Architecture du moteur de collecte.
+
+Domaine
+
+Le pipeline métier est désormais fixé.
+
+Source
+    ↓
+Observation
+    ↓
+Story
+    ↓
+Fact
+    ↓
+Article
+    ↓
+Publication
+    ↓
+Edition
+
+Le modèle Observation fait partie du cœur métier.
+
+Branche Git
+feature/admin-auth
+
+Les derniers travaux ont été commités et poussés.
+
+Prisma
+
+Version :
+
+Prisma 7
+
+Le générateur est :
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+Tous les imports Prisma doivent utiliser :
+
+@/lib/generated/prisma/client
+
+et jamais :
+
+@prisma/client
+Fonctionnalité Source
+
+La partie administration des sources est opérationnelle.
+
+Fonctionnalités disponibles :
+
+CRUD
+activation / désactivation
+vérification de disponibilité HTTP
+affichage :
+dernier contrôle
+statut
+dernier message d'erreur
+Source Availability
+
+Une source possède :
+
+availabilityStatus
+lastCheckedAt
+lastErrorMessage
+
+avec
+
+enum SourceAvailabilityStatus {
+  UNKNOWN
+  AVAILABLE
+  UNAVAILABLE
+}
+checkSource()
+
+Architecture terminée.
+
+checkSource()
+        │
+        ▼
+SourceRepository
+        │
+        ▼
+HttpClient
+
+Injection de dépendances.
+
+Repositories fake.
+
+Http fake.
+
+Tests verts.
+
+Gestion du timeout.
+
+Source Engine
+
+Architecture actuelle :
+
+lib/source-engine/
+│
+├── checkSource.ts
+├── collectSource.ts
+│
+├── collectors/
+│   ├── Collector.ts
+│   └── HtmlCollector.ts
+│
+├── factories/
+│   ├── CollectorFactory.ts
+│   └── CollectorFactoryInterface.ts
+│
+├── repositories/
+│   ├── SourceRepository.ts
+│   ├── PrismaSourceRepository.ts
+│   │
+│   ├── CollectionSourceRepository.ts
+│   └── PrismaCollectionSourceRepository.ts
+│
+└── http/
+    ├── HttpClient.ts
+    └── FetchHttpClient.ts
+Séparation volontaire des repositories
+
+Deux cas d'usage différents.
+
+checkSource()
+
+Utilise :
+
+SourceRepository
+
+Le contrat est volontairement minimal :
+
+SourceForCheck
+
+afin d'éviter de charger toute la Source.
+
+collectSource()
+
+Utilise :
+
+CollectionSourceRepository
+
+qui retourne :
+
+Source
+
+complet.
+
+Cette séparation est volontaire et doit être conservée.
+
+Ne pas fusionner les deux repositories.
+
+Collectors
+
+Contrat créé.
+
+Collector
+
+retourne
+
+ObservationInput[]
+
+Le premier collecteur existe :
+
+HtmlCollector
+
+Il retourne actuellement :
+
+[]
+
+Il sert uniquement à valider l'architecture.
+
+Factory
+
+Une
+
+CollectorFactory
+
+choisit le collecteur selon
+
+source.collectionMode
+
+Pour l'instant seul
+
+HTML
+
+est implémenté.
+
+Les autres modes devront être ajoutés progressivement :
+
+RSS
+API
+PDF
+FACEBOOK
+X
+YOUTUBE
+EMAIL
+collectSource()
+
+L'orchestrateur existe.
+
+Responsabilités :
+
+charger la Source
+        ↓
+demander le Collector
+        ↓
+collect()
+        ↓
+ObservationInput[]
+
+Aucune logique métier ne doit être ajoutée dans cet orchestrateur.
+
+Choix d'architecture
+
+Les dépendances sont injectables.
+
+Le moteur suit le même principe que :
+
+HttpClient
+SourceRepository
+
+afin de faciliter les tests.
+
+Constantes
+
+Une incohérence a été corrigée.
+
+Avant :
+
+WEBSITE
+
+Maintenant :
+
+HTML
+
+qui correspond exactement à
+
+SourceCollectionMode.HTML
+
+Ne jamais réintroduire
+
+WEBSITE
+Interface admin
+
+Le bouton
+
+Vérifier
+
+fonctionne.
+
+La Server Action :
+
+checkSourceAvailability()
+
+est opérationnelle.
+
+État du moteur
+
+Architecture :
+
+✅ terminée
+
+Implémentation :
+
+🟡 commencée
+
+Tests :
+
+❌ pas encore écrits
+
+Prochaine étape
+
+Ne pas commencer le parsing HTML.
+
+La prochaine étape est d'écrire les tests de :
+
+collectSource()
+
+avec :
+
+FakeCollectionSourceRepository
+FakeCollector
+FakeCollectorFactory
+
+Objectifs :
+
+source inexistante
+bon collecteur sélectionné
+observations retournées
+
+Une fois les tests verts, seulement ensuite implémenter le premier vrai HtmlCollector.
+
+Point d'attention
+
+Au cours de cette session, quelques propositions ont recréé des fichiers déjà existants. Pour la suite, il faut impérativement partir de l'état actuel du dépôt et ne proposer que des modifications ciblées ou de nouveaux fichiers lorsqu'ils sont réellement nécessaires. Cela évitera les doublons et préservera la cohérence de l'architecture.
+
+Passation technique – ANDORRE 360 Studio
+Contexte
+
+Projet développé selon une méthodologie stricte :
+
+Vision
+Domaine
+Architecture
+Implémentation
+Tests
+Documentation
+Commit
+
+Nous sommes actuellement dans l'implémentation du moteur de collecte, avec une approche TDD (tests avant implémentation).
+
+Branche Git
+feature/admin-auth
+Prisma
+
+Version :
+
+Prisma 7
+
+Le client est généré avec :
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+Toujours importer depuis :
+
+@/lib/generated/prisma/client
+
+Jamais :
+
+@prisma/client
+Domaine
+
+Pipeline métier :
+
+Source
+    ↓
+Observation
+    ↓
+Story
+    ↓
+Fact
+    ↓
+Article
+    ↓
+Publication
+    ↓
+Edition
+
+Observation est un objet métier de premier niveau.
+
+Fonctionnalité Source
+
+Terminée.
+
+CRUD
+activation
+désactivation
+vérification HTTP
+statut de disponibilité
+affichage admin
+Source availability
+
+Architecture terminée.
+
+checkSource()
+        │
+        ▼
+SourceRepository
+        │
+        ▼
+HttpClient
+        │
+        ▼
+FetchHttpClient
+
+Injection de dépendances.
+
+Tests verts.
+
+Timeout géré.
+
+Collection Engine
+
+Architecture actuelle :
+
+lib/source-engine/
+│
+├── checkSource.ts
+├── collectSource.ts
+│
+├── collectors/
+│   ├── Collector.ts
+│   └── HtmlCollector.ts
+│
+├── factories/
+│   ├── CollectorFactory.ts
+│   └── CollectorFactoryInterface.ts
+│
+├── repositories/
+│   ├── SourceRepository.ts
+│   ├── PrismaSourceRepository.ts
+│   ├── CollectionSourceRepository.ts
+│   └── PrismaCollectionSourceRepository.ts
+│
+├── html/
+│   ├── HtmlClient.ts
+│   └── FetchHtmlClient.ts
+│
+└── http/
+    ├── HttpClient.ts
+    └── FetchHttpClient.ts
+Architecture
+
+Deux repositories volontairement distincts.
+
+checkSource
+
+Utilise :
+
+SourceRepository
+
+Retourne un modèle minimal.
+
+Ne pas le modifier.
+
+collectSource
+
+Utilise :
+
+CollectionSourceRepository
+
+Retourne une Source complète.
+
+Ne pas fusionner ces deux contrats.
+
+Collectors
+
+Contrat :
+
+Collector
+
+Retour :
+
+ObservationInput[]
+
+Premier collecteur :
+
+HtmlCollector
+HtmlClient
+
+Nouvelle abstraction créée.
+
+Contrat :
+
+HtmlClient
+
+Implémentation :
+
+FetchHtmlClient
+
+Le collecteur dépend uniquement du contrat.
+
+collectSource()
+
+Entièrement testé.
+
+Les tests vérifient :
+
+identifiant invalide
+source inexistante
+appel de la factory
+propagation des observations
+
+Tests verts.
+
+HtmlCollector
+
+Premier test écrit.
+
+Le faux client :
+
+FakeHtmlClient
+
+mémorise :
+
+receivedUrl
+
+Le premier test vérifie que :
+
+collect(source)
+
+appelle :
+
+htmlClient.get(source.url)
+Implémentation actuelle
+
+Une seule ligne a été ajoutée dans HtmlCollector.collect() :
+
+await this.htmlClient.get(source.url);
+
+avant :
+
+return [];
+
+Le test passe.
+
+Le collecteur continue de retourner :
+
+[]
+
+Aucun parsing HTML n'a encore été commencé.
+
+État des tests
+
+Verts :
+
+checkSource
+collectSource
+premier test HtmlCollector
+Prochaine étape
+
+Écrire le deuxième test de HtmlCollector.
+
+Objectif :
+
+Si le HTML récupéré est vide :
+
+""
+
+alors :
+
+collect()
+
+retourne :
+
+[]
+
+Une fois ce test vert, continuer progressivement :
+
+récupération HTML
+parsing du <title>
+première ObservationInput
+puis seulement extraction des articles.
+Mode de travail retenu
+
+Le mode "pas à pas" est adopté.
+
+Ne plus fournir des fichiers complets sauf nécessité.
+
+Chaque étape doit être de la forme :
+
+ouvrir un fichier ;
+ajouter / modifier une ou deux lignes maximum ;
+lancer une commande (tsc ou vitest) ;
+attendre la validation avant de poursuivre.
+
+Ne jamais anticiper les étapes suivantes.
+
+Ce fonctionnement est plus fiable sur un projet de cette taille et évite de recréer ou de remplacer des éléments déjà existants.

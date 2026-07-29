@@ -1025,3 +1025,175 @@ Je pense qu'on a trouvé notre méthode de travail
 🚀 Sprint suivant.
 
 C'est une méthode simple, mais elle évite de construire un projet "au hasard". Et je pense qu'elle est particulièrement adaptée à l'ambition d'ANDORRE 360.
+
+CONTEXTE DU PROJET
+
+Projet : ANDORRE 360 Studio
+
+Objectif : construire un CMS / newsroom autonome destiné à alimenter ANDORRE 360.
+
+Le projet n'est pas un simple site d'actualité.
+
+Le but est de construire progressivement :
+
+un moteur de veille,
+un moteur éditorial,
+un moteur IA,
+un moteur de publication.
+
+Le développement est volontairement incrémental.
+
+MÉTHODE DE TRAVAIL
+
+Toujours respecter cet ordre.
+
+Vision
+Domaine
+Architecture
+Implémentation
+Tests
+Commit
+
+On ne saute jamais directement au code.
+
+Chaque nouvelle fonctionnalité commence par vérifier la documentation avant d'écrire une ligne de code.
+
+Le projet est découpé en petits sprints.
+
+Un sprint = un commit.
+
+DOCUMENTATION
+
+La documentation constitue la référence.
+
+Les principaux documents sont :
+
+docs/
+
+avec notamment :
+
+00-manifesto.md
+01-vision.md
+02-architecture.md
+03-domain-model.md
+ROADMAP.md
+
+En cas de doute, la documentation prévaut sur les suppositions.
+
+BRANCHE GIT
+
+Travail en cours :
+
+feature/admin-auth
+
+Le projet comporte déjà plusieurs commits locaux.
+
+STACK
+
+Next.js
+
+TypeScript
+
+Prisma 7
+
+Vitest
+
+PRISMA
+
+Le projet utilise Prisma 7.
+
+Le client est généré avec :
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+Les imports doivent toujours être :
+
+import {
+   ...
+} from "@/lib/generated/prisma/client";
+
+et jamais :
+
+@prisma/client
+
+Le dossier généré n'est pas versionné.
+
+CE QUI EST TERMINÉ
+Refactor éditorial
+
+Terminé.
+
+Administration
+
+Interface d'administration en place.
+
+Modèle Source
+
+Le modèle Source a été refactoré.
+
+Les champs string ont été remplacés par des enums Prisma :
+
+SourceOrganizationType
+SourceCollectionMode
+SourcePublicationMode
+SourceTrustLevel
+
+Migration effectuée.
+
+Compilation OK.
+
+Tests OK.
+
+Commit effectué.
+
+ÉTAT ACTUEL
+
+Le dépôt est propre.
+
+Les seules modifications restantes concernent la documentation (docs/*.md) et ne doivent pas être mélangées avec le développement du Source Engine.
+
+IMPORTANT
+
+Lors de la dernière session, une erreur méthodologique est apparue.
+
+Le développement est parti directement sur :
+
+lib/source-engine/checkSource.ts
+
+en inventant son architecture.
+
+C'est contraire à la méthode du projet.
+
+Il ne faut pas commencer par écrire ce fichier.
+
+CE QU'IL FAUT FAIRE MAINTENANT
+
+Avant toute nouvelle ligne de code :
+
+ouvrir docs/ROADMAP.md
+identifier précisément le prochain sprint
+vérifier que celui-ci est cohérent avec :
+00-manifesto
+01-vision
+02-architecture
+03-domain-model
+
+Seulement ensuite :
+
+définir les responsabilités du sprint,
+valider l'architecture,
+écrire le code.
+RÈGLE IMPORTANTE
+
+Le successeur ne doit jamais inventer la suite du projet.
+
+Il doit s'appuyer exclusivement sur :
+
+la documentation,
+l'état actuel du dépôt,
+les décisions déjà prises.
+
+Si une information manque, il doit demander le document concerné plutôt que faire des hypothèses.
