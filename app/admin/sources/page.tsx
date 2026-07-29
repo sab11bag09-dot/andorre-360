@@ -339,6 +339,10 @@ export default async function AdminSourcesPage({
                       Dernier contrôle :{" "}
                       {formatDate(source.lastCheckedAt)}
                     </p>
+                    <p className="mt-1 text-xs text-zinc-600">
+  Dernier succès :{" "}
+  {formatDate(source.lastSuccessAt)}
+</p>
 
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       {getAvailabilityBadge(

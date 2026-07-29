@@ -31,13 +31,15 @@ class SourceCheckTimeoutError extends Error {
 }
 
 function normalizeErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message
-      .trim()
-      .slice(0, MAX_ERROR_MESSAGE_LENGTH);
+  if (!(error instanceof Error)) {
+    return "Une erreur inconnue est survenue.";
   }
 
-  return "Une erreur inconnue est survenue.";
+  const message = error.message
+    .trim()
+    .slice(0, MAX_ERROR_MESSAGE_LENGTH);
+
+  return message || "Une erreur inconnue est survenue.";
 }
 
 async function executeHttpCheck(
@@ -98,18 +100,20 @@ export async function checkSource(
       source.url,
       httpClient,
     );
-  } catch (error) {
+    } catch (error) {
     const responseTimeMs = getResponseTime(startedAt);
     const checkedAt = new Date();
-    const isTimeout =
-  error instanceof SourceCheckTimeoutError ||
-  (error instanceof Error && error.name === "AbortError");
 
-const message = isTimeout
-  ? `La source n'a pas répondu dans le délai de ${
-      SOURCE_CHECK_TIMEOUT_MS / 1000
-    } secondes.`
-  : normalizeErrorMessage(error);
+    const isTimeout =
+      error instanceof SourceCheckTimeoutError ||
+      (error instanceof Error &&
+        error.name === "AbortError");
+
+    const message = isTimeout
+      ? `La source n'a pas répondu dans le délai de ${
+          SOURCE_CHECK_TIMEOUT_MS / 1000
+        } secondes.`
+      : normalizeErrorMessage(error);
 
     await repository.markUnavailable(
       source.id,
