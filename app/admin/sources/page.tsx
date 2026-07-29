@@ -26,6 +26,11 @@ import {
   ORGANIZATION_TYPES,
   PUBLICATION_MODES,
 } from "@/lib/sources/constants";
+import {
+  checkSourceAvailability,
+  collectSourceNow,
+  toggleSource,
+} from "@/app/admin/sources/actions";
 
 const SOURCE_GRID_TEMPLATE =
   "minmax(0, 2fr) 150px 140px 140px 110px 260px";
@@ -315,6 +320,11 @@ export default async function AdminSourcesPage({
                   null,
                   source.id,
                 );
+                const collectAction =
+  collectSourceNow.bind(
+    null,
+    source.id,
+  );
 
               return (
                 <DataTableRow
@@ -400,11 +410,20 @@ export default async function AdminSourcesPage({
       Vérifier
     </Button>
   </form>
+<form action={collectAction}>
+  <Button
+    type="submit"
+    variant="outline"
+  >
+    Collecter
+  </Button>
+</form>
 
   <Button
     href={`/admin/sources/${source.id}`}
     variant="outline"
   >
+
     Modifier
   </Button>
 

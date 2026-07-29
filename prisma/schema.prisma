@@ -160,10 +160,29 @@ model Source {
   lastErrorMessage     String?
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
+  observations         Observation[]
 
   @@index([active])
   @@index([collectionMode])
   @@index([lastCheckedAt])
+}
+model Observation {
+  id          Int      @id @default(autoincrement())
+  sourceId    Int
+  title       String
+  url         String
+  publishedAt DateTime?
+  content     String?
+  collectedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, url])
+  @@index([sourceId])
+  @@index([publishedAt])
+  @@index([collectedAt])
 }
 
 enum SourceOrganizationType {

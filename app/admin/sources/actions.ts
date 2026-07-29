@@ -18,6 +18,7 @@ import {
   PUBLICATION_MODES,
   TRUST_LEVELS,
 } from "@/lib/sources/constants";
+import { collectSource } from "@/lib/source-engine/collectSource";
 
 function getRequiredString(
   formData: FormData,
@@ -330,6 +331,16 @@ export async function checkSourceAvailability(
   validateSourceId(sourceId);
 
   await checkSource(sourceId);
+
+  revalidateSourcePages(sourceId);
+  
+}
+export async function collectSourceNow(
+  sourceId: number,
+): Promise<void> {
+  validateSourceId(sourceId);
+
+  await collectSource(sourceId);
 
   revalidateSourcePages(sourceId);
 }

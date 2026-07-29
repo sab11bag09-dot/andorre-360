@@ -19,7 +19,9 @@ export class HtmlCollector implements Collector {
     console.info(
       `[HtmlCollector] Collecte de ${source.url}`,
     );
-await this.htmlClient.get(source.url);
+
+    await this.htmlClient.get(source.url);
+
     return [];
   }
 }
