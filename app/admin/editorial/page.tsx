@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Button,
   PageHeader,
@@ -6,10 +5,16 @@ import {
 } from "@/components/admin/ui";
 
 import EditorialSlot from "@/components/editorial/EditorialSlot";
+import {
+  EDITORIAL_ZONE_CONFIG,
+  EDITORIAL_ZONES,
+} from "@/lib/editorial/zones";
 import { getPublishedArticles } from "@/lib/articles";
 import { buildEditorialLayout } from "@/lib/editorial/engine";
 import { prisma } from "@/lib/prisma";
-
+import EditorialHealthCard from "@/components/editorial/EditorialHealthCard";
+import EditorialSocialCard from "@/components/editorial/EditorialSocialCard";
+import EditorialHeader from "@/components/editorial/EditorialHeader";
 
 export default async function EditorialPage() {
   const now = new Date();
@@ -96,7 +101,7 @@ export default async function EditorialPage() {
   const secondary = [...editorialLayout.secondary];
 
   while (
-    secondary.length < 2 &&
+    secondary.length < EDITORIAL_ZONE_CONFIG.secondary.slots &&
     availableArticles.length > 0
   ) {
     const article = availableArticles.shift();
@@ -109,7 +114,7 @@ export default async function EditorialPage() {
   const goodToKnow = [...editorialLayout.goodToKnow];
 
   while (
-    goodToKnow.length < 3 &&
+    goodToKnow.length < EDITORIAL_ZONE_CONFIG["good-to-know"].slots &&
     availableArticles.length > 0
   ) {
     const article = availableArticles.shift();
@@ -122,7 +127,7 @@ export default async function EditorialPage() {
   const briefs = [...editorialLayout.briefs];
 
   while (
-    briefs.length < 3 &&
+   briefs.length < EDITORIAL_ZONE_CONFIG.brief.slots &&
     availableArticles.length > 0
   ) {
     const article = availableArticles.shift();
@@ -274,97 +279,13 @@ export default async function EditorialPage() {
 
         {/* SANTÉ DU JOURNAL — MAQUETTE TEMPORAIRE */}
 
-        <section className="mt-8 rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-700 p-8 text-white shadow-xl">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-emerald-100">
-                Santé du journal
-              </p>
-
-              <h2 className="mt-3 font-serif text-4xl">
-                Indice éditorial global
-              </h2>
-
-              <p className="mt-3 max-w-xl text-emerald-100">
-                Une première représentation visuelle de la
-                santé éditoriale. Les valeurs seront ensuite
-                calculées à partir des vraies statistiques.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="text-7xl font-black">
-                84
-              </div>
-
-              <p className="mt-2 text-xl font-semibold">
-                /100
-              </p>
-
-              <div className="mt-5 inline-flex rounded-full bg-white/20 px-5 py-2 text-sm font-bold">
-                🟢 Excellent
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl bg-white/10 p-5">
-              <p className="text-3xl font-bold">
-                3
-              </p>
-
-              <p className="mt-2 text-sm">
-                Contenus très performants
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-white/10 p-5">
-              <p className="text-3xl font-bold">
-                1
-              </p>
-
-              <p className="mt-2 text-sm">
-                Contenu à surveiller
-              </p>
-            </div>
-
-            <div className="rounded-2xl bg-white/10 p-5">
-              <p className="text-3xl font-bold">
-                {scheduledPublications.length}
-              </p>
-
-              <p className="mt-2 text-sm">
-                Publications programmées
-              </p>
-            </div>
-          </div>
-        </section>
+        <EditorialHealthCard
+  scheduledPublicationsCount={scheduledPublications.length}
+/>
 
         {/* TITRE DE LA COMPOSITION */}
 
-        <section className="mt-10 flex flex-col gap-4 border-b border-gray-300 pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-700">
-              Composition en direct
-            </p>
-
-            <h2 className="mt-2 font-serif text-3xl md:text-4xl">
-              Page d’accueil
-            </h2>
-
-            <p className="mt-2 text-sm text-gray-600">
-              Les missions éditoriales priment sur le
-              remplissage automatique.
-            </p>
-          </div>
-
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold shadow-sm transition hover:border-yellow-500"
-          >
-            Voir la homepage →
-          </Link>
-        </section>
+       <EditorialHeader />
 
         {/* COMPOSITION DU JOURNAL */}
 
@@ -392,10 +313,13 @@ export default async function EditorialPage() {
               </div>
 
               <EditorialSlot
-                title="⭐ Une principale"
+                title={
+  EDITORIAL_ZONE_CONFIG.hero.title ??
+  "⭐ Une principale"
+}
                 article={hero}
                 editionKey="home"
-                zone="hero"
+                zone={EDITORIAL_ZONES.HERO}
                 articles={publishedArticles}
               />
             </div>
@@ -414,10 +338,13 @@ export default async function EditorialPage() {
               </div>
 
               <EditorialSlot
-                title="🟨 Grande carte"
+                title={
+  EDITORIAL_ZONE_CONFIG.feature.title ??
+  "🟨 Grande carte"
+}
                 article={feature}
                 editionKey="home"
-                zone="main"
+                zone={EDITORIAL_ZONES.MAIN}
                 articles={publishedArticles}
               />
             </div>
@@ -437,19 +364,22 @@ export default async function EditorialPage() {
                 </div>
 
                 <span className="text-sm text-gray-500">
-                  {briefs.filter(Boolean).length}/3 occupées
-                </span>
+  {briefs.filter(Boolean).length}/
+  {EDITORIAL_ZONE_CONFIG.brief.slots} occupées
+</span>
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {[0, 1, 2].map((index) => (
+                {Array.from({
+  length: EDITORIAL_ZONE_CONFIG.brief.slots,
+}).map((_,index) => (
                   <EditorialSlot
                     key={`brief-${index}`}
-                    title={`Brève ${index + 1}`}
+                    title={`${EDITORIAL_ZONE_CONFIG.brief.title ?? "Brève"} ${index + 1}`}
                     article={briefs[index] ?? null}
                     editionKey="home"
-                    zone="brief"
-                    compact
+                    zone={EDITORIAL_ZONES.BRIEF}
+                    compact={EDITORIAL_ZONE_CONFIG.brief.compact}
                     articles={publishedArticles}
                   />
                 ))}
@@ -481,11 +411,14 @@ export default async function EditorialPage() {
     </h4>
 
     <EditorialSlot
-      title="Question à…"
+      title={
+  EDITORIAL_ZONE_CONFIG.question.title ??
+  "Question à…"
+}
       article={question}
       editionKey="home"
-      zone="question"
-      compact
+      zone={EDITORIAL_ZONES.QUESTION}
+      compact={EDITORIAL_ZONE_CONFIG.question.compact}
       articles={publishedArticles}
     />
   </div>
@@ -496,14 +429,16 @@ export default async function EditorialPage() {
     </h4>
 
     <div className="space-y-4">
-      {[0, 1].map((index) => (
+      {Array.from({
+  length: EDITORIAL_ZONE_CONFIG.secondary.slots,
+}).map((_, index) => (
         <EditorialSlot
           key={`selection-${index}`}
-          title={`Sélection ${index + 1}`}
+          title={`${EDITORIAL_ZONE_CONFIG.secondary.title ?? "Sélection"} ${index + 1}`}
           article={secondary[index] ?? null}
           editionKey="home"
-          zone="secondary"
-          compact
+          zone={EDITORIAL_ZONES.SECONDARY}
+          compact={EDITORIAL_ZONE_CONFIG.secondary.compact}
           articles={publishedArticles}
         />
       ))}
@@ -516,14 +451,16 @@ export default async function EditorialPage() {
     </h4>
 
     <div className="space-y-4">
-      {[0, 1, 2].map((index) => (
+      {Array.from({
+  length: EDITORIAL_ZONE_CONFIG["good-to-know"].slots,
+}).map((_,index) => (
         <EditorialSlot
           key={`gtk-${index}`}
-          title={`Bon à savoir ${index + 1}`}
+          title={`${EDITORIAL_ZONE_CONFIG["good-to-know"].title ?? "Bon à savoir"} ${index + 1}`}
           article={goodToKnow[index] ?? null}
           editionKey="home"
-          zone="good-to-know"
-          compact
+          zone={EDITORIAL_ZONES.GOOD_TO_KNOW}
+          compact={EDITORIAL_ZONE_CONFIG["good-to-know"].compact}
           articles={publishedArticles}
         />
       ))}
@@ -535,50 +472,14 @@ export default async function EditorialPage() {
 
             {/* ACTIVITÉ SOCIALE */}
 
-            <section className="rounded-3xl bg-[#161616] p-6 text-white shadow-lg">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-yellow-500">
-                Diffusion sociale
-              </p>
+            <EditorialSocialCard
+  facebookCount={facebookPublications.length}
+  whatsappCount={whatsappPublications.length}
+  scheduledCount={scheduledPublications.length}
+/>
 
-              <h3 className="mt-2 font-serif text-2xl">
-                Réseaux sociaux
-              </h3>
-
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center justify-between rounded-xl bg-white/5 p-4">
-                  <span>Facebook</span>
-
-                  <strong className="text-yellow-400">
-                    {facebookPublications.length}
-                  </strong>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-white/5 p-4">
-                  <span>WhatsApp</span>
-
-                  <strong className="text-yellow-400">
-                    {whatsappPublications.length}
-                  </strong>
-                </div>
-
-                <div className="flex items-center justify-between rounded-xl bg-white/5 p-4">
-                  <span>Programmées</span>
-
-                  <strong className="text-yellow-400">
-                    {scheduledPublications.length}
-                  </strong>
-                </div>
-              </div>
-
-              <Link
-                href="/admin/diffusion"
-                className="mt-6 block rounded-xl bg-white px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
-              >
-                Piloter les diffusions
-              </Link>
-            </section>
-          </aside>
-        </section>
+</aside>
+</section>
 
         {/* PIED DE PAGE ÉDITORIAL */}
 
@@ -601,14 +502,18 @@ export default async function EditorialPage() {
 
           <div className="mx-auto max-w-4xl">
             <EditorialSlot
-              title="📍 Bas de page"
+              title={
+  EDITORIAL_ZONE_CONFIG["grand-format"].title ??
+  "📍 Bas de page"
+}
               article={bottom}
               editionKey="home"
-              zone="grand-format"
+              zone={EDITORIAL_ZONES.GRAND_FORMAT}
               articles={publishedArticles}
             />
           </div>
         </section>
+      
 
         {/* NOTE DE FONCTIONNEMENT */}
 

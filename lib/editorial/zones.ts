@@ -42,3 +42,51 @@ export const EDITORIAL_ZONE_LABELS: Record<
   bottom: "Bas de page — ancien format",
   standard: "Article standard",
 };
+
+export const EDITORIAL_ZONE_CONFIG: Record<
+  EditorialZone,
+  {
+    slots: number;
+    compact: boolean;
+    title?: string;
+  }
+> = {
+  hero: { slots: 1, compact: false, title: "⭐ Une principale", },
+  feature: {
+  slots: 1,
+  compact: false,
+  title: "🟨 Grande carte",
+},question: {
+  slots: 1,
+  compact: true,
+  title: "Question à…",
+},card: { slots: 1, compact: false },
+  brief: {
+  slots: 3,
+  compact: true,
+  title: "Brève",
+},
+  "grand-format": {
+  slots: 1,
+  compact: false,
+  title: "📍 Bas de page",
+},
+  "good-to-know": {
+  slots: 3,
+  compact: true,
+  title: "Bon à savoir",
+},
+  editorial: { slots: 1, compact: false },
+  discover: { slots: 1, compact: false },
+
+  // Compatibilité
+  main: { slots: 1, compact: false },
+  secondary: {
+  slots: 2,
+  compact: true,
+  title: "Sélection",
+},
+  column: { slots: 1, compact: true },
+  bottom: { slots: 1, compact: false },
+  standard: { slots: 1, compact: false },
+};
