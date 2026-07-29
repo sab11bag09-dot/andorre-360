@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
+import { checkSource } from "@/lib/source-engine/checkSource";
 import {
   SourceCollectionMode,
   SourceOrganizationType,
@@ -160,7 +160,7 @@ export async function updateSource(
   sourceId: number,
   formData: FormData,
 ) {
-  if (!Number.isInteger(sourceId)) {
+  if (!Number.isInteger(sourceId) || sourceId < 1) {
     throw new Error("Identifiant de source invalide.");
   }
 
@@ -181,7 +181,7 @@ export async function updateSource(
 }
 
 export async function toggleSource(sourceId: number) {
-  if (!Number.isInteger(sourceId)) {
+  if (!Number.isInteger(sourceId) || sourceId < 1) {
     throw new Error("Identifiant de source invalide.");
   }
 
@@ -209,4 +209,17 @@ export async function toggleSource(sourceId: number) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/sources");
+}
+export async function checkSourceAvailability(sourceId: number) {
+  if (!Number.isInteger(sourceId) || sourceId < 1) {
+    throw new Error("Identifiant de source invalide.");
+  }
+
+  const result = await checkSource(sourceId);
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/sources");
+  revalidatePath(`/admin/sources/${sourceId}`);
+
+  return result;
 }

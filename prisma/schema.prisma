@@ -142,23 +142,24 @@ model PublicationAnalytics {
 }
 
 model Source {
-  id                   Int                    @id @default(autoincrement())
+  id                   Int                      @id @default(autoincrement())
   name                 String
   description          String?
-  url                  String                 @unique
-  organizationType     SourceOrganizationType @default(OTHER)
-  collectionMode       SourceCollectionMode   @default(RSS)
-  checkIntervalMinutes Int                    @default(15)
-  active               Boolean                @default(true)
-  publicationMode      SourcePublicationMode  @default(MANUAL)
-  trustLevel           SourceTrustLevel       @default(HIGH)
+  url                  String                   @unique
+  organizationType     SourceOrganizationType   @default(OTHER)
+  collectionMode       SourceCollectionMode     @default(RSS)
+  checkIntervalMinutes Int                      @default(15)
+  active               Boolean                  @default(true)
+  availabilityStatus   SourceAvailabilityStatus @default(UNKNOWN)
+  publicationMode      SourcePublicationMode    @default(MANUAL)
+  trustLevel           SourceTrustLevel         @default(HIGH)
   category             String?
   lastCheckedAt        DateTime?
   lastSuccessAt        DateTime?
   lastErrorAt          DateTime?
   lastErrorMessage     String?
-  createdAt            DateTime               @default(now())
-  updatedAt            DateTime               @updatedAt
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
 
   @@index([active])
   @@index([collectionMode])
@@ -188,6 +189,12 @@ enum SourceCollectionMode {
   X
   YOUTUBE
   EMAIL
+}
+
+enum SourceAvailabilityStatus {
+  UNKNOWN
+  AVAILABLE
+  UNAVAILABLE
 }
 
 enum SourcePublicationMode {
