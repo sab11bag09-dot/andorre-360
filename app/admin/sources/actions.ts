@@ -3,6 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import {
+  SourceCollectionMode,
+  SourceOrganizationType,
+  SourcePublicationMode,
+  SourceTrustLevel,
+} from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   COLLECTION_MODES,
@@ -29,13 +35,14 @@ function getOptionalString(formData: FormData, field: string) {
   }
 
   const normalized = value.trim();
+
   return normalized === "" ? null : normalized;
 }
 
-function isAllowedValue(
+function isAllowedValue<T extends string>(
   value: string,
-  options: readonly { value: string }[],
-) {
+  options: readonly { value: T }[],
+): value is T {
   return options.some((option) => option.value === value);
 }
 
@@ -45,22 +52,25 @@ function readSourceForm(formData: FormData) {
   const description = getOptionalString(formData, "description");
   const category = getOptionalString(formData, "category");
 
-  const organizationType = getRequiredString(
+  const organizationTypeValue = getRequiredString(
     formData,
     "organizationType",
   );
 
-  const collectionMode = getRequiredString(
+  const collectionModeValue = getRequiredString(
     formData,
     "collectionMode",
   );
 
-  const publicationMode = getRequiredString(
+  const publicationModeValue = getRequiredString(
     formData,
     "publicationMode",
   );
 
-  const trustLevel = getRequiredString(formData, "trustLevel");
+  const trustLevelValue = getRequiredString(
+    formData,
+    "trustLevel",
+  );
 
   const intervalValue = Number(
     getRequiredString(formData, "checkIntervalMinutes"),
@@ -71,12 +81,39 @@ function readSourceForm(formData: FormData) {
   }
 
   if (
-    !isAllowedValue(organizationType, ORGANIZATION_TYPES) ||
-    !isAllowedValue(collectionMode, COLLECTION_MODES) ||
-    !isAllowedValue(publicationMode, PUBLICATION_MODES) ||
-    !isAllowedValue(trustLevel, TRUST_LEVELS)
+    !isAllowedValue(
+      organizationTypeValue,
+      ORGANIZATION_TYPES,
+    )
   ) {
-    throw new Error("Une valeur du formulaire n’est pas autorisée.");
+    throw new Error(
+      "Le type d’organisation n’est pas autorisé.",
+    );
+  }
+
+  if (
+    !isAllowedValue(collectionModeValue, COLLECTION_MODES)
+  ) {
+    throw new Error(
+      "Le mode de collecte n’est pas autorisé.",
+    );
+  }
+
+  if (
+    !isAllowedValue(
+      publicationModeValue,
+      PUBLICATION_MODES,
+    )
+  ) {
+    throw new Error(
+      "Le mode de publication n’est pas autorisé.",
+    );
+  }
+
+  if (!isAllowedValue(trustLevelValue, TRUST_LEVELS)) {
+    throw new Error(
+      "Le niveau de confiance n’est pas autorisé.",
+    );
   }
 
   if (
@@ -94,10 +131,13 @@ function readSourceForm(formData: FormData) {
     url,
     description,
     category,
-    organizationType,
-    collectionMode,
-    publicationMode,
-    trustLevel,
+    organizationType:
+      organizationTypeValue as SourceOrganizationType,
+    collectionMode:
+      collectionModeValue as SourceCollectionMode,
+    publicationMode:
+      publicationModeValue as SourcePublicationMode,
+    trustLevel: trustLevelValue as SourceTrustLevel,
     checkIntervalMinutes: intervalValue,
     active: formData.get("active") === "on",
   };
@@ -112,6 +152,7 @@ export async function createSource(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/admin/sources");
+
   redirect("/admin/sources");
 }
 
