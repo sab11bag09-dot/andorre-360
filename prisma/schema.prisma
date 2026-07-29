@@ -79,6 +79,8 @@ model Article {
   updatedAt     DateTime           @updatedAt
   analytics     ArticleAnalytics[]
   publications  Publication[]
+
+  observations  Observation[]
 }
 
 model Category {
@@ -169,18 +171,27 @@ model Source {
 model Observation {
   id          Int      @id @default(autoincrement())
   sourceId    Int
+  articleId   Int?
+
   title       String
   url         String
   publishedAt DateTime?
   content     String?
+
+  processed   Boolean  @default(false)
+  processedAt DateTime?
+
   collectedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  source Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  source  Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
 
   @@unique([sourceId, url])
   @@index([sourceId])
+  @@index([articleId])
+  @@index([processed])
   @@index([publishedAt])
   @@index([collectedAt])
 }

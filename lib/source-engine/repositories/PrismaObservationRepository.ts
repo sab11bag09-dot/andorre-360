@@ -1,8 +1,14 @@
-import { Prisma } from "@/lib/generated/prisma/client";
+import {
+  Prisma,
+  type Observation,
+} from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
 import type { ObservationInput } from "../collectors/Collector";
-import type { ObservationRepository } from "./ObservationRepository";
+import type {
+  ObservationRepository,
+  ObservationWithSource,
+} from "./ObservationRepository";
 
 function isUniqueConstraintError(
   error: unknown,
@@ -16,6 +22,47 @@ function isUniqueConstraintError(
 export class PrismaObservationRepository
   implements ObservationRepository
 {
+  async findById(
+    id: number,
+  ): Promise<ObservationWithSource | null> {
+    return prisma.observation.findUnique({
+      where: { id },
+      include: {
+        source: true,
+      },
+    });
+  }
+
+  async findUnprocessed(): Promise<Observation[]> {
+    return prisma.observation.findMany({
+      where: {
+        processed: false,
+      },
+      orderBy: [
+        {
+          publishedAt: "desc",
+        },
+        {
+          collectedAt: "desc",
+        },
+      ],
+    });
+  }
+
+  async markProcessed(
+    id: number,
+    articleId: number,
+  ): Promise<void> {
+    await prisma.observation.update({
+      where: { id },
+      data: {
+        processed: true,
+        processedAt: new Date(),
+        articleId,
+      },
+    });
+  }
+
   async saveMany(
     sourceId: number,
     observations: ObservationInput[],
