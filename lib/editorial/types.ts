@@ -1,4 +1,4 @@
-import type { Article } from "@prisma/client";
+import type { Article } from "@/lib/generated/prisma/client";
 
 export type EditorialLayout = {
   hero: Article | null;

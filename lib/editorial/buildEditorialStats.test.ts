@@ -47,7 +47,7 @@ describe("buildEditorialStats", () => {
       publications: [
         publication,
         makePublication({
-          id: "publication-2",
+          id: 2,
         }),
       ],
       now,

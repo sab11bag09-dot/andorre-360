@@ -1,51 +1,52 @@
+import { getPublishedArticles } from "@/lib/articles";
+import type { EditorialLayout } from "@/lib/editorial/types";
 import { EDITORIAL_ZONE_CONFIG } from "@/lib/editorial/zones";
+
 type BuildEditorialPageDataParams = {
-  editorialLayout: Awaited<
-    ReturnType<typeof buildEditorialLayout>
-  >;
+  editorialLayout: EditorialLayout;
   publishedArticles: Awaited<
     ReturnType<typeof getPublishedArticles>
   >;
 };
-import { getPublishedArticles } from "@/lib/articles";
-import { buildEditorialLayout } from "@/lib/editorial/engine";
+
 export function buildEditorialPageData({
   editorialLayout,
   publishedArticles,
 }: BuildEditorialPageDataParams) {
   const usedArticleIds = new Set<number>();
 
-if (editorialLayout.hero) {
-  usedArticleIds.add(editorialLayout.hero.id);
-}
+  if (editorialLayout.hero) {
+    usedArticleIds.add(editorialLayout.hero.id);
+  }
 
-if (editorialLayout.feature) {
-  usedArticleIds.add(editorialLayout.feature.id);
-}
+  if (editorialLayout.feature) {
+    usedArticleIds.add(editorialLayout.feature.id);
+  }
 
-editorialLayout.secondary.forEach((article) => {
-  usedArticleIds.add(article.id);
-});
+  editorialLayout.secondary.forEach((article) => {
+    usedArticleIds.add(article.id);
+  });
 
-editorialLayout.briefs.forEach((article) => {
-  usedArticleIds.add(article.id);
-});
+  editorialLayout.briefs.forEach((article) => {
+    usedArticleIds.add(article.id);
+  });
 
-if (editorialLayout.grandFormat) {
-  usedArticleIds.add(editorialLayout.grandFormat.id);
-}
+  if (editorialLayout.grandFormat) {
+    usedArticleIds.add(editorialLayout.grandFormat.id);
+  }
 
-if (editorialLayout.question) {
-  usedArticleIds.add(editorialLayout.question.id);
-}
+  if (editorialLayout.question) {
+    usedArticleIds.add(editorialLayout.question.id);
+  }
 
-editorialLayout.goodToKnow.forEach((article) => {
-  usedArticleIds.add(article.id);
-});
+  editorialLayout.goodToKnow.forEach((article) => {
+    usedArticleIds.add(article.id);
+  });
 
-const availableArticles = publishedArticles.filter(
-  (article) => !usedArticleIds.has(article.id)
-);
+  const availableArticles = publishedArticles.filter(
+    (article) => !usedArticleIds.has(article.id)
+  );
+
   const hero =
     editorialLayout.hero ??
     availableArticles.shift() ??
@@ -64,7 +65,8 @@ const availableArticles = publishedArticles.filter(
   const secondary = [...editorialLayout.secondary];
 
   while (
-    secondary.length < EDITORIAL_ZONE_CONFIG.secondary.slots &&
+    secondary.length <
+      EDITORIAL_ZONE_CONFIG.secondary.slots &&
     availableArticles.length > 0
   ) {
     const article = availableArticles.shift();
