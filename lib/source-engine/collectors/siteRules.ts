@@ -45,4 +45,12 @@ export const siteRules: Record<string, SiteRule> = {
     '[class^="ContentArticle_infoBody"]',
   ],
 },
+"www.laveulliure.ad": {
+  listing: [
+    'a[href^="/ca/article/"]',
+  ],
+  content: [
+    ".field--name-body",
+  ],
+},
 };
