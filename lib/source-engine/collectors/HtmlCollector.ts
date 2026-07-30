@@ -8,6 +8,7 @@ import type {
 } from "./Collector";
 import { FetchHtmlClient } from "../html/FetchHtmlClient";
 import type { HtmlClient } from "../html/HtmlClient";
+import { siteRules } from "./siteRules";
 
 function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -109,9 +110,10 @@ export class HtmlCollector implements Collector {
       const html = await this.htmlClient.get(url);
       const $ = cheerio.load(html);
 
-      const contentSelectors = [
-  ".c-mainarticle__body",
-  ".c-detail__body", 
+      const hostname = new URL(url).hostname;
+const siteRule = siteRules[hostname];
+
+const genericContentSelectors = [
   ".field--name-body",
   ".article-content",
   ".article-body",
@@ -120,6 +122,11 @@ export class HtmlCollector implements Collector {
   ".content-noticia",
   ".noticia-cos",
   ".node__content",
+];
+
+const contentSelectors = [
+  ...(siteRule?.content ?? []),
+  ...genericContentSelectors,
 ];
 
 
@@ -132,34 +139,31 @@ if (!element.length) {
   continue;
 }
 
+const genericRemoveSelectors = [
+  "script",
+  "style",
+  "nav",
+  "footer",
+  "header",
+  "aside",
+  "form",
+  "button",
+  "audio",
+  ".comments",
+  ".comentaris",
+  ".share",
+  ".social",
+  ".meta",
+  ".metadata",
+];
+
+const removeSelectors = [
+  ...genericRemoveSelectors,
+  ...(siteRule?.remove ?? []),
+];
+
 element
-  .find(
-    [
-      "script",
-      "style",
-      "nav",
-      "footer",
-      "header",
-      "aside",
-      "form",
-      "button",
-      "audio",
-      ".comments",
-      ".comentaris",
-      ".share",
-      ".social",
-      ".meta",
-      ".metadata",
-      ".c-detail__author",
-      ".google-auto-placed",
-".ap_container",
-".c-detail__tags-content",
-".c-detail__related",
-".c-detail__recommended",
-".henneoHB_desktop",
-".c-add",
-    ].join(", "),
-  )
+  .find(removeSelectors.join(", "))
   .remove();
 
         const paragraphs = element
