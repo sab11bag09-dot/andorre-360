@@ -133,18 +133,21 @@ export default async function AdminPage() {
   />
 
   <StatCard
-    title="Publiés"
-    value={publishedArticleCount}
-    description="Visibles sur le site"
-    valueClassName="text-emerald-400"
-  />
+  title="Publiés"
+  value={publishedArticleCount}
+  description="Visibles sur le site"
+  valueClassName="text-emerald-400"
+  href="/admin/articles?status=published"
+/>
+
 
   <StatCard
-    title="Brouillons"
-    value={draftArticleCount}
-    description="En attente de publication"
-    valueClassName="text-amber-400"
-  />
+  title="Brouillons"
+  value={draftArticleCount}
+  description="En attente de publication"
+  valueClassName="text-amber-400"
+  href="/admin/articles?status=draft"
+/>
 
   <StatCard
     title="Médias"

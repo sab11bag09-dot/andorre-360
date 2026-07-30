@@ -22,7 +22,21 @@ function formatDate(date: Date) {
   }).format(date);
 }
 
-export default async function AdminArticlesPage() {
+type AdminArticlesPageProps = {
+  searchParams?: Promise<{
+    status?: string;
+  }>;
+};
+
+export default async function AdminArticlesPage({
+  searchParams,
+}: AdminArticlesPageProps) {
+  const params = await searchParams;
+
+  const activeStatus =
+    params?.status === "published" || params?.status === "draft"
+      ? params.status
+      : "all";
   const articles = await prisma.article.findMany({
     orderBy: {
       updatedAt: "desc",
@@ -50,6 +64,24 @@ export default async function AdminArticlesPage() {
   const featuredCount = articles.filter(
     (article) => article.featured,
   ).length;
+  const filteredArticles = articles.filter((article) => {
+  if (activeStatus === "published") {
+    return article.published;
+  }
+
+  if (activeStatus === "draft") {
+    return !article.published;
+  }
+
+  return true;
+});
+
+const sectionTitle =
+  activeStatus === "published"
+    ? "Articles publiés"
+    : activeStatus === "draft"
+      ? "Brouillons"
+      : "Tous les articles";
 
   return (
   <>
@@ -69,6 +101,7 @@ export default async function AdminArticlesPage() {
   title="Tous les articles"
   value={articles.length}
   description="Contenus enregistrés"
+  href="/admin/articles"
 />
 
 <StatCard
@@ -76,6 +109,7 @@ export default async function AdminArticlesPage() {
   value={publishedCount}
   description="Visibles sur le site"
   valueClassName="text-emerald-400"
+  href="/admin/articles?status=published"
 />
 
 <StatCard
@@ -83,6 +117,7 @@ export default async function AdminArticlesPage() {
   value={draftCount}
   description="En attente de publication"
   valueClassName="text-amber-400"
+  href="/admin/articles?status=draft"
 />
 
 <StatCard
@@ -95,8 +130,10 @@ export default async function AdminArticlesPage() {
         <section className="border-t border-zinc-800 py-8">
           <SectionHeader
   eyebrow="Gestion des contenus"
-  title="Tous les articles"
-  description={`${articles.length} article${articles.length > 1 ? "s" : ""}`}
+  title={sectionTitle}
+description={`${filteredArticles.length} article${
+  filteredArticles.length > 1 ? "s" : ""
+}`}
   actions={
     <Button
       href="/admin/articles/nouveau"
@@ -107,7 +144,7 @@ export default async function AdminArticlesPage() {
   }
 />
 
-          {articles.length === 0 ? (
+          {filteredArticles.length === 0 ? (
             <EmptyState
   title="Aucun article"
   description="Crée ton premier contenu pour commencer à alimenter le journal."
@@ -129,7 +166,7 @@ export default async function AdminArticlesPage() {
    { key: "actions", label: "Action", align: "right" },
   ]}
 >
-  {articles.map((article) => (
+  {filteredArticles.map((article) => (
     <DataTableRow
   key={article.id}
   className="py-5 transition hover:bg-zinc-900/70"

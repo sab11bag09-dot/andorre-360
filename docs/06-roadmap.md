@@ -279,3 +279,317 @@ L'objectif est de permettre à une rédaction de fonctionner en continu grâce �
 - Collecte HTML Andorra Difusió
 - Collecte HTML El Periòdic
 - Règles d'extraction par domaine
+----------------------------------
+Passation technique — ANDORRE 360
+Objet
+
+Ce document présente l'état actuel du projet, les travaux réalisés, les chantiers restant à mener et les priorités de développement.
+
+Il constitue le document de référence pour toute reprise du projet.
+
+État du projet
+
+Le socle technique d'ANDORRE 360 est désormais en place.
+
+L'architecture générale est définie et les premiers moteurs sont opérationnels.
+
+Les développements réalisés permettent déjà de collecter automatiquement des contenus provenant de plusieurs médias andorrans, de conserver les observations et de préparer leur exploitation par les moteurs de connaissance.
+
+Travaux réalisés
+Architecture
+
+✔ Architecture générale définie.
+
+Les moteurs suivants sont identifiés :
+
+Source Engine
+Collection Engine
+Knowledge Engine
+AI Engine
+Editorial Engine
+Publishing Engine
+
+Les responsabilités de chaque moteur sont documentées.
+
+Source Engine
+
+Réalisé.
+
+Fonctionnalités :
+
+gestion des sources ;
+configuration des médias ;
+planification de la collecte ;
+distinction RSS / HTML.
+Collection Engine
+
+Le moteur de collecte est fonctionnel.
+
+Fonctionnalités réalisées
+collecte RSS ;
+collecte HTML ;
+découverte automatique des articles ;
+extraction du contenu complet ;
+conservation des métadonnées ;
+gestion des observations.
+Architecture
+
+Le collecteur HTML est désormais générique.
+
+Les spécificités des sites sont externalisées dans un registre de règles (siteRules).
+
+Chaque média peut définir :
+
+les sélecteurs de découverte (listing) ;
+les sélecteurs du contenu (content) ;
+les éléments à supprimer (remove).
+
+Cette architecture évite de modifier le collecteur lors de l'ajout d'une nouvelle source.
+
+Médias intégrés
+
+À ce jour, les règles d'extraction sont disponibles notamment pour :
+
+Altaveu
+Diari d'Andorra
+Bondia
+RTVA
+La Veu Lliure
+El Periòdic
+
+Le moteur peut être enrichi par simple ajout de nouvelles règles.
+
+Documentation
+
+La documentation d'architecture est en cours de structuration.
+
+Elle couvre désormais :
+
+la vision du projet ;
+l'architecture globale ;
+les responsabilités des moteurs ;
+l'architecture du moteur de collecte.
+Feuille de route
+Sprint 1
+
+✔ Terminé
+
+Architecture générale.
+
+Sprint 2
+
+✔ Terminé
+
+Source Engine.
+
+Sprint 3
+
+✔ Terminé
+
+Première version du Collection Engine.
+
+Sprint 4
+
+✔ Fonctionnel
+
+Finalisation du moteur de collecte.
+
+Travaux réalisés :
+
+collecteur HTML générique ;
+règles par domaine (siteRules) ;
+extraction du contenu complet ;
+architecture documentée ;
+intégration des principaux médias.
+
+Travaux restant dans ce sprint :
+
+intégrer les derniers médias locaux (configuration uniquement) ;
+consolider les tests de collecte.
+
+Ces travaux ne remettent plus en cause l'architecture.
+
+Travaux restant à réaliser
+Finaliser la couverture des médias
+
+Médias restant à intégrer :
+
+Ara Andorra
+Forum.ad
+autres sources locales à évaluer
+
+Il s'agit principalement d'ajouter des règles dans siteRules.
+
+Sources institutionnelles
+
+Débuter l'intégration des sources officielles.
+
+Exemples :
+
+Govern
+Consell General
+BOPA
+Comuns
+Protection Civile
+COEX
+Météo
+Stations de ski
+
+Ces sources alimenteront directement les futures rubriques éditoriales.
+
+Knowledge Engine
+
+Prochaine grande étape du projet.
+
+Objectifs :
+
+transformer les observations en connaissances ;
+créer les Stories ;
+extraire les Facts ;
+rapprocher plusieurs sources ;
+détecter les évolutions ;
+calculer un niveau de confiance.
+
+Ce moteur constituera le cœur d'ANDORRE 360.
+
+AI Engine
+
+À démarrer après la stabilisation du Knowledge Engine.
+
+Les agents IA devront produire les contenus uniquement à partir des connaissances construites par le système, jamais directement à partir des sources.
+
+Editorial Engine
+
+À développer.
+
+Objectifs :
+
+priorisation des sujets ;
+classement par rubrique ;
+règles éditoriales ;
+arbitrage IA / journaliste.
+Publishing Engine
+
+À développer.
+
+Objectifs :
+
+publication sur le site ;
+réseaux sociaux ;
+newsletters ;
+API.
+Priorités recommandées
+Finaliser la documentation technique.
+Intégrer les derniers médias locaux.
+Ajouter les premières sources institutionnelles.
+Concevoir le modèle de données du Knowledge Engine.
+Développer le Knowledge Engine avant toute évolution des agents IA.
+Conclusion
+
+Le projet a franchi une étape importante.
+
+Le principal risque technique — disposer d'un moteur de collecte générique, extensible et maintenable — est désormais levé.
+
+Les prochains développements ne porteront plus sur la collecte elle-même, mais sur la valorisation de l'information : consolidation des observations, construction des connaissances et production éditoriale.
+
+C'est à partir de cette étape qu'ANDORRE 360 commencera réellement à se distinguer d'un simple agrégateur de contenus pour devenir un Information Operating System.
+
+# Backlog éditorial
+
+## Une
+- Définir les critères de mise en avant.
+- Développer le système de priorisation des Stories.
+
+---
+
+## Actu
+- Finaliser les médias généralistes.
+- Intégrer Ara Andorra.
+- Intégrer Forum.ad.
+
+---
+
+## Fil info
+- Construire le flux temps réel.
+- Détection automatique des breaking news.
+- Notifications institutionnelles.
+
+---
+
+## Économie
+Sources à intégrer :
+- Govern (Économie)
+- Cambra de Comerç
+- Estadística
+- CASS (si pertinent)
+
+---
+
+## Société
+Sources à intégrer :
+- Santé
+- Éducation
+- Associations
+- Justice
+- Police
+
+---
+
+## Politique
+Sources à intégrer :
+- Govern
+- Consell General
+- BOPA
+- Comuns
+
+---
+
+## Immo
+Sources à intégrer :
+- Estadística
+- Registres publics
+- Observatoires
+- Notaires (si données publiques)
+
+---
+
+## International
+- Définir les agences de référence.
+- Règles de sélection des sujets.
+
+---
+
+## Sports
+Sources à intégrer :
+- Fédérations sportives
+- Comité Olympique Andorran
+- Clubs majeurs
+
+---
+
+## Culture
+Sources à intégrer :
+- Ministère de la Culture
+- Agenda culturel
+- Musées
+- Festivals
+
+---
+
+## Montagne
+Sources à intégrer :
+- Météo
+- COEX
+- Protection Civile
+- Risque d'avalanche
+- Stations de ski
+- Parcs naturels
+
+---
+
+## Lifestyle
+Sources à intégrer :
+- Tourisme
+- Gastronomie
+- Événements
+- Loisirs

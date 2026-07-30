@@ -224,3 +224,46 @@ Chaque observation conserve désormais :
 - le contenu intégral de l'article lorsqu'il est disponible.
 
 L'extraction HTML repose sur des règles spécifiques à chaque domaine avec des sélecteurs génériques en secours.
+-------------------------
+Collecte HTML
+
+Le moteur de collecte HTML repose sur un principe simple : le moteur est générique, les spécificités sont déclaratives.
+
+Le collecteur ne contient aucune logique propre à un média. Toutes les différences de structure entre les sites sont décrites dans une configuration dédiée.
+
+L'architecture s'articule autour de deux composants :
+
+HtmlCollector, responsable de télécharger les pages, de découvrir les articles et d'extraire leur contenu ;
+siteRules, qui centralise les règles d'extraction propres à chaque domaine.
+
+Chaque règle peut définir :
+
+les sélecteurs de découverte des articles (listing) ;
+les sélecteurs du contenu principal (content) ;
+les éléments à supprimer avant l'extraction (remove).
+
+Lorsqu'une règle est disponible pour un domaine, elle est utilisée en priorité. Dans le cas contraire, le collecteur applique des sélecteurs génériques afin de conserver un fonctionnement minimal.
+
+Cette approche permet d'intégrer de nouveaux médias sans modifier le moteur de collecte.
+
+Intégration d'un média
+
+L'intégration d'une nouvelle source suit toujours la même méthode.
+
+Identifier les liens vers les articles.
+Identifier le conteneur contenant le contenu rédactionnel.
+Identifier les éléments parasites (publicités, recommandations, widgets, partage, etc.).
+Ajouter une règle dans siteRules.
+Vérifier l'extraction sur plusieurs articles représentatifs.
+
+Dans la plupart des cas, l'ajout d'un nouveau média consiste uniquement à enrichir la configuration, sans modifier le code du collecteur.
+
+Principes
+
+Cette architecture respecte plusieurs principes fondamentaux :
+
+un collecteur unique pour tous les médias ;
+une configuration spécifique par domaine ;
+aucune logique métier propre à un site dans le moteur ;
+une maintenance simplifiée lors des évolutions des sites ;
+la possibilité d'ajouter rapidement de nouvelles sources sans impacter le reste du système.
