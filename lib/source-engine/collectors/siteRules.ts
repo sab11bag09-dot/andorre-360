@@ -1,20 +1,22 @@
 export type SiteRule = {
+  listing?: string[];
   content: string[];
-  remove: string[];
+  remove?: string[];
 };
 
 export const siteRules: Record<string, SiteRule> = {
   "www.altaveu.com": {
-    content: [
-      ".c-mainarticle__body",
-    ],
-    remove: [],
-  },
+  listing: ["h2 a"],
+  content: [
+    ".c-mainarticle__body",
+  ],
+},
 
   "www.diariandorra.ad": {
-    content: [
-      ".c-detail__body",
-    ],
+  listing: ["h2 a"],
+  content: [
+    ".c-detail__body",
+  ],
     remove: [
       ".c-detail__author",
       ".c-detail__tags-content",
@@ -26,12 +28,21 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
   "www.bondia.ad": {
-    content: [
-      ".article-body",
-    ],
+  listing: ["h2 a"],
+  content: [
+    ".article-body",
+  ],
     remove: [
       ".google-auto-placed",
       ".ap_container",
     ],
-  },
+    },
+"www.rtva.ad": {
+  listing: [
+    'a[href^="/noticies/"]',
+  ],
+  content: [
+    '[class^="ContentArticle_infoBody"]',
+  ],
+},
 };

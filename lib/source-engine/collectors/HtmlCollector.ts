@@ -6,9 +6,9 @@ import type {
   Collector,
   ObservationInput,
 } from "./Collector";
+import { siteRules } from "./siteRules";
 import { FetchHtmlClient } from "../html/FetchHtmlClient";
 import type { HtmlClient } from "../html/HtmlClient";
-import { siteRules } from "./siteRules";
 
 function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -111,85 +111,86 @@ export class HtmlCollector implements Collector {
       const $ = cheerio.load(html);
 
       const hostname = new URL(url).hostname;
-const siteRule = siteRules[hostname];
+      const siteRule = siteRules[hostname];
 
-const genericContentSelectors = [
-  ".field--name-body",
-  ".article-content",
-  ".article-body",
-  ".entry-content",
-  ".post-content",
-  ".content-noticia",
-  ".noticia-cos",
-  ".node__content",
-];
+      const genericContentSelectors = [
+        ".field--name-body",
+        ".article-content",
+        ".article-body",
+        ".entry-content",
+        ".post-content",
+        ".content-noticia",
+        ".noticia-cos",
+        ".node__content",
+      ];
 
-const contentSelectors = [
-  ...(siteRule?.content ?? []),
-  ...genericContentSelectors,
-];
+      const contentSelectors = [
+        ...(siteRule?.content ?? []),
+        ...genericContentSelectors,
+      ];
 
+      const genericRemoveSelectors = [
+        "script",
+        "style",
+        "nav",
+        "footer",
+        "header",
+        "aside",
+        "form",
+        "button",
+        "audio",
+        ".comments",
+        ".comentaris",
+        ".share",
+        ".social",
+        ".meta",
+        ".metadata",
+      ];
+
+      const removeSelectors = [
+        ...genericRemoveSelectors,
+        ...(siteRule?.remove ?? []),
+      ];
 
       let content: string | null = null;
 
       for (const selector of contentSelectors) {
         const element = $(selector).first().clone();
 
-if (!element.length) {
-  continue;
-}
+        if (!element.length) {
+          continue;
+        }
 
-const genericRemoveSelectors = [
-  "script",
-  "style",
-  "nav",
-  "footer",
-  "header",
-  "aside",
-  "form",
-  "button",
-  "audio",
-  ".comments",
-  ".comentaris",
-  ".share",
-  ".social",
-  ".meta",
-  ".metadata",
-];
-
-const removeSelectors = [
-  ...genericRemoveSelectors,
-  ...(siteRule?.remove ?? []),
-];
-
-element
-  .find(removeSelectors.join(", "))
-  .remove();
+        element
+          .find(removeSelectors.join(", "))
+          .remove();
 
         const paragraphs = element
-  .find("p")
-  .map((_, paragraph) =>
-    normalizeText($(paragraph).text()),
-  )
-  .get()
-  .filter((text) => {
-    if (!text) {
-      return false;
-    }
+          .find("p")
+          .map((_, paragraph) =>
+            normalizeText($(paragraph).text()),
+          )
+          .get()
+          .filter((text) => {
+            if (!text) {
+              return false;
+            }
 
-    const loweredText = text.toLowerCase();
+            const loweredText = text.toLowerCase();
 
-    return (
-      !loweredText.includes("escolta l'article") &&
-      !loweredText.includes("comentaris") &&
-      !/^\d{2}\/\d{2}\/\d{4}/.test(text)
-    );
-  });
+            return (
+              !loweredText.includes(
+                "escolta l'article",
+              ) &&
+              !loweredText.includes("comentaris") &&
+              !/^\d{2}\/\d{2}\/\d{4}/.test(text)
+            );
+          });
 
-const extractedContent =
-  paragraphs.length > 0
-    ? paragraphs.join("\n\n")
-    : normalizeContent(element.text());
+        const extractedContent =
+          paragraphs.length > 0
+            ? paragraphs.join("\n\n")
+            : normalizeContent(element.text());
 
         if (extractedContent.length >= 50) {
           content = extractedContent;
@@ -204,12 +205,7 @@ const extractedContent =
         )
           .first()
           .text();
-console.log("[HtmlCollector] article extrait", {
-  url,
-  selectorUtilise: content ? "trouvé" : "aucun",
-  contentLength: content?.length ?? 0,
-  contentPreview: content?.slice(0, 300) ?? null,
-});
+
       return {
         content,
         publishedAt: dateText
@@ -239,6 +235,12 @@ console.log("[HtmlCollector] article extrait", {
     const html = await this.htmlClient.get(source.url);
     const $ = cheerio.load(html);
 
+    const hostname = new URL(source.url).hostname;
+    const siteRule = siteRules[hostname];
+
+    const listingSelectors =
+      siteRule?.listing ?? ["h2 a"];
+
     const links: Array<{
       title: string;
       url: string;
@@ -247,47 +249,49 @@ console.log("[HtmlCollector] article extrait", {
 
     const knownUrls = new Set<string>();
 
-    $("h2 a").each((_, element) => {
-      const link = $(element);
-      const title = normalizeText(link.text());
-      const href = link.attr("href");
+    for (const selector of listingSelectors) {
+      $(selector).each((_, element) => {
+        const link = $(element);
+        const title = normalizeText(link.text());
+        const href = link.attr("href");
 
-      if (!title || !href) {
-        return;
-      }
+        if (!title || !href) {
+          return;
+        }
 
-      const url = normalizeUrl(href, source.url);
+        const url = normalizeUrl(href, source.url);
 
-      if (!url || knownUrls.has(url)) {
-        return;
-      }
+        if (!url || knownUrls.has(url)) {
+          return;
+        }
 
-      const container = link.closest(
-        "article, .views-row, .node, .item, li, div",
-      );
+        const container = link.closest(
+          "article, .views-row, .node, .item, li, div",
+        );
 
-      const dateText =
-        container
-          .find("time")
-          .first()
-          .attr("datetime") ??
-        container
-          .find(
-            "time, .date, .field--name-created",
-          )
-          .first()
-          .text();
+        const dateText =
+          container
+            .find("time")
+            .first()
+            .attr("datetime") ??
+          container
+            .find(
+              "time, .date, .field--name-created",
+            )
+            .first()
+            .text();
 
-      knownUrls.add(url);
+        knownUrls.add(url);
 
-      links.push({
-        title,
-        url,
-        publishedAt: dateText
-          ? parseGenericDate(dateText)
-          : null,
+        links.push({
+          title,
+          url,
+          publishedAt: dateText
+            ? parseGenericDate(dateText)
+            : null,
+        });
       });
-    });
+    }
 
     const observations: ObservationInput[] = [];
 
