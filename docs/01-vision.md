@@ -1,155 +1,123 @@
-01 - Vision
-1. Objectif
+# Vision
 
-ANDORRE 360 est une plateforme éditoriale autonome capable de détecter, comprendre, produire et publier des informations en continu, tout en permettant à un journaliste de reprendre le contrôle de n'importe quel sujet à tout moment.
+## Notre ambition
 
-2. Le fonctionnement global
-                    SOURCES
+ANDORRE 360 a pour ambition de devenir le premier **Information Operating System** dédié aux rédactions.
 
-      RSS • Sites • API • PDF • Réseaux sociaux
-                       │
-                       ▼
-              MOTEUR DE VEILLE
-        Détection des nouveautés
-                       │
-                       ▼
-              MOTEUR STORY
-    Création ou mise à jour d'une Story
-                       │
-                       ▼
-              MOTEUR IA
-      Rédaction • SEO • Réseaux sociaux
-                       │
-                       ▼
-           MOTEUR ÉDITORIAL
-      Placement dans le journal
-                       │
-                       ▼
-          MOTEUR DE PUBLICATION
- Site • Facebook • WhatsApp • Newsletter
+Son objectif n'est pas seulement de produire des articles, mais de transformer un flux continu d'informations en une connaissance exploitable, puis en contenus éditoriaux adaptés à chaque canal de diffusion.
 
-Ce schéma doit devenir la carte du projet.
+Le système fonctionne en continu, assiste les journalistes dans leurs décisions et peut automatiser les tâches répétitives tout en laissant le contrôle éditorial aux humains.
 
-3. Les trois acteurs
+---
 
-Il n'y en a que trois.
+# Une nouvelle façon de produire l'information
 
-Les Sources
+Les rédactions travaillent traditionnellement autour des articles.
 
-Elles produisent l'information.
+ANDORRE 360 travaille autour des événements.
 
-Les Agents IA
+Un article n'est plus le point de départ.
 
-Ils traitent l'information.
+Il devient l'une des représentations possibles d'un événement.
 
-Les Journalistes
+Cette approche permet :
 
-Ils prennent les décisions éditoriales.
+- d'éviter les doublons ;
+- de conserver l'historique d'un sujet ;
+- de produire plusieurs contenus à partir des mêmes informations ;
+- de mettre à jour automatiquement les publications lorsqu'un événement évolue.
 
-Tout le reste n'est que de la technique.
+---
 
-4. Le cycle de vie d'une information
-Information détectée
+# Comprendre avant de publier
 
-↓
+Le système ne se contente pas de collecter des contenus.
 
-Story
+Il cherche d'abord à comprendre ce qu'il se passe.
 
-↓
+Les informations issues des différentes sources sont analysées, rapprochées et consolidées afin de construire une vision cohérente d'un événement.
 
-Story enrichie
+Les contenus éditoriaux sont produits à partir de cette connaissance, et non directement à partir des documents collectés.
 
-↓
+---
 
-Article
+# Une rédaction hybride
 
-↓
+ANDORRE 360 repose sur la collaboration entre trois acteurs.
 
-Publication
+## Les sources
 
-↓
+Elles produisent les informations.
 
-Mise à jour
+## Les agents IA
 
-↓
+Ils collectent, comprennent, enrichissent, rédigent et proposent.
 
-Archive
+Chaque agent possède une mission clairement définie.
 
-C'est ici qu'on explique pourquoi Story est l'entité centrale.
+## Les journalistes
 
-5. Les modes de fonctionnement
-AUTO
+Ils apportent l'expertise éditoriale.
 
-L'IA décide.
+Ils enquêtent, arbitrent, expliquent et restent responsables des décisions de publication.
 
-Elle publie.
+---
 
-ASSISTÉ
+# Les modes de fonctionnement
 
-L'IA prépare.
+Le système s'adapte au niveau d'autonomie souhaité.
 
-Le journaliste valide.
+## Mode autonome
 
-MANUEL
+Les informations de confiance sont publiées automatiquement selon les règles définies par la rédaction.
 
-Le journaliste écrit.
+## Mode assisté
 
-L'IA observe.
+Les agents IA préparent le travail.
 
-6. Les règles fondamentales
+Le journaliste valide les décisions importantes.
 
-Par exemple :
+## Mode manuel
 
-une Story ne peut avoir qu'un seul propriétaire actif ;
-une publication est toujours liée à un article ;
-un article est toujours lié à une Story ;
-une Story peut avoir plusieurs sources ;
-une source peut produire plusieurs Stories ;
-un journaliste est prioritaire sur une IA ;
-chaque décision est traçable.
+Le journaliste pilote entièrement le sujet.
 
-Ces règles guideront tout le développement.
+Les agents poursuivent uniquement leur travail d'assistance et de veille.
 
-7. Les objectifs du produit
+---
 
-Je mettrais des objectifs concrets plutôt que des fonctionnalités.
+# Les principes de fonctionnement
 
-Par exemple :
+Le système respecte en permanence les principes suivants :
 
-détecter une information officielle en moins de 5 minutes ;
-éviter les doublons sur un même événement ;
-publier automatiquement les contenus de routine selon les règles définies ;
-permettre au journaliste de reprendre la main instantanément ;
-conserver l'historique complet des décisions.
-Ensuite...
+- une information possède toujours une origine identifiable ;
+- chaque décision est traçable ;
+- un événement peut produire plusieurs contenus ;
+- les connaissances sont indépendantes des modèles d'IA utilisés ;
+- les journalistes restent prioritaires sur les agents IA ;
+- l'automatisation ne doit jamais compromettre la fiabilité.
 
-Une fois ce document terminé, je passerais directement à 03-domain-model.md.
+---
 
-C'est là que, selon moi, le projet va vraiment changer de dimension. On ne parlera plus de tables Prisma, mais du métier :
+# Les objectifs du produit
 
-Source
-Story
-Fact
-Article
-Publication
-Edition
-Agent
-Workflow
-Decision
+À terme, ANDORRE 360 devra être capable de :
 
-À mon avis, il manque déjà une entité qui sera essentielle : Fact.
+- détecter automatiquement les nouvelles informations pertinentes ;
+- comprendre l'évolution d'un événement au fil du temps ;
+- éviter la création de contenus en double ;
+- produire des contenus multilingues à partir d'une même connaissance ;
+- publier automatiquement les contenus de routine ;
+- assister les journalistes sur les sujets complexes ;
+- conserver une traçabilité complète de toutes les décisions.
 
-Pourquoi ? Parce qu'une Story est composée de faits.
+---
 
-Exemple :
+# Les critères de réussite
 
-Story : Le Gouvernement annonce une nouvelle aide énergétique.
+Le projet sera considéré comme abouti lorsque :
 
-Les Facts associés pourraient être :
-
-le montant de l'aide ;
-la date d'entrée en vigueur ;
-les bénéficiaires ;
-le lien vers le décret.
-
-Si un communiqué est mis à jour, ce sont les Facts qui changent, pas nécessairement toute la Story. C'est ce niveau de granularité qui permettra à l'IA de détecter précisément ce qui évolue, de mettre à jour un article existant plutôt que d'en créer un nouveau, et de conserver une traçabilité complète. C'est une approche qu'on retrouve dans les systèmes de gestion de connaissances et elle me paraît particulièrement adaptée à la vision d'ANDORRE 360.
+- une rédaction pourra fonctionner vingt-quatre heures sur vingt-quatre avec l'assistance des agents IA ;
+- chaque information publiée sera traçable jusqu'à ses sources ;
+- un journaliste pourra reprendre instantanément le contrôle de n'importe quel sujet ;
+- les contenus seront cohérents sur l'ensemble des canaux de diffusion ;
+- le système pourra évoluer indépendamment des modèles d'intelligence artificielle utilisés.

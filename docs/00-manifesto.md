@@ -1,6 +1,6 @@
 # ANDORRE 360 Manifesto
 
-> Construire la première rédaction autonome assistée par l'intelligence artificielle.
+> Construire le premier **Information Operating System** dédié aux rédactions, où des agents IA et des journalistes collaborent pour transformer un flux continu d'informations en une information fiable, traçable et publiable.
 
 ---
 
@@ -22,7 +22,7 @@ Les journalistes doivent consacrer leur temps à enquêter, vérifier, expliquer
 
 # Notre vision
 
-Nous voulons créer un système éditorial capable de faire vivre un journal 24 heures sur 24.
+Nous voulons créer un système éditorial capable de faire vivre un journal vingt-quatre heures sur vingt-quatre.
 
 Même lorsqu'aucun journaliste n'est connecté.
 
@@ -30,22 +30,26 @@ L'intelligence artificielle assure la continuité de l'information.
 
 Les journalistes gardent la maîtrise de la ligne éditoriale.
 
+ANDORRE 360 n'a pas vocation à remplacer une rédaction.
+
+Il a vocation à lui fournir un système d'exploitation de l'information.
+
 ---
 
 # Ce que nous construisons
 
 Nous ne construisons pas un CMS.
 
-Nous construisons une rédaction.
+Nous construisons l'infrastructure logicielle d'une rédaction.
 
-Une rédaction composée :
+Une plateforme où collaborent :
 
-- de journalistes ;
-- d'agents IA spécialisés ;
-- d'un moteur de veille ;
-- d'un moteur Story ;
-- d'un moteur éditorial ;
-- d'un moteur de publication.
+- des journalistes ;
+- des agents IA spécialisés ;
+- un moteur de collecte ;
+- un moteur de connaissance ;
+- un moteur éditorial ;
+- un moteur de publication.
 
 Chaque composant possède une responsabilité unique.
 
@@ -63,6 +67,22 @@ Une information ne devrait jamais être saisie deux fois.
 
 Chaque tâche répétitive doit être automatisée.
 
+Chaque décision importante doit pouvoir être expliquée.
+
+---
+
+# Comprendre avant de rédiger
+
+Le système ne transforme jamais directement un texte en article.
+
+Il commence par comprendre les faits.
+
+La rédaction est une conséquence de cette compréhension.
+
+Ainsi, une information collectée en catalan peut produire un article en français, puis être publiée dans d'autres langues, sans jamais perdre le lien avec sa source d'origine.
+
+La langue de collecte n'est pas la langue de publication.
+
 ---
 
 # Ce que l'IA fait
@@ -72,10 +92,12 @@ L'IA :
 - surveille les sources ;
 - détecte les nouveautés ;
 - identifie les événements ;
+- extrait les faits ;
+- rapproche les informations provenant de plusieurs sources ;
 - rédige les contenus de routine ;
 - génère les titres ;
 - prépare le référencement ;
-- prépare les réseaux sociaux ;
+- prépare les publications sur les réseaux sociaux ;
 - met à jour les articles ;
 - organise automatiquement le journal.
 
@@ -94,7 +116,7 @@ Les journalistes :
 
 L'IA ne remplace pas le jugement éditorial.
 
-Elle le complète.
+Elle l'assiste.
 
 ---
 
@@ -104,7 +126,7 @@ Elle le complète.
 
 Le journal continue de vivre.
 
-Les informations de confiance sont publiées automatiquement selon les règles définies par la rédaction.
+Les informations de confiance peuvent être publiées automatiquement selon les règles définies par la rédaction.
 
 ---
 
@@ -114,49 +136,35 @@ Lorsqu'un journaliste prend en charge un sujet, l'automatisation se retire.
 
 L'IA devient un assistant.
 
-Elle continue la veille, mais ne publie plus sur ce sujet.
+Elle poursuit la veille, propose des enrichissements et prépare les contenus.
 
-Le journaliste est toujours prioritaire.
+Le journaliste reste toujours prioritaire.
 
 ---
 
 # Notre unité fondamentale
 
-Une rédaction ne produit pas des articles.
+Une rédaction ne traite pas des articles.
 
 Elle traite des événements.
 
-Dans ANDORRE 360, un événement est appelé une **Story**.
+Les articles ne sont qu'une représentation éditoriale d'un événement.
 
-Une Story possède un cycle de vie.
+Un même événement peut produire plusieurs articles, plusieurs mises à jour et plusieurs publications.
 
-```text
-Source
-    ↓
-Story
-    ↓
-Article
-    ↓
-Publication
-    ↓
-Mises à jour
-    ↓
-Archive
-```
-
-Cette approche permet au journal de comprendre les événements avant de produire des contenus.
+Le système construit sa connaissance avant de produire des contenus.
 
 ---
 
 # Notre ambition
 
-Créer le premier système d'exploitation pour une rédaction autonome.
+Créer le premier système d'exploitation de l'information dédié aux rédactions.
 
 Un système capable de transformer un flux continu d'informations en un journal vivant.
 
 Sans intervention humaine permanente.
 
-Tout en laissant les journalistes reprendre le contrôle à tout moment.
+Tout en permettant aux journalistes de reprendre le contrôle à tout moment.
 
 ---
 
@@ -179,16 +187,31 @@ Il découvre :
 Nous croyons que :
 
 - une information est plus importante qu'un article ;
-- une Story peut produire plusieurs articles ;
+- les faits précèdent toujours les contenus ;
+- un événement peut produire plusieurs articles ;
+- chaque affirmation doit être reliée à sa ou ses sources ;
 - chaque décision du système doit être traçable ;
 - les journalistes restent responsables de la ligne éditoriale ;
 - l'automatisation doit être fiable avant d'être rapide ;
-- les règles éditoriales priment toujours sur les décisions de l'IA.
+- les règles éditoriales priment toujours sur les décisions de l'IA ;
+- les modèles d'IA sont remplaçables ; les données et les règles constituent le véritable patrimoine du système.
+
+---
+
+# Ce que nous refusons
+
+Nous refusons :
+
+- les contenus sans source ;
+- les traductions aveugles ;
+- les décisions éditoriales opaques ;
+- les automatisations impossibles à expliquer ;
+- la dépendance à un modèle d'intelligence artificielle unique.
 
 ---
 
 # Notre objectif à long terme
 
-Faire d'ANDORRE 360 la plateforme de référence pour les rédactions qui souhaitent utiliser l'intelligence artificielle de manière responsable.
+Faire d'ANDORRE 360 la plateforme de référence pour les rédactions souhaitant utiliser l'intelligence artificielle de manière responsable.
 
-Une plateforme où humains et agents IA collaborent pour produire une information plus rapide, plus fiable et toujours sous contrôle éditorial.
+Une plateforme où humains et agents IA collaborent pour produire une information plus rapide, plus fiable, multilingue, toujours explicable et toujours sous contrôle éditorial.

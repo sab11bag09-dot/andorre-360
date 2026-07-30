@@ -1,189 +1,226 @@
-docs/02-architecture.md
-
-L'objectif est de répondre à une seule question :
-
-Comment une information devient-elle un article publié ?
-
-Je ne parlerais pas de Next.js, Prisma ou OpenAI. Je parlerais uniquement des composants du système.
-
-Par exemple :
-
 # Architecture
 
-## Vue d'ensemble
+## Principes
 
-Le système est composé de plusieurs moteurs indépendants.
+ANDORRE 360 est conçu comme un **Information Operating System**.
 
-Chaque moteur possède une responsabilité unique.
+Son architecture repose sur une succession de moteurs spécialisés, chacun responsable d'une étape précise du traitement de l'information.
+
+Chaque moteur possède une responsabilité unique, communique avec les autres au travers du modèle métier et peut évoluer indépendamment.
+
+Cette séparation garantit la maintenabilité, la traçabilité et l'évolutivité du système.
+
+---
+
+# Vue d'ensemble
 
 ```
                     Sources
                        │
                        ▼
-               Source Engine
+                Source Engine
                        │
                        ▼
-               Watch Engine
+               Collection Engine
                        │
                        ▼
-               Story Engine
+              Knowledge Engine
                        │
                        ▼
-               AI Engine
+                 AI Engine
                        │
                        ▼
              Editorial Engine
                        │
                        ▼
-             Publishing Engine
+            Publishing Engine
                        │
                        ▼
-    Site • Facebook • WhatsApp • API
+     Site • Réseaux sociaux • API
 ```
+
+Chaque moteur enrichit la connaissance sans modifier les responsabilités des autres.
 
 ---
 
 # Source Engine
 
-Responsabilité :
+## Mission
 
 Gérer les sources d'information.
 
-Fonctions :
+## Responsabilités
 
-- enregistrer les sources
-- surveiller leur disponibilité
-- planifier les analyses
-
----
-
-# Watch Engine
-
-Responsabilité :
-
-Détecter les nouveautés.
-
-Fonctions :
-
-- télécharger les contenus
-- comparer avec les versions précédentes
-- détecter les changements
-- éviter les doublons
+- enregistrer les sources ;
+- vérifier leur disponibilité ;
+- planifier leur collecte ;
+- gérer leur configuration.
 
 ---
 
-# Story Engine
+# Collection Engine
 
-Responsabilité :
+## Mission
 
-Créer ou mettre à jour une Story.
+Transformer les sources en observations exploitables.
 
-Fonctions :
+## Responsabilités
 
-- créer une Story
-- fusionner deux Stories
-- enrichir une Story existante
-- calculer le niveau de confiance
+- collecter les contenus ;
+- extraire les informations utiles ;
+- détecter les nouveautés ;
+- éviter les doublons ;
+- conserver l'historique des observations.
+
+Les observations restent fidèles aux documents d'origine.
+
+Aucune interprétation n'est réalisée à ce stade.
+
+---
+
+# Knowledge Engine
+
+## Mission
+
+Construire la connaissance du système.
+
+C'est le cœur d'ANDORRE 360.
+
+Il transforme les observations en événements, faits et relations.
+
+## Responsabilités
+
+- créer ou mettre à jour les Stories ;
+- extraire les Facts ;
+- rapprocher plusieurs sources ;
+- détecter les évolutions ;
+- calculer le niveau de confiance ;
+- maintenir l'historique des connaissances.
+
+Le Knowledge Engine représente la mémoire du système.
 
 ---
 
 # AI Engine
 
-Responsabilité :
+## Mission
 
-Transformer une Story en contenu éditorial.
+Produire des contenus éditoriaux.
 
-Fonctions :
+Les agents IA travaillent exclusivement à partir des connaissances construites par le système.
 
-- rédaction
-- résumé
-- SEO
-- réseaux sociaux
-- traduction
+Ils ne produisent jamais directement un article à partir d'une source brute.
+
+## Responsabilités
+
+- rédaction ;
+- résumé ;
+- traduction éditoriale ;
+- optimisation SEO ;
+- préparation des publications sociales.
+
+Les modèles d'IA sont interchangeables.
 
 ---
 
 # Editorial Engine
 
-Responsabilité :
+## Mission
 
-Décider.
+Appliquer les règles éditoriales.
 
-Fonctions :
+## Responsabilités
 
-- choisir la catégorie
-- choisir la priorité
-- construire l'édition
-- appliquer les règles éditoriales
+- déterminer la priorité d'un sujet ;
+- choisir la catégorie ;
+- préparer les éditions ;
+- appliquer les règles de publication ;
+- arbitrer entre automatisation et validation humaine.
 
 ---
 
 # Publishing Engine
 
-Responsabilité :
+## Mission
 
-Publier.
+Diffuser les contenus.
 
-Fonctions :
+## Responsabilités
 
-- Site
-- Facebook
-- WhatsApp
-- Newsletter
-- API
+- publier sur le site ;
+- publier sur les réseaux sociaux ;
+- alimenter les newsletters ;
+- exposer les contenus via API ;
+- maintenir les publications synchronisées.
+
+Chaque canal est indépendant.
+
+L'ajout d'un nouveau canal ne modifie pas les autres moteurs.
 
 ---
 
 # Human Override
 
-À tout moment :
+À tout moment, un journaliste peut reprendre la main sur une Story.
 
-Le journaliste peut reprendre la main.
+Le système suspend immédiatement les automatisations liées à cette Story tout en poursuivant la collecte et la veille.
 
-Le système suspend alors toute publication automatique sur le sujet concerné.
+Les propositions de l'IA deviennent consultatives.
+
+Le journaliste reste prioritaire.
 
 ---
 
 # Traçabilité
 
-Chaque étape laisse une trace.
+Chaque décision laisse une trace.
 
+```
 Source
-
-↓
-
+      │
+Observation
+      │
+Fact
+      │
 Story
-
-↓
-
-Facts
-
-↓
-
+      │
 Article
-
-↓
-
+      │
 Publication
-
-↓
-
+      │
 Historique
+```
 
-Aucune décision n'est perdue.
-Ensuite, on changera complètement de manière de développer
+Chaque contenu publié peut être relié à son origine.
 
-Jusqu'à aujourd'hui, on raisonnait souvent en termes de pages ou de fonctionnalités.
+Aucune information n'est perdue.
 
-À partir de maintenant, je te proposerais qu'on raisonne en termes de moteurs :
+---
 
-Source Engine
-Watch Engine
-Story Engine
-AI Engine
-Editorial Engine
-Publishing Engine
+# Principes d'architecture
 
-Chaque nouveau développement appartiendra à l'un de ces moteurs.
+L'architecture repose sur quelques règles simples.
 
-Cette approche a un gros avantage : dans un an, si tu ajoutes un nouveau canal (par exemple Telegram ou une application mobile), tu ne touches pas au moteur de veille ou au moteur Story. Tu ajoutes simplement un nouveau composant de publication. C'est ce type de découpage qui permet à une plateforme de grandir sans devenir difficile à maintenir.
+- Chaque moteur possède une responsabilité unique.
+- Les moteurs communiquent au travers du modèle métier.
+- Les données sont indépendantes des modèles d'IA.
+- Les contenus sont produits à partir des connaissances.
+- Toute décision est explicable.
+- Toute évolution est traçable.
+- Les journalistes restent prioritaires sur les agents IA.
+----------------------
+## Collecte des contenus
+
+Le moteur de collecte fonctionne en deux étapes :
+
+1. découverte des articles (RSS ou HTML) ;
+2. extraction du contenu complet.
+
+Chaque observation conserve désormais :
+
+- le titre ;
+- l'URL ;
+- la date de publication ;
+- le contenu intégral de l'article lorsqu'il est disponible.
+
+L'extraction HTML repose sur des règles spécifiques à chaque domaine avec des sélecteurs génériques en secours.

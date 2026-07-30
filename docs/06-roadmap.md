@@ -1,528 +1,281 @@
-# ANDORRE 360 — Roadmap
+# Roadmap
 
-> Plan de construction progressif de la rédaction autonome ANDORRE 360.
+> L'évolution du produit ANDORRE 360.
 
----
+Ce document décrit les grandes étapes de développement du produit.
 
-# Principes de développement
+Il ne détaille ni les sprints, ni les tâches techniques, ni l'état d'avancement du développement.
 
-ANDORRE 360 est développé par moteurs indépendants.
-
-Chaque moteur possède une responsabilité unique et communique avec le moteur suivant.
-
-```text
-Source Engine
-    ↓
-Watch Engine
-    ↓
-Story Engine
-    ↓
-AI Engine
-    ↓
-Editorial Engine
-    ↓
-Publishing Engine
-```
-
-Un moteur ne peut jamais accéder directement aux responsabilités d'un moteur situé plus loin dans la chaîne.
-
-Chaque moteur ne dépend que du précédent et prépare le suivant.
+Chaque version représente une capacité métier supplémentaire apportée au système.
 
 ---
 
-# Méthodologie
+# Vision
 
-Chaque sprint respecte systématiquement l'ordre suivant :
+ANDORRE 360 a pour ambition de devenir un système éditorial capable de :
 
-1. Vision
-2. Domaine
-3. Architecture
-4. Implémentation
-5. Tests
-6. Documentation
-7. Commit
+collecter ;
+comprendre ;
+vérifier ;
+organiser ;
+rédiger ;
+publier ;
+mettre à jour ;
+archiver
 
-Un sprint n'est terminé que lorsque :
+des informations en continu, avec une collaboration fluide entre journalistes et agents d'intelligence artificielle.
 
-- TypeScript compile sans erreur ;
-- ESLint ne contient aucune erreur bloquante ;
-- les tests passent ;
-- la documentation est à jour ;
-- les modifications sont enregistrées dans un commit dédié.
+Chaque étape de cette roadmap rapproche progressivement le produit de cette vision.
 
 ---
 
-# État actuel
-
-## Fondations
-
-Statut : ✅ Terminé
-
-Livrables :
-
-- manifeste ;
-- vision produit ;
-- architecture par moteurs ;
-- modèle de domaine ;
-- authentification de l'administration ;
-- administration des sources ;
-- infrastructure de tests.
-
----
-
-# Phase 1 — Source Engine
+# Version 1 — Le CMS éditorial
 
 ## Objectif
 
-Le Source Engine gère les fournisseurs d'information.
+Construire le socle de gestion des contenus.
 
-Il est responsable :
+Le système permet à une rédaction de produire et publier des articles manuellement.
 
-- de la configuration des sources ;
-- de leur disponibilité ;
-- de leur état technique ;
-- de leur planification.
+## Capacités
 
-Le Source Engine ne télécharge jamais de contenu éditorial.
+- administration ;
+- authentification ;
+- gestion des utilisateurs ;
+- articles ;
+- catégories ;
+- médias ;
+- publication ;
+- administration du site.
 
-Cette responsabilité appartient au Watch Engine.
-
----
-
-## Sprint 1 — Administration des sources
-
-Statut : ✅ Terminé
-
-Livrables :
-
-- modèle `Source` ;
-- enums Prisma ;
-- CRUD ;
-- activation / désactivation ;
-- filtres ;
-- migration ;
-- tests.
+Le produit fonctionne comme un CMS moderne.
 
 ---
 
-## Sprint 2 — Disponibilité des sources
-
-Statut : 🔜 À faire
-
-### Objectif
-
-Vérifier qu'une source est techniquement accessible.
-
-### Périmètre
-
-- contrôle HTTP manuel ;
-- délai maximal de réponse ;
-- dernier contrôle ;
-- dernier succès ;
-- dernière erreur ;
-- affichage de l'état dans l'administration.
-
-### Hors périmètre
-
-- téléchargement RSS ;
-- parsing HTML ;
-- parsing API ;
-- téléchargement PDF ;
-- création d'Observation ;
-- création de Story ;
-- intelligence artificielle.
-
-### Critères de validation
-
-- contrôle individuel d'une source ;
-- succès historisé ;
-- erreurs historisées ;
-- affichage de l'état ;
-- tests unitaires.
-
----
-
-## Sprint 3 — Planification des contrôles
-
-Statut : 🔜 À faire
-
-### Objectif
-
-Déterminer automatiquement quelles sources doivent être contrôlées.
-
-### Périmètre
-
-- fréquence de surveillance ;
-- sélection des sources arrivées à échéance ;
-- exclusion des sources inactives ;
-- exécution planifiée ;
-- prévention des contrôles concurrents.
-
-### Critères de validation
-
-- sélection correcte des sources ;
-- exécution traçable ;
-- fonctionnement sans interface d'administration.
-
----
-
-# Phase 2 — Watch Engine
+# Version 2 — Le moteur de collecte
 
 ## Objectif
 
-Transformer les contenus détectés en Observations.
+Surveiller automatiquement les Sources.
 
-Le Watch Engine ne crée jamais directement de Story.
+Le système ne dépend plus uniquement des journalistes pour découvrir les nouvelles informations.
 
----
+## Capacités
 
-## Observation
+- catalogue de Sources ;
+- collecte périodique ;
+- surveillance continue ;
+- détection des nouveautés ;
+- stockage des Observations ;
+- suivi de disponibilité des Sources.
 
-Le Watch Engine consomme les Sources.
-
-Il produit des Observations.
-
-Le modèle métier de l'Observation est défini dans le document `03-domain-model.md`.
-
-Le Story Engine consomme ensuite ces Observations.
-
----
-
-## Sprint 4 — Observation RSS
-
-### Objectif
-
-Transformer un flux RSS ou Atom en Observations.
-
-### Livrables
-
-- téléchargement ;
-- parsing RSS/Atom ;
-- extraction des métadonnées ;
-- rattachement à la Source ;
-- identifiant externe ;
-- données brutes conservées.
+Le système sait désormais ce qui change.
 
 ---
 
-## Sprint 5 — Détection des nouveautés
+# Version 3 — Le moteur de connaissance
 
-### Objectif
+## Objectif
 
-Identifier les nouveaux contenus et les modifications.
+Comprendre les informations collectées.
 
-### Livrables
+Le système organise les Observations en connaissances structurées.
 
-- empreinte ;
+## Capacités
+
+- extraction des Claims ;
+- création des Facts ;
 - détection des doublons ;
-- comparaison ;
-- historique des versions.
+- rapprochement des Stories ;
+- gestion des contradictions ;
+- suivi de l'évolution des événements ;
+- traçabilité complète.
+
+Le système sait désormais de quoi parlent les informations.
 
 ---
 
-## Sprint 6 — Observation HTML
-
-### Objectif
-
-Créer des Observations à partir de pages HTML.
-
----
-
-## Sprint 7 — Observation API
-
-### Objectif
-
-Créer des Observations à partir de réponses API.
-
----
-
-## Sprint 8 — Observation PDF
-
-### Objectif
-
-Créer des Observations à partir de documents PDF.
-
----
-
-# Phase 3 — Story Engine
+# Version 4 — Le journaliste IA
 
 ## Objectif
 
-Transformer les Observations en événements éditoriaux.
+Produire un premier brouillon journalistique.
 
-La Story est l'objet central du système.
+Les agents IA assistent la rédaction sans remplacer le journaliste.
 
----
+## Capacités
 
-## Sprint 9 — Création d'une Story
+- rédaction automatique ;
+- résumés ;
+- titres ;
+- chapôs ;
+- SEO ;
+- traduction ;
+- génération de contenus sociaux ;
+- signalement des informations manquantes.
 
-Créer une Story lorsqu'aucun événement existant ne correspond.
-
----
-
-## Sprint 10 — Rattachement
-
-Associer une Observation à une Story existante.
-
----
-
-## Sprint 11 — Gestion des Facts
-
-Extraire et historiser les informations vérifiables.
-
-Les Facts :
-
-- possèdent une provenance ;
-- sont historisés ;
-- ne sont jamais écrasés ;
-- restent traçables.
+Chaque brouillon reste entièrement traçable.
 
 ---
 
-## Sprint 12 — Confiance
-
-Calcul du niveau de confiance.
-
-Détection des contradictions.
-
----
-
-## Sprint 13 — Fusion
-
-Fusion de Stories représentant le même événement.
-
----
-
-# Phase 4 — AI Engine
+# Version 5 — La rédaction assistée
 
 ## Objectif
 
-Transformer les Stories en propositions éditoriales.
+Transformer l'IA en assistant éditorial complet.
 
-L'IA prépare.
+Les journalistes collaborent avec plusieurs agents spécialisés.
 
-Le journaliste décide.
+## Capacités
 
----
+- contrôle qualité ;
+- vérification des Facts ;
+- amélioration du style ;
+- recommandations éditoriales ;
+- hiérarchisation des sujets ;
+- aide à la décision.
 
-## Sprint 14 — Résumé
-
----
-
-## Sprint 15 — Rédaction
-
----
-
-## Sprint 16 — Titres et chapôs
+Le journaliste conserve toujours la responsabilité éditoriale.
 
 ---
 
-## Sprint 17 — SEO
-
----
-
-## Sprint 18 — Réseaux sociaux
-
----
-
-## Sprint 19 — Traduction
-
-Toutes les productions IA :
-
-- sont rattachées à une Story ;
-- sont versionnées ;
-- conservent leur contexte ;
-- identifient leur Agent ;
-- restent modifiables.
-
----
-
-# Phase 5 — Editorial Engine
+# Version 6 — La publication autonome
 
 ## Objectif
 
-Appliquer les décisions éditoriales.
+Automatiser la publication des contenus à faible risque.
 
-Le journaliste reste toujours prioritaire.
+Le système applique les règles éditoriales avant toute diffusion.
 
----
+## Capacités
 
-## Sprint 20 — Workflow
+- validation automatique selon les règles ;
+- planification ;
+- publication multi-canaux ;
+- mises à jour automatiques ;
+- corrections ;
+- archivage.
 
----
-
-## Sprint 21 — Modes AUTO / ASSISTÉ / MANUEL
-
----
-
-## Sprint 22 — Priorités
-
----
-
-## Sprint 23 — Validation humaine
+Les sujets sensibles restent soumis à une validation humaine.
 
 ---
 
-## Sprint 24 — Human Override
-
----
-
-## Sprint 25 — Construction des éditions
-
----
-
-# Phase 6 — Publishing Engine
+# Version 7 — Le média multilingue
 
 ## Objectif
 
-Diffuser les contenus validés.
+Produire une information de qualité dans plusieurs langues.
+
+Le système comprend les Sources dans leur langue d'origine puis rédige dans la langue de publication.
+
+## Capacités
+
+- compréhension multilingue ;
+- rédaction en plusieurs langues ;
+- traduction des citations ;
+- terminologie éditoriale ;
+- adaptation culturelle ;
+- publication internationale.
+
+La langue de collecte devient indépendante de la langue de publication.
 
 ---
 
-## Sprint 26 — Site web
-
----
-
-## Sprint 27 — Facebook
-
----
-
-## Sprint 28 — WhatsApp
-
----
-
-## Sprint 29 — Newsletter
-
----
-
-## Sprint 30 — API
-
-Chaque publication :
-
-- référence un Article ;
-- possède un canal ;
-- possède un statut ;
-- historise les erreurs ;
-- permet une nouvelle tentative.
-
----
-
-# Phase 7 — Traçabilité
+# Version 8 — L'Information Operating System
 
 ## Objectif
 
-Conserver l'historique complet du fonctionnement du système.
+Faire d'ANDORRE 360 un système éditorial autonome capable d'assister une rédaction en continu.
+
+Le système devient une plateforme de gestion de l'information plutôt qu'un simple CMS.
+
+## Capacités
+
+- veille permanente ;
+- compréhension des événements ;
+- suivi des Stories ;
+- rédaction continue ;
+- mises à jour automatiques ;
+- orchestration des agents IA ;
+- collaboration humain / IA ;
+- publication continue ;
+- traçabilité complète.
+
+Le produit devient un véritable système d'exploitation de l'information.
 
 ---
 
-## Sprint 31 — Journal des décisions
+# Principes d'évolution
+
+Quel que soit le niveau atteint, plusieurs principes restent constants.
+
+- Le journaliste conserve la priorité.
+- Les Sources restent traçables.
+- Les décisions restent explicables.
+- Les modèles d'IA sont remplaçables.
+- Les règles éditoriales priment sur les recommandations des agents.
+- Les Stories constituent le cœur du système.
+- Les Articles ne sont qu'une représentation éditoriale des connaissances.
 
 ---
 
-## Sprint 32 — Historique des workflows
+# Vision finale
 
----
+À terme, ANDORRE 360 devra être capable de transformer automatiquement un flux continu d'informations en un journal vivant.
 
-## Sprint 33 — Supervision des Agents
+Le système devra pouvoir :
 
----
+Source
 
-## Sprint 34 — Tableau de bord
+↓
 
-Le système doit toujours permettre de répondre :
+Observation
 
-- qui ?
-- quand ?
-- pourquoi ?
-- sur quelles informations ?
-- quel résultat ?
-- un journaliste est-il intervenu ?
+↓
 
----
+Claim
 
-# Phase 8 — Autonomie éditoriale
+↓
 
-## Objectif
+Fact
 
-Faire fonctionner la rédaction en continu sous contrôle humain.
+↓
 
----
+Story
 
-## Sprint 35 — Publications automatiques
+↓
 
----
+Article
 
-## Sprint 36 — Mise à jour des articles
+↓
 
----
+Publication
 
-## Sprint 37 — Enrichissement continu des Stories
+↓
 
----
+Edition
 
-## Sprint 38 — Alertes éditoriales
+sans perdre la provenance des informations, tout en permettant à un journaliste de reprendre instantanément le contrôle lorsque le contexte l'exige.
 
----
+L'objectif n'est pas de remplacer la rédaction.
 
-## Sprint 39 — Fonctionnement autonome
+L'objectif est de permettre à une rédaction de fonctionner en continu grâce à une collaboration intelligente entre humains et agents spécialisés.
+------------------------
+## Pipeline de collecte
 
----
+### ✅ Terminé
 
-# Phase 9 — Exploitation
+- Collecte RSS
+- Collecte HTML Altaveu
+- Mise à jour des observations existantes
+- Création de brouillons à partir des observations
+- Compatibilité avec l'éditeur à blocs
 
-## Objectif
+### 🚧 À venir
 
-Garantir un fonctionnement durable, fiable et maintenable.
-
----
-
-## Sprint 40 — Observabilité
-
-- métriques ;
-- journaux ;
-- supervision.
-
----
-
-## Sprint 41 — Sauvegardes
-
-- sauvegardes ;
-- restauration ;
-- reprise après incident.
-
----
-
-## Sprint 42 — Performances
-
-- optimisation ;
-- cache ;
-- parallélisation.
-
----
-
-## Sprint 43 — Sécurité
-
-- audit ;
-- permissions ;
-- protection des données.
-
----
-
-# Vision cible
-
-À terme, ANDORRE 360 devra être capable de :
-
-- surveiller un grand nombre de sources ;
-- détecter automatiquement les nouveautés ;
-- produire des Observations ;
-- construire et enrichir des Stories ;
-- historiser les Facts ;
-- générer plusieurs formes éditoriales ;
-- assister les journalistes dans leurs décisions ;
-- publier sur plusieurs canaux ;
-- conserver l'historique complet des décisions ;
-- permettre à un journaliste de reprendre le contrôle à tout moment.
-
-ANDORRE 360 n'est pas un CMS.
-
-C'est un système d'exploitation pour une rédaction autonome assistée par l'intelligence artificielle.
+- Collecte HTML Diari d'Andorra
+- Collecte HTML Bondia
+- Collecte HTML RTVA
+- Collecte HTML Andorra Difusió
+- Collecte HTML El Periòdic
+- Règles d'extraction par domaine

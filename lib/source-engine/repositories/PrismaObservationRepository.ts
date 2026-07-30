@@ -83,11 +83,37 @@ export class PrismaObservationRepository
 
         created += 1;
       } catch (error) {
-        if (isUniqueConstraintError(error)) {
-          continue;
+        if (!isUniqueConstraintError(error)) {
+          throw error;
         }
 
-        throw error;
+        const updatedObservation =
+          await prisma.observation.update({
+            where: {
+              sourceId_url: {
+                sourceId,
+                url: observation.url,
+              },
+            },
+            data: {
+              title: observation.title,
+              publishedAt: observation.publishedAt,
+              content: observation.content,
+              processed: false,
+              processedAt: null,
+              articleId: null,
+            },
+          });
+
+        console.log(
+          "[ObservationRepository] observation mise à jour",
+          {
+            id: updatedObservation.id,
+            url: updatedObservation.url,
+            contentLength:
+              updatedObservation.content?.length ?? 0,
+          },
+        );
       }
     }
 

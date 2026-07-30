@@ -13,6 +13,14 @@ function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function normalizeContent(value: string): string {
+  return value
+    .split(/\n+/)
+    .map((line) => normalizeText(line))
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 function normalizeUrl(
   value: string,
   sourceUrl: string,
@@ -66,7 +74,23 @@ function parseCatalanDate(value: string): Date | null {
     Number(dayValue),
   );
 
-  return Number.isNaN(date.getTime()) ? null : date;
+  return Number.isNaN(date.getTime())
+    ? null
+    : date;
+}
+
+function parseGenericDate(value: string): Date | null {
+  const catalanDate = parseCatalanDate(value);
+
+  if (catalanDate) {
+    return catalanDate;
+  }
+
+  const parsedDate = new Date(value);
+
+  return Number.isNaN(parsedDate.getTime())
+    ? null
+    : parsedDate;
 }
 
 export class HtmlCollector implements Collector {
@@ -74,6 +98,130 @@ export class HtmlCollector implements Collector {
     private readonly htmlClient: HtmlClient =
       new FetchHtmlClient(),
   ) {}
+
+  private async getArticleContent(
+    url: string,
+  ): Promise<{
+    content: string | null;
+    publishedAt: Date | null;
+  }> {
+    try {
+      const html = await this.htmlClient.get(url);
+      const $ = cheerio.load(html);
+
+      const contentSelectors = [
+  ".c-mainarticle__body",
+  ".c-detail__body", 
+  ".field--name-body",
+  ".article-content",
+  ".article-body",
+  ".entry-content",
+  ".post-content",
+  ".content-noticia",
+  ".noticia-cos",
+  ".node__content",
+];
+
+
+      let content: string | null = null;
+
+      for (const selector of contentSelectors) {
+        const element = $(selector).first().clone();
+
+if (!element.length) {
+  continue;
+}
+
+element
+  .find(
+    [
+      "script",
+      "style",
+      "nav",
+      "footer",
+      "header",
+      "aside",
+      "form",
+      "button",
+      "audio",
+      ".comments",
+      ".comentaris",
+      ".share",
+      ".social",
+      ".meta",
+      ".metadata",
+      ".c-detail__author",
+".c-detail__tags-content",
+".c-detail__related",
+".c-detail__recommended",
+".henneoHB_desktop",
+".c-add",
+    ].join(", "),
+  )
+  .remove();
+
+        const paragraphs = element
+  .find("p")
+  .map((_, paragraph) =>
+    normalizeText($(paragraph).text()),
+  )
+  .get()
+  .filter((text) => {
+    if (!text) {
+      return false;
+    }
+
+    const loweredText = text.toLowerCase();
+
+    return (
+      !loweredText.includes("escolta l'article") &&
+      !loweredText.includes("comentaris") &&
+      !/^\d{2}\/\d{2}\/\d{4}/.test(text)
+    );
+  });
+
+const extractedContent =
+  paragraphs.length > 0
+    ? paragraphs.join("\n\n")
+    : normalizeContent(element.text());
+
+        if (extractedContent.length >= 50) {
+          content = extractedContent;
+          break;
+        }
+      }
+
+      const dateText =
+        $("time").first().attr("datetime") ??
+        $(
+          "time, .date, .field--name-created, .published-date",
+        )
+          .first()
+          .text();
+console.log("[HtmlCollector] article extrait", {
+  url,
+  selectorUtilise: content ? "trouvé" : "aucun",
+  contentLength: content?.length ?? 0,
+  contentPreview: content?.slice(0, 300) ?? null,
+});
+      return {
+        content,
+        publishedAt: dateText
+          ? parseGenericDate(dateText)
+          : null,
+      };
+    } catch (error) {
+      console.error(
+        `[HtmlCollector] Impossible de lire ${url}`,
+        error,
+      );
+
+      return {
+        content: null,
+        publishedAt: null,
+      };
+    }
+  }
 
   async collect(
     source: Source,
@@ -85,7 +233,12 @@ export class HtmlCollector implements Collector {
     const html = await this.htmlClient.get(source.url);
     const $ = cheerio.load(html);
 
-    const observations: ObservationInput[] = [];
+    const links: Array<{
+      title: string;
+      url: string;
+      publishedAt: Date | null;
+    }> = [];
+
     const knownUrls = new Set<string>();
 
     $("h2 a").each((_, element) => {
@@ -107,47 +260,44 @@ export class HtmlCollector implements Collector {
         "article, .views-row, .node, .item, li, div",
       );
 
-      const containerText = normalizeText(container.text());
-
       const dateText =
         container
           .find("time")
           .first()
           .attr("datetime") ??
         container
-          .find("time, .date, .field--name-created")
-          .first()
-          .text() ??
-        containerText;
-
-      const description = normalizeText(
-        container
           .find(
-            "p, .field--name-body, .field--name-field-resum",
+            "time, .date, .field--name-created",
           )
           .first()
-          .text(),
-      );
-
-      const publishedAt =
-        parseCatalanDate(dateText) ??
-        (() => {
-          const parsed = new Date(dateText);
-
-          return Number.isNaN(parsed.getTime())
-            ? null
-            : parsed;
-        })();
+          .text();
 
       knownUrls.add(url);
 
-      observations.push({
+      links.push({
         title,
         url,
-        publishedAt,
-        content: description || null,
+        publishedAt: dateText
+          ? parseGenericDate(dateText)
+          : null,
       });
     });
+
+    const observations: ObservationInput[] = [];
+
+    for (const link of links) {
+      const article =
+        await this.getArticleContent(link.url);
+
+      observations.push({
+        title: link.title,
+        url: link.url,
+        publishedAt:
+          article.publishedAt ??
+          link.publishedAt,
+        content: article.content,
+      });
+    }
 
     console.info(
       `[HtmlCollector] ${observations.length} observation(s) trouvée(s).`,

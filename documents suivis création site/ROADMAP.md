@@ -1251,3 +1251,457 @@ attendre la validation avant de poursuivre.
 Ne jamais anticiper les étapes suivantes.
 
 Ce fonctionnement est plus fiable sur un projet de cette taille et évite de recréer ou de remplacer des éléments déjà existants.
+----------------------------------
+Sprint 4 — Poste de travail du journaliste
+Objectif
+
+Construire l'interface où les brouillons sont consultés, édités, validés et, demain, enrichis par l'IA.
+
+Livrables
+1. Liste des articles
+/admin/articles
+
+Affichage :
+
+titre ;
+statut ;
+source(s) ;
+date de création ;
+dernière modification ;
+actions.
+2. Fiche article
+/admin/articles/[id]
+
+Avec plusieurs panneaux :
+
+┌──────────────────────────────┐
+│ Métadonnées                  │
+├──────────────────────────────┤
+│ Titre                        │
+│ Chapô                        │
+│ Corps                        │
+│ Catégorie                    │
+│ Tags                         │
+└──────────────────────────────┘
+
+┌──────────────────────────────┐
+│ Sources                      │
+├──────────────────────────────┤
+│ Observation 1                │
+│ Observation 2                │
+│ Observation 3                │
+└──────────────────────────────┘
+
+┌──────────────────────────────┐
+│ Historique                   │
+└──────────────────────────────┘
+
+Plus tard, nous ajouterons :
+
+Assistant IA
+
+qui proposera :
+
+résumé ;
+angle ;
+améliorations ;
+alertes ;
+niveau de confiance.
+3. États éditoriaux
+
+Nous allons stabiliser les statuts dès maintenant :
+
+DRAFT
+AI_DRAFT
+REVIEW
+APPROVED
+PUBLISHED
+ARCHIVED
+
+Cela évitera des migrations plus tard.
+
+4. Architecture
+
+On garde la même logique que pour le Source Engine et l'Article Engine :
+
+app/
+admin/articles/
+
+lib/
+article-engine/
+    repositories/
+    services/
+    actions/
+
+Aucune logique Prisma dans les composants React.
+
+5. Critère de fin
+
+À la fin du sprint, nous devrons pouvoir :
+
+créer un brouillon ;
+l'ouvrir ;
+le modifier ;
+l'enregistrer ;
+voir ses observations sources ;
+changer son statut.
+Ce que je veux éviter
+
+Beaucoup de projets "IA" commencent par appeler un LLM très tôt. Ensuite, ils passent leur temps à réparer une architecture qui n'avait pas été pensée pour accueillir ces agents.
+
+Je préfère que chaque futur agent IA s'insère naturellement dans le système. Par exemple :
+
+Collector Agent → collecte les informations.
+Fact Extraction Agent → extrait les faits.
+Journalist Agent → rédige un brouillon.
+Editor Agent → améliore le style et la structure.
+Fact Checker Agent → vérifie la cohérence et les sources.
+Publisher Agent → prépare la publication.
+
+Chaque agent aura des responsabilités claires et pourra être remplacé ou amélioré sans remettre en cause l'ensemble du système.
+
+Je pense que cette approche modulaire correspond bien à l'ambition d'ANDORRE 360 : construire un véritable Information Operating System, et non simplement une application qui appelle un modèle d'IA.
+
+
+
+-----------------------------------
+Feuille de route ANDORRE 360
+Vision cible
+
+ANDORRE 360 doit devenir un système capable de :
+
+Collecter
+→ comprendre
+→ recouper
+→ hiérarchiser
+→ enquêter
+→ rédiger
+→ réviser
+→ publier
+→ mettre à jour
+
+L’objectif n’est pas seulement de générer du texte. L’IA doit produire un travail journalistique traçable, vérifiable et révisable.
+
+Phase 1 — Socle de collecte
+
+Objectif : obtenir des observations fiables et normalisées.
+
+Déjà réalisé :
+
+gestion des sources ;
+collecte RSS ;
+collecte HTML ;
+stockage des observations ;
+détection simple des doublons ;
+création manuelle d’un brouillon depuis une observation.
+
+À terminer :
+
+gestion propre des erreurs de collecte ;
+journal d’exécution des collecteurs ;
+date de dernière collecte ;
+statut de santé des sources ;
+extracteurs HTML configurables selon les sites ;
+conservation du contenu brut collecté ;
+tests automatiques des collecteurs.
+
+Critère de validation : une source peut être collectée plusieurs fois sans créer de doublons ni perdre d’information.
+
+Phase 2 — Espace éditorial
+
+Objectif : rendre les articles visibles et modifiables dans l’administration.
+
+À construire :
+
+/admin/articles
+/admin/articles/[id]
+
+Fonctions attendues :
+
+liste des brouillons ;
+filtres par statut, date et source ;
+page d’édition ;
+titre, chapô, corps, catégorie et tags ;
+historique des modifications ;
+statut éditorial ;
+observations liées à l’article ;
+aperçu avant publication.
+
+Statuts recommandés :
+
+DRAFT
+AI_DRAFT
+REVIEW
+APPROVED
+PUBLISHED
+ARCHIVED
+
+Critère de validation : un rédacteur peut ouvrir un brouillon, le modifier, le valider et suivre son origine.
+
+Phase 3 — Traçabilité des sources
+
+Objectif : permettre à un article de s’appuyer sur plusieurs observations.
+
+La relation actuelle entre une observation et un article est suffisante pour le prototype, mais pas pour le système final.
+
+Il faudra introduire une relation plusieurs-à-plusieurs :
+
+Article
+   ↕
+ArticleObservation
+   ↕
+Observation
+
+Chaque association pourra conserver :
+
+le rôle de la source ;
+sa pertinence ;
+son niveau de fiabilité ;
+les faits qu’elle soutient ;
+les contradictions éventuelles.
+
+Il faudra également distinguer :
+
+Observation brute
+Fait extrait
+Affirmation de l’article
+Source justificative
+
+Critère de validation : chaque affirmation importante d’un article peut être reliée à une ou plusieurs sources.
+
+Phase 4 — Premier journaliste IA
+
+Objectif : produire un brouillon structuré à partir d’une observation.
+
+Premier périmètre volontairement limité :
+
+analyser l’observation ;
+identifier le sujet principal ;
+extraire les faits essentiels ;
+proposer un angle ;
+générer un titre ;
+générer un chapô ;
+rédiger un article ;
+signaler les éléments incertains ;
+créer un article avec le statut AI_DRAFT.
+
+Le résultat de l’IA devra être structuré, par exemple :
+
+{
+  title: string;
+  summary: string;
+  body: string;
+  angle: string;
+  keyFacts: string[];
+  missingInformation: string[];
+  confidence: number;
+  warnings: string[];
+}
+
+Critère de validation : l’IA produit un brouillon exploitable sans inventer de faits absents de l’observation.
+
+Phase 5 — Recoupement journalistique
+
+Objectif : passer de la génération de texte au raisonnement journalistique.
+
+L’IA devra pouvoir :
+
+regrouper plusieurs observations parlant du même événement ;
+identifier les faits communs ;
+détecter les contradictions ;
+différencier faits, opinions et déclarations ;
+repérer les informations manquantes ;
+demander ou rechercher des sources complémentaires ;
+estimer le niveau de confiance ;
+proposer plusieurs angles éditoriaux.
+
+Une nouvelle entité pourra représenter un sujet ou dossier :
+
+Story / Topic / Dossier
+
+Exemple :
+
+Dossier : Travaux sur l’avenue Meritxell
+├── communiqué du Comú
+├── article de presse
+├── information sur la circulation
+├── déclaration d’un commerçant
+└── article produit
+
+Critère de validation : l’IA refuse de présenter comme certain un fait insuffisamment corroboré.
+
+Phase 6 — Publication et mise à jour
+
+Objectif : gérer tout le cycle de vie de l’information.
+
+À prévoir :
+
+validation humaine obligatoire ou configurable ;
+publication sur le site ;
+programmation d’une publication ;
+corrections ;
+versions successives ;
+mise à jour automatique lorsqu’un nouveau fait arrive ;
+ajout d’une note de correction ;
+dépublication et archivage ;
+journal d’audit.
+
+Critère de validation : chaque publication permet de savoir qui — humain ou IA — a produit, modifié et validé chaque version.
+
+Phase 7 — Autonomie supervisée
+
+Objectif : permettre à l’IA de gérer une partie de la rédaction quotidiennement.
+
+L’IA pourra :
+
+surveiller toutes les sources ;
+détecter les sujets importants ;
+prioriser les événements ;
+créer automatiquement des dossiers ;
+produire des brouillons ;
+demander des vérifications ;
+mettre à jour les articles existants ;
+suggérer une publication ;
+signaler les informations urgentes.
+
+L’autonomie devra être configurable par niveau :
+
+Niveau 0 — suggestions uniquement
+Niveau 1 — brouillons automatiques
+Niveau 2 — enquêtes et recoupements automatiques
+Niveau 3 — publication après validation humaine
+Niveau 4 — publication automatique sur sujets autorisés
+Principes non négociables
+Traçabilité
+
+Aucun article généré ne doit perdre le lien avec ses sources.
+
+Séparation des données
+
+Il faut distinguer clairement :
+
+contenu collecté ;
+faits extraits ;
+analyse de l’IA ;
+brouillon IA ;
+contenu validé ;
+contenu publié.
+Pas d’invention silencieuse
+
+Toute information incertaine doit être signalée.
+
+Versionnement
+
+Chaque modification importante doit être conservée.
+
+Supervision humaine
+
+L’humain reste responsable de la ligne éditoriale, des sujets sensibles et de la publication tant que le système n’a pas démontré sa fiabilité.
+
+Ordre recommandé des prochains sprints
+Sprint 4 — Administration des articles
+/admin/articles
+page de détail ;
+modification du brouillon ;
+statuts éditoriaux ;
+affichage des observations sources.
+Sprint 5 — Modèle journalistique
+relation plusieurs-à-plusieurs ;
+entité Fact ou Claim ;
+historique des versions ;
+métadonnées IA ;
+niveau de confiance.
+Sprint 6 — Génération IA v1
+service generateArticleDraft ;
+prompt structuré ;
+sortie JSON validée ;
+création d’un AI_DRAFT ;
+affichage des avertissements et faits manquants.
+Sprint 7 — Regroupement et recoupement
+détection de sujets similaires ;
+dossiers éditoriaux ;
+plusieurs sources par article ;
+contradictions ;
+score de confiance.
+Sprint 8 — Publication
+validation ;
+aperçu ;
+publication ;
+historique ;
+corrections.
+Prochaine décision
+
+La prochaine étape ne devrait pas encore être l’appel à un modèle d’IA. Elle devrait être le Sprint 4 : espace éditorial des articles, car c’est dans cette interface que nous afficherons ensuite le raisonnement, les sources, les alertes et les propositions de l’IA.
+
+-------------------------------
+Modification de la feuille de route
+
+J’ajouterais un chantier transversal : Multilinguisme et localisation éditoriale.
+
+Sprint 4 — Interface éditoriale
+
+Prévoir dès maintenant dans le modèle :
+
+langue de la source ;
+langue de l’article ;
+titre original ;
+contenu original ;
+version française ;
+statut de traduction ;
+avertissements éventuels.
+
+Par exemple :
+
+sourceLanguage  String?
+articleLanguage String @default("fr")
+originalTitle   String?
+originalContent String?
+Sprint 6 — Journaliste IA v1
+
+Le service ne devra pas seulement « traduire », mais :
+
+generateFrenchArticleFromObservation()
+
+Il devra retourner quelque chose comme :
+
+{
+  originalLanguage: "ca",
+  outputLanguage: "fr",
+  title: string,
+  summary: string,
+  body: string,
+  keyFacts: string[],
+  translatedQuotes: {
+    original: string,
+    translated: string,
+  }[],
+  terminologyWarnings: string[],
+  confidence: number,
+}
+Contrôle qualité
+
+Chaque brouillon devra permettre de consulter côte à côte :
+
+Source catalane | Article français
+
+Avec conservation des éléments suivants :
+
+texte original ;
+traduction des citations ;
+noms propres non modifiés ;
+termes institutionnels sensibles ;
+liens vers les observations d’origine.
+Principe important
+
+L’article français ne doit pas être une traduction opaque. Le système doit pouvoir expliquer d’où vient chaque information.
+
+La vision devient donc :
+
+Collecter en catalan
+→ comprendre en catalan
+→ vérifier les faits
+→ rédiger en français
+→ contrôler la fidélité
+→ publier
+
+Le français sera la langue éditoriale principale, mais l’architecture devra rester extensible pour produire plus tard des versions en catalan, espagnol ou anglais sans reconstruire tout le système.
