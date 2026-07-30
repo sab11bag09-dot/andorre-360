@@ -151,6 +151,8 @@ element
       ".meta",
       ".metadata",
       ".c-detail__author",
+      ".google-auto-placed",
+".ap_container",
 ".c-detail__tags-content",
 ".c-detail__related",
 ".c-detail__recommended",
