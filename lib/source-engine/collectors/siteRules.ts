@@ -53,4 +53,12 @@ export const siteRules: Record<string, SiteRule> = {
     ".field--name-body",
   ],
 },
+"elperiodic.ad": {
+  listing: [
+    ".e-loop-item .elementor-heading-title a",
+  ],
+  content: [
+    ".elementor-widget-theme-post-content",
+  ],
+},
 };
