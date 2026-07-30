@@ -10,6 +10,10 @@ export const EDITORIAL_ZONES = {
   EDITORIAL: "editorial",
   DISCOVER: "discover",
 
+  // Blocs de pied de page
+  FOOTER_WIDE: "footer-wide",
+  FOOTER_SMALL: "footer-small",
+
   // Zones conservées temporairement pour compatibilité
   MAIN: "main",
   SECONDARY: "secondary",
@@ -21,10 +25,7 @@ export const EDITORIAL_ZONES = {
 export type EditorialZone =
   (typeof EDITORIAL_ZONES)[keyof typeof EDITORIAL_ZONES];
 
-export const EDITORIAL_ZONE_LABELS: Record<
-  EditorialZone,
-  string
-> = {
+export const EDITORIAL_ZONE_LABELS: Record<EditorialZone, string> = {
   hero: "Une principale",
   feature: "Grande carte",
   card: "Carte éditoriale",
@@ -34,6 +35,9 @@ export const EDITORIAL_ZONE_LABELS: Record<
   "good-to-know": "Bon à savoir",
   editorial: "Édito",
   discover: "À découvrir",
+
+  "footer-wide": "Bloc de pied de page (4 colonnes)",
+  "footer-small": "Bloc de pied de page (2 colonnes)",
 
   // Anciens noms, maintenus pendant la migration
   main: "Grande carte — ancien format",
@@ -51,42 +55,93 @@ export const EDITORIAL_ZONE_CONFIG: Record<
     title?: string;
   }
 > = {
-  hero: { slots: 1, compact: false, title: "⭐ Une principale", },
+  hero: {
+    slots: 1,
+    compact: false,
+    title: "⭐ Une principale",
+  },
+
   feature: {
-  slots: 1,
-  compact: false,
-  title: "🟨 Grande carte",
-},question: {
-  slots: 1,
-  compact: true,
-  title: "Question à…",
-},card: { slots: 1, compact: false },
+    slots: 1,
+    compact: false,
+    title: "🟨 Grande carte",
+  },
+
+  card: {
+    slots: 1,
+    compact: false,
+  },
+
   brief: {
-  slots: 3,
-  compact: true,
-  title: "Brève",
-},
+    slots: 3,
+    compact: true,
+    title: "Brève",
+  },
+
   "grand-format": {
-  slots: 1,
-  compact: false,
-  title: "📍 Bas de page",
-},
+    slots: 1,
+    compact: false,
+    title: "📍 Bas de page",
+  },
+
+  question: {
+    slots: 1,
+    compact: true,
+    title: "Question à…",
+  },
+
   "good-to-know": {
-  slots: 3,
-  compact: true,
-  title: "Bon à savoir",
-},
-  editorial: { slots: 1, compact: false },
-  discover: { slots: 1, compact: false },
+    slots: 3,
+    compact: true,
+    title: "Bon à savoir",
+  },
+
+  editorial: {
+    slots: 1,
+    compact: false,
+  },
+
+  discover: {
+    slots: 1,
+    compact: false,
+  },
+
+  "footer-wide": {
+    slots: 1,
+    compact: false,
+    title: "Bloc 4 colonnes",
+  },
+
+  "footer-small": {
+    slots: 1,
+    compact: false,
+    title: "Bloc 2 colonnes",
+  },
 
   // Compatibilité
-  main: { slots: 1, compact: false },
+  main: {
+    slots: 1,
+    compact: false,
+  },
+
   secondary: {
-  slots: 2,
-  compact: true,
-  title: "Sélection",
-},
-  column: { slots: 1, compact: true },
-  bottom: { slots: 1, compact: false },
-  standard: { slots: 1, compact: false },
+    slots: 2,
+    compact: true,
+    title: "Sélection",
+  },
+
+  column: {
+    slots: 1,
+    compact: true,
+  },
+
+  bottom: {
+    slots: 1,
+    compact: false,
+  },
+
+  standard: {
+    slots: 1,
+    compact: false,
+  },
 };
