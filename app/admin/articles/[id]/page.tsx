@@ -53,9 +53,10 @@ export default async function EditArticlePage({
   status={article.editorialStatus}
 />
       <ArticleEditor
-        mode="update"
-        initialValues={draft}
-      />
+  key={`${article.id}-${article.editorialStatus}`}
+  mode="update"
+  initialValues={draft}
+/>
     </main>
   );
 }

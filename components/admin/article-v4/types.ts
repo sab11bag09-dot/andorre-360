@@ -1,3 +1,4 @@
+import type { EditorialStatus } from "@/lib/generated/prisma/client";
 export type ArticleEditorMode = "create" | "update";
 
 export type ArticleSubmissionIntent =
@@ -41,6 +42,7 @@ export type ArticleDraft = {
 
   featured: boolean;
   published: boolean;
+  editorialStatus: EditorialStatus;
 
   pageKey: string;
   zone: string;
@@ -129,6 +131,7 @@ export const EMPTY_ARTICLE_DRAFT: ArticleDraft = {
 
   featured: false,
   published: false,
+  editorialStatus: "DRAFT",
 
   pageKey: "home",
   zone: "standard",
