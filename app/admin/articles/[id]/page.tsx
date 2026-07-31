@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import EditorialWorkflowPanel from "@/components/admin/article/EditorialWorkflowPanel";
 
 import ArticleEditor from "@/components/admin/article-v4/ArticleEditor";
 import { mapArticleToDraft } from "@/components/admin/article-v4/mapArticleToDraft";
@@ -47,6 +48,10 @@ export default async function EditArticlePage({
 
   return (
     <main className="min-h-screen bg-zinc-950 p-6 md:p-10">
+      <EditorialWorkflowPanel
+  articleId={article.id}
+  status={article.editorialStatus}
+/>
       <ArticleEditor
         mode="update"
         initialValues={draft}
