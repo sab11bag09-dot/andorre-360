@@ -9,6 +9,7 @@ import {
   StatCard,
 } from "@/components/admin/ui";
 
+import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
 import { prisma } from "@/lib/prisma";
 const ARTICLE_GRID_TEMPLATE =
   "minmax(0, 2fr) 150px 140px 100px 110px 120px";
@@ -50,6 +51,7 @@ export default async function AdminArticlesPage({
       contentType: true,
       featured: true,
       published: true,
+      editorialStatus: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -234,15 +236,9 @@ description={`${filteredArticles.length} article${
                         Statut
                       </p>
 
-                     {article.published ? (
-  <Badge variant="success">
-    Publié
-  </Badge>
-) : (
-  <Badge variant="warning">
-    Brouillon
-  </Badge>
-)}
+                                          <EditorialStatusBadge
+                        status={article.editorialStatus}
+                      />
                     </div>
 
                     <div className="flex gap-2 xl:justify-end">
