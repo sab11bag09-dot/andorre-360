@@ -85,4 +85,51 @@ export const siteRules: Record<string, SiteRule> = {
     "#parent-fieldname-text",
   ],
 },
+"andorraara.com": {
+  listing: [
+    ".uael-post__title a",
+  ],
+
+  content: [
+    ".elementor-widget-text-editor .page .layoutArea .column",
+  ],
+
+  remove: [
+    ".sharedaddy",
+    ".social-share",
+    ".post-tags",
+    ".comments-area",
+  ],
+},
+"canillo.ad": {
+  listing: [
+    ".item-noticia a.btn-fletxa.stretched-link",
+  ],
+
+  content: [
+    ".field--name-field-content .field__item",
+  ],
+
+  remove: [
+    ".field--name-field-galeria-noticia",
+    ".layout__region--second",
+  ],
+},
+"comuencamp.ad": {
+  listing: [
+    ".newsItem2__title a.newsItem2__link",
+  ],
+
+  content: [
+    "#content-core",
+  ],
+
+  remove: [
+    "#content-core > time",
+    "#content-core > figure",
+    ".documentByLine",
+    "script",
+    "style",
+  ],
+},
 };
