@@ -50,6 +50,16 @@ function makeDependencies(
     async () => undefined,
   );
 
+  const prepareArticle = vi.fn(
+    async () => ({
+      title: "Titre test",
+      description: "Premier paragraphe.",
+      content: "Premier paragraphe.",
+      category: "Société",
+      author: "Source test",
+    }),
+  );
+
   const dependencies: CreateArticleFromObservationDependencies = {
     observationRepository: {
       findById,
@@ -59,6 +69,9 @@ function makeDependencies(
       createDraft,
       updateDraft,
     },
+    editorialGenerator: {
+      prepareArticle,
+    },
   };
 
   return {
@@ -67,6 +80,7 @@ function makeDependencies(
     markProcessed,
     createDraft,
     updateDraft,
+    prepareArticle,
   };
 }
 

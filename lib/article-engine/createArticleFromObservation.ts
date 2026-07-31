@@ -2,6 +2,8 @@ import type { ObservationRepository } from "../source-engine/repositories/Observ
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
 import type { ArticleRepository } from "./repositories/ArticleRepository";
 import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
+import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
+import type { EditorialGenerator } from "./generators/EditorialGenerator";
 
 export interface CreateArticleFromObservationResult {
   articleId: number;
@@ -13,6 +15,7 @@ export interface CreateArticleFromObservationDependencies {
     "findById" | "markProcessed"
   >;
   articleRepository: ArticleRepository;
+  editorialGenerator: EditorialGenerator;
 }
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
@@ -20,6 +23,8 @@ const defaultDependencies: CreateArticleFromObservationDependencies = {
     new PrismaObservationRepository(),
   articleRepository:
     new PrismaArticleRepository(),
+  editorialGenerator:
+    new DeterministicEditorialGenerator(),
 };
 
 export async function createArticleFromObservation(
@@ -69,15 +74,15 @@ export async function createArticleFromObservation(
     );
   }
 
-  const draft = {
-    title: observation.title.trim(),
-    description: content.slice(0, 250),
-    content,
-    category:
-      observation.source.category?.trim() ||
-      "Général",
-    author: observation.source.name,
-  };
+ const draft =
+  await dependencies.editorialGenerator.prepareArticle(
+    {
+      originalTitle: observation.title,
+      originalContent: content,
+      sourceName: observation.source.name,
+      sourceCategory: observation.source.category,
+    },
+  );
 
   let articleId: number;
 
