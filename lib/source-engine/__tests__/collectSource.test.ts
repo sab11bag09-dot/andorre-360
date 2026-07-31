@@ -9,6 +9,7 @@ import {
 import { collectSource } from "../collectSource";
 import { CollectorFactoryInterface } from "../factories/CollectorFactoryInterface";
 import { CollectionSourceRepository } from "../repositories/CollectionSourceRepository";
+import { ObservationRepository } from "../repositories/ObservationRepository";
 
 class FakeCollectionSourceRepository
   implements CollectionSourceRepository
@@ -43,6 +44,26 @@ class FakeCollectorFactory
     this.receivedSource = source;
 
     return this.collector;
+  }
+}
+
+class FakeObservationRepository
+  implements ObservationRepository
+{
+  constructor(private readonly created: number) {}
+
+  async findById() {
+    return null;
+  }
+
+  async findUnprocessed() {
+    return [];
+  }
+
+  async markProcessed(): Promise<void> {}
+
+  async saveMany(): Promise<number> {
+    return this.created;
   }
 }
 
@@ -117,7 +138,7 @@ describe("collectSource", () => {
     expect(factory.receivedSource).toBe(source);
   });
 
-  it("retourne les observations du collecteur", async () => {
+  it("retourne le bilan de collecte", async () => {
     const source = createSource();
 
     const observations: ObservationInput[] = [
@@ -138,12 +159,16 @@ describe("collectSource", () => {
 
     const factory = new FakeCollectorFactory(collector);
 
+    const observationRepository =
+      new FakeObservationRepository(1);
+
     const result = await collectSource(
       1,
       repository,
       factory,
+      observationRepository,
     );
 
-    expect(result).toEqual(observations);
+    expect(result).toEqual({ collected: 1, created: 1 });
   });
 });

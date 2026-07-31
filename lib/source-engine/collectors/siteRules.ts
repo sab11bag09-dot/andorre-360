@@ -61,4 +61,28 @@ export const siteRules: Record<string, SiteRule> = {
     ".elementor-widget-theme-post-content",
   ],
 },
+"www.govern.ad": {
+  listing: [
+    ".journal-content-article h3 a",
+  ],
+
+  content: [
+    ".component-html",
+  ],
+
+  remove: [
+    ".share",
+    ".social",
+    ".related",
+  ],
+},
+"www.consellgeneral.ad": {
+  listing: [
+    ".noticiesDestacades .titleItem a",
+  ],
+
+  content: [
+    "#parent-fieldname-text",
+  ],
+},
 };
