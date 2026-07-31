@@ -1,18 +1,30 @@
+import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
+import type { ArticleRepository } from "./repositories/ArticleRepository";
 import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
-
-const observationRepository =
-  new PrismaObservationRepository();
-
-const articleRepository =
-  new PrismaArticleRepository();
 
 export interface CreateArticleFromObservationResult {
   articleId: number;
 }
 
+export interface CreateArticleFromObservationDependencies {
+  observationRepository: Pick<
+    ObservationRepository,
+    "findById" | "markProcessed"
+  >;
+  articleRepository: ArticleRepository;
+}
+
+const defaultDependencies: CreateArticleFromObservationDependencies = {
+  observationRepository:
+    new PrismaObservationRepository(),
+  articleRepository:
+    new PrismaArticleRepository(),
+};
+
 export async function createArticleFromObservation(
   observationId: number,
+  dependencies = defaultDependencies,
 ): Promise<CreateArticleFromObservationResult> {
   if (
     !Number.isInteger(observationId) ||
@@ -24,7 +36,7 @@ export async function createArticleFromObservation(
   }
 
   const observation =
-    await observationRepository.findById(
+    await dependencies.observationRepository.findById(
       observationId,
     );
 
@@ -72,18 +84,18 @@ export async function createArticleFromObservation(
   if (observation.articleId !== null) {
     articleId = observation.articleId;
 
-    await articleRepository.updateDraft(
+    await dependencies.articleRepository.updateDraft(
       articleId,
       draft,
     );
   } else {
     articleId =
-      await articleRepository.createDraft(
+      await dependencies.articleRepository.createDraft(
         draft,
       );
   }
 
-  await observationRepository.markProcessed(
+  await dependencies.observationRepository.markProcessed(
     observation.id,
     articleId,
   );
