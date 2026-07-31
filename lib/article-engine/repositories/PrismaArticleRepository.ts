@@ -5,8 +5,12 @@ import type {
   ArticleRepository,
 } from "./ArticleRepository";
 
-export class PrismaArticleRepository implements ArticleRepository {
-  async createDraft(input: ArticleDraftInput): Promise<number> {
+export class PrismaArticleRepository
+  implements ArticleRepository
+{
+  async createDraft(
+    input: ArticleDraftInput,
+  ): Promise<number> {
     const article = await prisma.article.create({
       data: {
         slug: crypto.randomUUID(),
@@ -25,5 +29,31 @@ export class PrismaArticleRepository implements ArticleRepository {
     });
 
     return article.id;
+  }
+
+  async updateDraft(
+    articleId: number,
+    input: ArticleDraftInput,
+  ): Promise<void> {
+    const result = await prisma.article.updateMany({
+      where: {
+        id: articleId,
+        published: false,
+      },
+      data: {
+        title: input.title,
+        description: input.description,
+        content: input.content,
+        category: input.category,
+        author: input.author,
+        readingTime: "1 min",
+      },
+    });
+
+    if (result.count !== 1) {
+      throw new Error(
+        "Le brouillon associé est introuvable ou déjà publié.",
+      );
+    }
   }
 }

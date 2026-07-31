@@ -10,4 +10,9 @@ export interface ArticleRepository {
   createDraft(
     input: ArticleDraftInput,
   ): Promise<number>;
+
+  updateDraft(
+    articleId: number,
+    input: ArticleDraftInput,
+  ): Promise<void>;
 }

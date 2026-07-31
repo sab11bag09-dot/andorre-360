@@ -101,7 +101,6 @@ export class PrismaObservationRepository
               content: observation.content,
               processed: false,
               processedAt: null,
-              articleId: null,
             },
           });
 

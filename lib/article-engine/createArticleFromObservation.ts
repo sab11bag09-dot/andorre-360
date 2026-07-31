@@ -1,5 +1,5 @@
-import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
+import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
 
 const observationRepository =
   new PrismaObservationRepository();
@@ -12,67 +12,80 @@ export interface CreateArticleFromObservationResult {
 }
 
 export async function createArticleFromObservation(
-  observationId: number
+  observationId: number,
 ): Promise<CreateArticleFromObservationResult> {
   if (
     !Number.isInteger(observationId) ||
     observationId <= 0
   ) {
     throw new Error(
-      "Identifiant d’observation invalide."
+      "Identifiant d’observation invalide.",
     );
   }
 
   const observation =
     await observationRepository.findById(
-      observationId
+      observationId,
     );
 
   if (!observation) {
     throw new Error(
-      "Observation introuvable."
+      "Observation introuvable.",
     );
+  }
+
+  if (
+    observation.processed &&
+    observation.articleId !== null
+  ) {
+    return {
+      articleId: observation.articleId,
+    };
   }
 
   if (observation.processed) {
     throw new Error(
-      "Cette observation a déjà été traitée."
+      "Cette observation est marquée comme traitée sans article associé.",
     );
   }
 
-  console.error("=== OBSERVATION TO DRAFT ===", {
-  id: observation.id,
-  title: observation.title,
-  contentLength: observation.content?.length ?? 0,
-  contentPreview: observation.content?.slice(0, 300) ?? null,
-  category: observation.source.category,
-  source: observation.source.name,
-});
+  const content = observation.content?.trim();
 
-  const articleId =
-    await articleRepository.createDraft({
-      title: observation.title,
+  if (!content) {
+    throw new Error(
+      "Le contenu collecté est insuffisant pour préparer un article.",
+    );
+  }
 
-      description:
-        observation.content?.slice(
-          0,
-          250
-        ) ?? "",
+  const draft = {
+    title: observation.title.trim(),
+    description: content.slice(0, 250),
+    content,
+    category:
+      observation.source.category?.trim() ||
+      "Général",
+    author: observation.source.name,
+  };
 
-      content:
-        observation.content ?? "",
+  let articleId: number;
 
-      category:
-        observation.source.category ??
-        "Général",
+  if (observation.articleId !== null) {
+    articleId = observation.articleId;
 
-      author:
-        observation.source.name,
-    });
+    await articleRepository.updateDraft(
+      articleId,
+      draft,
+    );
+  } else {
+    articleId =
+      await articleRepository.createDraft(
+        draft,
+      );
+  }
 
   await observationRepository.markProcessed(
     observation.id,
-    articleId
+    articleId,
   );
 
   return {
