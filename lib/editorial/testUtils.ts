@@ -32,6 +32,7 @@ export function makeArticle(
     socialText: null,
     featured: false,
     published: true,
+    editorialStatus: "PUBLISHED",
     createdAt: now,
     updatedAt: now,
     ...overrides,

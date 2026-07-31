@@ -58,29 +58,39 @@ model VerificationToken {
 }
 
 model Article {
-  id            Int                @id @default(autoincrement())
-  slug          String             @unique
-  title         String
-  category      String
-  categoryId    Int?
-  categoryRef   Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  description   String
-  content       String
-  image         String
-  author        String
-  readingTime   String
-  contentType   String             @default("article")
-  videoUrl      String?
-  videoDuration String?
-  socialText    String?
-  featured      Boolean            @default(false)
-  published     Boolean            @default(false)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  analytics     ArticleAnalytics[]
-  publications  Publication[]
+  id              Int                @id @default(autoincrement())
+  slug            String             @unique
+  title           String
+  category        String
+  categoryId      Int?
+  categoryRef     Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description     String
+  content         String
+  image           String
+  author          String
+  readingTime     String
+  contentType     String             @default("article")
+  videoUrl        String?
+  videoDuration   String?
+  socialText      String?
+  featured        Boolean            @default(false)
+  published       Boolean            @default(false)
+  editorialStatus EditorialStatus    @default(DRAFT)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  analytics       ArticleAnalytics[]
+  publications    Publication[]
 
-  observations  Observation[]
+  observations Observation[]
+}
+
+enum EditorialStatus {
+  DRAFT
+  AI_DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
 }
 
 model Category {
@@ -168,17 +178,18 @@ model Source {
   @@index([collectionMode])
   @@index([lastCheckedAt])
 }
+
 model Observation {
-  id          Int      @id @default(autoincrement())
-  sourceId    Int
-  articleId   Int?
+  id        Int  @id @default(autoincrement())
+  sourceId  Int
+  articleId Int?
 
   title       String
   url         String
   publishedAt DateTime?
   content     String?
 
-  processed   Boolean  @default(false)
+  processed   Boolean   @default(false)
   processedAt DateTime?
 
   collectedAt DateTime @default(now())

@@ -22,6 +22,7 @@ export class PrismaArticleRepository
         author: input.author,
         readingTime: "1 min",
         published: false,
+        editorialStatus: "AI_DRAFT",
       },
       select: {
         id: true,
@@ -39,6 +40,9 @@ export class PrismaArticleRepository
       where: {
         id: articleId,
         published: false,
+        editorialStatus: {
+          in: ["DRAFT", "AI_DRAFT"],
+        },
       },
       data: {
         title: input.title,
@@ -47,6 +51,7 @@ export class PrismaArticleRepository
         category: input.category,
         author: input.author,
         readingTime: "1 min",
+        editorialStatus: "AI_DRAFT",
       },
     });
 
