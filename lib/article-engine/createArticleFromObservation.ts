@@ -1,9 +1,9 @@
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
-import type { ArticleRepository } from "./repositories/ArticleRepository";
-import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
+import type { ArticleRepository } from "./repositories/ArticleRepository";
+import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
 
 export interface CreateArticleFromObservationResult {
   articleId: number;
@@ -14,15 +14,22 @@ export interface CreateArticleFromObservationDependencies {
     ObservationRepository,
     "findById" | "markProcessed"
   >;
+
   articleRepository: ArticleRepository;
-  editorialGenerator: EditorialGenerator;
+
+  editorialGenerator: Pick<
+    EditorialGenerator,
+    "prepareArticle"
+  >;
 }
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
   observationRepository:
     new PrismaObservationRepository(),
+
   articleRepository:
     new PrismaArticleRepository(),
+
   editorialGenerator:
     new DeterministicEditorialGenerator(),
 };
@@ -66,7 +73,8 @@ export async function createArticleFromObservation(
     );
   }
 
-  const content = observation.content?.trim();
+  const content =
+    observation.content?.trim();
 
   if (!content) {
     throw new Error(
@@ -74,15 +82,14 @@ export async function createArticleFromObservation(
     );
   }
 
- const draft =
-  await dependencies.editorialGenerator.prepareArticle(
-    {
+  const draft =
+    await dependencies.editorialGenerator.prepareArticle({
       originalTitle: observation.title,
       originalContent: content,
       sourceName: observation.source.name,
-      sourceCategory: observation.source.category,
-    },
-  );
+      sourceCategory:
+        observation.source.category,
+    });
 
   let articleId: number;
 

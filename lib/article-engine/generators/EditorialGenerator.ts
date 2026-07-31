@@ -13,8 +13,28 @@ export interface PreparedArticle {
   author: string;
 }
 
+export type TranslationLocale = "CA" | "ES";
+
+export interface TranslateArticleInput {
+  locale: TranslationLocale;
+  title: string;
+  description: string;
+  content: string;
+}
+
+export interface PreparedTranslation {
+  locale: TranslationLocale;
+  title: string;
+  description: string;
+  content: string;
+}
+
 export interface EditorialGenerator {
   prepareArticle(
     input: PrepareArticleInput,
   ): Promise<PreparedArticle>;
+
+  translateArticle(
+    input: TranslateArticleInput,
+  ): Promise<PreparedTranslation>;
 }
