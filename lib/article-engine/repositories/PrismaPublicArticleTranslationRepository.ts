@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { PrismaClient } from "@/lib/generated/prisma/client";
 
 import type {
   PublicArticleTranslation,
@@ -9,11 +10,15 @@ import type { ContentLocale } from "@/lib/generated/prisma/client";
 export class PrismaPublicArticleTranslationRepository
   implements PublicArticleTranslationRepository
 {
+  constructor(
+    private readonly client: Pick<PrismaClient, "articleTranslation"> = prisma,
+  ) {}
+
   async findPublishedByLocaleAndSlug(
     locale: ContentLocale,
     slug: string,
   ): Promise<PublicArticleTranslation | null> {
-    const translation = await prisma.articleTranslation.findFirst({
+    const translation = await this.client.articleTranslation.findFirst({
       where: {
         locale,
         slug,

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { PrismaClient } from "@/lib/generated/prisma/client";
 import { createLocalizedSlug } from "../localizedSlug";
 
 import type {
@@ -10,14 +11,27 @@ import type {
   TranslationLocale,
 } from "./ArticleTranslationRepository";
 
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "P2002"
+  );
+}
+
 export class PrismaArticleTranslationRepository
   implements ArticleTranslationRepository
 {
+  constructor(
+    private readonly client: Pick<PrismaClient, "articleTranslation"> = prisma,
+  ) {}
+
   async findByArticleAndLocale(
     articleId: number,
     locale: TranslationLocale,
   ): Promise<ArticleTranslationRecord | null> {
-    return prisma.articleTranslation.findUnique({
+    return this.client.articleTranslation.findUnique({
       where: {
         articleId_locale: {
           articleId,
@@ -35,29 +49,54 @@ export class PrismaArticleTranslationRepository
   async createDraft(
     input: ArticleTranslationDraftInput,
   ): Promise<number> {
-    const slug = await this.resolveUniqueSlug(
-      input.locale,
-      createLocalizedSlug(input.title),
+    const desiredSlug = createLocalizedSlug(input.title);
+
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const slug = await this.resolveUniqueSlug(input.locale, desiredSlug);
+
+      try {
+        const translation = await this.client.articleTranslation.create({
+          data: {
+            articleId: input.articleId,
+            locale: input.locale,
+            title: input.title,
+            slug,
+            description: input.description,
+            content: input.content,
+            status: "AI_DRAFT",
+            generatedAt: new Date(),
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        return translation.id;
+      } catch (error) {
+        if (!isUniqueConstraintError(error)) {
+          throw error;
+        }
+
+        const concurrentTranslation =
+          await this.client.articleTranslation.findUnique({
+            where: {
+              articleId_locale: {
+                articleId: input.articleId,
+                locale: input.locale,
+              },
+            },
+            select: { id: true },
+          });
+
+        if (concurrentTranslation) {
+          return concurrentTranslation.id;
+        }
+      }
+    }
+
+    throw new Error(
+      "Impossible de créer la traduction après plusieurs tentatives concurrentes.",
     );
-
-    const translation =
-      await prisma.articleTranslation.create({
-        data: {
-          articleId: input.articleId,
-          locale: input.locale,
-          title: input.title,
-          slug,
-          description: input.description,
-          content: input.content,
-          status: "AI_DRAFT",
-          generatedAt: new Date(),
-        },
-        select: {
-          id: true,
-        },
-      });
-
-    return translation.id;
   }
 
   async updateDraft(
@@ -65,7 +104,7 @@ export class PrismaArticleTranslationRepository
     input: ArticleTranslationDraftInput,
   ): Promise<void> {
     const result =
-      await prisma.articleTranslation.updateMany({
+      await this.client.articleTranslation.updateMany({
         where: {
           id: translationId,
           articleId: input.articleId,
@@ -104,7 +143,7 @@ export class PrismaArticleTranslationRepository
           : `${desiredSlug}-${suffix}`;
 
       const existing =
-        await prisma.articleTranslation.findUnique({
+        await this.client.articleTranslation.findUnique({
           where: {
             locale_slug: {
               locale,
@@ -132,7 +171,7 @@ export class PrismaArticleTranslationRepository
     input: ArticleTranslationContentInput,
   ): Promise<void> {
     const result =
-      await prisma.articleTranslation.updateMany({
+      await this.client.articleTranslation.updateMany({
         where: {
           id: translationId,
           status: {
@@ -160,7 +199,7 @@ export class PrismaArticleTranslationRepository
     slug: string,
   ): Promise<void> {
     const result =
-      await prisma.articleTranslation.updateMany({
+      await this.client.articleTranslation.updateMany({
         where: {
           id: translationId,
           status: currentStatus,
@@ -192,7 +231,7 @@ export class PrismaArticleTranslationRepository
           : undefined;
 
     const result =
-      await prisma.articleTranslation.updateMany({
+      await this.client.articleTranslation.updateMany({
         where: {
           id: translationId,
           status: currentStatus,
@@ -215,7 +254,7 @@ export class PrismaArticleTranslationRepository
     publishedAt: Date,
   ): Promise<void> {
     const result =
-      await prisma.articleTranslation.updateMany({
+      await this.client.articleTranslation.updateMany({
         where: {
           id: translationId,
           status: "APPROVED",
