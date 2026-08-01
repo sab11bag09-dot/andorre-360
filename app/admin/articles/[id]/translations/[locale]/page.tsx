@@ -2,10 +2,13 @@ import { notFound } from "next/navigation";
 
 import {
   approveArticleTranslationAction,
+  archiveArticleTranslationAction,
+  publishArticleTranslationAction,
   returnArticleTranslationToDraftAction,
   submitArticleTranslationForReviewAction,
   updateArticleTranslationAction,
 } from "@/app/admin/articles/translation-actions";
+import ConfirmTranslationActionButton from "@/components/admin/article/ConfirmTranslationActionButton";
 import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
 import {
   Button,
@@ -80,6 +83,23 @@ export default async function EditArticleTranslationPage({
 
   const canApprove =
     translation.status === "REVIEW";
+
+  const canPublish =
+    translation.status === "APPROVED";
+
+  const canArchive =
+    translation.status === "PUBLISHED";
+
+  const lockedMessage =
+    translation.status === "REVIEW"
+      ? "Le contenu est verrouillé pendant la relecture. Revenez au brouillon pour le modifier."
+      : translation.status === "APPROVED"
+        ? "La traduction est approuvée et prête à être publiée."
+        : translation.status === "PUBLISHED"
+          ? "La traduction est publiée. Retirez-la de la publication avant toute correction."
+          : translation.status === "ARCHIVED"
+            ? "La traduction est archivée et son contenu est conservé."
+            : null;
 
   const languageLabel =
     locale === "CA"
@@ -167,12 +187,43 @@ export default async function EditArticleTranslationPage({
                 </Button>
               </form>
             )}
+
+            {canPublish && (
+              <form
+                action={publishArticleTranslationAction.bind(
+                  null,
+                  articleId,
+                  locale,
+                )}
+              >
+                <ConfirmTranslationActionButton
+                  label="Publier"
+                  message="Confirmer la publication de cette traduction ?"
+                />
+              </form>
+            )}
+
+            {canArchive && (
+              <form
+                action={archiveArticleTranslationAction.bind(
+                  null,
+                  articleId,
+                  locale,
+                )}
+              >
+                <ConfirmTranslationActionButton
+                  label="Retirer de la publication"
+                  message="Confirmer le retrait de cette traduction ? Son contenu sera conservé."
+                  variant="danger"
+                />
+              </form>
+            )}
           </div>
         </section>
 
-        {!canEdit && (
+        {lockedMessage && (
           <div className="mb-6 rounded-xl border border-yellow-900 bg-yellow-950/40 p-4 text-sm text-yellow-200">
-            Le contenu est verrouillé pendant la relecture. Revenez au brouillon pour le modifier.
+            {lockedMessage}
           </div>
         )}
 

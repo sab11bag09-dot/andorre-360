@@ -2,11 +2,45 @@
 
 import { revalidatePath } from "next/cache";
 
+import { auth } from "@/auth";
 import { generateArticleTranslations } from "@/lib/article-engine/generateArticleTranslations";
 import {
+  publishArticleTranslation,
   transitionArticleTranslation,
   updateArticleTranslation,
 } from "@/lib/article-engine/manageArticleTranslation";
+import { prisma } from "@/lib/prisma";
+
+async function assertAdminAction(): Promise<void> {
+  const session = await auth();
+  const email = session?.user?.email;
+
+  if (!email) {
+    throw new Error(
+      "Action administrateur non autorisée.",
+    );
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email.toLowerCase(),
+    },
+    select: {
+      role: true,
+      active: true,
+    },
+  });
+
+  if (
+    !user ||
+    !user.active ||
+    user.role !== "ADMIN"
+  ) {
+    throw new Error(
+      "Action administrateur non autorisée.",
+    );
+  }
+}
 
 function revalidateArticleTranslationPaths(
   articleId: number,
@@ -103,6 +137,41 @@ export async function approveArticleTranslationAction(
     articleId,
     locale,
     nextStatus: "APPROVED",
+  });
+
+  revalidateArticleTranslationPaths(
+    articleId,
+    locale,
+  );
+}
+
+export async function publishArticleTranslationAction(
+  articleId: number,
+  locale: string,
+): Promise<void> {
+  await assertAdminAction();
+
+  await publishArticleTranslation({
+    articleId,
+    locale,
+  });
+
+  revalidateArticleTranslationPaths(
+    articleId,
+    locale,
+  );
+}
+
+export async function archiveArticleTranslationAction(
+  articleId: number,
+  locale: string,
+): Promise<void> {
+  await assertAdminAction();
+
+  await transitionArticleTranslation({
+    articleId,
+    locale,
+    nextStatus: "ARCHIVED",
   });
 
   revalidateArticleTranslationPaths(
