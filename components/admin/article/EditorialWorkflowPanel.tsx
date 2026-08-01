@@ -65,6 +65,23 @@ export default function EditorialWorkflowPanel({
                   item.locale === locale,
               );
 
+            if (translation) {
+              return (
+                <Button
+                  key={locale}
+                  href={`/admin/articles/${articleId}/translations/${locale}`}
+                  variant="outline"
+                  className="gap-2 px-3 py-2"
+                >
+                  <span>{locale}</span>
+
+                  <EditorialStatusBadge
+                    status={translation.status}
+                  />
+                </Button>
+              );
+            }
+
             return (
               <div
                 key={locale}
@@ -74,15 +91,9 @@ export default function EditorialWorkflowPanel({
                   {locale}
                 </span>
 
-                {translation ? (
-                  <EditorialStatusBadge
-                    status={translation.status}
-                  />
-                ) : (
-                  <Badge variant="default">
-                    Non générée
-                  </Badge>
-                )}
+                <Badge variant="default">
+                  Non générée
+                </Badge>
               </div>
             );
           })}
