@@ -1,5 +1,6 @@
 import type { EditorialStatus } from "@/lib/generated/prisma/client";
 
+import { generateArticleTranslationsAction } from "@/app/admin/articles/translation-actions";
 import {
   approveArticleAction,
   submitArticleForReviewAction,
@@ -17,6 +18,9 @@ export default function EditorialWorkflowPanel({
   articleId,
   status,
 }: EditorialWorkflowPanelProps) {
+  const canGenerateTranslations =
+    status !== "ARCHIVED";
+
   const canSubmitForReview =
     status === "DRAFT" ||
     status === "AI_DRAFT";
@@ -37,6 +41,22 @@ export default function EditorialWorkflowPanel({
       </div>
 
       <div className="flex flex-wrap gap-3">
+        {canGenerateTranslations && (
+          <form
+            action={generateArticleTranslationsAction.bind(
+              null,
+              articleId,
+            )}
+          >
+            <Button
+              type="submit"
+              variant="outline"
+            >
+              Générer CA / ES
+            </Button>
+          </form>
+        )}
+
         {canSubmitForReview && (
           <form
             action={submitArticleForReviewAction.bind(
