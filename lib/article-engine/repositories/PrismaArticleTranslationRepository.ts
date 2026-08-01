@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 import type {
+  ArticleTranslationContentInput,
   ArticleTranslationDraftInput,
   ArticleTranslationRecord,
   ArticleTranslationRepository,
+  ArticleTranslationStatus,
   TranslationLocale,
 } from "./ArticleTranslationRepository";
 
@@ -77,6 +79,65 @@ export class PrismaArticleTranslationRepository
     if (result.count !== 1) {
       throw new Error(
         "La traduction est introuvable ou déjà en cours de relecture.",
+      );
+    }
+  }
+
+  async updateContent(
+    translationId: number,
+    input: ArticleTranslationContentInput,
+  ): Promise<void> {
+    const result =
+      await prisma.articleTranslation.updateMany({
+        where: {
+          id: translationId,
+          status: {
+            in: ["DRAFT", "AI_DRAFT"],
+          },
+        },
+        data: {
+          title: input.title,
+          description: input.description,
+          content: input.content,
+          status: "DRAFT",
+        },
+      });
+
+    if (result.count !== 1) {
+      throw new Error(
+        "La traduction est introuvable ou verrouillée pour relecture.",
+      );
+    }
+  }
+
+  async transitionStatus(
+    translationId: number,
+    currentStatus: ArticleTranslationStatus,
+    nextStatus: ArticleTranslationStatus,
+  ): Promise<void> {
+    const approvedAt =
+      nextStatus === "APPROVED"
+        ? new Date()
+        : nextStatus === "DRAFT" ||
+            nextStatus === "REVIEW"
+          ? null
+          : undefined;
+
+    const result =
+      await prisma.articleTranslation.updateMany({
+        where: {
+          id: translationId,
+          status: currentStatus,
+        },
+        data: {
+          status: nextStatus,
+          approvedAt,
+        },
+      });
+
+    if (result.count !== 1) {
+      throw new Error(
+        "Le statut de la traduction a changé. Recharge la page et réessaie.",
       );
     }
   }

@@ -33,7 +33,12 @@ export interface GenerateArticleTranslationsDependencies {
     "findById"
   >;
 
-  translationRepository: ArticleTranslationRepository;
+    translationRepository: Pick<
+    ArticleTranslationRepository,
+    | "findByArticleAndLocale"
+    | "createDraft"
+    | "updateDraft"
+  >;
 
   editorialGenerator: Pick<
     EditorialGenerator,

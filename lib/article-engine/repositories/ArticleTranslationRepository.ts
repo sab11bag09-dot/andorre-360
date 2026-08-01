@@ -1,14 +1,13 @@
+import type {
+  EditorialStatus,
+} from "@/lib/generated/prisma/client";
+
 import type { TranslationLocale } from "../generators/EditorialGenerator";
 
 export type { TranslationLocale };
 
 export type ArticleTranslationStatus =
-  | "DRAFT"
-  | "AI_DRAFT"
-  | "REVIEW"
-  | "APPROVED"
-  | "PUBLISHED"
-  | "ARCHIVED";
+  EditorialStatus;
 
 export interface ArticleTranslationRecord {
   id: number;
@@ -18,6 +17,12 @@ export interface ArticleTranslationRecord {
 export interface ArticleTranslationDraftInput {
   articleId: number;
   locale: TranslationLocale;
+  title: string;
+  description: string;
+  content: string;
+}
+
+export interface ArticleTranslationContentInput {
   title: string;
   description: string;
   content: string;
@@ -36,5 +41,16 @@ export interface ArticleTranslationRepository {
   updateDraft(
     translationId: number,
     input: ArticleTranslationDraftInput,
+  ): Promise<void>;
+
+  updateContent(
+    translationId: number,
+    input: ArticleTranslationContentInput,
+  ): Promise<void>;
+
+  transitionStatus(
+    translationId: number,
+    currentStatus: ArticleTranslationStatus,
+    nextStatus: ArticleTranslationStatus,
   ): Promise<void>;
 }
