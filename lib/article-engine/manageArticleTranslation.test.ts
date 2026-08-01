@@ -19,6 +19,10 @@ import type {
 function makeDependencies(
   translation: ArticleTranslationRecord | null,
 ) {
+  const publishedAt = new Date(
+    "2026-08-01T16:30:00.000Z",
+  );
+
   const findByArticleAndLocale = vi.fn(
     async () => translation,
   );
@@ -32,7 +36,10 @@ function makeDependencies(
   );
 
   const publishApproved = vi.fn(
-    async () => undefined,
+    async (
+      _translationId: number,
+      _publishedAt: Date,
+    ) => undefined,
   );
 
   const dependencies: ManageArticleTranslationDependencies = {
@@ -42,6 +49,7 @@ function makeDependencies(
       transitionStatus,
       publishApproved,
     },
+    now: () => publishedAt,
   };
 
   return {
@@ -50,6 +58,7 @@ function makeDependencies(
     updateContent,
     transitionStatus,
     publishApproved,
+    publishedAt,
   };
 }
 
@@ -267,6 +276,7 @@ describe("manageArticleTranslation", () => {
     const {
       dependencies,
       publishApproved,
+      publishedAt,
     } = makeDependencies({
       id: 12,
       status: "APPROVED",
@@ -288,7 +298,10 @@ describe("manageArticleTranslation", () => {
 
     expect(
       publishApproved,
-    ).toHaveBeenCalledWith(12);
+    ).toHaveBeenCalledWith(
+      12,
+      publishedAt,
+    );
   });
 
   it.each([
@@ -353,6 +366,7 @@ describe("manageArticleTranslation", () => {
     const {
       dependencies,
       publishApproved,
+      publishedAt,
     } = makeDependencies({
       id: 12,
       status: "APPROVED",
@@ -378,7 +392,10 @@ describe("manageArticleTranslation", () => {
 
     expect(
       publishApproved,
-    ).toHaveBeenCalledWith(12);
+    ).toHaveBeenCalledWith(
+      12,
+      publishedAt,
+    );
   });
 
   it("réserve la publication au service dédié", async () => {

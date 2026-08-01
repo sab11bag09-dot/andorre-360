@@ -38,11 +38,13 @@ export interface ManageArticleTranslationDependencies {
     | "transitionStatus"
     | "publishApproved"
   >;
+  now: () => Date;
 }
 
 const defaultDependencies: ManageArticleTranslationDependencies = {
   translationRepository:
     new PrismaArticleTranslationRepository(),
+  now: () => new Date(),
 };
 
 function isTranslationLocale(
@@ -217,7 +219,10 @@ export async function publishArticleTranslation(
   }
 
   await dependencies.translationRepository
-    .publishApproved(translation.id);
+    .publishApproved(
+      translation.id,
+      dependencies.now(),
+    );
 
   return {
     translationId: translation.id,

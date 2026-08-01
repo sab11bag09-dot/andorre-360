@@ -56,5 +56,6 @@ export interface ArticleTranslationRepository {
 
   publishApproved(
     translationId: number,
+    publishedAt: Date,
   ): Promise<void>;
 }

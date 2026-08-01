@@ -113,6 +113,7 @@ model ArticleTranslation {
   status         EditorialStatus @default(AI_DRAFT)
   generatedAt    DateTime?
   approvedAt     DateTime?
+  publishedAt    DateTime?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 

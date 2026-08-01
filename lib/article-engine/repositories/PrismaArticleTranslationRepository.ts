@@ -144,6 +144,7 @@ export class PrismaArticleTranslationRepository
 
   async publishApproved(
     translationId: number,
+    publishedAt: Date,
   ): Promise<void> {
     const result =
       await prisma.articleTranslation.updateMany({
@@ -153,6 +154,7 @@ export class PrismaArticleTranslationRepository
         },
         data: {
           status: "PUBLISHED",
+          publishedAt,
         },
       });
 
