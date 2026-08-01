@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
+import {
+  createGenerateArticleTranslationsDependencies,
+} from "@/lib/article-engine/articleEngineComposition";
 import { generateArticleTranslations } from "@/lib/article-engine/generateArticleTranslations";
 import {
   publishArticleTranslation,
@@ -78,6 +81,7 @@ export async function generateArticleTranslationsAction(
 
   await generateArticleTranslations(
     articleId,
+    createGenerateArticleTranslationsDependencies(),
   );
 
   revalidateArticleTranslationPaths(
