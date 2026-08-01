@@ -8,6 +8,7 @@ import {
   publishArticleTranslation,
   transitionArticleTranslation,
   updateArticleTranslation,
+  updateArticleTranslationSlug,
 } from "@/lib/article-engine/manageArticleTranslation";
 import { prisma } from "@/lib/prisma";
 
@@ -88,6 +89,27 @@ export async function updateArticleTranslationAction(
         ?.toString() ?? "",
     content:
       formData.get("content")?.toString() ??
+      "",
+  });
+
+  revalidateArticleTranslationPaths(
+    articleId,
+    locale,
+  );
+}
+
+export async function updateArticleTranslationSlugAction(
+  articleId: number,
+  locale: string,
+  formData: FormData,
+): Promise<void> {
+  await assertAdminAction();
+
+  await updateArticleTranslationSlug({
+    articleId,
+    locale,
+    slug:
+      formData.get("slug")?.toString() ??
       "",
   });
 

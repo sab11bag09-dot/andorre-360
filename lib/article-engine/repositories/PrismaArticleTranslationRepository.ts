@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { createLocalizedSlug } from "../localizedSlug";
 
 import type {
   ArticleTranslationContentInput,
@@ -26,6 +27,7 @@ export class PrismaArticleTranslationRepository
       select: {
         id: true,
         status: true,
+        publishedAt: true,
       },
     });
   }
@@ -33,13 +35,18 @@ export class PrismaArticleTranslationRepository
   async createDraft(
     input: ArticleTranslationDraftInput,
   ): Promise<number> {
+    const slug = await this.resolveUniqueSlug(
+      input.locale,
+      createLocalizedSlug(input.title),
+    );
+
     const translation =
       await prisma.articleTranslation.create({
         data: {
           articleId: input.articleId,
           locale: input.locale,
           title: input.title,
-          slug: crypto.randomUUID(),
+          slug,
           description: input.description,
           content: input.content,
           status: "AI_DRAFT",
@@ -83,6 +90,43 @@ export class PrismaArticleTranslationRepository
     }
   }
 
+  async resolveUniqueSlug(
+    locale: TranslationLocale,
+    desiredSlug: string,
+    excludeTranslationId?: number,
+  ): Promise<string> {
+    let suffix = 1;
+
+    while (true) {
+      const candidate =
+        suffix === 1
+          ? desiredSlug
+          : `${desiredSlug}-${suffix}`;
+
+      const existing =
+        await prisma.articleTranslation.findUnique({
+          where: {
+            locale_slug: {
+              locale,
+              slug: candidate,
+            },
+          },
+          select: {
+            id: true,
+          },
+        });
+
+      if (
+        !existing ||
+        existing.id === excludeTranslationId
+      ) {
+        return candidate;
+      }
+
+      suffix += 1;
+    }
+  }
+
   async updateContent(
     translationId: number,
     input: ArticleTranslationContentInput,
@@ -106,6 +150,30 @@ export class PrismaArticleTranslationRepository
     if (result.count !== 1) {
       throw new Error(
         "La traduction est introuvable ou verrouillée pour relecture.",
+      );
+    }
+  }
+
+  async updateSlugBeforePublication(
+    translationId: number,
+    currentStatus: ArticleTranslationStatus,
+    slug: string,
+  ): Promise<void> {
+    const result =
+      await prisma.articleTranslation.updateMany({
+        where: {
+          id: translationId,
+          status: currentStatus,
+          publishedAt: null,
+        },
+        data: {
+          slug,
+        },
+      });
+
+    if (result.count !== 1) {
+      throw new Error(
+        "Le slug est verrouillé ou la traduction a changé. Recharge la page et réessaie.",
       );
     }
   }

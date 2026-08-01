@@ -12,6 +12,7 @@ export type ArticleTranslationStatus =
 export interface ArticleTranslationRecord {
   id: number;
   status: ArticleTranslationStatus;
+  publishedAt?: Date | null;
 }
 
 export interface ArticleTranslationDraftInput {
@@ -46,6 +47,18 @@ export interface ArticleTranslationRepository {
   updateContent(
     translationId: number,
     input: ArticleTranslationContentInput,
+  ): Promise<void>;
+
+  resolveUniqueSlug(
+    locale: TranslationLocale,
+    desiredSlug: string,
+    excludeTranslationId?: number,
+  ): Promise<string>;
+
+  updateSlugBeforePublication(
+    translationId: number,
+    currentStatus: ArticleTranslationStatus,
+    slug: string,
   ): Promise<void>;
 
   transitionStatus(

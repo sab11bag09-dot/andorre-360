@@ -1,4 +1,5 @@
 import { canTransitionEditorialStatus } from "./editorialWorkflow";
+import { createLocalizedSlug } from "./localizedSlug";
 import type {
   ArticleTranslationRepository,
   ArticleTranslationStatus,
@@ -12,6 +13,12 @@ export interface UpdateArticleTranslationInput {
   title: string;
   description: string;
   content: string;
+}
+
+export interface UpdateArticleTranslationSlugInput {
+  articleId: number;
+  locale: string;
+  slug: string;
 }
 
 export interface TransitionArticleTranslationInput {
@@ -35,6 +42,8 @@ export interface ManageArticleTranslationDependencies {
     ArticleTranslationRepository,
     | "findByArticleAndLocale"
     | "updateContent"
+    | "resolveUniqueSlug"
+    | "updateSlugBeforePublication"
     | "transitionStatus"
     | "publishApproved"
   >;
@@ -122,19 +131,70 @@ export async function updateArticleTranslation(
     );
   }
 
-  await dependencies.translationRepository
-    .updateContent(
-      translation.id,
-      {
-        title,
-        description,
-        content,
-      },
-    );
+  await dependencies.translationRepository.updateContent(
+    translation.id,
+    {
+      title,
+      description,
+      content,
+    },
+  );
 
   return {
     translationId: translation.id,
     status: "DRAFT",
+  };
+}
+
+export async function updateArticleTranslationSlug(
+  input: UpdateArticleTranslationSlugInput,
+  dependencies = defaultDependencies,
+): Promise<ManageArticleTranslationResult> {
+  assertTranslationReference(
+    input.articleId,
+    input.locale,
+  );
+
+  const translation =
+    await dependencies.translationRepository
+      .findByArticleAndLocale(
+        input.articleId,
+        input.locale,
+      );
+
+  if (!translation) {
+    throw new Error("Traduction introuvable.");
+  }
+
+  if (
+    translation.status === "PUBLISHED" ||
+    translation.status === "ARCHIVED" ||
+    translation.publishedAt
+  ) {
+    throw new Error(
+      "Le slug est verrouillé après la première publication.",
+    );
+  }
+
+  const slug = createLocalizedSlug(input.slug);
+  const uniqueSlug =
+    await dependencies.translationRepository
+      .resolveUniqueSlug(
+        input.locale,
+        slug,
+        translation.id,
+      );
+
+  await dependencies.translationRepository
+    .updateSlugBeforePublication(
+      translation.id,
+      translation.status,
+      uniqueSlug,
+    );
+
+  return {
+    translationId: translation.id,
+    status: translation.status,
   };
 }
 

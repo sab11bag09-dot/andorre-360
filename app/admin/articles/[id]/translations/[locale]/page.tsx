@@ -7,6 +7,7 @@ import {
   returnArticleTranslationToDraftAction,
   submitArticleTranslationForReviewAction,
   updateArticleTranslationAction,
+  updateArticleTranslationSlugAction,
 } from "@/app/admin/articles/translation-actions";
 import ConfirmTranslationActionButton from "@/components/admin/article/ConfirmTranslationActionButton";
 import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
@@ -89,6 +90,10 @@ export default async function EditArticleTranslationPage({
 
   const canArchive =
     translation.status === "PUBLISHED";
+
+  const canEditSlug =
+    translation.publishedAt === null &&
+    translation.status !== "ARCHIVED";
 
   const lockedMessage =
     translation.status === "REVIEW"
@@ -226,6 +231,37 @@ export default async function EditArticleTranslationPage({
             {lockedMessage}
           </div>
         )}
+
+        <form
+          action={updateArticleTranslationSlugAction.bind(
+            null,
+            articleId,
+            locale,
+          )}
+          className="mb-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+        >
+          <label className="block text-sm font-semibold text-zinc-300">
+            Slug public
+            <Input
+              name="slug"
+              defaultValue={translation.slug}
+              disabled={!canEditSlug}
+              required
+            />
+            <span className="mt-2 block text-xs font-normal text-zinc-500">
+              Normalisé automatiquement. URL actuelle :{" "}
+              {`/${locale.toLowerCase()}/article/${translation.slug}`}
+            </span>
+          </label>
+
+          {canEditSlug && (
+            <div className="flex justify-end">
+              <Button type="submit" variant="outline">
+                Enregistrer le slug
+              </Button>
+            </div>
+          )}
+        </form>
 
         <form
           action={updateArticleTranslationAction.bind(

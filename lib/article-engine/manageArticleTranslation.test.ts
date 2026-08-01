@@ -9,6 +9,7 @@ import {
   publishArticleTranslation,
   transitionArticleTranslation,
   updateArticleTranslation,
+  updateArticleTranslationSlug,
   type ManageArticleTranslationDependencies,
 } from "./manageArticleTranslation";
 import type {
@@ -31,6 +32,17 @@ function makeDependencies(
     async () => undefined,
   );
 
+  const resolveUniqueSlug = vi.fn(
+    async (
+      _locale: "CA" | "ES",
+      desiredSlug: string,
+    ) => desiredSlug,
+  );
+
+  const updateSlugBeforePublication = vi.fn(
+    async () => undefined,
+  );
+
   const transitionStatus = vi.fn(
     async () => undefined,
   );
@@ -46,6 +58,8 @@ function makeDependencies(
     translationRepository: {
       findByArticleAndLocale,
       updateContent,
+      resolveUniqueSlug,
+      updateSlugBeforePublication,
       transitionStatus,
       publishApproved,
     },
@@ -56,6 +70,8 @@ function makeDependencies(
     dependencies,
     findByArticleAndLocale,
     updateContent,
+    resolveUniqueSlug,
+    updateSlugBeforePublication,
     transitionStatus,
     publishApproved,
     publishedAt,
@@ -166,13 +182,20 @@ describe("manageArticleTranslation", () => {
     );
   });
 
-  it("verrouille le contenu en relecture", async () => {
+  it.each([
+    "REVIEW",
+    "APPROVED",
+    "PUBLISHED",
+    "ARCHIVED",
+  ] as ArticleTranslationStatus[])(
+    "verrouille le contenu au statut %s",
+    async (status) => {
     const {
       dependencies,
       updateContent,
     } = makeDependencies({
       id: 12,
-      status: "REVIEW",
+      status,
     });
 
     await expect(
@@ -191,7 +214,87 @@ describe("manageArticleTranslation", () => {
     );
 
     expect(updateContent).not.toHaveBeenCalled();
+    },
+  );
+
+  it("modifie et suffixe un slug avant publication", async () => {
+    const {
+      dependencies,
+      resolveUniqueSlug,
+      updateSlugBeforePublication,
+    } = makeDependencies({
+      id: 12,
+      status: "APPROVED",
+      publishedAt: null,
+    });
+
+    resolveUniqueSlug.mockResolvedValueOnce("titol-2");
+
+    const result = await updateArticleTranslationSlug(
+      {
+        articleId: 7,
+        locale: "CA",
+        slug: "Títol",
+      },
+      dependencies,
+    );
+
+    expect(resolveUniqueSlug).toHaveBeenCalledWith(
+      "CA",
+      "titol",
+      12,
+    );
+    expect(updateSlugBeforePublication).toHaveBeenCalledWith(
+      12,
+      "APPROVED",
+      "titol-2",
+    );
+    expect(result.status).toBe("APPROVED");
   });
+
+  it.each([
+    {
+      status: "PUBLISHED" as ArticleTranslationStatus,
+      publishedAt: new Date("2026-08-01T12:00:00.000Z"),
+    },
+    {
+      status: "ARCHIVED" as ArticleTranslationStatus,
+      publishedAt: new Date("2026-08-01T12:00:00.000Z"),
+    },
+    {
+      status: "DRAFT" as ArticleTranslationStatus,
+      publishedAt: new Date("2026-08-01T12:00:00.000Z"),
+    },
+  ])(
+    "verrouille le slug apres publication au statut $status",
+    async ({ status, publishedAt }) => {
+      const {
+        dependencies,
+        updateSlugBeforePublication,
+      } = makeDependencies({
+        id: 12,
+        status,
+        publishedAt,
+      });
+
+      await expect(
+        updateArticleTranslationSlug(
+          {
+            articleId: 7,
+            locale: "ES",
+            slug: "nouveau-slug",
+          },
+          dependencies,
+        ),
+      ).rejects.toThrow(
+        "Le slug est verrouillé après la première publication.",
+      );
+
+      expect(
+        updateSlugBeforePublication,
+      ).not.toHaveBeenCalled();
+    },
+  );
 
   it.each([
     {
