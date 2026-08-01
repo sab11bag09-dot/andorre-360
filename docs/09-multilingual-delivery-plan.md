@@ -865,3 +865,45 @@ f6fdba7 docs: ajouter le point de passation multilingue
 ```
 
 Le premier nouveau commit doit rester limité au prochain lot validé.
+
+## 13. Décisions confirmées
+
+Décisions validées le 1 août 2026 :
+
+1. Les URL publiques seront :
+
+   `/ca/article/[slug]`
+
+   `/es/article/[slug]`
+
+2. Le modèle `ArticleTranslation` recevra le champ :
+
+   `publishedAt DateTime?`
+
+3. Le retrait d’une traduction publiée utilisera la transition :
+
+   `PUBLISHED → ARCHIVED`
+
+4. Le slug deviendra stable après la première publication et ne pourra plus être modifié automatiquement.
+
+Ces décisions remplacent toute mention antérieure indiquant qu’elles restaient à confirmer.
+
+La prochaine action est désormais le lot 1 : ajouter la publication métier contrôlée, limitée aux traductions au statut `APPROVED`.
+
+
+## 14. Consigne de reprise pour la prochaine session
+
+Reprendre le chantier multilingue sur la branche `feature/editorial-pipeline-multilingual`.
+
+Lire dans cet ordre :
+
+1. `docs/08-editorial-multilingual-handoff.md`
+2. `docs/09-multilingual-delivery-plan.md`
+
+Vérifier le dernier commit avec :
+
+`git log -1 --oneline`
+
+Les quatre décisions de publication sont confirmées dans la section 13. Ne pas les rediscuter sauf nouvelle demande explicite.
+
+Commencer par le lot 1 : publication métier contrôlée des traductions `APPROVED`.
