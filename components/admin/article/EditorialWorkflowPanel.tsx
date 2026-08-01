@@ -1,22 +1,40 @@
-import type { EditorialStatus } from "@/lib/generated/prisma/client";
+import type {
+  ContentLocale,
+  EditorialStatus,
+} from "@/lib/generated/prisma/client";
 
 import { generateArticleTranslationsAction } from "@/app/admin/articles/translation-actions";
 import {
   approveArticleAction,
   submitArticleForReviewAction,
 } from "@/app/admin/articles/workflow-actions";
-import { Button } from "@/components/admin/ui";
+import {
+  Badge,
+  Button,
+} from "@/components/admin/ui";
 
 import EditorialStatusBadge from "./EditorialStatusBadge";
+
+type TranslationSummary = {
+  locale: ContentLocale;
+  status: EditorialStatus;
+};
 
 type EditorialWorkflowPanelProps = {
   articleId: number;
   status: EditorialStatus;
+  translations: TranslationSummary[];
 };
+
+const translationLocales: ContentLocale[] = [
+  "CA",
+  "ES",
+];
 
 export default function EditorialWorkflowPanel({
   articleId,
   status,
+  translations,
 }: EditorialWorkflowPanelProps) {
   const canGenerateTranslations =
     status !== "ARCHIVED";
@@ -38,6 +56,37 @@ export default function EditorialWorkflowPanel({
         <EditorialStatusBadge
           status={status}
         />
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          {translationLocales.map((locale) => {
+            const translation =
+              translations.find(
+                (item) =>
+                  item.locale === locale,
+              );
+
+            return (
+              <div
+                key={locale}
+                className="flex items-center gap-2"
+              >
+                <span className="text-xs font-semibold text-zinc-400">
+                  {locale}
+                </span>
+
+                {translation ? (
+                  <EditorialStatusBadge
+                    status={translation.status}
+                  />
+                ) : (
+                  <Badge variant="default">
+                    Non générée
+                  </Badge>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
