@@ -1,39 +1,27 @@
 "use client";
 
-import type { MouseEvent } from "react";
 import { useFormStatus } from "react-dom";
 
 import Button, {
   type ButtonVariant,
 } from "@/components/admin/ui/Button";
 
-type ConfirmTranslationActionButtonProps = {
+type TranslationSubmitButtonProps = {
   label: string;
-  message: string;
   variant?: ButtonVariant;
 };
 
-export default function ConfirmTranslationActionButton({
+export default function TranslationSubmitButton({
   label,
-  message,
   variant = "primary",
-}: ConfirmTranslationActionButtonProps) {
+}: TranslationSubmitButtonProps) {
   const { pending } = useFormStatus();
-
-  function handleClick(
-    event: MouseEvent<HTMLButtonElement>,
-  ): void {
-    if (!window.confirm(message)) {
-      event.preventDefault();
-    }
-  }
 
   return (
     <Button
       type="submit"
       variant={variant}
       disabled={pending}
-      onClick={handleClick}
     >
       {pending ? "Traitement…" : label}
     </Button>

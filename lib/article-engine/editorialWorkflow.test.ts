@@ -39,6 +39,15 @@ describe("editorialWorkflow", () => {
     ).toBe(true);
   });
 
+  it("autorise une traduction approuvée à revenir en relecture", () => {
+    expect(
+      canTransitionEditorialStatus(
+        "APPROVED",
+        "REVIEW",
+      ),
+    ).toBe(true);
+  });
+
   it("autorise uniquement les contenus approuvés ou déjà publiés", () => {
     expect(
       canPublishEditorialStatus("APPROVED"),

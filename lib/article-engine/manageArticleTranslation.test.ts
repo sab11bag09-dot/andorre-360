@@ -309,6 +309,12 @@ describe("manageArticleTranslation", () => {
       nextStatus:
         "APPROVED" as ArticleTranslationStatus,
     },
+    {
+      currentStatus:
+        "APPROVED" as ArticleTranslationStatus,
+      nextStatus:
+        "REVIEW" as ArticleTranslationStatus,
+    },
   ])(
     "autorise $currentStatus vers $nextStatus",
     async ({
