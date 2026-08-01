@@ -20,6 +20,11 @@ export interface TransitionArticleTranslationInput {
   nextStatus: ArticleTranslationStatus;
 }
 
+export interface PublishArticleTranslationInput {
+  articleId: number;
+  locale: string;
+}
+
 export interface ManageArticleTranslationResult {
   translationId: number;
   status: ArticleTranslationStatus;
@@ -31,6 +36,7 @@ export interface ManageArticleTranslationDependencies {
     | "findByArticleAndLocale"
     | "updateContent"
     | "transitionStatus"
+    | "publishApproved"
   >;
 }
 
@@ -163,6 +169,12 @@ export async function transitionArticleTranslation(
     );
   }
 
+  if (input.nextStatus === "PUBLISHED") {
+    throw new Error(
+      "La publication utilise un service dédié.",
+    );
+  }
+
   await dependencies.translationRepository
     .transitionStatus(
       translation.id,
@@ -173,5 +185,42 @@ export async function transitionArticleTranslation(
   return {
     translationId: translation.id,
     status: input.nextStatus,
+  };
+}
+
+export async function publishArticleTranslation(
+  input: PublishArticleTranslationInput,
+  dependencies = defaultDependencies,
+): Promise<ManageArticleTranslationResult> {
+  assertTranslationReference(
+    input.articleId,
+    input.locale,
+  );
+
+  const translation =
+    await dependencies.translationRepository
+      .findByArticleAndLocale(
+        input.articleId,
+        input.locale,
+      );
+
+  if (!translation) {
+    throw new Error(
+      "Traduction introuvable.",
+    );
+  }
+
+  if (translation.status !== "APPROVED") {
+    throw new Error(
+      "La traduction doit être approuvée avant publication.",
+    );
+  }
+
+  await dependencies.translationRepository
+    .publishApproved(translation.id);
+
+  return {
+    translationId: translation.id,
+    status: "PUBLISHED",
   };
 }

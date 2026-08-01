@@ -6,6 +6,7 @@ import {
 } from "vitest";
 
 import {
+  publishArticleTranslation,
   transitionArticleTranslation,
   updateArticleTranslation,
   type ManageArticleTranslationDependencies,
@@ -30,11 +31,16 @@ function makeDependencies(
     async () => undefined,
   );
 
+  const publishApproved = vi.fn(
+    async () => undefined,
+  );
+
   const dependencies: ManageArticleTranslationDependencies = {
     translationRepository: {
       findByArticleAndLocale,
       updateContent,
       transitionStatus,
+      publishApproved,
     },
   };
 
@@ -43,6 +49,7 @@ function makeDependencies(
     findByArticleAndLocale,
     updateContent,
     transitionStatus,
+    publishApproved,
   };
 }
 
@@ -249,6 +256,151 @@ describe("manageArticleTranslation", () => {
       ),
     ).rejects.toThrow(
       "Cette transition de traduction est interdite.",
+    );
+
+    expect(
+      transitionStatus,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("publie une traduction approuvée", async () => {
+    const {
+      dependencies,
+      publishApproved,
+    } = makeDependencies({
+      id: 12,
+      status: "APPROVED",
+    });
+
+    const result =
+      await publishArticleTranslation(
+        {
+          articleId: 7,
+          locale: "CA",
+        },
+        dependencies,
+      );
+
+    expect(result).toEqual({
+      translationId: 12,
+      status: "PUBLISHED",
+    });
+
+    expect(
+      publishApproved,
+    ).toHaveBeenCalledWith(12);
+  });
+
+  it.each([
+    "AI_DRAFT",
+    "DRAFT",
+    "REVIEW",
+    "PUBLISHED",
+    "ARCHIVED",
+  ] as const)(
+    "refuse de publier une traduction $status",
+    async (status) => {
+      const {
+        dependencies,
+        publishApproved,
+      } = makeDependencies({
+        id: 12,
+        status,
+      });
+
+      await expect(
+        publishArticleTranslation(
+          {
+            articleId: 7,
+            locale: "ES",
+          },
+          dependencies,
+        ),
+      ).rejects.toThrow(
+        "La traduction doit être approuvée avant publication.",
+      );
+
+      expect(
+        publishApproved,
+      ).not.toHaveBeenCalled();
+    },
+  );
+
+  it("refuse de publier une traduction introuvable", async () => {
+    const {
+      dependencies,
+      publishApproved,
+    } = makeDependencies(null);
+
+    await expect(
+      publishArticleTranslation(
+        {
+          articleId: 7,
+          locale: "CA",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow(
+      "Traduction introuvable.",
+    );
+
+    expect(
+      publishApproved,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("détecte un changement concurrent pendant la publication", async () => {
+    const {
+      dependencies,
+      publishApproved,
+    } = makeDependencies({
+      id: 12,
+      status: "APPROVED",
+    });
+
+    publishApproved.mockRejectedValueOnce(
+      new Error(
+        "Le statut de la traduction a changé. Recharge la page et réessaie.",
+      ),
+    );
+
+    await expect(
+      publishArticleTranslation(
+        {
+          articleId: 7,
+          locale: "ES",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow(
+      "Le statut de la traduction a changé.",
+    );
+
+    expect(
+      publishApproved,
+    ).toHaveBeenCalledWith(12);
+  });
+
+  it("réserve la publication au service dédié", async () => {
+    const {
+      dependencies,
+      transitionStatus,
+    } = makeDependencies({
+      id: 12,
+      status: "APPROVED",
+    });
+
+    await expect(
+      transitionArticleTranslation(
+        {
+          articleId: 7,
+          locale: "CA",
+          nextStatus: "PUBLISHED",
+        },
+        dependencies,
+      ),
+    ).rejects.toThrow(
+      "La publication utilise un service dédié.",
     );
 
     expect(

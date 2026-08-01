@@ -141,4 +141,25 @@ export class PrismaArticleTranslationRepository
       );
     }
   }
+
+  async publishApproved(
+    translationId: number,
+  ): Promise<void> {
+    const result =
+      await prisma.articleTranslation.updateMany({
+        where: {
+          id: translationId,
+          status: "APPROVED",
+        },
+        data: {
+          status: "PUBLISHED",
+        },
+      });
+
+    if (result.count !== 1) {
+      throw new Error(
+        "Le statut de la traduction a changé. Recharge la page et réessaie.",
+      );
+    }
+  }
 }

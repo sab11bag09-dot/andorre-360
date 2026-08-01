@@ -53,4 +53,8 @@ export interface ArticleTranslationRepository {
     currentStatus: ArticleTranslationStatus,
     nextStatus: ArticleTranslationStatus,
   ): Promise<void>;
+
+  publishApproved(
+    translationId: number,
+  ): Promise<void>;
 }
