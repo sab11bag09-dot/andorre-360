@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
+import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
 
 import {
   type ArticleDraft,
@@ -174,6 +175,7 @@ function revalidateArticlePages(
   revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/articles");
+  revalidatePath("/admin/media");
   revalidatePath(
     `/admin/articles/${articleId}`
   );
@@ -207,6 +209,13 @@ async function createArticle(
 ): Promise<SaveArticleResult> {
   const shouldPublish =
     input.intent === "publish";
+if (shouldPublish) {
+  return {
+    success: false,
+    message:
+      "Enregistre d’abord l’article, puis fais-le relire et approuver.",
+  };
+}
 
   const slug = await createUniqueSlug(
     draft.slug
@@ -256,8 +265,25 @@ async function createArticle(
 
               published:
                 shouldPublish,
+               editorialStatus: "DRAFT",
             },
           });
+          const media = await transaction.media.findUnique({
+  where: {
+    path: draft.image,
+  },
+});
+
+if (media) {
+  await transaction.mediaUsage.create({
+    data: {
+      mediaId: media.id,
+      entityType: "ARTICLE",
+      entityId: article.id,
+      field: "image",
+    },
+  });
+}
 
         if (shouldPublish) {
           await transaction.publication.create({
@@ -307,9 +333,7 @@ async function createArticle(
     published:
       createdArticle.published,
 
-    redirectTo: shouldPublish
-      ? `/article/${createdArticle.slug}`
-      : `/admin/articles/${createdArticle.id}`,
+    redirectTo: `/admin/articles/${createdArticle.id}`,
   };
 }
 
@@ -335,10 +359,12 @@ async function updateArticle(
       where: {
         id: draft.id,
       },
-      select: {
-        id: true,
-        slug: true,
-      },
+     select: {
+  id: true,
+  slug: true,
+  image: true,
+  editorialStatus: true,
+},
     });
 
   if (!existingArticle) {
@@ -351,6 +377,18 @@ async function updateArticle(
 
   const shouldPublish =
     input.intent === "publish";
+   if (
+  shouldPublish &&
+  !canPublishEditorialStatus(
+    existingArticle.editorialStatus,
+  )
+) {
+  return {
+    success: false,
+    message:
+      "Cet article doit être relu et approuvé avant sa publication.",
+  };
+  }
 
   const slug = await createUniqueSlug(
     draft.slug,
@@ -405,8 +443,47 @@ async function updateArticle(
 
               published:
                 shouldPublish,
+                editorialStatus: shouldPublish
+  ? "PUBLISHED"
+  : existingArticle.editorialStatus ===
+      "PUBLISHED"
+    ? "DRAFT"
+    : existingArticle.editorialStatus,
             },
+
           });
+          await transaction.mediaUsage.deleteMany({
+  where: {
+    entityType: "ARTICLE",
+    entityId: article.id,
+    field: "image",
+  },
+});
+          const media = await transaction.media.findUnique({
+  where: {
+    path: draft.image,
+  },
+});
+
+if (media) {
+  await transaction.mediaUsage.upsert({
+    where: {
+      mediaId_entityType_entityId_field: {
+        mediaId: media.id,
+        entityType: "ARTICLE",
+        entityId: article.id,
+        field: "image",
+      },
+    },
+    update: {},
+    create: {
+      mediaId: media.id,
+      entityType: "ARTICLE",
+      entityId: article.id,
+      field: "image",
+    },
+  });
+}
           console.log("UPDATED ARTICLE", {
   id: article.id,
   title: article.title,

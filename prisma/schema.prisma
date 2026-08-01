@@ -7,87 +7,170 @@ datasource db {
   provider = "sqlite"
 }
 
-model Article {
-  id            Int      @id @default(autoincrement())
-  slug          String   @unique
-  title         String
-  category      String
-  description   String
-  content       String
-  image         String
-  author        String
-  readingTime   String
-  contentType   String   @default("article")
-  videoUrl      String?
-  videoDuration String?
-  socialText    String?
-  featured      Boolean  @default(false)
-  published     Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  publications Publication[]
-  analytics    ArticleAnalytics[]
+model User {
+  id            String    @id @default(cuid())
+  firstName     String
+  lastName      String
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  role          UserRole  @default(EDITOR)
+  active        Boolean   @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
 }
 
-model Media {
-  id           Int      @id @default(autoincrement())
-  filename     String
-  originalName String
-  path         String
-  mimeType     String
-  size         Int
-  width        Int?
-  height       Int?
-  alt          String?
-  caption      String?
-  createdAt    DateTime @default(now())
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+model Article {
+  id              Int                @id @default(autoincrement())
+  slug            String             @unique
+  title           String
+  category        String
+  categoryId      Int?
+  categoryRef     Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  description     String
+  content         String
+  image           String
+  author          String
+  readingTime     String
+  contentType     String             @default("article")
+  videoUrl        String?
+  videoDuration   String?
+  socialText      String?
+  featured        Boolean            @default(false)
+  published       Boolean            @default(false)
+  editorialStatus EditorialStatus    @default(DRAFT)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  analytics       ArticleAnalytics[]
+  publications    Publication[]
+
+  observations Observation[]
+  translations ArticleTranslation[]
+}
+
+enum EditorialStatus {
+  DRAFT
+  AI_DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContentLocale {
+  FR
+  CA
+  ES
+}
+
+model ArticleTranslation {
+  id             Int             @id @default(autoincrement())
+  articleId      Int
+  locale         ContentLocale
+  title          String
+  slug           String
+  description    String
+  content        String
+  seoTitle       String?
+  seoDescription String?
+  status         EditorialStatus @default(AI_DRAFT)
+  generatedAt    DateTime?
+  approvedAt     DateTime?
+  publishedAt    DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, locale])
+  @@unique([locale, slug])
+  @@index([status])
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
 }
 
 model Edition {
-  id          Int      @id @default(autoincrement())
-  key         String   @unique
-  name        String
-  description String?
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
+  id           Int           @id @default(autoincrement())
+  key          String        @unique
+  name         String
+  description  String?
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   publications Publication[]
 }
 
 model Publication {
-  id        Int     @id @default(autoincrement())
+  id        Int                    @id @default(autoincrement())
   articleId Int
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
+  channel   String
+  pageKey   String                 @default("home")
+  zone      String
+  priority  Int                    @default(0)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  active    Boolean                @default(true)
+  createdAt DateTime               @default(now())
   editionId Int?
-  edition   Edition? @relation(fields: [editionId], references: [id])
-
-  channel  String
-  pageKey  String @default("home")
-  zone     String
-  priority Int    @default(0)
-
-  startsAt DateTime?
-  endsAt   DateTime?
-
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-
+  edition   Edition?               @relation(fields: [editionId], references: [id])
+  article   Article                @relation(fields: [articleId], references: [id], onDelete: Cascade)
   analytics PublicationAnalytics[]
 }
 
 model ArticleAnalytics {
-  id        Int     @id @default(autoincrement())
-  articleId Int
-  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
+  id               Int      @id @default(autoincrement())
+  articleId        Int
   date             DateTime
   views            Int      @default(0)
   uniqueVisitors   Int      @default(0)
   totalReadingTime Int      @default(0)
   completedReads   Int      @default(0)
+  article          Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   @@unique([articleId, date])
 }
@@ -95,38 +178,176 @@ model ArticleAnalytics {
 model PublicationAnalytics {
   id            Int         @id @default(autoincrement())
   publicationId Int
+  impressions   Int         @default(0)
+  clicks        Int         @default(0)
+  shares        Int         @default(0)
   publication   Publication @relation(fields: [publicationId], references: [id], onDelete: Cascade)
-
-  impressions Int @default(0)
-  clicks      Int @default(0)
-  shares      Int @default(0)
 }
 
 model Source {
-  id Int @id @default(autoincrement())
+  id                   Int                      @id @default(autoincrement())
+  name                 String
+  description          String?
+  url                  String                   @unique
+  organizationType     SourceOrganizationType   @default(OTHER)
+  collectionMode       SourceCollectionMode     @default(RSS)
+  checkIntervalMinutes Int                      @default(15)
+  active               Boolean                  @default(true)
+  availabilityStatus   SourceAvailabilityStatus @default(UNKNOWN)
+  publicationMode      SourcePublicationMode    @default(MANUAL)
+  trustLevel           SourceTrustLevel         @default(HIGH)
+  category             String?
+  lastCheckedAt        DateTime?
+  lastSuccessAt        DateTime?
+  lastErrorAt          DateTime?
+  lastErrorMessage     String?
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  observations         Observation[]
 
-  // Identité
-  name             String
-  description      String?
-  url              String  @unique
-  organizationType String  @default("OTHER")
+  @@index([active])
+  @@index([collectionMode])
+  @@index([lastCheckedAt])
+}
 
-  // Collecte
-  collectionMode       String  @default("RSS")
-  checkIntervalMinutes Int     @default(15)
-  active               Boolean @default(true)
+model Observation {
+  id        Int  @id @default(autoincrement())
+  sourceId  Int
+  articleId Int?
 
-  // Politique éditoriale
-  publicationMode String  @default("MANUAL")
-  trustLevel      String  @default("HIGH")
-  category        String?
+  title       String
+  url         String
+  publishedAt DateTime?
+  content     String?
 
-  // État du collecteur
-  lastCheckedAt    DateTime?
-  lastSuccessAt    DateTime?
-  lastErrorAt      DateTime?
-  lastErrorMessage String?
+  processed   Boolean   @default(false)
+  processedAt DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  collectedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  source  Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+
+  @@unique([sourceId, url])
+  @@index([sourceId])
+  @@index([articleId])
+  @@index([processed])
+  @@index([publishedAt])
+  @@index([collectedAt])
+}
+
+enum SourceOrganizationType {
+  GOVERNMENT
+  COMMUNE
+  POLICE
+  EMERGENCY_SERVICE
+  SPORTS_CLUB
+  SPORTS_FEDERATION
+  COMPANY
+  ASSOCIATION
+  MEDIA
+  WEATHER_SERVICE
+  OTHER
+}
+
+enum SourceCollectionMode {
+  RSS
+  HTML
+  API
+  PDF
+  FACEBOOK
+  X
+  YOUTUBE
+  EMAIL
+}
+
+enum SourceAvailabilityStatus {
+  UNKNOWN
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum SourcePublicationMode {
+  AUTO
+  ASSISTED
+  MANUAL
+}
+
+enum SourceTrustLevel {
+  LOW
+  MEDIUM
+  HIGH
+  OFFICIAL
+}
+
+model Media {
+  id           Int          @id @default(autoincrement())
+  type         MediaType    @default(IMAGE)
+  filename     String
+  originalName String
+  path         String       @unique
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  title        String?
+  alt          String?
+  caption      String?
+  credit       String?
+  copyright    String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+  usages       MediaUsage[]
+}
+
+model MediaUsage {
+  id         Int             @id @default(autoincrement())
+  mediaId    Int
+  entityType MediaEntityType
+  entityId   Int
+  field      String
+  createdAt  DateTime        @default(now())
+  media      Media           @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, entityType, entityId, field])
+  @@index([entityType, entityId])
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  JOURNALIST
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+enum MediaEntityType {
+  ARTICLE
+  PAGE
+  EVENT
+  USER
+  EDITION
+}
+
+model ExternalVideo {
+  id        Int                   @id @default(autoincrement())
+  url       String                @unique
+  provider  ExternalVideoProvider
+  title     String?
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+}
+
+enum ExternalVideoProvider {
+  YOUTUBE
+  VIMEO
+  TIKTOK
+  FACEBOOK
 }

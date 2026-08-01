@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import ArticleEditor from "@/components/admin/article-v4/ArticleEditor";
 import { mapArticleToDraft } from "@/components/admin/article-v4/mapArticleToDraft";
+import EditorialWorkflowPanel from "@/components/admin/article/EditorialWorkflowPanel";
 import { prisma } from "@/lib/prisma";
 
 export default async function EditArticlePage({
@@ -16,22 +17,34 @@ export default async function EditArticlePage({
     notFound();
   }
 
-  const article = await prisma.article.findUnique({
-    where: {
-      id: articleId,
-    },
-    include: {
-      publications: {
-        where: {
-          active: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 1,
+  const article =
+    await prisma.article.findUnique({
+      where: {
+        id: articleId,
       },
-    },
-  });
+      include: {
+        publications: {
+          where: {
+            active: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+        },
+        translations: {
+          where: {
+            locale: {
+              in: ["CA", "ES"],
+            },
+          },
+          select: {
+            locale: true,
+            status: true,
+          },
+        },
+      },
+    });
 
   if (!article) {
     notFound();
@@ -42,12 +55,19 @@ export default async function EditArticlePage({
 
   const draft = mapArticleToDraft(
     article,
-    activePublication
+    activePublication,
   );
 
   return (
     <main className="min-h-screen bg-zinc-950 p-6 md:p-10">
+      <EditorialWorkflowPanel
+        articleId={article.id}
+        status={article.editorialStatus}
+        translations={article.translations}
+      />
+
       <ArticleEditor
+        key={`${article.id}-${article.editorialStatus}`}
         mode="update"
         initialValues={draft}
       />

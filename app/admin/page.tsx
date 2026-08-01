@@ -102,8 +102,7 @@ export default async function AdminPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-6 md:px-10 md:py-10">
-      <div className="mx-auto max-w-7xl">
+  <>
         <PageHeader
   title="Tableau de bord"
   description="Pilote les contenus, les médias et la mise en avant éditoriale d’ANDORRE 360."
@@ -134,18 +133,21 @@ export default async function AdminPage() {
   />
 
   <StatCard
-    title="Publiés"
-    value={publishedArticleCount}
-    description="Visibles sur le site"
-    valueClassName="text-emerald-400"
-  />
+  title="Publiés"
+  value={publishedArticleCount}
+  description="Visibles sur le site"
+  valueClassName="text-emerald-400"
+  href="/admin/articles?status=published"
+/>
+
 
   <StatCard
-    title="Brouillons"
-    value={draftArticleCount}
-    description="En attente de publication"
-    valueClassName="text-amber-400"
-  />
+  title="Brouillons"
+  value={draftArticleCount}
+  description="En attente de publication"
+  valueClassName="text-amber-400"
+  href="/admin/articles?status=draft"
+/>
 
   <StatCard
     title="Médias"
@@ -314,7 +316,6 @@ export default async function AdminPage() {
             </div>
           )}
         </section>
-      </div>
-    </main>
-  );
+        </>
+);
 }

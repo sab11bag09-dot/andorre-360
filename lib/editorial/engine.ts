@@ -4,6 +4,7 @@ import {
   EDITORIAL_ZONES,
   type EditorialZone,
 } from "@/lib/editorial/zones";
+import type { EditorialLayout } from "@/lib/editorial/types";
 
 function isActivePublication(
   startsAt: Date | null,
@@ -22,7 +23,9 @@ function isActivePublication(
   return true;
 }
 
-export async function buildEditorialLayout(pageKey: string) {
+export async function buildEditorialLayout(
+  pageKey: string
+): Promise<EditorialLayout> {
   const publications = await prisma.publication.findMany({
     where: {
       pageKey,

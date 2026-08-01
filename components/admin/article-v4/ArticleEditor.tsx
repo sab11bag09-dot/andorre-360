@@ -3,24 +3,23 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import ArticleContent from "@/components/admin/article/ArticleContent";
+import ArticleContent from "@/components/admin/article-v5/ArticleContent";
 import ArticleEditorial from "@/components/admin/article/ArticleEditorial";
 import ArticleMedia from "@/components/admin/article/ArticleMedia";
 import ArticleSidebar from "@/components/admin/article/ArticleSidebar";
-
-import { submitArticle } from "./submitArticle";
 import {
   Button,
   PageHeader,
   Select,
 } from "@/components/admin/ui";
+import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
 
+import { submitArticle } from "./submitArticle";
 import {
   type ArticleContentType,
   type ArticleDraft,
   type ArticleEditorMode,
   type ArticleSubmissionIntent,
-  
   EDITORIAL_ZONES,
   calculateArticleReadingTime,
   calculateArticleWordCount,
@@ -69,44 +68,59 @@ export default function ArticleEditor({
 }: Props) {
   const router = useRouter();
 
-  const [draft, setDraft] = useState<ArticleDraft>(() =>
-    createArticleDraft(initialValues)
+  const [draft, setDraft] = useState<ArticleDraft>(
+    () => createArticleDraft(initialValues),
   );
 
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSaving, setIsSaving] =
+    useState(false);
 
   const [activeIntent, setActiveIntent] =
-    useState<ArticleSubmissionIntent | null>(null);
+    useState<ArticleSubmissionIntent | null>(
+      null,
+    );
 
   const [errorMessage, setErrorMessage] =
     useState<string | null>(null);
 
   const wordCount = useMemo(
-    () => calculateArticleWordCount(draft.content),
-    [draft.content]
+    () =>
+      calculateArticleWordCount(
+        draft.content,
+      ),
+    [draft.content],
   );
 
   const readingTime = useMemo(() => {
     const readingTimeLabel =
-      calculateArticleReadingTime(draft.content);
+      calculateArticleReadingTime(
+        draft.content,
+      );
 
-    const parsedReadingTime = Number.parseInt(
-      readingTimeLabel,
-      10
-    );
+    const parsedReadingTime =
+      Number.parseInt(
+        readingTimeLabel,
+        10,
+      );
 
     return Number.isNaN(parsedReadingTime)
       ? 1
       : parsedReadingTime;
   }, [draft.content]);
 
+  const canPublish =
+    canPublishEditorialStatus(
+      draft.editorialStatus,
+    );
+
   const selectedZone = useMemo(
     () =>
       EDITORIAL_ZONES.find(
         (editorialZone) =>
-          editorialZone.value === draft.zone
+          editorialZone.value ===
+          draft.zone,
       ),
-    [draft.zone]
+    [draft.zone],
   );
 
   function clearError() {
@@ -115,9 +129,11 @@ export default function ArticleEditor({
     }
   }
 
-  function updateField<K extends keyof ArticleDraft>(
+  function updateField<
+    K extends keyof ArticleDraft,
+  >(
     field: K,
-    value: ArticleDraft[K]
+    value: ArticleDraft[K],
   ) {
     setDraft((currentDraft) => ({
       ...currentDraft,
@@ -127,7 +143,9 @@ export default function ArticleEditor({
     clearError();
   }
 
-  function handleTitleChange(value: string) {
+  function handleTitleChange(
+    value: string,
+  ) {
     setDraft((currentDraft) => ({
       ...currentDraft,
       title: value,
@@ -137,7 +155,9 @@ export default function ArticleEditor({
     clearError();
   }
 
-  function handleContentChange(value: string) {
+  function handleContentChange(
+    value: string,
+  ) {
     setDraft((currentDraft) => ({
       ...currentDraft,
       content: value,
@@ -149,7 +169,7 @@ export default function ArticleEditor({
   }
 
   async function handleIntent(
-    intent: ArticleSubmissionIntent
+    intent: ArticleSubmissionIntent,
   ) {
     if (isSaving) {
       return;
@@ -176,11 +196,11 @@ export default function ArticleEditor({
     } catch (error) {
       console.error(
         "Erreur pendant la soumission de l’article :",
-        error
+        error,
       );
 
       setErrorMessage(
-        "Une erreur inattendue est survenue pendant la sauvegarde."
+        "Une erreur inattendue est survenue pendant la sauvegarde.",
       );
     } finally {
       setIsSaving(false);
@@ -201,34 +221,55 @@ export default function ArticleEditor({
   return (
     <div className="mx-auto max-w-[1600px]">
       <PageHeader
-  eyebrow="ANDORRE 360 Studio"
-  title={pageTitle}
-  description={pageDescription}
-  actions={
-    <>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => handleIntent("draft")}
-        disabled={isSaving}
-      >
-        {isSaving && activeIntent === "draft"
-          ? "Enregistrement…"
-          : "Enregistrer"}
-      </Button>
+        eyebrow="ANDORRE 360 Studio"
+        title={pageTitle}
+        description={pageDescription}
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() =>
+                handleIntent("draft")
+              }
+              disabled={isSaving}
+            >
+              {isSaving &&
+              activeIntent === "draft"
+                ? "Enregistrement…"
+                : "Enregistrer"}
+            </Button>
 
-      <Button
-        type="button"
-        onClick={() => handleIntent("publish")}
-        disabled={isSaving}
-      >
-        {isSaving && activeIntent === "publish"
-          ? "Publication…"
-          : "Publier"}
-      </Button>
-    </>
-  }
-/>
+            <Button
+              type="button"
+              onClick={() =>
+                handleIntent("publish")
+              }
+              disabled={
+                isSaving || !canPublish
+              }
+            >
+              {isSaving &&
+              activeIntent === "publish"
+                ? "Publication…"
+                : canPublish
+                  ? "Publier"
+                  : "Validation requise"}
+            </Button>
+          </>
+        }
+      />
+
+      {!canPublish && (
+        <div
+          role="status"
+          className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 text-sm text-amber-200"
+        >
+          {draft.id === null
+            ? "Enregistre d’abord l’article, puis envoie-le en relecture."
+            : "Cet article doit être relu et approuvé avant sa publication."}
+        </div>
+      )}
 
       {errorMessage && (
         <div
@@ -239,7 +280,9 @@ export default function ArticleEditor({
             La sauvegarde a échoué
           </p>
 
-          <p className="mt-1">{errorMessage}</p>
+          <p className="mt-1">
+            {errorMessage}
+          </p>
         </div>
       )}
 
@@ -264,27 +307,30 @@ export default function ArticleEditor({
                 Format éditorial
               </label>
 
-             <Select
-  id="contentType"
-  value={draft.contentType}
-  onChange={(event) =>
-    updateField(
-      "contentType",
-      event.target.value as ArticleContentType
-    )
-  }
-  disabled={isSaving}
-  className="mt-0"
->
-  {CONTENT_TYPES.map((contentType) => (
-    <option
-      key={contentType.value}
-      value={contentType.value}
-    >
-      {contentType.label}
-    </option>
-  ))}
-</Select>
+              <Select
+                id="contentType"
+                value={draft.contentType}
+                onChange={(event) =>
+                  updateField(
+                    "contentType",
+                    event.target
+                      .value as ArticleContentType,
+                  )
+                }
+                disabled={isSaving}
+                className="mt-0"
+              >
+                {CONTENT_TYPES.map(
+                  (contentType) => (
+                    <option
+                      key={contentType.value}
+                      value={contentType.value}
+                    >
+                      {contentType.label}
+                    </option>
+                  ),
+                )}
+              </Select>
             </div>
           </section>
 
@@ -293,15 +339,24 @@ export default function ArticleEditor({
             setTitle={handleTitleChange}
             category={draft.category}
             setCategory={(value) =>
-              updateField("category", value)
+              updateField(
+                "category",
+                value,
+              )
             }
             author={draft.author}
             setAuthor={(value) =>
-              updateField("author", value)
+              updateField(
+                "author",
+                value,
+              )
             }
             description={draft.description}
             setDescription={(value) =>
-              updateField("description", value)
+              updateField(
+                "description",
+                value,
+              )
             }
             content={draft.content}
             setContent={handleContentChange}
@@ -317,13 +372,18 @@ export default function ArticleEditor({
             contentType={draft.contentType}
             videoUrl={draft.videoUrl}
             setVideoUrl={(value) =>
-              updateField("videoUrl", value)
+              updateField(
+                "videoUrl",
+                value,
+              )
             }
-            videoDuration={draft.videoDuration}
+            videoDuration={
+              draft.videoDuration
+            }
             setVideoDuration={(value) =>
               updateField(
                 "videoDuration",
-                value
+                value,
               )
             }
           />
@@ -333,38 +393,54 @@ export default function ArticleEditor({
           <ArticleEditorial
             pageKey={draft.pageKey}
             setPageKey={(value) =>
-              updateField("pageKey", value)
+              updateField(
+                "pageKey",
+                value,
+              )
             }
             zone={draft.zone}
             setZone={(value) =>
               updateField("zone", value)
             }
-            priority={String(draft.priority)}
+            priority={String(
+              draft.priority,
+            )}
             setPriority={(value) => {
               const parsedPriority =
-                Number.parseInt(value, 10);
+                Number.parseInt(
+                  value,
+                  10,
+                );
 
               updateField(
                 "priority",
-                Number.isNaN(parsedPriority)
+                Number.isNaN(
+                  parsedPriority,
+                )
                   ? 0
-                  : parsedPriority
+                  : parsedPriority,
               );
             }}
             channel={draft.channel}
             setChannel={(value) =>
               updateField(
                 "channel",
-                value as ArticleDraft["channel"]
+                value as ArticleDraft["channel"],
               )
             }
             startsAt={draft.startsAt}
             setStartsAt={(value) =>
-              updateField("startsAt", value)
+              updateField(
+                "startsAt",
+                value,
+              )
             }
             endsAt={draft.endsAt}
             setEndsAt={(value) =>
-              updateField("endsAt", value)
+              updateField(
+                "endsAt",
+                value,
+              )
             }
           />
 
@@ -381,7 +457,10 @@ export default function ArticleEditor({
             }
             featured={draft.featured}
             setFeatured={(value) =>
-              updateField("featured", value)
+              updateField(
+                "featured",
+                value,
+              )
             }
           />
         </aside>

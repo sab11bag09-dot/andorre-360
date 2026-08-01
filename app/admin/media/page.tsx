@@ -1,102 +1,175 @@
-import Image from "next/image";
-import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
-import MediaMetadataForm from "@/components/admin/MediaMetadataForm";
+import ExternalVideoButton from "@/components/admin/ExternalVideoButton";
+import MediaLibrary from "@/components/admin/MediaLibrary";
+import MediaSearch from "@/components/admin/MediaSearch";
 import MediaUploadButton from "@/components/admin/MediaUploadButton";
-import { prisma } from "@/lib/prisma";
 import {
   EmptyState,
   PageHeader,
   SectionHeader,
+  Toolbar,
 } from "@/components/admin/ui";
-export default async function AdminMediaPage() {
-  const media = await prisma.media.findMany({
+import { prisma } from "@/lib/prisma";
+
+type AdminMediaPageProps = {
+  searchParams: Promise<{
+    recherche?: string;
+  }>;
+};
+
+export default async function AdminMediaPage({
+  searchParams,
+}: AdminMediaPageProps) {
+  const { recherche = "" } = await searchParams;
+  const normalizedSearch = recherche.trim();
+  const lowercaseSearch = normalizedSearch.toLowerCase();
+
+  const [media, externalVideos] = await Promise.all([
+  prisma.media.findMany({
+    include: {
+      usages: true,
+    },
     orderBy: {
       createdAt: "desc",
     },
-  });
+  }),
+
+  prisma.externalVideo.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  }),
+]);
+
+  const totalMedia = media.length + externalVideos.length;
+
+  const filteredMedia = normalizedSearch
+    ? media.filter((item) => {
+        return (
+          item.originalName
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          item.filename.toLowerCase().includes(lowercaseSearch) ||
+          item.path.toLowerCase().includes(lowercaseSearch) ||
+          item.mimeType.toLowerCase().includes(lowercaseSearch) ||
+          item.type.toLowerCase().includes(lowercaseSearch) ||
+          (item.title ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          (item.alt ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          (item.caption ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          (item.credit ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          (item.copyright ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch)
+        );
+      })
+    : media;
+
+  const filteredExternalVideos = normalizedSearch
+    ? externalVideos.filter((video) => {
+        return (
+          (video.title ?? "")
+            .toLowerCase()
+            .includes(lowercaseSearch) ||
+          video.url.toLowerCase().includes(lowercaseSearch) ||
+          video.provider.toLowerCase().includes(lowercaseSearch)
+        );
+      })
+    : externalVideos;
+
+  const filteredTotal =
+    filteredMedia.length + filteredExternalVideos.length;
+
+  const serializedMedia = filteredMedia.map((item) => ({
+  id: item.id,
+  type: item.type,
+  filename: item.filename,
+  originalName: item.originalName,
+  path: item.path,
+  mimeType: item.mimeType,
+  size: item.size,
+  width: item.width,
+  height: item.height,
+  title: item.title,
+  alt: item.alt,
+  caption: item.caption,
+  credit: item.credit,
+  copyright: item.copyright,
+  usages: item.usages.map((usage) => ({
+    id: usage.id,
+    entityType: usage.entityType,
+    entityId: usage.entityId,
+    field: usage.field,
+  })),
+}));
+
+  const serializedExternalVideos =
+    filteredExternalVideos.map((video) => ({
+      id: video.id,
+      url: video.url,
+      provider: video.provider,
+      title: video.title,
+    }));
 
   return (
-    <main className="min-h-screen bg-black px-6 py-10 text-white md:px-10">
-      <div className="mx-auto max-w-7xl">
-        <PageHeader
-  backHref="/admin"
-  backLabel="Retour au Studio"
-  eyebrow="ANDORRE 360 Studio"
-  title="Bibliothèque de médias"
-  description="Téléverse, consulte et réutilise les images de ton journal."
-/>
+    <>
+      <PageHeader
+        backHref="/admin"
+        backLabel="Retour au Studio"
+        eyebrow="ANDORRE 360 Studio"
+        title="Bibliothèque de médias"
+        description="Téléverse, consulte et réutilise les images et vidéos de ton journal."
+      />
 
-        <section className="py-8">
-          <SectionHeader
-  title="Images"
-  description={`${media.length} média${media.length > 1 ? "s" : ""}`}
-  actions={<MediaUploadButton />}
-/>
+      <section className="py-8">
+        <SectionHeader
+          title="Médias"
+          description={`${filteredTotal} média${
+            filteredTotal > 1 ? "s" : ""
+          }`}
+        />
 
-          {media.length === 0 ? (
-            <EmptyState
-  title="Aucune image dans la bibliothèque"
-  description="Clique sur Téléverser une image pour commencer."
-  action={<MediaUploadButton />}
-/>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {media.map((item) => (
-                <article
-                  key={item.id}
-                  className="overflow-hidden rounded-xl border border-gray-800 bg-zinc-950 transition hover:border-yellow-500"
-                >
-                  <div className="relative aspect-[4/3] bg-zinc-900">
-                    <Image
-                      src={item.path}
-                      alt={item.alt || item.originalName}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover"
-                    />
-                  </div>
+        <Toolbar
+          search={
+            <MediaSearch initialQuery={normalizedSearch} />
+          }
+          actions={
+            <>
+              <MediaUploadButton />
+              <ExternalVideoButton />
+            </>
+          }
+        />
 
-                  <div className="space-y-4 p-4">
-                    <div className="space-y-2">
-                      <h3 className="truncate font-medium">
-                        {item.originalName}
-                      </h3>
-
-                      <p
-                        className="truncate text-xs text-gray-500"
-                        title={item.path}
-                      >
-                        {item.path}
-                      </p>
-
-                      <div className="flex items-center justify-between gap-3 text-xs text-gray-500">
-                        <span>{(item.size / 1024).toFixed(1)} Ko</span>
-
-                        <span className="text-right">
-                          {item.width && item.height
-                            ? `${item.width} × ${item.height}`
-                            : "Dimensions inconnues"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <MediaMetadataForm
-                      mediaId={item.id}
-                      initialAlt={item.alt}
-                      initialCaption={item.caption}
-                    />
-
-                    <MediaDeleteButton
-                      mediaId={item.id}
-                      mediaName={item.originalName}
-                    />
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-      </div>
-    </main>
+        {totalMedia === 0 ? (
+          <EmptyState
+            title="Aucun média dans la bibliothèque"
+            description="Téléverse un fichier ou ajoute une vidéo externe pour commencer."
+            action={
+              <div className="flex flex-wrap justify-center gap-3">
+                <MediaUploadButton />
+                <ExternalVideoButton />
+              </div>
+            }
+          />
+        ) : filteredTotal === 0 ? (
+          <EmptyState
+            title="Aucun résultat"
+            description={`Aucun média ne correspond à « ${normalizedSearch} ».`}
+          />
+        ) : (
+          <MediaLibrary
+            media={serializedMedia}
+            externalVideos={serializedExternalVideos}
+          />
+        )}
+      </section>
+    </>
   );
 }

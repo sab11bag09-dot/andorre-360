@@ -97,8 +97,7 @@ export default async function DiffusionPage() {
   ).size;
 
   return (
-    <main className="min-h-screen bg-gray-100 px-6 py-10 text-gray-900">
-      <div className="mx-auto max-w-7xl">
+  <>
         <PageHeader
           backHref="/admin"
           backLabel="Retour au tableau de bord"
@@ -243,7 +242,6 @@ export default async function DiffusionPage() {
             </DataTable>
           )}
         </section>
-      </div>
-    </main>
-  );
+        </>
+);
 }

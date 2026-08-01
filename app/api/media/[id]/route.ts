@@ -10,6 +10,18 @@ type RouteContext = {
   }>;
 };
 
+function normalizeOptionalString(value: unknown) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const normalizedValue = value.trim();
+
+  return normalizedValue.length > 0
+    ? normalizedValue
+    : null;
+}
+
 export async function PATCH(
   request: NextRequest,
   context: RouteContext
@@ -27,15 +39,11 @@ export async function PATCH(
 
     const body = await request.json();
 
-    const alt =
-      typeof body.alt === "string"
-        ? body.alt.trim()
-        : "";
-
-    const caption =
-      typeof body.caption === "string"
-        ? body.caption.trim()
-        : "";
+    const title = normalizeOptionalString(body.title);
+    const alt = normalizeOptionalString(body.alt);
+    const caption = normalizeOptionalString(body.caption);
+    const credit = normalizeOptionalString(body.credit);
+    const copyright = normalizeOptionalString(body.copyright);
 
     const media = await prisma.media.findUnique({
       where: {
@@ -55,8 +63,11 @@ export async function PATCH(
         id: mediaId,
       },
       data: {
+        title,
         alt,
         caption,
+        credit,
+        copyright,
       },
     });
 

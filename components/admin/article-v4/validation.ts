@@ -136,13 +136,16 @@ export function validateArticleDraft(
       });
     }
 
-    if (!image) {
-      errors.push({
-        field: "image",
-        message:
-          "Une image de couverture est obligatoire pour publier.",
-      });
-    }
+    if (
+  draft.contentType !== "video" &&
+  !image
+) {
+  errors.push({
+    field: "image",
+    message:
+      "Une image de couverture est obligatoire pour publier.",
+  });
+}
 
     if (
       draft.contentType === "video" &&

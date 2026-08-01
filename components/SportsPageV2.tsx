@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
@@ -24,14 +24,16 @@ export default async function SportsPageV2() {
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
           <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
-            <Image
-              src={featured.image}
-              alt={featured.title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
+            {featured.image ? (
+              <SafeImage
+                src={featured.image}
+                alt={featured.title}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
+              />
+            ) : null}
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
@@ -66,15 +68,17 @@ export default async function SportsPageV2() {
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
-                    <Image
-                      src={mainArticle.image}
-                      alt={mainArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 66vw"
-                      className="object-cover"
-                    />
-                  </div>
+                  {mainArticle.image ? (
+                    <div className="relative h-[420px]">
+                      <SafeImage
+                        src={mainArticle.image}
+                        alt={mainArticle.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 66vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
 
                   <div className="p-6">
                     <h2 className="font-serif text-3xl">
@@ -127,15 +131,17 @@ export default async function SportsPageV2() {
                     className="block"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
-                        <Image
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
+                      {bottomCard.image ? (
+                        <div className="relative h-64">
+                          <SafeImage
+                            src={bottomCard.image}
+                            alt={bottomCard.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : null}
 
                       <div className="p-5">
                         <h2 className="font-serif text-2xl">
@@ -156,15 +162,17 @@ export default async function SportsPageV2() {
                     className="block"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
-                        <Image
-                          src={secondBottomCard.image}
-                          alt={secondBottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
+                      {secondBottomCard.image ? (
+                        <div className="relative h-64">
+                          <SafeImage
+                            src={secondBottomCard.image}
+                            alt={secondBottomCard.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : null}
 
                       <div className="p-5">
                         <h2 className="font-serif text-2xl">
@@ -193,15 +201,17 @@ export default async function SportsPageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
-                    <Image
-                      src={questionArticle.image}
-                      alt={questionArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                  {questionArticle.image ? (
+                    <div className="relative h-40">
+                      <SafeImage
+                        src={questionArticle.image}
+                        alt={questionArticle.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
 
                   <div className="p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
@@ -233,15 +243,17 @@ export default async function SportsPageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
-                    <Image
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                  {article.image ? (
+                    <div className="relative h-40">
+                      <SafeImage
+                        src={article.image}
+                        alt={article.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
 
                   <div className="p-4">
                     <h3 className="font-serif text-lg leading-snug">

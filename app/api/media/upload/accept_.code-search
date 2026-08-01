@@ -1,0 +1,9 @@
+# Query: accept=
+# ContextLines: 1
+
+1 result - 1 file
+
+components/admin/MediaUploadButton.tsx:
+  85          type="file"
+  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+  87          onChange={handleFileChange}

@@ -30,7 +30,7 @@ export interface AssignPublicationResult {
 export async function assignPublicationToZone(
   options: AssignPublicationOptions
 ): Promise<AssignPublicationResult> {
-  const { articleId, pageKey, zone } = options;
+  const { articleId } = options;
 
   // Vérification de l'existence de l'article
 

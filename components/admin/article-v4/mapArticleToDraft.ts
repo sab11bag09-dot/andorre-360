@@ -4,7 +4,7 @@ import {
   type ArticleDraft,
   createArticleDraft,
 } from "./types";
-
+import type { EditorialStatus } from "@/lib/generated/prisma/client";
 type ArticleRecord = {
   id: number;
   slug: string;
@@ -21,6 +21,7 @@ type ArticleRecord = {
   socialText: string | null;
   featured: boolean;
   published: boolean;
+  editorialStatus: EditorialStatus;
 };
 
 type PublicationRecord = {
@@ -121,6 +122,8 @@ export function mapArticleToDraft(
 
     featured: article.featured,
     published: article.published,
+    editorialStatus:
+  article.editorialStatus,
 
     pageKey: publication?.pageKey ?? "home",
     zone: publication?.zone ?? "standard",

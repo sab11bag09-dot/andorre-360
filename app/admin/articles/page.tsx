@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import {
   Badge,
   Button,
@@ -11,6 +9,7 @@ import {
   StatCard,
 } from "@/components/admin/ui";
 
+import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
 import { prisma } from "@/lib/prisma";
 const ARTICLE_GRID_TEMPLATE =
   "minmax(0, 2fr) 150px 140px 100px 110px 120px";
@@ -24,7 +23,21 @@ function formatDate(date: Date) {
   }).format(date);
 }
 
-export default async function AdminArticlesPage() {
+type AdminArticlesPageProps = {
+  searchParams?: Promise<{
+    status?: string;
+  }>;
+};
+
+export default async function AdminArticlesPage({
+  searchParams,
+}: AdminArticlesPageProps) {
+  const params = await searchParams;
+
+  const activeStatus =
+    params?.status === "published" || params?.status === "draft"
+      ? params.status
+      : "all";
   const articles = await prisma.article.findMany({
     orderBy: {
       updatedAt: "desc",
@@ -38,6 +51,7 @@ export default async function AdminArticlesPage() {
       contentType: true,
       featured: true,
       published: true,
+      editorialStatus: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -52,10 +66,27 @@ export default async function AdminArticlesPage() {
   const featuredCount = articles.filter(
     (article) => article.featured,
   ).length;
+  const filteredArticles = articles.filter((article) => {
+  if (activeStatus === "published") {
+    return article.published;
+  }
+
+  if (activeStatus === "draft") {
+    return !article.published;
+  }
+
+  return true;
+});
+
+const sectionTitle =
+  activeStatus === "published"
+    ? "Articles publiés"
+    : activeStatus === "draft"
+      ? "Brouillons"
+      : "Tous les articles";
 
   return (
-    <main className="min-h-screen bg-black px-5 py-8 text-white sm:px-6 md:px-10 md:py-10">
-      <div className="mx-auto max-w-7xl">
+  <>
         <PageHeader
   backHref="/admin"
   backLabel="Retour au tableau de bord"
@@ -72,6 +103,7 @@ export default async function AdminArticlesPage() {
   title="Tous les articles"
   value={articles.length}
   description="Contenus enregistrés"
+  href="/admin/articles"
 />
 
 <StatCard
@@ -79,6 +111,7 @@ export default async function AdminArticlesPage() {
   value={publishedCount}
   description="Visibles sur le site"
   valueClassName="text-emerald-400"
+  href="/admin/articles?status=published"
 />
 
 <StatCard
@@ -86,6 +119,7 @@ export default async function AdminArticlesPage() {
   value={draftCount}
   description="En attente de publication"
   valueClassName="text-amber-400"
+  href="/admin/articles?status=draft"
 />
 
 <StatCard
@@ -98,8 +132,10 @@ export default async function AdminArticlesPage() {
         <section className="border-t border-zinc-800 py-8">
           <SectionHeader
   eyebrow="Gestion des contenus"
-  title="Tous les articles"
-  description={`${articles.length} article${articles.length > 1 ? "s" : ""}`}
+  title={sectionTitle}
+description={`${filteredArticles.length} article${
+  filteredArticles.length > 1 ? "s" : ""
+}`}
   actions={
     <Button
       href="/admin/articles/nouveau"
@@ -110,7 +146,7 @@ export default async function AdminArticlesPage() {
   }
 />
 
-          {articles.length === 0 ? (
+          {filteredArticles.length === 0 ? (
             <EmptyState
   title="Aucun article"
   description="Crée ton premier contenu pour commencer à alimenter le journal."
@@ -132,7 +168,7 @@ export default async function AdminArticlesPage() {
    { key: "actions", label: "Action", align: "right" },
   ]}
 >
-  {articles.map((article) => (
+  {filteredArticles.map((article) => (
     <DataTableRow
   key={article.id}
   className="py-5 transition hover:bg-zinc-900/70"
@@ -200,15 +236,9 @@ export default async function AdminArticlesPage() {
                         Statut
                       </p>
 
-                     {article.published ? (
-  <Badge variant="success">
-    Publié
-  </Badge>
-) : (
-  <Badge variant="warning">
-    Brouillon
-  </Badge>
-)}
+                                          <EditorialStatusBadge
+                        status={article.editorialStatus}
+                      />
                     </div>
 
                     <div className="flex gap-2 xl:justify-end">
@@ -224,7 +254,6 @@ export default async function AdminArticlesPage() {
             </DataTable>
           )}
         </section>
-      </div>
-    </main>
-  );
+        </>
+);
 }

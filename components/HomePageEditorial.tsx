@@ -1,4 +1,4 @@
-import Image from "next/image";
+import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getPublishedArticles } from "@/lib/articles";
@@ -118,7 +118,7 @@ export default async function HomePageEditorial() {
         className="block"
       >
         <section className="relative h-[68vh] min-h-[520px] overflow-hidden">
-          <Image
+          <SafeImage
             src={hero.image}
             alt={hero.title}
             fill
@@ -174,15 +174,17 @@ export default async function HomePageEditorial() {
                     </h2>
                   </div>
 
-                  <div className="relative mt-7 h-[520px] overflow-hidden md:h-[620px]">
-                    <Image
-                      src={feature.image}
-                      alt={feature.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 66vw"
-                      className="object-cover transition duration-500 group-hover:scale-[1.02]"
-                    />
-                  </div>
+                  {feature.image ? (
+  <div className="relative mt-7 h-[520px] overflow-hidden md:h-[620px]">
+    <SafeImage
+      src={feature.image}
+      alt={feature.title}
+      fill
+      sizes="(max-width: 1024px) 100vw, 66vw"
+      className="object-cover transition duration-500 group-hover:scale-[1.02]"
+    />
+  </div>
+) : null}
 
                   <div className="pt-6">
                     <p className="max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
@@ -265,15 +267,17 @@ export default async function HomePageEditorial() {
 
                       {/* Photo : deux colonnes à droite */}
 
-                      <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
-  <Image
-    src={grandFormat.image}
-    alt={grandFormat.title}
-    fill
-    sizes="(max-width: 768px) 100vw, 44vw"
-    className="object-cover transition duration-500 group-hover:scale-[1.02]"
-  />
-</div>
+                     {grandFormat.image ? (
+  <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
+    <SafeImage
+      src={grandFormat.image}
+      alt={grandFormat.title}
+      fill
+      sizes="(max-width: 768px) 100vw, 44vw"
+      className="object-cover transition duration-500 group-hover:scale-[1.02]"
+    />
+  </div>
+) : null}
                     </div>
                   </article>
                 </Link>
@@ -355,7 +359,7 @@ export default async function HomePageEditorial() {
       >
         <article className="grid grid-cols-[110px_1fr] gap-4">
           <div className="relative h-[110px] overflow-hidden">
-            <Image
+            <SafeImage
               src={article.image}
               alt={article.title}
               fill

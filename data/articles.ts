@@ -1,4 +1,4 @@
-import { enrichArticle } from "@/lib/utils";
+import {} from "@/lib/utils";
 import type { Article } from "@/types/article";
 export const articles: Article[] = [
 
