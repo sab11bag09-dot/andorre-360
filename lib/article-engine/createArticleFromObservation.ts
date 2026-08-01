@@ -15,7 +15,10 @@ export interface CreateArticleFromObservationDependencies {
     "findById" | "markProcessed"
   >;
 
-  articleRepository: ArticleRepository;
+    articleRepository: Pick<
+    ArticleRepository,
+    "createDraft" | "updateDraft"
+  >;
 
   editorialGenerator: Pick<
     EditorialGenerator,

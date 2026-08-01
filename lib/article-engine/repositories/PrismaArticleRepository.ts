@@ -2,12 +2,29 @@ import { prisma } from "@/lib/prisma";
 
 import type {
   ArticleDraftInput,
+  ArticleForTranslation,
   ArticleRepository,
 } from "./ArticleRepository";
 
 export class PrismaArticleRepository
   implements ArticleRepository
 {
+  async findById(
+    articleId: number,
+  ): Promise<ArticleForTranslation | null> {
+    return prisma.article.findUnique({
+      where: {
+        id: articleId,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        content: true,
+      },
+    });
+  }
+
   async createDraft(
     input: ArticleDraftInput,
   ): Promise<number> {
