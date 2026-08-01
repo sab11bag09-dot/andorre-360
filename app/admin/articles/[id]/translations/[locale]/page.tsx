@@ -18,6 +18,9 @@ import {
   Input,
   Textarea,
 } from "@/components/admin/ui";
+import {
+  isMultilingualPublicationEnabled,
+} from "@/lib/config/multilingualPublication";
 import { prisma } from "@/lib/prisma";
 
 function isTranslationLocale(
@@ -124,7 +127,11 @@ export default async function EditArticleTranslationPage({
   const canApprove =
     translation.status === "REVIEW";
 
+  const publicationEnabled =
+    isMultilingualPublicationEnabled();
+
   const canPublish =
+    publicationEnabled &&
     translation.status === "APPROVED";
 
   const canArchive =
@@ -375,6 +382,13 @@ export default async function EditArticleTranslationPage({
             {lockedMessage}
           </div>
         )}
+
+        {!publicationEnabled &&
+          translation.status === "APPROVED" && (
+            <div className="mb-6 rounded-xl border border-orange-900 bg-orange-950/40 p-4 text-sm text-orange-200">
+              La publication multilingue est désactivée par la configuration du déploiement.
+            </div>
+          )}
 
         <form
           action={updateArticleTranslationSlugAction.bind(

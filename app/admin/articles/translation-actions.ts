@@ -14,6 +14,9 @@ import {
   updateArticleTranslation,
   updateArticleTranslationSlug,
 } from "@/lib/article-engine/manageArticleTranslation";
+import {
+  assertMultilingualPublicationEnabled,
+} from "@/lib/config/multilingualPublication";
 
 function getTranslationPath(
   articleId: number,
@@ -219,6 +222,8 @@ export async function publishArticleTranslationAction(
     locale,
     "Traduction publiée.",
     async () => {
+      assertMultilingualPublicationEnabled();
+
       await publishArticleTranslation({
         articleId,
         locale,
