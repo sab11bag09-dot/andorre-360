@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { PrismaClient } from "@/lib/generated/prisma/client";
 
 import type {
   ArticleDraftInput,
@@ -9,10 +10,14 @@ import type {
 export class PrismaArticleRepository
   implements ArticleRepository
 {
+  constructor(
+    private readonly client: Pick<PrismaClient, "article"> = prisma,
+  ) {}
+
   async findById(
     articleId: number,
   ): Promise<ArticleForTranslation | null> {
-    return prisma.article.findUnique({
+    return this.client.article.findUnique({
       where: {
         id: articleId,
       },
@@ -28,7 +33,7 @@ export class PrismaArticleRepository
   async createDraft(
     input: ArticleDraftInput,
   ): Promise<number> {
-    const article = await prisma.article.create({
+    const article = await this.client.article.create({
       data: {
         slug: crypto.randomUUID(),
         title: input.title,
@@ -53,7 +58,7 @@ export class PrismaArticleRepository
     articleId: number,
     input: ArticleDraftInput,
   ): Promise<void> {
-    const result = await prisma.article.updateMany({
+    const result = await this.client.article.updateMany({
       where: {
         id: articleId,
         published: false,

@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## ANDORRE 360
+
+La procédure de préparation, de déploiement progressif et de retour arrière du
+pipeline éditorial multilingue se trouve dans
+[`docs/11-multilingual-deployment.md`](docs/11-multilingual-deployment.md).
+
+Copier `.env.example` vers `.env` pour le développement, puis remplacer les
+valeurs factices sans jamais commiter le fichier `.env`.
+
 ## Getting Started
 
 First, run the development server:

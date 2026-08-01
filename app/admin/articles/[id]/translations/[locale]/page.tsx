@@ -4,17 +4,23 @@ import {
   approveArticleTranslationAction,
   archiveArticleTranslationAction,
   publishArticleTranslationAction,
+  returnApprovedTranslationToReviewAction,
   returnArticleTranslationToDraftAction,
   submitArticleTranslationForReviewAction,
   updateArticleTranslationAction,
+  updateArticleTranslationSlugAction,
 } from "@/app/admin/articles/translation-actions";
 import ConfirmTranslationActionButton from "@/components/admin/article/ConfirmTranslationActionButton";
 import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
+import TranslationSubmitButton from "@/components/admin/article/TranslationSubmitButton";
 import {
   Button,
   Input,
   Textarea,
 } from "@/components/admin/ui";
+import {
+  isMultilingualPublicationEnabled,
+} from "@/lib/config/multilingualPublication";
 import { prisma } from "@/lib/prisma";
 
 function isTranslationLocale(
@@ -26,18 +32,41 @@ function isTranslationLocale(
   );
 }
 
+function getSearchMessage(
+  value: string | string[] | undefined,
+): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function formatWorkflowDate(value: Date | null): string {
+  return value
+    ? value.toLocaleString("fr-FR", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "Non renseignée";
+}
+
 export default async function EditArticleTranslationPage({
   params,
+  searchParams,
 }: {
   params: Promise<{
     id: string;
     locale: string;
+  }>;
+  searchParams: Promise<{
+    success?: string | string[];
+    error?: string | string[];
   }>;
 }) {
   const {
     id,
     locale,
   } = await params;
+  const feedback = await searchParams;
+  const successMessage = getSearchMessage(feedback.success);
+  const errorMessage = getSearchMessage(feedback.error);
 
   const articleId = Number(id);
 
@@ -62,6 +91,17 @@ export default async function EditArticleTranslationPage({
           select: {
             id: true,
             title: true,
+            translations: {
+              where: {
+                locale: {
+                  in: ["CA", "ES"],
+                },
+              },
+              select: {
+                locale: true,
+                status: true,
+              },
+            },
           },
         },
       },
@@ -81,14 +121,25 @@ export default async function EditArticleTranslationPage({
   const canReturnToDraft =
     translation.status === "REVIEW";
 
+  const canReturnToReview =
+    translation.status === "APPROVED";
+
   const canApprove =
     translation.status === "REVIEW";
 
+  const publicationEnabled =
+    isMultilingualPublicationEnabled();
+
   const canPublish =
+    publicationEnabled &&
     translation.status === "APPROVED";
 
   const canArchive =
     translation.status === "PUBLISHED";
+
+  const canEditSlug =
+    translation.publishedAt === null &&
+    translation.status !== "ARCHIVED";
 
   const lockedMessage =
     translation.status === "REVIEW"
@@ -105,6 +156,24 @@ export default async function EditArticleTranslationPage({
     locale === "CA"
       ? "Catalan"
       : "Espagnol";
+
+  const workflowDates: Array<{
+    label: string;
+    value: Date | null;
+  }> = [
+    {
+      label: "Générée",
+      value: translation.generatedAt,
+    },
+    {
+      label: "Approuvée",
+      value: translation.approvedAt,
+    },
+    {
+      label: "Publiée",
+      value: translation.publishedAt,
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-zinc-950 p-6 text-white md:p-10">
@@ -126,13 +195,91 @@ export default async function EditArticleTranslationPage({
             </div>
           </div>
 
+          <div className="flex flex-wrap gap-3">
+            <Button
+              href={`/admin/articles/${articleId}/translations/${locale}/preview`}
+              variant="outline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Aperçu
+            </Button>
+            <Button
+              href={`/admin/articles/${articleId}`}
+              variant="secondary"
+            >
+              Retour à l’article
+            </Button>
+          </div>
+        </div>
+
+        <nav
+          className="mb-6 flex flex-wrap items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-4"
+          aria-label="Versions linguistiques"
+        >
+          <span className="text-sm font-semibold text-zinc-400">
+            Versions :
+          </span>
           <Button
             href={`/admin/articles/${articleId}`}
-            variant="secondary"
+            variant="outline"
           >
-            Retour à l’article
+            Français
           </Button>
-        </div>
+          {translation.article.translations.map((version) => (
+            <Button
+              key={version.locale}
+              href={
+                `/admin/articles/${articleId}/translations/${version.locale}`
+              }
+              variant={
+                version.locale === locale
+                  ? "primary"
+                  : "outline"
+              }
+            >
+              {version.locale === "CA"
+                ? "Catalan"
+                : "Espagnol"}
+              {" · "}
+              {version.status}
+            </Button>
+          ))}
+        </nav>
+
+        {successMessage && (
+          <div
+            role="status"
+            className="mb-6 rounded-xl border border-emerald-800 bg-emerald-950/50 p-4 text-sm text-emerald-200"
+          >
+            {successMessage}
+          </div>
+        )}
+
+        {errorMessage && (
+          <div
+            role="alert"
+            className="mb-6 rounded-xl border border-red-800 bg-red-950/50 p-4 text-sm text-red-200"
+          >
+            {errorMessage}
+          </div>
+        )}
+
+        <section className="mb-6 grid gap-3 sm:grid-cols-3">
+          {workflowDates.map(({ label, value }) => (
+            <div
+              key={label}
+              className="rounded-xl border border-zinc-800 bg-zinc-900 p-4"
+            >
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                {label}
+              </p>
+              <p className="mt-2 text-sm text-zinc-200">
+                {formatWorkflowDate(value)}
+              </p>
+            </div>
+          ))}
+        </section>
 
         <section className="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
           <h2 className="mb-4 text-lg font-semibold">
@@ -148,12 +295,10 @@ export default async function EditArticleTranslationPage({
                   locale,
                 )}
               >
-                <Button
-                  type="submit"
+                <TranslationSubmitButton
+                  label="Envoyer en relecture"
                   variant="outline"
-                >
-                  Envoyer en relecture
-                </Button>
+                />
               </form>
             )}
 
@@ -165,12 +310,25 @@ export default async function EditArticleTranslationPage({
                   locale,
                 )}
               >
-                <Button
-                  type="submit"
+                <TranslationSubmitButton
+                  label="Revenir au brouillon"
                   variant="outline"
-                >
-                  Revenir au brouillon
-                </Button>
+                />
+              </form>
+            )}
+
+            {canReturnToReview && (
+              <form
+                action={returnApprovedTranslationToReviewAction.bind(
+                  null,
+                  articleId,
+                  locale,
+                )}
+              >
+                <TranslationSubmitButton
+                  label="Renvoyer en relecture"
+                  variant="outline"
+                />
               </form>
             )}
 
@@ -182,9 +340,7 @@ export default async function EditArticleTranslationPage({
                   locale,
                 )}
               >
-                <Button type="submit">
-                  Approuver
-                </Button>
+                <TranslationSubmitButton label="Approuver" />
               </form>
             )}
 
@@ -226,6 +382,45 @@ export default async function EditArticleTranslationPage({
             {lockedMessage}
           </div>
         )}
+
+        {!publicationEnabled &&
+          translation.status === "APPROVED" && (
+            <div className="mb-6 rounded-xl border border-orange-900 bg-orange-950/40 p-4 text-sm text-orange-200">
+              La publication multilingue est désactivée par la configuration du déploiement.
+            </div>
+          )}
+
+        <form
+          action={updateArticleTranslationSlugAction.bind(
+            null,
+            articleId,
+            locale,
+          )}
+          className="mb-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-5"
+        >
+          <label className="block text-sm font-semibold text-zinc-300">
+            Slug public
+            <Input
+              name="slug"
+              defaultValue={translation.slug}
+              disabled={!canEditSlug}
+              required
+            />
+            <span className="mt-2 block text-xs font-normal text-zinc-500">
+              Normalisé automatiquement. URL actuelle :{" "}
+              {`/${locale.toLowerCase()}/article/${translation.slug}`}
+            </span>
+          </label>
+
+          {canEditSlug && (
+            <div className="flex justify-end">
+              <TranslationSubmitButton
+                label="Enregistrer le slug"
+                variant="outline"
+              />
+            </div>
+          )}
+        </form>
 
         <form
           action={updateArticleTranslationAction.bind(
@@ -271,9 +466,9 @@ export default async function EditArticleTranslationPage({
 
           {canEdit && (
             <div className="flex justify-end">
-              <Button type="submit">
-                Enregistrer les corrections
-              </Button>
+              <TranslationSubmitButton
+                label="Enregistrer les corrections"
+              />
             </div>
           )}
         </form>
