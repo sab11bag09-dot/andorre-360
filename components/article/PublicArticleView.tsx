@@ -16,6 +16,7 @@ export interface PublicArticleViewData {
 type Props = {
   article: PublicArticleViewData;
   dateLocale: "ca-ES" | "es-ES" | "fr-FR";
+  contentLanguage: "ca" | "es" | "fr";
 };
 
 function getVideoEmbedUrl(url: string) {
@@ -86,13 +87,17 @@ function isUploadedVideo(url: string) {
 export default function PublicArticleView({
   article,
   dateLocale,
+  contentLanguage,
 }: Props) {
   const videoEmbedUrl = article.videoUrl
     ? getVideoEmbedUrl(article.videoUrl)
     : null;
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main
+      lang={contentLanguage}
+      className="min-h-screen bg-black text-white"
+    >
       {article.image ? (
         <div className="relative h-[500px] w-full">
           <SafeImage

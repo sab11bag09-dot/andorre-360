@@ -5,6 +5,8 @@ export interface PublicArticleTranslation {
   locale: ContentLocale;
   title: string;
   description: string;
+  seoTitle: string | null;
+  seoDescription: string | null;
   content: string;
   slug: string;
   publishedAt: Date;
