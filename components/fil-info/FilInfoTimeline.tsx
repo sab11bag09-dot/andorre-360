@@ -5,6 +5,7 @@ import {
   normalizeFilInfoFormat,
   type FilInfoFormat,
 } from "@/lib/fil-info-format";
+import { getFilInfoArticlePath, type PublicFilInfoLocale } from "@/lib/fil-info-locale";
 
 export type FilInfoTimelineEntry = {
   id: number;
@@ -15,16 +16,23 @@ export type FilInfoTimelineEntry = {
   publicationDate: Date;
 };
 
-function formatHour(value: Date) {
-  return new Intl.DateTimeFormat("fr-FR", {
+const localeNames = { fr: "fr-FR", ca: "ca-ES", es: "es-ES" } as const;
+const copy = {
+  fr: { latest: "Dernières publications", title: "Fil Info", empty: "Le fil se remplira avec les prochaines publications de la rubrique Actualité." },
+  ca: { latest: "Últimes publicacions", title: "Fil informatiu", empty: "El fil s’omplirà amb les pròximes publicacions d’Actualitat." },
+  es: { latest: "Últimas publicaciones", title: "Hilo informativo", empty: "El hilo se completará con las próximas publicaciones de Actualidad." },
+} as const;
+
+function formatHour(value: Date, locale: PublicFilInfoLocale) {
+  return new Intl.DateTimeFormat(localeNames[locale], {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: "Europe/Andorra",
   }).format(value);
 }
 
-function formatDate(value: Date) {
-  return new Intl.DateTimeFormat("fr-FR", {
+function formatDate(value: Date, locale: PublicFilInfoLocale) {
+  return new Intl.DateTimeFormat(localeNames[locale], {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -43,8 +51,10 @@ function getDateKey(value: Date) {
 
 export default function FilInfoTimeline({
   entries,
+  locale = "fr",
 }: {
   entries: readonly FilInfoTimelineEntry[];
+  locale?: PublicFilInfoLocale;
 }) {
   return (
     <section
@@ -54,7 +64,7 @@ export default function FilInfoTimeline({
       <header className="border-b border-gray-800">
         <div className="bg-yellow-500 px-5 py-3 text-black sm:px-7">
           <p className="text-[10px] font-black uppercase tracking-[0.3em]">
-            Dernières publications
+            {copy[locale].latest}
           </p>
         </div>
 
@@ -64,7 +74,7 @@ export default function FilInfoTimeline({
               id="fil-info-timeline-title"
               className="font-serif text-4xl leading-none sm:text-5xl"
             >
-              Fil Info
+              {copy[locale].title}
             </h2>
           </div>
 
@@ -88,11 +98,11 @@ export default function FilInfoTimeline({
               <li key={entry.id}>
                 {startsNewDay && (
                   <h3 className="border-b border-gray-800 bg-black/70 px-5 py-3 text-[10px] font-bold capitalize tracking-[0.18em] text-gray-500 sm:px-7">
-                    {formatDate(entry.publicationDate)}
+                    {formatDate(entry.publicationDate, locale)}
                   </h3>
                 )}
                 <Link
-                  href={`/article/${entry.slug}`}
+                  href={getFilInfoArticlePath(locale, entry.slug)}
                   className={`group grid grid-cols-[64px_1fr] gap-4 px-5 py-5 transition-colors duration-300 motion-reduce:transition-none sm:grid-cols-[76px_1fr] sm:px-7 sm:py-6 ${
                     isAlert
                       ? "bg-yellow-500 text-black hover:bg-yellow-400"
@@ -105,7 +115,7 @@ export default function FilInfoTimeline({
                       isAlert ? "text-black" : "text-yellow-500"
                     }`}
                   >
-                    {formatHour(entry.publicationDate)}
+                    {formatHour(entry.publicationDate, locale)}
                   </time>
 
                   <div
@@ -127,7 +137,7 @@ export default function FilInfoTimeline({
                         isAlert ? "text-black/65" : "text-gray-600"
                       }`}
                     >
-                      {getFilInfoFormatLabel(format)} · {String(index + 1).padStart(2, "0")}
+                      {getFilInfoFormatLabel(format, locale)} · {String(index + 1).padStart(2, "0")}
                     </p>
 
                     <h4
@@ -153,8 +163,7 @@ export default function FilInfoTimeline({
         </ol>
       ) : (
         <p className="px-5 py-8 text-sm leading-7 text-gray-500 sm:px-7">
-          Le fil se remplira avec les prochaines publications de la rubrique
-          Actualité.
+          {copy[locale].empty}
         </p>
       )}
     </section>
