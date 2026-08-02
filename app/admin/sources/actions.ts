@@ -10,6 +10,7 @@ import {
   SourcePublicationMode,
   SourceTrustLevel,
 } from "@/lib/generated/prisma/client";
+import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import { checkSource } from "@/lib/source-engine/checkSource";
 import {
@@ -206,6 +207,8 @@ function revalidateSourcePages(sourceId?: number): void {
 export async function createSource(
   formData: FormData,
 ): Promise<void> {
+  await requireAdmin();
+
   const data = readSourceForm(formData);
 
   const existingSource = await prisma.source.findUnique({
@@ -245,6 +248,8 @@ export async function updateSource(
   sourceId: number,
   formData: FormData,
 ): Promise<void> {
+  await requireAdmin();
+
   validateSourceId(sourceId);
 
   const data = readSourceForm(formData);
@@ -298,6 +303,8 @@ export async function updateSource(
 export async function toggleSource(
   sourceId: number,
 ): Promise<void> {
+  await requireAdmin();
+
   validateSourceId(sourceId);
 
   const source = await prisma.source.findUnique({
@@ -328,16 +335,20 @@ export async function toggleSource(
 export async function checkSourceAvailability(
   sourceId: number,
 ): Promise<void> {
+  await requireAdmin();
+
   validateSourceId(sourceId);
 
   await checkSource(sourceId);
 
   revalidateSourcePages(sourceId);
-  
+
 }
 export async function collectSourceNow(
   sourceId: number,
 ): Promise<void> {
+  await requireAdmin();
+
   validateSourceId(sourceId);
 
   await collectSource(sourceId);

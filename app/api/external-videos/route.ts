@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import { ExternalVideoProvider } from "@/lib/generated/prisma/enums";
 
@@ -54,6 +55,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   try {
     const body = await request.json();
     const url = typeof body.url === "string" ? body.url.trim() : "";

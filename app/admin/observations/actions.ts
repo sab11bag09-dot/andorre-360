@@ -3,11 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { createArticleFromObservation } from "@/lib/article-engine/createArticleFromObservation";
 
 export async function createArticleFromObservationAction(
   observationId: number,
 ) {
+  await requireAdmin();
+
   const { articleId } =
     await createArticleFromObservation(observationId);
 

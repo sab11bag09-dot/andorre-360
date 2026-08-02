@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -15,6 +16,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   const body = await request.json();
 
   const name = body.name?.trim();

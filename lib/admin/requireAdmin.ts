@@ -1,17 +1,37 @@
+import { NextResponse } from "next/server";
+
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function requireAdmin(): Promise<void> {
+export type AdminAuthorizationResult =
+  | { authorized: true; email: string }
+  | { authorized: false; status: 401 | 403; message: string };
+
+export class AdminAuthorizationError extends Error {
+  readonly status: 401 | 403;
+
+  constructor(status: 401 | 403, message: string) {
+    super(message);
+    this.name = "AdminAuthorizationError";
+    this.status = status;
+  }
+}
+
+export async function getAdminAuthorization(): Promise<AdminAuthorizationResult> {
   const session = await auth();
-  const email = session?.user?.email;
+  const email = session?.user?.email?.trim().toLowerCase();
 
   if (!email) {
-    throw new Error("Action administrateur non autorisée.");
+    return {
+      authorized: false,
+      status: 401,
+      message: "Authentification requise.",
+    };
   }
 
   const user = await prisma.user.findUnique({
     where: {
-      email: email.toLowerCase(),
+      email,
     },
     select: {
       role: true,
@@ -20,6 +40,36 @@ export async function requireAdmin(): Promise<void> {
   });
 
   if (!user || !user.active || user.role !== "ADMIN") {
-    throw new Error("Action administrateur non autorisée.");
+    return {
+      authorized: false,
+      status: 403,
+      message: "Accès administrateur requis.",
+    };
   }
+
+  return { authorized: true, email };
+}
+
+export async function requireAdmin(): Promise<void> {
+  const authorization = await getAdminAuthorization();
+
+  if (!authorization.authorized) {
+    throw new AdminAuthorizationError(
+      authorization.status,
+      authorization.message,
+    );
+  }
+}
+
+export async function requireAdminApi() {
+  const authorization = await getAdminAuthorization();
+
+  if (!authorization.authorized) {
+    return NextResponse.json(
+      { error: authorization.message },
+      { status: authorization.status },
+    );
+  }
+
+  return null;
 }
