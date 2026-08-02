@@ -2,7 +2,9 @@
 
 Date de cadrage : 2 août 2026
 
-Statut : proposition de mise en œuvre
+Statut : lots 1 à 7 livrés ; lot 8 consacré à la validation et à la documentation
+
+Référence d’exploitation : `docs/14-fil-info-workflow.md`
 
 ## Objet
 
