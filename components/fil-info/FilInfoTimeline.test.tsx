@@ -12,12 +12,16 @@ describe("FilInfoTimeline", () => {
             id: 1,
             slug: "information-recente",
             title: "Information récente",
+            description: "Description de l’article.",
+            filInfoFormat: "ARTICLE",
             publicationDate: new Date("2026-08-02T10:30:00.000Z"),
           },
           {
             id: 2,
             slug: "information-precedente",
             title: "Information précédente",
+            description: "Description de la brève.",
+            filInfoFormat: "BRIEF",
             publicationDate: new Date("2026-08-02T09:15:00.000Z"),
           },
         ]}
@@ -29,7 +33,30 @@ describe("FilInfoTimeline", () => {
     );
     expect(html).toContain('href="/article/information-recente"');
     expect(html).toContain('dateTime="2026-08-02T10:30:00.000Z"');
+    expect(html).toContain("Article · 01");
+    expect(html).toContain("Brève · 02");
+    expect(html).toContain("Description de la brève.");
     expect(html).not.toContain("Mise à jour continue");
+  });
+
+  it("met une alerte en évidence", () => {
+    const html = renderToStaticMarkup(
+      <FilInfoTimeline
+        entries={[
+          {
+            id: 1,
+            slug: "alerte-meteo",
+            title: "Alerte météo",
+            description: "",
+            filInfoFormat: "ALERT",
+            publicationDate: new Date("2026-08-02T11:00:00.000Z"),
+          },
+        ]}
+      />,
+    );
+
+    expect(html).toContain("Alerte · 01");
+    expect(html).toContain("bg-yellow-500 text-black");
   });
 
   it("rend un état vide explicite", () => {

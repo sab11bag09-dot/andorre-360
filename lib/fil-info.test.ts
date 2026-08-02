@@ -7,20 +7,46 @@ import {
 } from "./fil-info";
 
 describe("partitionFilInfoArticles", () => {
-  it("réserve les informations les plus récentes au fil", () => {
-    const result = partitionFilInfoArticles([1, 2, 3, 4]);
+  const makeItem = (
+    id: number,
+    filInfoFormat = "ARTICLE",
+    featured = false,
+  ) => ({ id, filInfoFormat, featured });
 
-    expect(result.featured).toBe(1);
-    expect(result.newsFeed).toEqual([2, 3, 4]);
+  it("conserve les alertes récentes dans le fil", () => {
+    const alert = makeItem(1, "ALERT");
+    const article = makeItem(2);
+    const brief = makeItem(3, "BRIEF");
+    const result = partitionFilInfoArticles([
+      alert,
+      article,
+      brief,
+    ]);
+
+    expect(result.featured).toBe(article);
+    expect(result.newsFeed).toEqual([alert, brief]);
     expect(result.briefs).toEqual([]);
     expect(result.cards).toEqual([]);
     expect(result.illustratedBriefs).toEqual([]);
   });
 
+  it("privilégie l’article explicitement sélectionné", () => {
+    const items = [
+      makeItem(1),
+      makeItem(2),
+      makeItem(3, "ARTICLE", true),
+    ];
+
+    const result = partitionFilInfoArticles(items);
+
+    expect(result.featured).toBe(items[2]);
+    expect(result.newsFeed).toEqual(items.slice(0, 2));
+  });
+
   it("ne place aucun article dans plusieurs blocs", () => {
     const items = Array.from(
       { length: FIL_INFO_QUERY_LIMIT },
-      (_, index) => index + 1,
+      (_, index) => makeItem(index + 1),
     );
     const result = partitionFilInfoArticles(items);
     const partitionedItems = [
@@ -29,9 +55,11 @@ describe("partitionFilInfoArticles", () => {
       ...result.briefs,
       ...result.cards,
       ...result.illustratedBriefs,
-    ].filter((item): item is number => item !== null);
+    ].filter((item): item is ReturnType<typeof makeItem> => item !== null);
 
-    expect(partitionedItems).toEqual(items);
+    expect(
+      partitionedItems.map((item) => item.id).sort((a, b) => a - b),
+    ).toEqual(items.map((item) => item.id));
     expect(new Set(partitionedItems).size).toBe(items.length);
   });
 

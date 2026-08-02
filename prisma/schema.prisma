@@ -70,6 +70,7 @@ model Article {
   author          String
   readingTime     String
   contentType     String             @default("article")
+  filInfoFormat   FilInfoFormat      @default(ARTICLE)
   videoUrl        String?
   videoDuration   String?
   socialText      String?
@@ -86,6 +87,7 @@ model Article {
   translations ArticleTranslation[]
 
   @@index([category, published, publishedAt])
+  @@index([filInfoFormat])
 }
 
 enum EditorialStatus {
@@ -101,6 +103,12 @@ enum ContentLocale {
   FR
   CA
   ES
+}
+
+enum FilInfoFormat {
+  ALERT
+  BRIEF
+  ARTICLE
 }
 
 model ArticleTranslation {

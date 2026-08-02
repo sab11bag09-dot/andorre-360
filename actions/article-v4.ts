@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
+import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
 
 import {
   type ArticleDraft,
@@ -88,6 +89,7 @@ function normalizeDraft(
     ),
 
     image: cleanRequiredValue(draft.image),
+    filInfoFormat: normalizeFilInfoFormat(draft.filInfoFormat),
 
     videoUrl: cleanRequiredValue(
       draft.videoUrl
@@ -181,6 +183,7 @@ function revalidateArticlePages(
   );
 
   revalidatePath("/actualite");
+  revalidatePath("/fil-info");
   revalidatePath("/economie");
   revalidatePath("/societe");
   revalidatePath("/culture");
@@ -244,6 +247,8 @@ if (shouldPublish) {
 
               contentType:
                 draft.contentType,
+              filInfoFormat:
+                draft.filInfoFormat,
 
               videoUrl:
                 cleanOptionalValue(
@@ -364,6 +369,7 @@ async function updateArticle(
   slug: true,
   image: true,
   editorialStatus: true,
+  publishedAt: true,
 },
     });
 
@@ -422,6 +428,8 @@ async function updateArticle(
 
               contentType:
                 draft.contentType,
+              filInfoFormat:
+                draft.filInfoFormat,
 
               videoUrl:
                 cleanOptionalValue(
@@ -443,6 +451,9 @@ async function updateArticle(
 
               published:
                 shouldPublish,
+              publishedAt: shouldPublish
+                ? existingArticle.publishedAt ?? new Date()
+                : existingArticle.publishedAt,
                 editorialStatus: shouldPublish
   ? "PUBLISHED"
   : existingArticle.editorialStatus ===

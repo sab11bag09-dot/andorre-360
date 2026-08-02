@@ -27,6 +27,7 @@ export function makeArticle(
     author: "ANDORRE 360",
     readingTime: "3 min",
     contentType: "article",
+    filInfoFormat: "ARTICLE",
     videoUrl: null,
     videoDuration: null,
     socialText: null,

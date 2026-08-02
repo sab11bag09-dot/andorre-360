@@ -1,9 +1,11 @@
 "use client";
 
 import { SectionHeader } from "@/components/admin/ui";
+import { getFilInfoFormatLabel } from "@/lib/fil-info-format";
 
 type Props = {
   contentType: string;
+  filInfoFormat?: string;
   slug: string;
   wordCount: number;
   readingTime: number;
@@ -16,6 +18,7 @@ type Props = {
 
 export default function ArticleSidebar({
   contentType,
+  filInfoFormat = "ARTICLE",
   slug,
   wordCount,
   readingTime,
@@ -40,6 +43,16 @@ export default function ArticleSidebar({
 
             <dd className="text-right text-sm font-semibold capitalize text-white">
               {contentType}
+            </dd>
+          </div>
+
+          <div className="flex justify-between gap-4 py-4">
+            <dt className="text-sm text-zinc-500">
+              Fil info
+            </dt>
+
+            <dd className="text-right text-sm font-semibold text-white">
+              {getFilInfoFormatLabel(filInfoFormat)}
             </dd>
           </div>
 

@@ -13,6 +13,10 @@ import {
   Select,
 } from "@/components/admin/ui";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
+import {
+  FIL_INFO_FORMATS,
+  normalizeFilInfoFormat,
+} from "@/lib/fil-info-format";
 
 import { submitArticle } from "./submitArticle";
 import {
@@ -299,38 +303,73 @@ export default function ArticleEditor({
               </h2>
             </div>
 
-            <div className="mt-6">
-              <label
-                htmlFor="contentType"
-                className="mb-2 block font-semibold text-zinc-200"
-              >
-                Format éditorial
-              </label>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              <div>
+                <label
+                  htmlFor="contentType"
+                  className="mb-2 block font-semibold text-zinc-200"
+                >
+                  Format du contenu
+                </label>
 
-              <Select
-                id="contentType"
-                value={draft.contentType}
-                onChange={(event) =>
-                  updateField(
-                    "contentType",
-                    event.target
-                      .value as ArticleContentType,
-                  )
-                }
-                disabled={isSaving}
-                className="mt-0"
-              >
-                {CONTENT_TYPES.map(
-                  (contentType) => (
+                <Select
+                  id="contentType"
+                  value={draft.contentType}
+                  onChange={(event) =>
+                    updateField(
+                      "contentType",
+                      event.target.value as ArticleContentType,
+                    )
+                  }
+                  disabled={isSaving}
+                  className="mt-0"
+                >
+                  {CONTENT_TYPES.map((contentType) => (
                     <option
                       key={contentType.value}
                       value={contentType.value}
                     >
                       {contentType.label}
                     </option>
-                  ),
-                )}
-              </Select>
+                  ))}
+                </Select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="filInfoFormat"
+                  className="mb-2 block font-semibold text-zinc-200"
+                >
+                  Format dans le Fil info
+                </label>
+
+                <Select
+                  id="filInfoFormat"
+                  value={draft.filInfoFormat}
+                  onChange={(event) =>
+                    updateField(
+                      "filInfoFormat",
+                      normalizeFilInfoFormat(event.target.value),
+                    )
+                  }
+                  disabled={isSaving}
+                  className="mt-0"
+                >
+                  {FIL_INFO_FORMATS.map((format) => (
+                    <option key={format.value} value={format.value}>
+                      {format.label}
+                    </option>
+                  ))}
+                </Select>
+
+                <p className="mt-2 text-xs leading-5 text-zinc-500">
+                  {
+                    FIL_INFO_FORMATS.find(
+                      (format) => format.value === draft.filInfoFormat,
+                    )?.description
+                  }
+                </p>
+              </div>
             </div>
           </section>
 
@@ -446,6 +485,7 @@ export default function ArticleEditor({
 
           <ArticleSidebar
             contentType={draft.contentType}
+            filInfoFormat={draft.filInfoFormat}
             slug={draft.slug}
             wordCount={wordCount}
             readingTime={readingTime}

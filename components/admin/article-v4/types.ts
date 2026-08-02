@@ -1,4 +1,5 @@
 import type { EditorialStatus } from "@/lib/generated/prisma/client";
+import type { FilInfoFormat } from "@/lib/fil-info-format";
 export type ArticleEditorMode = "create" | "update";
 
 export type ArticleSubmissionIntent =
@@ -34,6 +35,7 @@ export type ArticleDraft = {
   image: string;
 
   contentType: ArticleContentType;
+  filInfoFormat: FilInfoFormat;
 
   videoUrl: string;
   videoDuration: string;
@@ -123,6 +125,7 @@ export const EMPTY_ARTICLE_DRAFT: ArticleDraft = {
   image: "",
 
   contentType: "article",
+  filInfoFormat: "ARTICLE",
 
   videoUrl: "",
   videoDuration: "",

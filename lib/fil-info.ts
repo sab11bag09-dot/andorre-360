@@ -1,3 +1,5 @@
+import { normalizeFilInfoFormat } from "./fil-info-format";
+
 export const FIL_INFO_NEWS_FEED_SIZE = 6;
 export const FIL_INFO_BRIEFS_SIZE = 6;
 export const FIL_INFO_CARDS_SIZE = 4;
@@ -10,31 +12,52 @@ export const FIL_INFO_QUERY_LIMIT =
   FIL_INFO_CARDS_SIZE +
   FIL_INFO_ILLUSTRATED_BRIEFS_SIZE;
 
-export function partitionFilInfoArticles<T>(items: readonly T[]) {
+type FilInfoPartitionArticle = {
+  featured: boolean;
+  filInfoFormat: string;
+};
+
+export function partitionFilInfoArticles<T extends FilInfoPartitionArticle>(
+  items: readonly T[],
+) {
+  const explicitSelectionIndex = items.findIndex(
+    (item) =>
+      item.featured &&
+      normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
+  );
+  const selectionIndex =
+    explicitSelectionIndex >= 0
+      ? explicitSelectionIndex
+      : items.findIndex(
+          (item) =>
+            normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
+        );
+  const featured =
+    selectionIndex >= 0 ? items[selectionIndex] : null;
+  const remainingItems = items.filter(
+    (_, index) => index !== selectionIndex,
+  );
   let cursor = 0;
 
-  const featured = items[cursor] ?? null;
-  cursor += featured ? 1 : 0;
-
-  const newsFeed = items.slice(
+  const newsFeed = remainingItems.slice(
     cursor,
     cursor + FIL_INFO_NEWS_FEED_SIZE,
   );
   cursor += newsFeed.length;
 
-  const briefs = items.slice(
+  const briefs = remainingItems.slice(
     cursor,
     cursor + FIL_INFO_BRIEFS_SIZE,
   );
   cursor += briefs.length;
 
-  const cards = items.slice(
+  const cards = remainingItems.slice(
     cursor,
     cursor + FIL_INFO_CARDS_SIZE,
   );
   cursor += cards.length;
 
-  const illustratedBriefs = items.slice(
+  const illustratedBriefs = remainingItems.slice(
     cursor,
     cursor + FIL_INFO_ILLUSTRATED_BRIEFS_SIZE,
   );
