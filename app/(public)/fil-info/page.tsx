@@ -15,12 +15,23 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function formatPinnedPublicationDate(value: Date) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(value);
+}
+
 export default async function FilInfoPage() {
   const items = await getArticlesByCategory("ACTUALITÉ", {
     limit: FIL_INFO_QUERY_LIMIT,
   });
 
   const {
+    pinned,
     featured,
     briefs,
     cards,
@@ -57,6 +68,45 @@ export default async function FilInfoPage() {
             </p>
           </div>
         </header>
+
+        {pinned && (
+          <section
+            aria-labelledby="fil-info-pinned-title"
+            className="mb-10 overflow-hidden border border-yellow-500 bg-yellow-500 text-black"
+          >
+            <div className="border-b border-black/20 px-5 py-3 text-[10px] font-black uppercase tracking-[0.3em] sm:px-7">
+              Information épinglée
+            </div>
+            <Link
+              href={`/article/${pinned.slug}`}
+              className="group block px-5 py-6 transition-colors hover:bg-yellow-400 sm:px-7"
+            >
+              <p className="text-[9px] font-bold uppercase tracking-[0.22em] text-black/60">
+                {getFilInfoFormatLabel(pinned.filInfoFormat)}
+              </p>
+              <h2
+                id="fil-info-pinned-title"
+                className="mt-2 font-serif text-2xl leading-tight sm:text-3xl"
+              >
+                {pinned.title}
+              </h2>
+              {normalizeFilInfoFormat(pinned.filInfoFormat) === "BRIEF" &&
+                pinned.description && (
+                  <p className="mt-3 max-w-3xl text-sm leading-6 text-black/70">
+                    {pinned.description}
+                  </p>
+                )}
+              <time
+                dateTime={getArticlePublicationDate(pinned).toISOString()}
+                className="mt-4 block text-xs font-semibold capitalize text-black/60"
+              >
+                {formatPinnedPublicationDate(
+                  getArticlePublicationDate(pinned),
+                )}
+              </time>
+            </Link>
+          </section>
+        )}
 
         <div
           className={

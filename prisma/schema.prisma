@@ -71,6 +71,8 @@ model Article {
   readingTime     String
   contentType     String             @default("article")
   filInfoFormat   FilInfoFormat      @default(ARTICLE)
+  filInfoVisible  Boolean            @default(true)
+  filInfoPinned   Boolean            @default(false)
   videoUrl        String?
   videoDuration   String?
   socialText      String?
@@ -88,6 +90,7 @@ model Article {
 
   @@index([category, published, publishedAt])
   @@index([filInfoFormat])
+  @@index([filInfoPinned])
 }
 
 enum EditorialStatus {

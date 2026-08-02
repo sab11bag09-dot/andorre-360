@@ -36,6 +36,10 @@ export type ArticleDraft = {
 
   contentType: ArticleContentType;
   filInfoFormat: FilInfoFormat;
+  filInfoVisible: boolean;
+  filInfoPinned: boolean;
+  publishedAt: string;
+  updatedAt: string;
 
   videoUrl: string;
   videoDuration: string;
@@ -126,6 +130,10 @@ export const EMPTY_ARTICLE_DRAFT: ArticleDraft = {
 
   contentType: "article",
   filInfoFormat: "ARTICLE",
+  filInfoVisible: true,
+  filInfoPinned: false,
+  publishedAt: "",
+  updatedAt: "",
 
   videoUrl: "",
   videoDuration: "",

@@ -27,8 +27,11 @@ describe("getArticlesByCategory", () => {
       where: {
         category: "ACTUALITÉ",
         published: true,
+        editorialStatus: "PUBLISHED",
+        filInfoVisible: true,
       },
       orderBy: [
+        { filInfoPinned: "desc" },
         { publishedAt: "desc" },
         { createdAt: "desc" },
         { id: "desc" },

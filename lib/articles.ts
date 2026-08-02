@@ -45,8 +45,13 @@ export async function getArticlesByCategory(
     where: {
       category: normalizedCategory,
       published: true,
+      editorialStatus: "PUBLISHED",
+      filInfoVisible: true,
     },
     orderBy: [
+      {
+        filInfoPinned: "desc",
+      },
       {
         publishedAt: "desc",
       },

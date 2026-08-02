@@ -18,12 +18,16 @@ type ArticleRecord = {
   readingTime: string;
   contentType: string;
   filInfoFormat: string;
+  filInfoVisible: boolean;
+  filInfoPinned: boolean;
   videoUrl: string | null;
   videoDuration: string | null;
   socialText: string | null;
   featured: boolean;
   published: boolean;
   editorialStatus: EditorialStatus;
+  publishedAt: Date | null;
+  updatedAt: Date;
 };
 
 type PublicationRecord = {
@@ -117,6 +121,10 @@ export function mapArticleToDraft(
       ? article.contentType
       : "article",
     filInfoFormat: normalizeFilInfoFormat(article.filInfoFormat),
+    filInfoVisible: article.filInfoVisible,
+    filInfoPinned: article.filInfoPinned,
+    publishedAt: article.publishedAt?.toISOString() ?? "",
+    updatedAt: article.updatedAt.toISOString(),
 
     videoUrl: article.videoUrl ?? "",
     videoDuration: article.videoDuration ?? "",
@@ -125,8 +133,7 @@ export function mapArticleToDraft(
 
     featured: article.featured,
     published: article.published,
-    editorialStatus:
-  article.editorialStatus,
+    editorialStatus: article.editorialStatus,
 
     pageKey: publication?.pageKey ?? "home",
     zone: publication?.zone ?? "standard",

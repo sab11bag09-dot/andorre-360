@@ -7,6 +7,7 @@ import ArticleContent from "@/components/admin/article-v5/ArticleContent";
 import ArticleEditorial from "@/components/admin/article/ArticleEditorial";
 import ArticleMedia from "@/components/admin/article/ArticleMedia";
 import ArticleSidebar from "@/components/admin/article/ArticleSidebar";
+import FilInfoAdminControls from "./FilInfoAdminControls";
 import {
   Button,
   PageHeader,
@@ -372,6 +373,21 @@ export default function ArticleEditor({
               </div>
             </div>
           </section>
+
+          {mode === "update" && draft.id !== null && (
+            <FilInfoAdminControls
+              articleId={draft.id}
+              title={draft.title}
+              description={draft.description}
+              format={draft.filInfoFormat}
+              initialVisible={draft.filInfoVisible}
+              initialPinned={draft.filInfoPinned}
+              initialPublishedAt={draft.publishedAt}
+              initialUpdatedAt={draft.updatedAt}
+              published={draft.published}
+              editorialStatus={draft.editorialStatus}
+            />
+          )}
 
           <ArticleContent
             title={draft.title}
