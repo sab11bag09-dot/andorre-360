@@ -44,8 +44,19 @@ export function normalizeFilInfoFormat(value: unknown): FilInfoFormat {
   return "ARTICLE";
 }
 
-export function getFilInfoFormatLabel(value: unknown): string {
+export function getFilInfoFormatLabel(
+  value: unknown,
+  locale: "fr" | "ca" | "es" = "fr",
+): string {
   const normalizedValue = normalizeFilInfoFormat(value);
+
+  if (locale === "ca") {
+    return { ARTICLE: "Article", BRIEF: "Breu", ALERT: "Alerta" }[normalizedValue];
+  }
+
+  if (locale === "es") {
+    return { ARTICLE: "Artículo", BRIEF: "Breve", ALERT: "Alerta" }[normalizedValue];
+  }
 
   return (
     FIL_INFO_FORMATS.find(

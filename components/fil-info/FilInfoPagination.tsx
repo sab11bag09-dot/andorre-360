@@ -10,6 +10,7 @@ import {
 } from "@/lib/fil-info-format";
 import type { FilInfoPageEntry } from "@/lib/fil-info-pagination";
 import { FIL_INFO_REFRESH_INTERVAL_MS } from "@/lib/fil-info";
+import { getFilInfoArticlePath, type PublicFilInfoLocale } from "@/lib/fil-info-locale";
 
 type PageResponse = {
   entries: FilInfoPageEntry[];
@@ -17,8 +18,15 @@ type PageResponse = {
   nextCursor: string | null;
 };
 
-function formatPublicationDate(value: string) {
-  return new Intl.DateTimeFormat("fr-FR", {
+const localeNames = { fr: "fr-FR", ca: "ca-ES", es: "es-ES" } as const;
+const copy = {
+  fr: { updated: "Nouvelles informations disponibles", updating: "Actualisation…", archives: "Archives du fil", retry: "Réessayer", more: "Afficher plus", loading: "Chargement…", error: "Impossible de charger la suite du Fil info." },
+  ca: { updated: "Hi ha informació nova disponible", updating: "Actualitzant…", archives: "Arxiu del fil", retry: "Torna-ho a provar", more: "Mostra’n més", loading: "Carregant…", error: "No s’ha pogut carregar la resta del fil." },
+  es: { updated: "Hay nueva información disponible", updating: "Actualizando…", archives: "Archivo del hilo", retry: "Reintentar", more: "Mostrar más", loading: "Cargando…", error: "No se ha podido cargar el resto del hilo." },
+} as const;
+
+function formatPublicationDate(value: string, locale: PublicFilInfoLocale) {
+  return new Intl.DateTimeFormat(localeNames[locale], {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -32,10 +40,12 @@ export default function FilInfoPagination({
   initialCursor,
   latestCursor,
   initialHasMore,
+  locale = "fr",
 }: {
   initialCursor: string | null;
   latestCursor: string | null;
   initialHasMore: boolean;
+  locale?: PublicFilInfoLocale;
 }) {
   const router = useRouter();
   const [entries, setEntries] = useState<FilInfoPageEntry[]>([]);
@@ -56,7 +66,7 @@ export default function FilInfoPagination({
     async function checkForUpdates() {
       try {
         const response = await fetch(
-          `/api/fil-info/updates?after=${encodeURIComponent(latestCursor!)}`,
+          `/api/fil-info/updates?after=${encodeURIComponent(latestCursor!)}&locale=${locale}`,
           { cache: "no-store" },
         );
 
@@ -83,7 +93,7 @@ export default function FilInfoPagination({
       active = false;
       window.clearInterval(interval);
     };
-  }, [latestCursor]);
+  }, [latestCursor, locale]);
 
   function refreshNewEntries() {
     setNewEntriesAvailable(false);
@@ -100,7 +110,7 @@ export default function FilInfoPagination({
 
     try {
       const response = await fetch(
-        `/api/fil-info?cursor=${encodeURIComponent(cursor)}`,
+        `/api/fil-info?cursor=${encodeURIComponent(cursor)}&locale=${locale}`,
         { cache: "no-store" },
       );
 
@@ -113,7 +123,7 @@ export default function FilInfoPagination({
       setCursor(result.nextCursor);
       setHasMore(result.hasMore);
     } catch {
-      setError("Impossible de charger la suite du Fil info.");
+      setError(copy[locale].error);
     } finally {
       setIsLoadingMore(false);
     }
@@ -134,8 +144,8 @@ export default function FilInfoPagination({
             className="border border-yellow-500 bg-yellow-500 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-yellow-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500 motion-reduce:transition-none disabled:opacity-60"
           >
             {isPending
-              ? "Actualisation…"
-              : "Nouvelles informations disponibles"}
+              ? copy[locale].updating
+              : copy[locale].updated}
           </button>
         </div>
       )}
@@ -144,7 +154,7 @@ export default function FilInfoPagination({
         <>
           <div className="mb-7 border-t border-gray-800 pt-5">
             <h2 id="fil-info-history-title" className="font-serif text-3xl">
-              Archives du fil
+              {copy[locale].archives}
             </h2>
           </div>
 
@@ -155,18 +165,18 @@ export default function FilInfoPagination({
               return (
                 <li key={entry.id}>
                   <Link
-                    href={`/article/${entry.slug}`}
+                    href={getFilInfoArticlePath(locale, entry.slug)}
                     className="grid gap-3 px-2 py-6 transition-colors hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:outline-yellow-500 motion-reduce:transition-none sm:grid-cols-[190px_1fr] sm:px-5"
                   >
                     <time
                       dateTime={entry.publicationDate}
                       className="text-xs capitalize text-yellow-500"
                     >
-                      {formatPublicationDate(entry.publicationDate)}
+                      {formatPublicationDate(entry.publicationDate, locale)}
                     </time>
                     <div>
                       <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-gray-600">
-                        {getFilInfoFormatLabel(format)}
+                        {getFilInfoFormatLabel(format, locale)}
                       </p>
                       <h3 className="mt-2 font-serif text-xl leading-tight">
                         {entry.title}
@@ -188,7 +198,7 @@ export default function FilInfoPagination({
             onClick={loadMore}
             className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-yellow-500 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500"
           >
-            Réessayer
+            {copy[locale].retry}
           </button>
         </div>
       )}
@@ -201,7 +211,7 @@ export default function FilInfoPagination({
             disabled={isLoadingMore || !cursor}
             className="border border-gray-700 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:border-yellow-500 hover:text-yellow-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500 motion-reduce:transition-none disabled:opacity-60"
           >
-            {isLoadingMore ? "Chargement…" : "Afficher plus"}
+            {isLoadingMore ? copy[locale].loading : copy[locale].more}
           </button>
         </div>
       )}

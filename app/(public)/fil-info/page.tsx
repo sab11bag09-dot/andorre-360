@@ -15,21 +15,24 @@ import {
   getFilInfoFormatLabel,
   normalizeFilInfoFormat,
 } from "@/lib/fil-info-format";
+import { getTranslatedFilInfoArticles } from "@/lib/fil-info-localized";
 
 export const dynamic = "force-dynamic";
-export const metadata: Metadata = {
-  title: "Fil info — L’actualité en continu en Andorre",
-  description:
-    "Suivez les dernières actualités d’Andorre, les alertes, les brèves et les articles publiés par Andorre 360.",
-  alternates: { canonical: "/fil-info" },
-  openGraph: {
-    title: "Fil info — Andorre 360",
-    description:
-      "Les dernières informations d’Andorre, classées selon leur heure de publication.",
-    type: "website",
-    url: "/fil-info",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [ca, es] = await Promise.all([
+    getTranslatedFilInfoArticles("ca", { limit: 1 }),
+    getTranslatedFilInfoArticles("es", { limit: 1 }),
+  ]);
+  const languages: Record<string, string> = { fr: "/fil-info", "x-default": "/fil-info" };
+  if (ca.length) languages.ca = "/ca/fil-info";
+  if (es.length) languages.es = "/es/fil-info";
+  return {
+    title: "Fil info — L’actualité en continu en Andorre",
+    description: "Suivez les dernières actualités d’Andorre, les alertes, les brèves et les articles publiés par Andorre 360.",
+    alternates: { canonical: "/fil-info", languages },
+    openGraph: { title: "Fil info — Andorre 360", description: "Les dernières informations d’Andorre, classées selon leur heure de publication.", type: "website", url: "/fil-info" },
+  };
+}
 
 function formatPinnedPublicationDate(value: Date) {
   return new Intl.DateTimeFormat("fr-FR", {
