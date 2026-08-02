@@ -89,6 +89,7 @@ model Article {
   translations ArticleTranslation[]
 
   @@index([category, published, publishedAt])
+  @@index([category, published, editorialStatus, filInfoVisible, publishedAt, createdAt, id])
   @@index([filInfoFormat])
   @@index([filInfoPinned])
 }

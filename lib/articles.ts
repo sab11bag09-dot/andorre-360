@@ -22,7 +22,39 @@ export async function getPublishedArticles() {
 
 type CategoryArticleQueryOptions = {
   limit?: number;
+  before?: ArticleChronologyCursor;
+  after?: ArticleChronologyCursor;
+  prioritizePinned?: boolean;
+  excludePinned?: boolean;
 };
+
+export type ArticleChronologyCursor = {
+  publishedAt: Date;
+  createdAt: Date;
+  id: number;
+};
+
+function buildChronologyBoundary(
+  cursor: ArticleChronologyCursor,
+  direction: "before" | "after",
+) {
+  const comparator = direction === "before" ? "lt" : "gt";
+
+  return {
+    OR: [
+      { publishedAt: { [comparator]: cursor.publishedAt } },
+      {
+        publishedAt: cursor.publishedAt,
+        createdAt: { [comparator]: cursor.createdAt },
+      },
+      {
+        publishedAt: cursor.publishedAt,
+        createdAt: cursor.createdAt,
+        id: { [comparator]: cursor.id },
+      },
+    ],
+  };
+}
 
 export async function getArticlesByCategory(
   category: string,
@@ -41,17 +73,29 @@ export async function getArticlesByCategory(
     throw new Error("La limite doit être un entier positif.");
   }
 
+  if (options.before && options.after) {
+    throw new Error("Une seule borne chronologique peut être utilisée.");
+  }
+
+  const chronologyBoundary = options.before
+    ? buildChronologyBoundary(options.before, "before")
+    : options.after
+      ? buildChronologyBoundary(options.after, "after")
+      : undefined;
+
   const articles = await prisma.article.findMany({
     where: {
       category: normalizedCategory,
       published: true,
       editorialStatus: "PUBLISHED",
       filInfoVisible: true,
+      ...(options.excludePinned ? { filInfoPinned: false } : {}),
+      ...(chronologyBoundary ? { AND: chronologyBoundary } : {}),
     },
     orderBy: [
-      {
-        filInfoPinned: "desc",
-      },
+      ...(options.prioritizePinned === false
+        ? []
+        : [{ filInfoPinned: "desc" as const }]),
       {
         publishedAt: "desc",
       },

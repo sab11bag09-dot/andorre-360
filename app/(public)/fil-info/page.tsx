@@ -1,5 +1,6 @@
 import SafeImage from "@/components/SafeImage";
 import FilInfoTimeline from "@/components/fil-info/FilInfoTimeline";
+import FilInfoPagination from "@/components/fil-info/FilInfoPagination";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
@@ -8,6 +9,7 @@ import {
   getArticlePublicationDate,
   partitionFilInfoArticles,
 } from "@/lib/fil-info";
+import { createFilInfoCursor } from "@/lib/fil-info-pagination";
 import {
   getFilInfoFormatLabel,
   normalizeFilInfoFormat,
@@ -27,8 +29,10 @@ function formatPinnedPublicationDate(value: Date) {
 
 export default async function FilInfoPage() {
   const items = await getArticlesByCategory("ACTUALITÉ", {
-    limit: FIL_INFO_QUERY_LIMIT,
+    limit: FIL_INFO_QUERY_LIMIT + 1,
   });
+  const hasMore = items.length > FIL_INFO_QUERY_LIMIT;
+  const visibleItems = items.slice(0, FIL_INFO_QUERY_LIMIT);
 
   const {
     pinned,
@@ -37,7 +41,11 @@ export default async function FilInfoPage() {
     cards,
     illustratedBriefs,
     newsFeed,
-  } = partitionFilInfoArticles(items);
+  } = partitionFilInfoArticles(visibleItems);
+  const oldestVisibleItem = visibleItems.at(-1);
+  const latestChronologicalItem = visibleItems.find(
+    (article) => !article.filInfoPinned,
+  );
   const newsFeedEntries = newsFeed.map((article) => ({
     id: article.id,
     slug: article.slug,
@@ -327,6 +335,18 @@ export default async function FilInfoPage() {
             )}
           </div>
         )}
+
+        <FilInfoPagination
+          initialCursor={
+            oldestVisibleItem ? createFilInfoCursor(oldestVisibleItem) : null
+          }
+          latestCursor={
+            latestChronologicalItem
+              ? createFilInfoCursor(latestChronologicalItem)
+              : null
+          }
+          initialHasMore={hasMore}
+        />
       </section>
     </main>
   );
