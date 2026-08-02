@@ -1,6 +1,7 @@
-import SafeImage from "@/components/SafeImage";
+import type { Metadata } from "next";
 import FilInfoTimeline from "@/components/fil-info/FilInfoTimeline";
 import FilInfoPagination from "@/components/fil-info/FilInfoPagination";
+import FilInfoImage from "@/components/fil-info/FilInfoImage";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
@@ -16,6 +17,19 @@ import {
 } from "@/lib/fil-info-format";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Fil info — L’actualité en continu en Andorre",
+  description:
+    "Suivez les dernières actualités d’Andorre, les alertes, les brèves et les articles publiés par Andorre 360.",
+  alternates: { canonical: "/fil-info" },
+  openGraph: {
+    title: "Fil info — Andorre 360",
+    description:
+      "Les dernières informations d’Andorre, classées selon leur heure de publication.",
+    type: "website",
+    url: "/fil-info",
+  },
+};
 
 function formatPinnedPublicationDate(value: Date) {
   return new Intl.DateTimeFormat("fr-FR", {
@@ -24,6 +38,7 @@ function formatPinnedPublicationDate(value: Date) {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Andorra",
   }).format(value);
 }
 
@@ -145,13 +160,12 @@ export default async function FilInfoPage() {
               >
                 <article className="flex w-full flex-col">
                   <div className="relative aspect-[4/5] min-h-[420px] overflow-hidden bg-neutral-900 sm:aspect-[16/11] lg:aspect-auto lg:min-h-0 lg:flex-1">
-                    <SafeImage
+                    <FilInfoImage
                       src={featured.image}
                       alt={featured.title}
-                      fill
                       priority
                       sizes="(max-width: 1024px) 100vw, 34vw"
-                      className="object-cover transition duration-700 ease-out group-hover:scale-[1.025]"
+                      className="object-cover transition duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
                     />
 
                     <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
@@ -251,12 +265,11 @@ export default async function FilInfoPage() {
                     >
                       <article className="flex h-full flex-col border-b border-gray-800 pb-8">
                         <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
-                          <SafeImage
+                          <FilInfoImage
                             src={article.image}
                             alt={article.title}
-                            fill
                             sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover transition duration-700 group-hover:scale-[1.025]"
+                            className="object-cover transition duration-700 group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
                           />
                         </div>
 
@@ -303,12 +316,11 @@ export default async function FilInfoPage() {
                     >
                       <article className="grid grid-cols-[112px_1fr] gap-4">
                         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
-                          <SafeImage
+                          <FilInfoImage
                             src={article.image}
                             alt={article.title}
-                            fill
                             sizes="112px"
-                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.04]"
+                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:transform-none"
                           />
                         </div>
 

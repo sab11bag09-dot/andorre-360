@@ -67,4 +67,33 @@ describe("FilInfoTimeline", () => {
     );
     expect(html).toContain('aria-labelledby="fil-info-timeline-title"');
   });
+
+  it("regroupe les publications lorsque le jour change", () => {
+    const html = renderToStaticMarkup(
+      <FilInfoTimeline
+        entries={[
+          {
+            id: 1,
+            slug: "jour-2",
+            title: "Jour deux",
+            description: "",
+            filInfoFormat: "ARTICLE",
+            publicationDate: new Date("2026-08-02T10:00:00.000Z"),
+          },
+          {
+            id: 2,
+            slug: "jour-1",
+            title: "Jour un",
+            description: "",
+            filInfoFormat: "ARTICLE",
+            publicationDate: new Date("2026-08-01T10:00:00.000Z"),
+          },
+        ]}
+      />,
+    );
+
+    expect(html).toContain("dimanche 2 août");
+    expect(html).toContain("samedi 1 août");
+    expect(html).toContain('aria-label="Publications chronologiques"');
+  });
 });

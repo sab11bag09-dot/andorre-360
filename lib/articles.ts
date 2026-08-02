@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
+const SLOW_FIL_INFO_QUERY_MS = 250;
+
 function normalizeImage<T extends { image: string | null }>(article: T): T {
   return {
     ...article,
@@ -60,6 +62,7 @@ export async function getArticlesByCategory(
   category: string,
   options: CategoryArticleQueryOptions = {},
 ) {
+  const startedAt = performance.now();
   const normalizedCategory = category.trim();
 
   if (!normalizedCategory) {
@@ -108,6 +111,14 @@ export async function getArticlesByCategory(
     ],
     take: options.limit,
   });
+
+  const durationMs = performance.now() - startedAt;
+
+  if (durationMs >= SLOW_FIL_INFO_QUERY_MS) {
+    console.warn(
+      `[Fil info] Requête lente pour ${normalizedCategory}: ${Math.round(durationMs)} ms`,
+    );
+  }
 
   return articles.map(normalizeImage);
 }

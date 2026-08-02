@@ -24,6 +24,7 @@ function formatPublicationDate(value: string) {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Andorra",
   }).format(new Date(value));
 }
 
@@ -119,14 +120,18 @@ export default function FilInfoPagination({
   }
 
   return (
-    <section aria-labelledby="fil-info-history-title" className="mt-16 md:mt-20">
+    <section
+      aria-labelledby="fil-info-history-title"
+      aria-busy={isLoadingMore || isPending}
+      className="mt-16 md:mt-20"
+    >
       {newEntriesAvailable && (
         <div className="mb-8 flex justify-center" role="status">
           <button
             type="button"
             onClick={refreshNewEntries}
             disabled={isPending}
-            className="border border-yellow-500 bg-yellow-500 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-yellow-400 disabled:opacity-60"
+            className="border border-yellow-500 bg-yellow-500 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-black transition hover:bg-yellow-400 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500 motion-reduce:transition-none disabled:opacity-60"
           >
             {isPending
               ? "Actualisation…"
@@ -151,7 +156,7 @@ export default function FilInfoPagination({
                 <li key={entry.id}>
                   <Link
                     href={`/article/${entry.slug}`}
-                    className="grid gap-3 px-2 py-6 transition-colors hover:bg-white/[0.03] sm:grid-cols-[190px_1fr] sm:px-5"
+                    className="grid gap-3 px-2 py-6 transition-colors hover:bg-white/[0.03] focus-visible:outline-2 focus-visible:outline-yellow-500 motion-reduce:transition-none sm:grid-cols-[190px_1fr] sm:px-5"
                   >
                     <time
                       dateTime={entry.publicationDate}
@@ -176,9 +181,16 @@ export default function FilInfoPagination({
       )}
 
       {error && (
-        <p className="mt-5 text-center text-sm text-red-300" role="alert">
-          {error}
-        </p>
+        <div className="mt-5 text-center" role="alert">
+          <p className="text-sm text-red-300">{error}</p>
+          <button
+            type="button"
+            onClick={loadMore}
+            className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-yellow-500 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500"
+          >
+            Réessayer
+          </button>
+        </div>
       )}
 
       {hasMore && (
@@ -187,7 +199,7 @@ export default function FilInfoPagination({
             type="button"
             onClick={loadMore}
             disabled={isLoadingMore || !cursor}
-            className="border border-gray-700 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:border-yellow-500 hover:text-yellow-500 disabled:opacity-60"
+            className="border border-gray-700 px-6 py-3 text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:border-yellow-500 hover:text-yellow-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-500 motion-reduce:transition-none disabled:opacity-60"
           >
             {isLoadingMore ? "Chargement…" : "Afficher plus"}
           </button>

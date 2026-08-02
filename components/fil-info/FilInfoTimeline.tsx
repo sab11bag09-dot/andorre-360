@@ -19,6 +19,7 @@ function formatHour(value: Date) {
   return new Intl.DateTimeFormat("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Andorra",
   }).format(value);
 }
 
@@ -27,6 +28,16 @@ function formatDate(value: Date) {
     weekday: "long",
     day: "numeric",
     month: "long",
+    timeZone: "Europe/Andorra",
+  }).format(value);
+}
+
+function getDateKey(value: Date) {
+  return new Intl.DateTimeFormat("fr-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: "Europe/Andorra",
   }).format(value);
 }
 
@@ -55,15 +66,6 @@ export default function FilInfoTimeline({
             >
               Fil Info
             </h2>
-
-            {entries[0] && (
-              <time
-                dateTime={entries[0].publicationDate.toISOString()}
-                className="mt-4 block text-xs capitalize text-gray-500"
-              >
-                {formatDate(entries[0].publicationDate)}
-              </time>
-            )}
           </div>
 
           <div aria-hidden="true" className="h-12 w-1 bg-yellow-500" />
@@ -71,17 +73,27 @@ export default function FilInfoTimeline({
       </header>
 
       {entries.length > 0 ? (
-        <ol className="divide-y divide-gray-800">
+        <ol className="divide-y divide-gray-800" aria-label="Publications chronologiques">
           {entries.map((entry, index) => {
             const format = normalizeFilInfoFormat(entry.filInfoFormat);
             const isAlert = format === "ALERT";
             const isBrief = format === "BRIEF";
+            const previousEntry = entries[index - 1];
+            const startsNewDay =
+              !previousEntry ||
+              getDateKey(previousEntry.publicationDate) !==
+                getDateKey(entry.publicationDate);
 
             return (
               <li key={entry.id}>
+                {startsNewDay && (
+                  <h3 className="border-b border-gray-800 bg-black/70 px-5 py-3 text-[10px] font-bold capitalize tracking-[0.18em] text-gray-500 sm:px-7">
+                    {formatDate(entry.publicationDate)}
+                  </h3>
+                )}
                 <Link
                   href={`/article/${entry.slug}`}
-                  className={`group grid grid-cols-[64px_1fr] gap-4 px-5 py-5 transition-colors duration-300 sm:grid-cols-[76px_1fr] sm:px-7 sm:py-6 ${
+                  className={`group grid grid-cols-[64px_1fr] gap-4 px-5 py-5 transition-colors duration-300 motion-reduce:transition-none sm:grid-cols-[76px_1fr] sm:px-7 sm:py-6 ${
                     isAlert
                       ? "bg-yellow-500 text-black hover:bg-yellow-400"
                       : "hover:bg-white/[0.04]"
@@ -118,7 +130,7 @@ export default function FilInfoTimeline({
                       {getFilInfoFormatLabel(format)} · {String(index + 1).padStart(2, "0")}
                     </p>
 
-                    <h3
+                    <h4
                       className={`mt-2 font-serif leading-[1.3] transition-colors duration-300 ${
                         isAlert
                           ? "text-xl font-semibold text-black sm:text-2xl"
@@ -126,7 +138,7 @@ export default function FilInfoTimeline({
                       }`}
                     >
                       {entry.title}
-                    </h3>
+                    </h4>
 
                     {isBrief && entry.description && (
                       <p className="mt-3 line-clamp-2 text-sm leading-6 text-gray-400">
