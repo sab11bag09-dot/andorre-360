@@ -5,6 +5,7 @@ import {
   createArticleDraft,
 } from "./types";
 import type { EditorialStatus } from "@/lib/generated/prisma/client";
+import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
 type ArticleRecord = {
   id: number;
   slug: string;
@@ -16,6 +17,7 @@ type ArticleRecord = {
   author: string;
   readingTime: string;
   contentType: string;
+  filInfoFormat: string;
   videoUrl: string | null;
   videoDuration: string | null;
   socialText: string | null;
@@ -114,6 +116,7 @@ export function mapArticleToDraft(
     )
       ? article.contentType
       : "article",
+    filInfoFormat: normalizeFilInfoFormat(article.filInfoFormat),
 
     videoUrl: article.videoUrl ?? "",
     videoDuration: article.videoDuration ?? "",

@@ -8,6 +8,10 @@ import {
   getArticlePublicationDate,
   partitionFilInfoArticles,
 } from "@/lib/fil-info";
+import {
+  getFilInfoFormatLabel,
+  normalizeFilInfoFormat,
+} from "@/lib/fil-info-format";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +31,8 @@ export default async function FilInfoPage() {
     id: article.id,
     slug: article.slug,
     title: article.title,
+    description: article.description,
+    filInfoFormat: normalizeFilInfoFormat(article.filInfoFormat),
     publicationDate: getArticlePublicationDate(article),
   }));
 
@@ -121,7 +127,7 @@ export default async function FilInfoPage() {
           >
             <div className="mb-7 flex items-end justify-between gap-6 border-t border-gray-800 pt-5">
               <h2 id="fil-info-briefs-title" className="font-serif text-3xl">
-                Dernières actualités
+                Autres publications
               </h2>
 
               <p className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-600 sm:block">
@@ -156,7 +162,7 @@ export default async function FilInfoPage() {
                     </div>
 
                     <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
-                      Lire la brève →
+                      {getFilInfoFormatLabel(article.filInfoFormat)} →
                     </p>
                   </article>
                 </Link>
@@ -197,6 +203,10 @@ export default async function FilInfoPage() {
                         </div>
 
                         <div className="pt-5">
+                          <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                            {getFilInfoFormatLabel(article.filInfoFormat)}
+                          </p>
+
                           <h3 className="font-serif text-2xl leading-[1.18] transition group-hover:text-yellow-500">
                             {article.title}
                           </h3>
@@ -245,9 +255,15 @@ export default async function FilInfoPage() {
                         </div>
 
                         <div className="flex min-w-0 flex-col justify-between">
-                          <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
-                            {article.title}
-                          </h3>
+                          <div>
+                            <p className="mb-2 text-[8px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
+                              {getFilInfoFormatLabel(article.filInfoFormat)}
+                            </p>
+
+                            <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
+                              {article.title}
+                            </h3>
+                          </div>
 
                           <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500 transition group-hover:text-yellow-500">
                             Lire →
