@@ -33,6 +33,7 @@ export function makeArticle(
     featured: false,
     published: true,
     editorialStatus: "PUBLISHED",
+    publishedAt: now,
     createdAt: now,
     updatedAt: now,
     ...overrides,

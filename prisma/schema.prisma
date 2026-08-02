@@ -76,6 +76,7 @@ model Article {
   featured        Boolean            @default(false)
   published       Boolean            @default(false)
   editorialStatus EditorialStatus    @default(DRAFT)
+  publishedAt     DateTime?
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   analytics       ArticleAnalytics[]
@@ -83,6 +84,8 @@ model Article {
 
   observations Observation[]
   translations ArticleTranslation[]
+
+  @@index([category, published, publishedAt])
 }
 
 enum EditorialStatus {

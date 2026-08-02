@@ -29,7 +29,8 @@ async function main() {
       continue;
     }
 
-    await prisma.article.upsert({
+    const isPublished = article.status !== "draft";
+    const importedArticle = await prisma.article.upsert({
       where: {
         slug,
       },
@@ -43,7 +44,7 @@ async function main() {
         author: article.author,
         readingTime: article.readingTime,
         featured: article.format === "une",
-        published: article.status !== "draft",
+        published: isPublished,
       },
 
       create: {
@@ -56,9 +57,21 @@ async function main() {
         author: article.author,
         readingTime: article.readingTime,
         featured: article.format === "une",
-        published: article.status !== "draft",
+        published: isPublished,
+        publishedAt: isPublished ? new Date() : null,
       },
     });
+
+    if (isPublished && importedArticle.publishedAt === null) {
+      await prisma.article.update({
+        where: {
+          id: importedArticle.id,
+        },
+        data: {
+          publishedAt: new Date(),
+        },
+      });
+    }
 
     imported++;
   }
