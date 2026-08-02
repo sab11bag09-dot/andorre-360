@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
 import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
@@ -641,6 +642,8 @@ if (media) {
 export async function saveArticle(
   input: SaveArticleInput
 ): Promise<SaveArticleResult> {
+  await requireAdmin();
+
   try {
     const draft = normalizeDraft(
       input.article

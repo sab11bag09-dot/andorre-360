@@ -2,6 +2,7 @@ import { unlink } from "fs/promises";
 import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 
+import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 
 type RouteContext = {
@@ -26,6 +27,12 @@ export async function PATCH(
   request: NextRequest,
   context: RouteContext
 ) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   try {
     const { id } = await context.params;
     const mediaId = Number(id);
@@ -89,6 +96,12 @@ export async function DELETE(
   request: Request,
   context: RouteContext
 ) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   try {
     const { id } = await context.params;
     const mediaId = Number(id);

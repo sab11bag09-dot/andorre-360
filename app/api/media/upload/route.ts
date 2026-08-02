@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { uploadMedia } from "@/lib/media/upload";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   try {
     const formData = await request.formData();
     const uploadedFile = formData.get("file");

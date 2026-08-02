@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 
 function createSlug(value: string) {
@@ -22,6 +23,12 @@ export async function PATCH(
   request: Request,
   context: RouteContext
 ) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   try {
     const { id } = await context.params;
     const categoryId = Number(id);
@@ -76,6 +83,12 @@ export async function DELETE(
   request: Request,
   context: RouteContext
 ) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   try {
     const { id } = await context.params;
     const categoryId = Number(id);

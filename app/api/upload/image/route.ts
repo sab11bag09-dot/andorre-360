@@ -2,6 +2,7 @@ import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
+import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -27,6 +28,12 @@ function sanitizeFilename(filename: string) {
 }
 
 export async function POST(request: Request) {
+  const authorizationError = await requireAdminApi();
+
+  if (authorizationError) {
+    return authorizationError;
+  }
+
   let filepath: string | null = null;
 
   try {

@@ -3,6 +3,7 @@
 import type { EditorialStatus } from "@/lib/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { canTransitionEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
 import { prisma } from "@/lib/prisma";
 
@@ -10,6 +11,8 @@ async function transitionArticleEditorialStatus(
   articleId: number,
   nextStatus: EditorialStatus,
 ): Promise<void> {
+  await requireAdmin();
+
   if (
     !Number.isInteger(articleId) ||
     articleId <= 0

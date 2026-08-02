@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import {
   getCascadeDestination,
@@ -126,6 +127,8 @@ async function movePublicationDown(
 export async function replacePublication(
   input: ReplacePublicationInput
 ): Promise<ReplacePublicationResult> {
+  await requireAdmin();
+
   const {
     articleId,
     pageKey,

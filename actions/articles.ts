@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 
 /* =========================================================
@@ -129,6 +130,8 @@ function revalidatePublicPages(slug?: string) {
 export async function createArticle(
   formData: FormData
 ) {
+  await requireAdmin();
+
   const submissionIntent =
     getSubmissionIntent(formData);
 
@@ -311,6 +314,8 @@ export async function updateArticle(
   articleId: number,
   formData: FormData
 ) {
+  await requireAdmin();
+
   const title = getRequiredString(
     formData,
     "title"
