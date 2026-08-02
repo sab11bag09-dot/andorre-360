@@ -55,4 +55,64 @@ describe("getArticlesByCategory", () => {
 
     expect(findMany).not.toHaveBeenCalled();
   });
+
+  it("charge une page plus ancienne sans reprendre le contenu épinglé", async () => {
+    const cursor = {
+      publishedAt: new Date("2026-08-02T08:00:00.000Z"),
+      createdAt: new Date("2026-08-02T07:00:00.000Z"),
+      id: 42,
+    };
+
+    await getArticlesByCategory("ACTUALITÉ", {
+      limit: 21,
+      before: cursor,
+      prioritizePinned: false,
+      excludePinned: true,
+    });
+
+    expect(findMany).toHaveBeenCalledWith({
+      where: {
+        category: "ACTUALITÉ",
+        published: true,
+        editorialStatus: "PUBLISHED",
+        filInfoVisible: true,
+        filInfoPinned: false,
+        AND: {
+          OR: [
+            { publishedAt: { lt: cursor.publishedAt } },
+            {
+              publishedAt: cursor.publishedAt,
+              createdAt: { lt: cursor.createdAt },
+            },
+            {
+              publishedAt: cursor.publishedAt,
+              createdAt: cursor.createdAt,
+              id: { lt: cursor.id },
+            },
+          ],
+        },
+      },
+      orderBy: [
+        { publishedAt: "desc" },
+        { createdAt: "desc" },
+        { id: "desc" },
+      ],
+      take: 21,
+    });
+  });
+
+  it("refuse deux bornes chronologiques simultanées", async () => {
+    const cursor = {
+      publishedAt: new Date("2026-08-02T08:00:00.000Z"),
+      createdAt: new Date("2026-08-02T07:00:00.000Z"),
+      id: 42,
+    };
+
+    await expect(
+      getArticlesByCategory("ACTUALITÉ", {
+        before: cursor,
+        after: cursor,
+      }),
+    ).rejects.toThrow("Une seule borne chronologique peut être utilisée.");
+  });
 });

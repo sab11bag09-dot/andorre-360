@@ -3,14 +3,12 @@ import { normalizeFilInfoFormat } from "./fil-info-format";
 export const FIL_INFO_NEWS_FEED_SIZE = 6;
 export const FIL_INFO_BRIEFS_SIZE = 6;
 export const FIL_INFO_CARDS_SIZE = 4;
-export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 4;
+export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 3;
+export const FIL_INFO_PAGE_SIZE = 20;
+export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000;
 
 export const FIL_INFO_QUERY_LIMIT =
-  2 +
-  FIL_INFO_NEWS_FEED_SIZE +
-  FIL_INFO_BRIEFS_SIZE +
-  FIL_INFO_CARDS_SIZE +
-  FIL_INFO_ILLUSTRATED_BRIEFS_SIZE;
+  FIL_INFO_PAGE_SIZE;
 
 type FilInfoPartitionArticle = {
   featured: boolean;
