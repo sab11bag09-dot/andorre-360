@@ -5,6 +5,7 @@ import {
 } from "@/lib/article-engine/articleSeo";
 import { recordArticleView } from "@/lib/analytics";
 import { getArticleBySlug } from "@/lib/articles";
+import { getPublicArticleDate } from "@/lib/public-article";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -18,7 +19,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
 
-  if (!article || !article.published) {
+  if (!article) {
     notFound();
   }
 
@@ -35,7 +36,7 @@ export async function generateMetadata({
     title: article.title,
     description: article.description,
     image: article.image,
-    publishedAt: article.createdAt,
+    publishedAt: getPublicArticleDate(article),
     versions,
   });
 }
@@ -46,7 +47,7 @@ export default async function ArticlePage({
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
 
-  if (!article || !article.published) {
+  if (!article) {
     notFound();
   }
 
@@ -56,7 +57,7 @@ export default async function ArticlePage({
     <PublicArticleView
       article={{
         ...article,
-        publishedAt: article.createdAt,
+        publishedAt: getPublicArticleDate(article),
       }}
       dateLocale="fr-FR"
       contentLanguage="fr"

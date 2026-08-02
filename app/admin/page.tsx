@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import {
+  isPublicArticle,
+  PUBLIC_ARTICLE_FILTER,
+} from "@/lib/public-article";
+import {
   Badge,
   Button,
   EmptyState,
@@ -30,13 +34,13 @@ export default async function AdminPage() {
 
     prisma.article.count({
       where: {
-        published: true,
+        ...PUBLIC_ARTICLE_FILTER,
       },
     }),
 
     prisma.article.count({
       where: {
-        published: false,
+        NOT: PUBLIC_ARTICLE_FILTER,
       },
     }),
 
@@ -57,6 +61,7 @@ export default async function AdminPage() {
         author: true,
         contentType: true,
         published: true,
+        editorialStatus: true,
         featured: true,
         updatedAt: true,
       },
@@ -291,7 +296,7 @@ export default async function AdminPage() {
                         Statut
                       </p>
 
-                      {article.published ? (
+                      {isPublicArticle(article) ? (
   <Badge variant="success">
     Publié
   </Badge>

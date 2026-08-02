@@ -1,4 +1,5 @@
 import { normalizeFilInfoFormat } from "./fil-info-format";
+import { getPublicArticleDate } from "./public-article";
 
 export const FIL_INFO_NEWS_FEED_SIZE = 6;
 export const FIL_INFO_BRIEFS_SIZE = 6;
@@ -78,5 +79,5 @@ export function getArticlePublicationDate(article: {
   publishedAt: Date | null;
   createdAt: Date;
 }) {
-  return article.publishedAt ?? article.createdAt;
+  return getPublicArticleDate(article);
 }

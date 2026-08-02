@@ -4,7 +4,7 @@ import FilInfoPagination from "@/components/fil-info/FilInfoPagination";
 import FilInfoImage from "@/components/fil-info/FilInfoImage";
 import Link from "next/link";
 
-import { getArticlesByCategory } from "@/lib/articles";
+import { getFilInfoArticles } from "@/lib/articles";
 import {
   FIL_INFO_QUERY_LIMIT,
   getArticlePublicationDate,
@@ -46,7 +46,7 @@ function formatPinnedPublicationDate(value: Date) {
 }
 
 export default async function FilInfoPage() {
-  const items = await getArticlesByCategory("ACTUALITÉ", {
+  const items = await getFilInfoArticles("ACTUALITÉ", {
     limit: FIL_INFO_QUERY_LIMIT + 1,
   });
   const hasMore = items.length > FIL_INFO_QUERY_LIMIT;

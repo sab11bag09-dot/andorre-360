@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 
 import {
   EDITORIAL_ZONES,
@@ -32,7 +33,7 @@ export async function buildEditorialLayout(
       channel: "site",
       active: true,
       article: {
-        published: true,
+        ...PUBLIC_ARTICLE_FILTER,
       },
     },
     include: {

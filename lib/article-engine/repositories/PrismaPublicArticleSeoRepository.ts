@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 
 import type {
   PublicArticleSeoRepository,
@@ -11,12 +12,12 @@ export class PrismaPublicArticleSeoRepository
   async findPublishedVersionsByArticleId(
     articleId: number,
   ): Promise<PublicArticleSeoVersions | null> {
-    const article = await prisma.article.findUnique({
+    const article = await prisma.article.findFirst({
       where: {
         id: articleId,
+        ...PUBLIC_ARTICLE_FILTER,
       },
       select: {
-        published: true,
         slug: true,
         translations: {
           where: {
@@ -41,9 +42,7 @@ export class PrismaPublicArticleSeoRepository
     }
 
     return {
-      frenchSlug: article.published
-        ? article.slug
-        : null,
+      frenchSlug: article.slug,
       translations: article.translations,
     };
   }

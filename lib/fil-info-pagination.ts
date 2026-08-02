@@ -1,4 +1,5 @@
 import type { ArticleChronologyCursor } from "./articles";
+import { getPublicArticleDate } from "./public-article";
 
 type CursorArticle = {
   id: number;
@@ -8,7 +9,7 @@ type CursorArticle = {
 
 export function createFilInfoCursor(article: CursorArticle): string {
   return [
-    (article.publishedAt ?? article.createdAt).toISOString(),
+    getPublicArticleDate(article).toISOString(),
     article.createdAt.toISOString(),
     String(article.id),
   ].join("|");
