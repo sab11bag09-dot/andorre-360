@@ -2,6 +2,11 @@ import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
+import {
+  FIL_INFO_QUERY_LIMIT,
+  getArticlePublicationDate,
+  partitionFilInfoArticles,
+} from "@/lib/fil-info";
 
 export const dynamic = "force-dynamic";
 
@@ -21,16 +26,21 @@ function formatDate(value: Date | string) {
 }
 
 export default async function FilInfoPage() {
-  const items = await getArticlesByCategory("ACTUALITÉ");
+  const items = await getArticlesByCategory("ACTUALITÉ", {
+    limit: FIL_INFO_QUERY_LIMIT,
+  });
 
-  const featured = items[0];
-  const briefs = items.slice(1, 7);
-  const cards = items.slice(7, 11);
-
-  // La colonne de droite conserve ses tranches d'origine afin que
-  // le Fil Info garde la même quantité de contenu et la même hauteur.
-  const illustratedBriefs = items.slice(8, 12);
-  const newsFeed = items.slice(12);
+  const {
+    featured,
+    briefs,
+    cards,
+    illustratedBriefs,
+    newsFeed,
+  } = partitionFilInfoArticles(items);
+  const newsFeedEntries = newsFeed.map((article) => ({
+    article,
+    publicationDate: getArticlePublicationDate(article),
+  }));
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -243,41 +253,43 @@ export default async function FilInfoPage() {
                   <div className="mt-1 h-10 w-1 bg-yellow-500" />
                 </div>
 
-                {newsFeed[0] && (
+                {newsFeedEntries[0] && (
                   <p className="mt-4 text-xs capitalize text-gray-500">
-                    {formatDate(newsFeed[0].updatedAt)}
+                    {formatDate(newsFeedEntries[0].publicationDate)}
                   </p>
                 )}
               </div>
 
-              {newsFeed.length > 0 ? (
+              {newsFeedEntries.length > 0 ? (
                 <div>
-                  {newsFeed.map((article, index) => (
-                    <Link
-                      key={article.id}
-                      href={`/article/${article.slug}`}
-                      className="group grid grid-cols-[62px_1fr] gap-4 border-b border-gray-800 px-5 py-5 transition-colors duration-300 last:border-b-0 hover:bg-white/[0.04]"
-                    >
-                      <time
-                        dateTime={new Date(article.updatedAt).toISOString()}
-                        className="pt-0.5 text-sm font-black tabular-nums tracking-[-0.02em] text-yellow-500"
+                  {newsFeedEntries.map(
+                    ({ article, publicationDate }, index) => (
+                      <Link
+                        key={article.id}
+                        href={`/article/${article.slug}`}
+                        className="group grid grid-cols-[62px_1fr] gap-4 border-b border-gray-800 px-5 py-5 transition-colors duration-300 last:border-b-0 hover:bg-white/[0.04]"
                       >
-                        {formatHour(article.updatedAt)}
-                      </time>
+                        <time
+                          dateTime={publicationDate.toISOString()}
+                          className="pt-0.5 text-sm font-black tabular-nums tracking-[-0.02em] text-yellow-500"
+                        >
+                          {formatHour(publicationDate)}
+                        </time>
 
-                      <div className="relative border-l border-gray-700/90 pl-5">
-                        <span className="absolute -left-[5.5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-neutral-950 bg-yellow-500 ring-1 ring-yellow-500/40" />
+                        <div className="relative border-l border-gray-700/90 pl-5">
+                          <span className="absolute -left-[5.5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-neutral-950 bg-yellow-500 ring-1 ring-yellow-500/40" />
 
-                        <p className="text-[8px] font-semibold uppercase tracking-[0.22em] text-gray-600">
-                          Dépêche {String(index + 1).padStart(2, "0")}
-                        </p>
+                          <p className="text-[8px] font-semibold uppercase tracking-[0.22em] text-gray-600">
+                            Dépêche {String(index + 1).padStart(2, "0")}
+                          </p>
 
-                        <h3 className="mt-2 font-serif text-[1.02rem] leading-[1.32] transition-colors duration-300 group-hover:text-yellow-500">
-                          {article.title}
-                        </h3>
-                      </div>
-                    </Link>
-                  ))}
+                          <h3 className="mt-2 font-serif text-[1.02rem] leading-[1.32] transition-colors duration-300 group-hover:text-yellow-500">
+                            {article.title}
+                          </h3>
+                        </div>
+                      </Link>
+                    ),
+                  )}
                 </div>
               ) : (
                 <p className="px-5 py-6 text-sm leading-7 text-gray-500">

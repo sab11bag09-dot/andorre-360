@@ -20,15 +20,44 @@ export async function getPublishedArticles() {
   return articles.map(normalizeImage);
 }
 
-export async function getArticlesByCategory(category: string) {
+type CategoryArticleQueryOptions = {
+  limit?: number;
+};
+
+export async function getArticlesByCategory(
+  category: string,
+  options: CategoryArticleQueryOptions = {},
+) {
+  const normalizedCategory = category.trim();
+
+  if (!normalizedCategory) {
+    throw new Error("La catégorie est obligatoire.");
+  }
+
+  if (
+    options.limit !== undefined &&
+    (!Number.isInteger(options.limit) || options.limit <= 0)
+  ) {
+    throw new Error("La limite doit être un entier positif.");
+  }
+
   const articles = await prisma.article.findMany({
     where: {
-      category,
+      category: normalizedCategory,
       published: true,
     },
-    orderBy: {
-      updatedAt: "desc",
-    },
+    orderBy: [
+      {
+        publishedAt: "desc",
+      },
+      {
+        createdAt: "desc",
+      },
+      {
+        id: "desc",
+      },
+    ],
+    take: options.limit,
   });
 
   return articles.map(normalizeImage);
