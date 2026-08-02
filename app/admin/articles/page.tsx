@@ -11,6 +11,7 @@ import {
 
 import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
 import { prisma } from "@/lib/prisma";
+import { isPublicArticle } from "@/lib/public-article";
 const ARTICLE_GRID_TEMPLATE =
   "minmax(0, 2fr) 150px 140px 100px 110px 120px";
 
@@ -58,7 +59,7 @@ export default async function AdminArticlesPage({
   });
 
   const publishedCount = articles.filter(
-    (article) => article.published,
+    isPublicArticle,
   ).length;
 
   const draftCount = articles.length - publishedCount;
@@ -68,11 +69,11 @@ export default async function AdminArticlesPage({
   ).length;
   const filteredArticles = articles.filter((article) => {
   if (activeStatus === "published") {
-    return article.published;
+    return isPublicArticle(article);
   }
 
   if (activeStatus === "draft") {
-    return !article.published;
+    return !isPublicArticle(article);
   }
 
   return true;

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 
 const SLOW_FIL_INFO_QUERY_MS = 250;
+const PUBLIC_ARTICLE_QUERY_LIMIT = 50;
 
 function normalizeImage<T extends { image: string | null }>(article: T): T {
   return {
@@ -12,17 +14,24 @@ function normalizeImage<T extends { image: string | null }>(article: T): T {
 export async function getPublishedArticles() {
   const articles = await prisma.article.findMany({
     where: {
-      published: true,
+      ...PUBLIC_ARTICLE_FILTER,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: [
+      { publishedAt: "desc" },
+      { createdAt: "desc" },
+      { id: "desc" },
+    ],
+    take: PUBLIC_ARTICLE_QUERY_LIMIT,
   });
 
   return articles.map(normalizeImage);
 }
 
 type CategoryArticleQueryOptions = {
+  limit?: number;
+};
+
+type FilInfoArticleQueryOptions = {
   limit?: number;
   before?: ArticleChronologyCursor;
   after?: ArticleChronologyCursor;
@@ -62,6 +71,39 @@ export async function getArticlesByCategory(
   category: string,
   options: CategoryArticleQueryOptions = {},
 ) {
+  const normalizedCategory = category.trim();
+
+  if (!normalizedCategory) {
+    throw new Error("La catégorie est obligatoire.");
+  }
+
+  if (
+    options.limit !== undefined &&
+    (!Number.isInteger(options.limit) || options.limit <= 0)
+  ) {
+    throw new Error("La limite doit être un entier positif.");
+  }
+
+  const articles = await prisma.article.findMany({
+    where: {
+      category: normalizedCategory,
+      ...PUBLIC_ARTICLE_FILTER,
+    },
+    orderBy: [
+      { publishedAt: "desc" },
+      { createdAt: "desc" },
+      { id: "desc" },
+    ],
+    take: options.limit ?? PUBLIC_ARTICLE_QUERY_LIMIT,
+  });
+
+  return articles.map(normalizeImage);
+}
+
+export async function getFilInfoArticles(
+  category: string,
+  options: FilInfoArticleQueryOptions = {},
+) {
   const startedAt = performance.now();
   const normalizedCategory = category.trim();
 
@@ -89,8 +131,7 @@ export async function getArticlesByCategory(
   const articles = await prisma.article.findMany({
     where: {
       category: normalizedCategory,
-      published: true,
-      editorialStatus: "PUBLISHED",
+      ...PUBLIC_ARTICLE_FILTER,
       filInfoVisible: true,
       ...(options.excludePinned ? { filInfoPinned: false } : {}),
       ...(chronologyBoundary ? { AND: chronologyBoundary } : {}),
@@ -99,17 +140,11 @@ export async function getArticlesByCategory(
       ...(options.prioritizePinned === false
         ? []
         : [{ filInfoPinned: "desc" as const }]),
-      {
-        publishedAt: "desc",
-      },
-      {
-        createdAt: "desc",
-      },
-      {
-        id: "desc",
-      },
+      { publishedAt: "desc" },
+      { createdAt: "desc" },
+      { id: "desc" },
     ],
-    take: options.limit,
+    take: options.limit ?? PUBLIC_ARTICLE_QUERY_LIMIT,
   });
 
   const durationMs = performance.now() - startedAt;
@@ -124,9 +159,10 @@ export async function getArticlesByCategory(
 }
 
 export async function getArticleBySlug(slug: string) {
-  const article = await prisma.article.findUnique({
+  const article = await prisma.article.findFirst({
     where: {
       slug,
+      ...PUBLIC_ARTICLE_FILTER,
     },
   });
 
@@ -137,11 +173,13 @@ export async function getFeaturedArticle() {
   const article = await prisma.article.findFirst({
     where: {
       featured: true,
-      published: true,
+      ...PUBLIC_ARTICLE_FILTER,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: [
+      { publishedAt: "desc" },
+      { createdAt: "desc" },
+      { id: "desc" },
+    ],
   });
 
   return article ? normalizeImage(article) : null;

@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { findUnique } = vi.hoisted(() => ({
-  findUnique: vi.fn(),
+const { findFirst } = vi.hoisted(() => ({
+  findFirst: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     article: {
-      findUnique,
+      findFirst,
     },
   },
 }));
@@ -16,12 +16,11 @@ import { PrismaPublicArticleSeoRepository } from "./PrismaPublicArticleSeoReposi
 
 describe("PrismaPublicArticleSeoRepository", () => {
   beforeEach(() => {
-    findUnique.mockReset();
+    findFirst.mockReset();
   });
 
   it("filtre les hreflang sur les traductions publiees", async () => {
-    findUnique.mockResolvedValue({
-      published: true,
+    findFirst.mockResolvedValue({
       slug: "article-fr",
       translations: [
         { locale: "CA", slug: "article-ca" },
@@ -40,9 +39,13 @@ describe("PrismaPublicArticleSeoRepository", () => {
       ],
     });
 
-    expect(findUnique).toHaveBeenCalledWith(
+    expect(findFirst).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { id: 42 },
+        where: {
+          id: 42,
+          published: true,
+          editorialStatus: "PUBLISHED",
+        },
         select: expect.objectContaining({
           translations: {
             where: {
@@ -60,25 +63,14 @@ describe("PrismaPublicArticleSeoRepository", () => {
     );
   });
 
-  it("exclut la version francaise non publiee", async () => {
-    findUnique.mockResolvedValue({
-      published: false,
-      slug: "brouillon-fr",
-      translations: [
-        { locale: "ES", slug: "article-es" },
-      ],
-    });
+  it("exclut entièrement un article français non public", async () => {
+    findFirst.mockResolvedValue(null);
 
     const repository =
       new PrismaPublicArticleSeoRepository();
 
     await expect(
       repository.findPublishedVersionsByArticleId(42),
-    ).resolves.toEqual({
-      frenchSlug: null,
-      translations: [
-        { locale: "ES", slug: "article-es" },
-      ],
-    });
+    ).resolves.toBeNull();
   });
 });

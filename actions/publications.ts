@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
+import { isPublicArticle } from "@/lib/public-article";
 import {
   getCascadeDestination,
 } from "@/lib/editorial/cascade";
@@ -151,6 +152,7 @@ export async function replacePublication(
     select: {
       id: true,
       published: true,
+      editorialStatus: true,
     },
   });
 
@@ -161,10 +163,10 @@ export async function replacePublication(
     };
   }
 
-  if (!article.published) {
+  if (!isPublicArticle(article)) {
     return {
       success: false,
-      message: "Cet article n’est pas publié.",
+      message: "Cet article n’est pas publié et validé.",
     };
   }
 

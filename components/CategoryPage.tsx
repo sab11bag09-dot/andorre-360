@@ -1,7 +1,7 @@
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
-import { prisma } from "@/lib/prisma";
+import { getArticlesByCategory } from "@/lib/articles";
 
 type CategoryPageProps = {
   category: string;
@@ -12,15 +12,7 @@ export default async function CategoryPage({
   category,
   title,
 }: CategoryPageProps) {
-  const articles = await prisma.article.findMany({
-    where: {
-      category,
-      published: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const articles = await getArticlesByCategory(category);
 
   const featured = articles[0];
   const mainArticle = articles[1];

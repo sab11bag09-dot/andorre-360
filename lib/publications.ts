@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 
 type HomepageZone =
   | "hero"
@@ -31,7 +32,7 @@ export async function getHomepagePublications() {
       active: true,
       channel: "site",
       article: {
-        published: true,
+        ...PUBLIC_ARTICLE_FILTER,
       },
       zone: {
         in: [

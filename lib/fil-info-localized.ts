@@ -1,6 +1,7 @@
 import type { ContentLocale } from "@/lib/generated/prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 import type { ArticleChronologyCursor } from "@/lib/articles";
 import type { PublicFilInfoLocale } from "@/lib/fil-info-locale";
 
@@ -39,8 +40,7 @@ export async function getTranslatedFilInfoArticles(
   const articles = await prisma.article.findMany({
     where: {
       category: "ACTUALITÉ",
-      published: true,
-      editorialStatus: "PUBLISHED",
+      ...PUBLIC_ARTICLE_FILTER,
       filInfoVisible: true,
       ...(options.excludePinned ? { filInfoPinned: false } : {}),
       ...(boundary ? { AND: boundary } : {}),

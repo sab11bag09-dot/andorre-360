@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getArticlesByCategory } from "@/lib/articles";
+import { getFilInfoArticles } from "@/lib/articles";
 import {
   createFilInfoCursor,
   parseFilInfoCursor,
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
   const articles = isTranslatedFilInfoLocale(locale)
     ? await getTranslatedFilInfoArticles(locale, options)
     : locale === "fr"
-      ? await getArticlesByCategory("ACTUALITÉ", options)
+      ? await getFilInfoArticles("ACTUALITÉ", options)
       : null;
   if (!articles) return NextResponse.json({ message: "Langue invalide." }, { status: 400 });
   const hasMore = articles.length > FIL_INFO_PAGE_SIZE;

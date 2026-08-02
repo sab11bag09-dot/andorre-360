@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 import type { PrismaClient } from "@/lib/generated/prisma/client";
 
 import type {
@@ -23,6 +24,9 @@ export class PrismaPublicArticleTranslationRepository
         locale,
         slug,
         status: "PUBLISHED",
+        article: {
+          ...PUBLIC_ARTICLE_FILTER,
+        },
       },
       select: {
         articleId: true,

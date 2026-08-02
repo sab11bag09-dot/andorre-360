@@ -50,6 +50,10 @@ describe("PrismaPublicArticleTranslationRepository", () => {
           locale: "CA",
           slug: "titol",
           status: "PUBLISHED",
+          article: {
+            published: true,
+            editorialStatus: "PUBLISHED",
+          },
         },
       }),
     );
