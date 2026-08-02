@@ -14,12 +14,16 @@ const article = {
   readingTime: "2 min",
   contentType: "article",
   filInfoFormat: "BRIEF",
+  filInfoVisible: true,
+  filInfoPinned: false,
   videoUrl: null,
   videoDuration: null,
   socialText: null,
   featured: false,
   published: false,
   editorialStatus: "DRAFT" as const,
+  publishedAt: null,
+  updatedAt: new Date("2026-08-02T06:00:00.000Z"),
 };
 
 describe("mapArticleToDraft", () => {
@@ -34,5 +38,19 @@ describe("mapArticleToDraft", () => {
         filInfoFormat: "format-inconnu",
       }).filInfoFormat,
     ).toBe("ARTICLE");
+  });
+
+  it("charge les réglages administratifs du Fil info", () => {
+    const draft = mapArticleToDraft({
+      ...article,
+      filInfoVisible: false,
+      filInfoPinned: true,
+      publishedAt: new Date("2026-08-02T05:30:00.000Z"),
+    });
+
+    expect(draft.filInfoVisible).toBe(false);
+    expect(draft.filInfoPinned).toBe(true);
+    expect(draft.publishedAt).toBe("2026-08-02T05:30:00.000Z");
+    expect(draft.updatedAt).toBe("2026-08-02T06:00:00.000Z");
   });
 });

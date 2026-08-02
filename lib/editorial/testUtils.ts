@@ -28,6 +28,8 @@ export function makeArticle(
     readingTime: "3 min",
     contentType: "article",
     filInfoFormat: "ARTICLE",
+    filInfoVisible: true,
+    filInfoPinned: false,
     videoUrl: null,
     videoDuration: null,
     socialText: null,

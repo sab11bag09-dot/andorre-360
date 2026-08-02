@@ -11,7 +11,8 @@ describe("partitionFilInfoArticles", () => {
     id: number,
     filInfoFormat = "ARTICLE",
     featured = false,
-  ) => ({ id, filInfoFormat, featured });
+    filInfoPinned = false,
+  ) => ({ id, filInfoFormat, featured, filInfoPinned });
 
   it("conserve les alertes récentes dans le fil", () => {
     const alert = makeItem(1, "ALERT");
@@ -24,6 +25,7 @@ describe("partitionFilInfoArticles", () => {
     ]);
 
     expect(result.featured).toBe(article);
+    expect(result.pinned).toBeNull();
     expect(result.newsFeed).toEqual([alert, brief]);
     expect(result.briefs).toEqual([]);
     expect(result.cards).toEqual([]);
@@ -46,11 +48,12 @@ describe("partitionFilInfoArticles", () => {
   it("ne place aucun article dans plusieurs blocs", () => {
     const items = Array.from(
       { length: FIL_INFO_QUERY_LIMIT },
-      (_, index) => makeItem(index + 1),
+      (_, index) => makeItem(index + 1, "ARTICLE", false, index === 0),
     );
     const result = partitionFilInfoArticles(items);
     const partitionedItems = [
       result.featured,
+      result.pinned,
       ...result.newsFeed,
       ...result.briefs,
       ...result.cards,
@@ -65,12 +68,23 @@ describe("partitionFilInfoArticles", () => {
 
   it("ignore proprement une liste vide", () => {
     expect(partitionFilInfoArticles([])).toEqual({
+      pinned: null,
       featured: null,
       newsFeed: [],
       briefs: [],
       cards: [],
       illustratedBriefs: [],
     });
+  });
+
+  it("retire le contenu épinglé de tous les autres blocs", () => {
+    const pinned = makeItem(1, "ALERT", false, true);
+    const article = makeItem(2);
+    const result = partitionFilInfoArticles([pinned, article]);
+
+    expect(result.pinned).toBe(pinned);
+    expect(result.featured).toBe(article);
+    expect(result.newsFeed).toEqual([]);
   });
 });
 
