@@ -287,7 +287,7 @@ export default async function HomePageEditorial() {
 
           {/* COLONNE ÉDITORIALE DROITE */}
 
-          <aside className="space-y-9 lg:col-span-2 lg:border-l lg:border-gray-800 lg:pl-8">
+          <aside className="space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
             <section className="border-b border-gray-800 pb-8">
@@ -392,7 +392,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 rounded-xl bg-zinc-900 p-6">
+              <section className="mt-12 rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-1 lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
