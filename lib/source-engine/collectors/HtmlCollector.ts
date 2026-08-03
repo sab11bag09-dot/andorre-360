@@ -265,6 +265,15 @@ export class HtmlCollector implements Collector {
           return;
         }
 
+        const articleUrl = new URL(url);
+
+        if (
+          siteRule?.articlePathPattern &&
+          !siteRule.articlePathPattern.test(articleUrl.pathname)
+        ) {
+          return;
+        }
+
         const container = link.closest(
           "article, .views-row, .node, .item, li, div",
         );
