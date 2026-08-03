@@ -15,4 +15,35 @@ export class PrismaCollectionSourceRepository
       },
     });
   }
+
+  async markCollectionSucceeded(
+    id: number,
+    checkedAt: Date,
+  ): Promise<void> {
+    await prisma.source.update({
+      where: { id },
+      data: {
+        availabilityStatus: "AVAILABLE",
+        lastCheckedAt: checkedAt,
+        lastSuccessAt: checkedAt,
+        lastErrorMessage: null,
+      },
+    });
+  }
+
+  async markCollectionFailed(
+    id: number,
+    checkedAt: Date,
+    message: string,
+  ): Promise<void> {
+    await prisma.source.update({
+      where: { id },
+      data: {
+        availabilityStatus: "UNAVAILABLE",
+        lastCheckedAt: checkedAt,
+        lastErrorAt: checkedAt,
+        lastErrorMessage: message,
+      },
+    });
+  }
 }

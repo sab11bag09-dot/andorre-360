@@ -99,8 +99,6 @@ export class PrismaObservationRepository
               title: observation.title,
               publishedAt: observation.publishedAt,
               content: observation.content,
-              processed: false,
-              processedAt: null,
             },
           });
 

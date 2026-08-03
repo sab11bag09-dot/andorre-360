@@ -14,10 +14,28 @@ import { ObservationRepository } from "../repositories/ObservationRepository";
 class FakeCollectionSourceRepository
   implements CollectionSourceRepository
 {
+  public succeededAt: Date | null = null;
+  public failure: { checkedAt: Date; message: string } | null = null;
+
   constructor(private readonly source: Source | null) {}
 
   async findById(): Promise<Source | null> {
     return this.source;
+  }
+
+  async markCollectionSucceeded(
+    _id: number,
+    checkedAt: Date,
+  ): Promise<void> {
+    this.succeededAt = checkedAt;
+  }
+
+  async markCollectionFailed(
+    _id: number,
+    checkedAt: Date,
+    message: string,
+  ): Promise<void> {
+    this.failure = { checkedAt, message };
   }
 }
 
@@ -28,6 +46,12 @@ class FakeCollector implements Collector {
 
   async collect(): Promise<ObservationInput[]> {
     return this.observations;
+  }
+}
+
+class FailingCollector implements Collector {
+  async collect(): Promise<ObservationInput[]> {
+    throw new Error("Collecte impossible");
   }
 }
 
@@ -170,5 +194,26 @@ describe("collectSource", () => {
     );
 
     expect(result).toEqual({ collected: 1, created: 1 });
+    expect(repository.succeededAt).toBeInstanceOf(Date);
+    expect(repository.failure).toBeNull();
+  });
+
+  it("enregistre l’échec de collecte avant de propager l’erreur", async () => {
+    const source = createSource();
+    const repository =
+      new FakeCollectionSourceRepository(source);
+    const factory = new FakeCollectorFactory(
+      new FailingCollector(),
+    );
+
+    await expect(
+      collectSource(1, repository, factory),
+    ).rejects.toThrow("Collecte impossible");
+
+    expect(repository.succeededAt).toBeNull();
+    expect(repository.failure).toEqual({
+      checkedAt: expect.any(Date),
+      message: "Collecte impossible",
+    });
   });
 });

@@ -1,14 +1,14 @@
 export const ORGANIZATION_TYPES = [
   { value: "GOVERNMENT", label: "Gouvernement" },
-  { value: "CITY", label: "Commune / mairie" },
+  { value: "COMMUNE", label: "Commune" },
   { value: "POLICE", label: "Police" },
-  { value: "EMERGENCY", label: "Secours" },
-  { value: "TOURISM", label: "Office de tourisme" },
-  { value: "SKI_RESORT", label: "Station de ski" },
-  { value: "TRANSPORT", label: "Routes et transports" },
-  { value: "SPORT", label: "Sport" },
-  { value: "CULTURE", label: "Culture" },
-  { value: "WEATHER", label: "Météo" },
+  { value: "EMERGENCY_SERVICE", label: "Service de secours" },
+  { value: "SPORTS_CLUB", label: "Club sportif" },
+  { value: "SPORTS_FEDERATION", label: "Fédération sportive" },
+  { value: "COMPANY", label: "Entreprise" },
+  { value: "ASSOCIATION", label: "Association" },
+  { value: "MEDIA", label: "Média" },
+  { value: "WEATHER_SERVICE", label: "Service météo" },
   { value: "OTHER", label: "Autre" },
 ] as const;
 
@@ -30,7 +30,7 @@ export const PUBLICATION_MODES = [
 ] as const;
 
 export const TRUST_LEVELS = [
-  { value: "VERY_HIGH", label: "Très élevée" },
+  { value: "OFFICIAL", label: "Officielle" },
   { value: "HIGH", label: "Élevée" },
   { value: "MEDIUM", label: "Moyenne" },
   { value: "LOW", label: "Faible" },
