@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import ArticleEditor from "@/components/admin/article-v4/ArticleEditor";
 import { mapArticleToDraft } from "@/components/admin/article-v4/mapArticleToDraft";
+import EditorialHistoryPanel from "@/components/admin/article/EditorialHistoryPanel";
 import EditorialWorkflowPanel from "@/components/admin/article/EditorialWorkflowPanel";
 import { prisma } from "@/lib/prisma";
 
@@ -43,6 +44,23 @@ export default async function EditArticlePage({
             status: true,
           },
         },
+        editorialEvents: {
+          orderBy: [
+            { createdAt: "desc" },
+            { id: "desc" },
+          ],
+          take: 50,
+          select: {
+            id: true,
+            action: true,
+            translationId: true,
+            actorEmail: true,
+            fromStatus: true,
+            toStatus: true,
+            details: true,
+            createdAt: true,
+          },
+        },
       },
     });
 
@@ -65,6 +83,8 @@ export default async function EditArticlePage({
         status={article.editorialStatus}
         translations={article.translations}
       />
+
+      <EditorialHistoryPanel events={article.editorialEvents} />
 
       <ArticleEditor
         key={`${article.id}-${article.editorialStatus}`}
