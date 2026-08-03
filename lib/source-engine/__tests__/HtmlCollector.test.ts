@@ -10,14 +10,33 @@ class FakeHtmlClient implements HtmlClient {
 
   public readonly receivedUrls: string[] = [];
 
+  public activeRequests = 0;
+
+  public maxActiveRequests = 0;
+
   constructor(
     private readonly responses: Record<string, string> = {},
+    private readonly delayMs = 0,
   ) {}
 
   async get(url: string): Promise<string> {
     this.receivedUrl = url;
 
     this.receivedUrls.push(url);
+
+    this.activeRequests += 1;
+    this.maxActiveRequests = Math.max(
+      this.maxActiveRequests,
+      this.activeRequests,
+    );
+
+    if (this.delayMs > 0) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, this.delayMs),
+      );
+    }
+
+    this.activeRequests -= 1;
 
     return this.responses[url] ?? "";
   }
@@ -93,5 +112,40 @@ describe("HtmlCollector", () => {
       source.url,
       articleUrl,
     ]);
+  });
+
+  it("limite et parallélise prudemment les articles RTVA", async () => {
+    const source = {
+      ...createSource(),
+      name: "RTVA",
+      url: "https://www.rtva.ad",
+    };
+    const articleLinks = Array.from(
+      { length: 30 },
+      (_, index) =>
+        `<a href="/noticies/societat/article-${index}">Article ${index}</a>`,
+    ).join("");
+    const articleResponses = Object.fromEntries(
+      Array.from({ length: 30 }, (_, index) => [
+        `https://www.rtva.ad/noticies/societat/article-${index}`,
+        `<div class="ContentArticle_infoBody_test"><p>Contingut prou llarg per a l'article número ${index} de la prova RTVA.</p></div>`,
+      ]),
+    );
+    const htmlClient = new FakeHtmlClient(
+      {
+        [source.url]: articleLinks,
+        ...articleResponses,
+      },
+      1,
+    );
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toHaveLength(24);
+    expect(observations[0]?.title).toBe("Article 0");
+    expect(observations[23]?.title).toBe("Article 23");
+    expect(htmlClient.receivedUrls).toHaveLength(25);
+    expect(htmlClient.maxActiveRequests).toBe(4);
   });
 });

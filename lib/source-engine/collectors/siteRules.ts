@@ -3,6 +3,8 @@ export type SiteRule = {
   content: string[];
   remove?: string[];
   articlePathPattern?: RegExp;
+  maxArticles?: number;
+  concurrency?: number;
 };
 
 export const siteRules: Record<string, SiteRule> = {
@@ -43,6 +45,8 @@ export const siteRules: Record<string, SiteRule> = {
     'a[href^="/noticies/"]',
   ],
   articlePathPattern: /^\/noticies\/[^/]+\/[^/]+\/?$/,
+  maxArticles: 24,
+  concurrency: 4,
   content: [
     '[class^="ContentArticle_infoBody"]',
   ],
