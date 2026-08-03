@@ -10,7 +10,7 @@ import {
 import {
   createGenerateArticleTranslationsDependencies,
 } from "@/lib/article-engine/articleEngineComposition";
-import { generateArticleTranslations } from "@/lib/article-engine/generateArticleTranslations";
+import { generateAuditedArticleTranslations } from "@/lib/article-engine/auditedTranslationGeneration";
 import {
   publishAuditedArticleTranslation,
   transitionAuditedArticleTranslation,
@@ -86,10 +86,11 @@ function revalidateArticleTranslationPaths(
 export async function generateArticleTranslationsAction(
   articleId: number,
 ): Promise<void> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
-  await generateArticleTranslations(
+  await generateAuditedArticleTranslations(
     articleId,
+    admin,
     createGenerateArticleTranslationsDependencies(),
   );
 

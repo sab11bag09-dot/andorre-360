@@ -42,6 +42,8 @@ const LOCALE_LABELS: Record<string, string> = {
 };
 
 const OPERATION_LABELS: Record<string, string> = {
+  created: "Création",
+  updated: "Régénération",
   content: "Contenu",
   slug: "Slug",
   status: "Statut",

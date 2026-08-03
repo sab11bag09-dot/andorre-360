@@ -5,6 +5,7 @@ import type {
 } from "./generators/EditorialGenerator";
 import type { ArticleRepository } from "./repositories/ArticleRepository";
 import type {
+  ArticleTranslationDraftInput,
   ArticleTranslationRepository,
   ArticleTranslationStatus,
 } from "./repositories/ArticleTranslationRepository";
@@ -27,13 +28,38 @@ export interface GenerateArticleTranslationsResult {
   translations: GeneratedTranslationResult[];
 }
 
+export type TranslationGenerationMutation = {
+  articleId: number;
+  locale: TranslationLocale;
+  translationId: number;
+  action: Exclude<TranslationGenerationAction, "skipped">;
+  fromStatus?: ArticleTranslationStatus;
+  toStatus: "AI_DRAFT";
+};
+
+export type PreparedTranslation =
+  | {
+      locale: TranslationLocale;
+      draft: ArticleTranslationDraftInput;
+    }
+  | {
+      locale: TranslationLocale;
+      draft: null;
+      translationId: number;
+    };
+
+export interface PreparedArticleTranslations {
+  articleId: number;
+  translations: PreparedTranslation[];
+}
+
 export interface GenerateArticleTranslationsDependencies {
   articleRepository: Pick<
     ArticleRepository,
     "findById"
   >;
 
-    translationRepository: Pick<
+  translationRepository: Pick<
     ArticleTranslationRepository,
     | "findByArticleAndLocale"
     | "createDraft"
@@ -44,6 +70,18 @@ export interface GenerateArticleTranslationsDependencies {
     EditorialGenerator,
     "translateArticle"
   >;
+}
+
+export interface PersistArticleTranslationsDependencies {
+  translationRepository: Pick<
+    ArticleTranslationRepository,
+    | "findByArticleAndLocale"
+    | "createDraft"
+    | "updateDraft"
+  >;
+  onMutation?: (
+    mutation: TranslationGenerationMutation,
+  ) => Promise<void>;
 }
 
 const defaultDependencies: GenerateArticleTranslationsDependencies = {
@@ -71,10 +109,15 @@ function isEditableStatus(
   );
 }
 
-export async function generateArticleTranslations(
+export async function prepareArticleTranslations(
   articleId: number,
-  dependencies = defaultDependencies,
-): Promise<GenerateArticleTranslationsResult> {
+  dependencies: Pick<
+    GenerateArticleTranslationsDependencies,
+    | "articleRepository"
+    | "translationRepository"
+    | "editorialGenerator"
+  > = defaultDependencies,
+): Promise<PreparedArticleTranslations> {
   if (
     !Number.isInteger(articleId) ||
     articleId <= 0
@@ -95,7 +138,7 @@ export async function generateArticleTranslations(
     );
   }
 
-  const translations: GeneratedTranslationResult[] = [];
+  const translations: PreparedTranslation[] = [];
 
   for (const locale of targetLocales) {
     const existing =
@@ -112,7 +155,7 @@ export async function generateArticleTranslations(
       translations.push({
         locale,
         translationId: existing.id,
-        action: "skipped",
+        draft: null,
       });
 
       continue;
@@ -135,33 +178,94 @@ export async function generateArticleTranslations(
       content: prepared.content,
     };
 
-    if (existing) {
-      await dependencies.translationRepository
-        .updateDraft(
-          existing.id,
-          draft,
-        );
-
-      translations.push({
-        locale,
-        translationId: existing.id,
-        action: "updated",
-      });
-    } else {
-      const translationId =
-        await dependencies.translationRepository
-          .createDraft(draft);
-
-      translations.push({
-        locale,
-        translationId,
-        action: "created",
-      });
-    }
+    translations.push({ locale, draft });
   }
 
   return {
     articleId: article.id,
     translations,
   };
+}
+
+export async function persistPreparedArticleTranslations(
+  prepared: PreparedArticleTranslations,
+  dependencies: PersistArticleTranslationsDependencies,
+): Promise<GenerateArticleTranslationsResult> {
+  const translations: GeneratedTranslationResult[] = [];
+
+  for (const item of prepared.translations) {
+    if (item.draft === null) {
+      translations.push({
+        locale: item.locale,
+        translationId: item.translationId,
+        action: "skipped",
+      });
+      continue;
+    }
+
+    const existing =
+      await dependencies.translationRepository
+        .findByArticleAndLocale(
+          prepared.articleId,
+          item.locale,
+        );
+
+    if (existing && !isEditableStatus(existing.status)) {
+      translations.push({
+        locale: item.locale,
+        translationId: existing.id,
+        action: "skipped",
+      });
+      continue;
+    }
+
+    const action = existing ? "updated" : "created";
+    const translationId = existing
+      ? existing.id
+      : await dependencies.translationRepository.createDraft(
+          item.draft,
+        );
+
+    if (existing) {
+      await dependencies.translationRepository.updateDraft(
+        existing.id,
+        item.draft,
+      );
+    }
+
+    await dependencies.onMutation?.({
+      articleId: prepared.articleId,
+      locale: item.locale,
+      translationId,
+      action,
+      fromStatus: existing?.status,
+      toStatus: "AI_DRAFT",
+    });
+
+    translations.push({
+      locale: item.locale,
+      translationId,
+      action,
+    });
+  }
+
+  return {
+    articleId: prepared.articleId,
+    translations,
+  };
+}
+
+export async function generateArticleTranslations(
+  articleId: number,
+  dependencies = defaultDependencies,
+): Promise<GenerateArticleTranslationsResult> {
+  const prepared = await prepareArticleTranslations(
+    articleId,
+    dependencies,
+  );
+
+  return persistPreparedArticleTranslations(
+    prepared,
+    dependencies,
+  );
 }
