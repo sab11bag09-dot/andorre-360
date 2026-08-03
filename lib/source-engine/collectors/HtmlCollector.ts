@@ -94,6 +94,34 @@ function parseGenericDate(value: string): Date | null {
     : parsedDate;
 }
 
+async function mapWithConcurrency<T, R>(
+  values: T[],
+  concurrency: number,
+  mapper: (value: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(values.length);
+  let nextIndex = 0;
+
+  async function runWorker(): Promise<void> {
+    while (nextIndex < values.length) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      results[currentIndex] = await mapper(values[currentIndex]);
+    }
+  }
+
+  const workerCount = Math.min(
+    Math.max(1, concurrency),
+    values.length,
+  );
+
+  await Promise.all(
+    Array.from({ length: workerCount }, () => runWorker()),
+  );
+
+  return results;
+}
+
 export class HtmlCollector implements Collector {
   constructor(
     private readonly htmlClient: HtmlClient =
@@ -302,21 +330,25 @@ export class HtmlCollector implements Collector {
       });
     }
 
-    const observations: ObservationInput[] = [];
+    const selectedLinks = siteRule?.maxArticles
+      ? links.slice(0, siteRule.maxArticles)
+      : links;
+    const observations = await mapWithConcurrency(
+      selectedLinks,
+      siteRule?.concurrency ?? 1,
+      async (link): Promise<ObservationInput> => {
+        const article = await this.getArticleContent(link.url);
 
-    for (const link of links) {
-      const article =
-        await this.getArticleContent(link.url);
-
-      observations.push({
+        return {
         title: link.title,
         url: link.url,
         publishedAt:
           article.publishedAt ??
           link.publishedAt,
         content: article.content,
-      });
-    }
+        };
+      },
+    );
 
     console.info(
       `[HtmlCollector] ${observations.length} observation(s) trouvée(s).`,
