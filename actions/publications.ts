@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import { isPublicArticle } from "@/lib/public-article";
+import { revalidateEditorialPublicPage } from "@/lib/public-revalidation";
 import {
   getCascadeDestination,
 } from "@/lib/editorial/cascade";
@@ -27,30 +28,10 @@ export type ReplacePublicationResult = {
 };
 
 function revalidateEditorialPages(pageKey: string) {
-  revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/editorial");
   revalidatePath("/admin/diffusion");
-
-  if (pageKey === "category:ACTUALITÉ") {
-    revalidatePath("/actualite");
-  }
-
-  if (pageKey === "category:ÉCONOMIE") {
-    revalidatePath("/economie");
-  }
-
-  if (pageKey === "category:SOCIÉTÉ") {
-    revalidatePath("/societe");
-  }
-
-  if (pageKey === "category:CULTURE") {
-    revalidatePath("/culture");
-  }
-
-  if (pageKey === "category:MONTAGNE") {
-    revalidatePath("/montagne");
-  }
+  revalidateEditorialPublicPage(pageKey);
 }
 
 async function movePublicationDown(

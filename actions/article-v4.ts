@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicArticlePages } from "@/lib/public-revalidation";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
 import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
 
@@ -173,9 +174,10 @@ async function createUniqueSlug(
 function revalidateArticlePages(
   articleId: number,
   slug: string,
-  previousSlug?: string
+  category: string,
+  previousSlug?: string,
+  previousCategory?: string,
 ) {
-  revalidatePath("/");
   revalidatePath("/admin");
   revalidatePath("/admin/articles");
   revalidatePath("/admin/media");
@@ -183,24 +185,16 @@ function revalidateArticlePages(
     `/admin/articles/${articleId}`
   );
 
-  revalidatePath("/actualite");
-  revalidatePath("/fil-info");
-  revalidatePath("/economie");
-  revalidatePath("/societe");
-  revalidatePath("/culture");
-  revalidatePath("/sports");
-  revalidatePath("/montagne");
-
-  revalidatePath(`/article/${slug}`);
-
-  if (
-    previousSlug &&
-    previousSlug !== slug
-  ) {
-    revalidatePath(
-      `/article/${previousSlug}`
-    );
-  }
+  revalidatePublicArticlePages({
+    categories: [
+      category,
+      ...(previousCategory ? [previousCategory] : []),
+    ],
+    slugs: [
+      slug,
+      ...(previousSlug && previousSlug !== slug ? [previousSlug] : []),
+    ],
+  });
 }
 
 /* =========================================================
@@ -329,7 +323,8 @@ if (media) {
 
   revalidateArticlePages(
     createdArticle.id,
-    createdArticle.slug
+    createdArticle.slug,
+    createdArticle.category,
   );
 
   return {
@@ -369,6 +364,7 @@ async function updateArticle(
   id: true,
   slug: true,
   image: true,
+  category: true,
   editorialStatus: true,
   publishedAt: true,
 },
@@ -619,7 +615,9 @@ if (media) {
   revalidateArticlePages(
     updatedArticle.id,
     updatedArticle.slug,
-    existingArticle.slug
+    updatedArticle.category,
+    existingArticle.slug,
+    existingArticle.category,
   );
 
   return {

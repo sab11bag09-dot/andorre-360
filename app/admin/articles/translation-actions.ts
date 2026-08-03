@@ -17,6 +17,7 @@ import {
 import {
   assertMultilingualPublicationEnabled,
 } from "@/lib/config/multilingualPublication";
+import { revalidateTranslatedPublicPages } from "@/lib/public-revalidation";
 
 function getTranslationPath(
   articleId: number,
@@ -74,6 +75,8 @@ function revalidateArticleTranslationPaths(
     revalidatePath(
       `/admin/articles/${articleId}/translations/${locale}`,
     );
+
+    revalidateTranslatedPublicPages(locale);
   }
 }
 

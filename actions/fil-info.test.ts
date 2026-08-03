@@ -7,6 +7,7 @@ const {
   updateMany,
   update,
   transaction,
+  revalidateFilInfoPublicPages,
 } = vi.hoisted(() => ({
   requireAdmin: vi.fn(),
   revalidatePath: vi.fn(),
@@ -14,10 +15,14 @@ const {
   updateMany: vi.fn(),
   update: vi.fn(),
   transaction: vi.fn(),
+  revalidateFilInfoPublicPages: vi.fn(),
 }));
 
 vi.mock("@/lib/admin/requireAdmin", () => ({ requireAdmin }));
 vi.mock("next/cache", () => ({ revalidatePath }));
+vi.mock("@/lib/public-revalidation", () => ({
+  revalidateFilInfoPublicPages,
+}));
 vi.mock("@/lib/prisma", () => ({
   prisma: { $transaction: transaction },
 }));
@@ -80,6 +85,7 @@ describe("updateFilInfoSettings", () => {
     expect(update.mock.calls[0]?.[0].data).not.toHaveProperty(
       "editorialStatus",
     );
+    expect(revalidateFilInfoPublicPages).toHaveBeenCalledOnce();
   });
 
   it("refuse d’exposer un article non publié", async () => {

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
+import { revalidateFilInfoPublicPages } from "@/lib/public-revalidation";
 
 export type UpdateFilInfoSettingsInput = {
   articleId: number;
@@ -111,7 +112,7 @@ export async function updateFilInfoSettings(
       });
     });
 
-    revalidatePath("/fil-info");
+    revalidateFilInfoPublicPages();
     revalidatePath(`/admin/articles/${input.articleId}`);
 
     return {
