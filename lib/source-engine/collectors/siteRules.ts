@@ -9,7 +9,11 @@ export type SiteRule = {
 
 export const siteRules: Record<string, SiteRule> = {
   "www.altaveu.com": {
-  listing: ["h2 a"],
+  listing: ['a[href*="/actualitat/"]'],
+  articlePathPattern:
+    /^\/actualitat\/[^/]+\/[^/]+_\d+_\d+\.html$/,
+  maxArticles: 24,
+  concurrency: 4,
   content: [
     ".c-mainarticle__body",
   ],

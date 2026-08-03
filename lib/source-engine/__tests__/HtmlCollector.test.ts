@@ -186,4 +186,44 @@ describe("HtmlCollector", () => {
       }),
     ]);
   });
+
+  it("collecte uniquement les articles d'actualité Altaveu", async () => {
+    const source = {
+      ...createSource(),
+      name: "Altaveu",
+      url: "https://www.altaveu.com",
+    };
+    const articleUrl =
+      "https://www.altaveu.com/actualitat/societat/article-test_123_102.html";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <a href="/actualitat/societat">Rubrique société</a>
+        <a href="/videos/video-test_123_110.html">Vidéo sans article</a>
+        <a href="${articleUrl}">Article Altaveu</a>
+        <a href="${articleUrl}#comments-anchor">Commentaires</a>
+      `,
+      [articleUrl]: `
+        <div class="c-mainarticle__body">
+          <p>Premier paragraphe complet de l'article publié par Altaveu.</p>
+          <p>Second paragraphe qui confirme la bonne extraction du contenu.</p>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Article Altaveu",
+        url: articleUrl,
+        content:
+          "Premier paragraphe complet de l'article publié par Altaveu.\n\nSecond paragraphe qui confirme la bonne extraction du contenu.",
+      }),
+    ]);
+    expect(htmlClient.receivedUrls).toEqual([
+      source.url,
+      articleUrl,
+    ]);
+  });
 });

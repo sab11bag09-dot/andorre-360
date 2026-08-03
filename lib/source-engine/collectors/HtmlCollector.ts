@@ -27,7 +27,10 @@ function normalizeUrl(
   sourceUrl: string,
 ): string | null {
   try {
-    return new URL(value, sourceUrl).toString();
+    const url = new URL(value, sourceUrl);
+    url.hash = "";
+
+    return url.toString();
   } catch {
     return null;
   }
