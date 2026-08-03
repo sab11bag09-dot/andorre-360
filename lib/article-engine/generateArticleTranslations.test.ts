@@ -287,4 +287,33 @@ describe("generateArticleTranslations", () => {
     expect(createDraft).not.toHaveBeenCalled();
     expect(updateDraft).not.toHaveBeenCalled();
   });
+
+  it("ne persiste rien si la préparation d’une langue échoue", async () => {
+    const {
+      dependencies,
+      createDraft,
+      updateDraft,
+      translateArticle,
+    } = makeDependencies();
+    translateArticle
+      .mockResolvedValueOnce({
+        locale: "CA",
+        title: "Títol",
+        description: "Descripció",
+        content: "Contingut",
+      })
+      .mockRejectedValueOnce(
+        new Error("Générateur indisponible"),
+      );
+
+    await expect(
+      generateArticleTranslations(
+        article.id,
+        dependencies,
+      ),
+    ).rejects.toThrow("Générateur indisponible");
+
+    expect(createDraft).not.toHaveBeenCalled();
+    expect(updateDraft).not.toHaveBeenCalled();
+  });
 });
