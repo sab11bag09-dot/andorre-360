@@ -2,6 +2,7 @@ export type SiteRule = {
   listing?: string[];
   content: string[];
   remove?: string[];
+  articlePathPattern?: RegExp;
 };
 
 export const siteRules: Record<string, SiteRule> = {
@@ -41,6 +42,7 @@ export const siteRules: Record<string, SiteRule> = {
   listing: [
     'a[href^="/noticies/"]',
   ],
+  articlePathPattern: /^\/noticies\/[^/]+\/[^/]+\/?$/,
   content: [
     '[class^="ContentArticle_infoBody"]',
   ],
