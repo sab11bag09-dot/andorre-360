@@ -4,7 +4,11 @@ Date de cadrage : 2 août 2026
 
 Base de référence : `audit/studio-v4` au commit `0f4dd6945d25c5fc8329121fd7d838dc54b1f3b6`
 
-Statut : proposition à valider avant développement
+Statut : chantier terminé et fusionné
+
+Date de clôture : 3 août 2026
+
+Référence Git de clôture : `audit/studio-v4` au commit `c3b8a07c23839ff455f469a3db3cf59d9005c18f`
 
 ## 1. Objet
 
@@ -291,6 +295,15 @@ Le chantier est terminé lorsque :
 - les migrations, les tests, TypeScript, ESLint et le build réussissent ;
 - le dépôt est propre et synchronisé après fusion.
 
-## 14. Première action
+## 14. Historique de livraison
 
-Fusionner cette feuille de route dans une PR documentaire autonome, puis commencer par `fix/admin-write-authorization`.
+Le chantier a été livré par quatre pull requests techniques successives :
+
+| PR | Branche | Résultat |
+| ---: | --- | --- |
+| #14 | `fix/admin-write-authorization` | Autorisation ADMIN et suppression des pages administratives de test |
+| #15 | `fix/publication-visibility-rules` | Barrière publique, indépendance du Fil info et date française |
+| #16 | `feat/public-page-revalidation` | Rendu dynamique et invalidation ciblée des pages publiques |
+| #17 | `test/security-publication-hardening` | Tests critiques d’autorisation, de visibilité et de fraîcheur |
+
+État de validation à la clôture : 25 migrations à jour, 38 fichiers de tests, 205 tests réussis, TypeScript sans erreur, ESLint sans nouvelle erreur et build Next.js réussi.
