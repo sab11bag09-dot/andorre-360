@@ -1,44 +1,32 @@
 import { NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
-import { join, extname } from "node:path";
+
+import { resolvePublicMediaFile } from "@/lib/media/resolvePublicMediaFile";
 
 export const runtime = "nodejs";
 
-const MIME_TYPES: Record<string, string> = {
-  ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg",
-  ".png": "image/png",
-  ".webp": "image/webp",
-  ".gif": "image/gif",
-  ".svg": "image/svg+xml",
-  ".avif": "image/avif",
-};
-
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ folder: string; filename: string }> }
 ) {
   const { folder, filename } = await params;
+  const mediaFile = resolvePublicMediaFile(folder, filename);
+
+  if (!mediaFile) {
+    return NextResponse.json(
+      { error: "File not found" },
+      { status: 404 },
+    );
+  }
 
   try {
-    const filePath = join(
-      process.cwd(),
-      "storage",
-      "media",
-      folder,
-      filename
-    );
-
-    const buffer = await readFile(filePath);
-
-    const extension = extname(filename).toLowerCase();
-    const contentType =
-      MIME_TYPES[extension] ?? "application/octet-stream";
+    const buffer = await readFile(mediaFile.filePath);
 
     return new NextResponse(buffer, {
       headers: {
-        "Content-Type": contentType,
+        "Content-Type": mediaFile.contentType,
         "Cache-Control": "public, max-age=31536000, immutable",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   } catch {

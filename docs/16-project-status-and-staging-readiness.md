@@ -4,9 +4,9 @@ Date de référence : 3 août 2026
 
 Branche de référence : `audit/studio-v4`
 
-Commit de référence : `c3b8a07c23839ff455f469a3db3cf59d9005c18f`
+Base de l’audit final : `da6d8874d7dfb9c6e3cc66473d7d677815fd33d2`
 
-Statut : base fonctionnelle, testée et sécurisée ; recette distante non engagée
+Statut : base fonctionnelle, audit final de sécurité corrigé ; recette distante non engagée
 
 ## 1. Objet
 
@@ -52,18 +52,35 @@ La référence d’exploitation est `docs/14-fil-info-workflow.md`.
 - l’accueil et les rubriques reflètent les mutations sans nouveau build ;
 - les anciennes pages administratives de test ont été supprimées.
 
+### Historique éditorial
+
+- traçage atomique des articles, statuts, placements et réglages du Fil info ;
+- traçage du cycle manuel et de la génération automatique des traductions ;
+- historique consultable sur chaque fiche article ;
+- journal global en lecture seule, paginé et filtrable ;
+- accès réservé aux administrateurs actifs.
+
+### Sécurisation finale
+
+- route publique des médias limitée aux dossiers et extensions autorisés ;
+- traversées de chemin Unix et Windows refusées avant toute lecture de fichier ;
+- réponses média protégées par `X-Content-Type-Options: nosniff` ;
+- Next.js mis à jour vers la version corrective `16.2.11` ;
+- dépendances Prisma et de traitement d’images mises à jour ;
+- audit npm sans vulnérabilité connue.
+
 ## 3. Référence de validation
 
-À la clôture du chantier sécurité :
+À la clôture de l’audit final :
 
-- 25 migrations Prisma appliquées ;
-- 38 fichiers de tests réussis ;
-- 205 tests réussis ;
+- 26 migrations Prisma validées ;
+- 44 fichiers de tests réussis ;
+- 234 tests réussis ;
 - TypeScript sans erreur ;
 - ESLint sans nouvelle erreur ;
-- build Next.js 16.2.10 réussi ;
-- aucune pull request ni issue ouverte ;
-- branche locale propre et synchronisée après fusion.
+- build Next.js 16.2.11 réussi ;
+- audit npm sans vulnérabilité ;
+- chaîne d’installation reproductible avec `npm ci`.
 
 Les six avertissements ESLint historiques restent hors du périmètre fonctionnel et ne bloquent pas le build.
 
@@ -128,6 +145,7 @@ npm test -- --run
 npx tsc --noEmit
 npm run lint
 npm run build
+npm audit --audit-level=moderate
 git diff --check
 ```
 
@@ -140,7 +158,6 @@ La base actuelle ne constitue pas encore l’Information Operating System comple
 - consolidation de plusieurs observations ;
 - Claims, Evidence et Facts ;
 - Story Engine ;
-- traçabilité éditoriale complète ;
 - agents journaliste, vérification factuelle et SEO avancé ;
 - publication autonome gouvernée par les règles éditoriales.
 
