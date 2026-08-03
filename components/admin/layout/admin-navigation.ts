@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Images,
+  History,
   LayoutDashboard,
   LayoutGrid,
   Newspaper,
@@ -63,6 +64,11 @@ export const adminNavigation: AdminNavigationItem[] = [
     label: "Diffusion",
     href: "/admin/diffusion",
     icon: Send,
+  },
+  {
+    label: "Historique",
+    href: "/admin/history",
+    icon: History,
   },
   {
     label: "Paramètres",
