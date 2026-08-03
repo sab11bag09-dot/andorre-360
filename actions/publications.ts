@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
+import { recordEditorialEvent } from "@/lib/editorial-history";
 import { prisma } from "@/lib/prisma";
 import { isPublicArticle } from "@/lib/public-article";
 import { revalidateEditorialPublicPage } from "@/lib/public-revalidation";
@@ -109,7 +110,7 @@ async function movePublicationDown(
 export async function replacePublication(
   input: ReplacePublicationInput
 ): Promise<ReplacePublicationResult> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   const {
     articleId,
@@ -233,6 +234,21 @@ export async function replacePublication(
               active: true,
             },
           });
+
+      await recordEditorialEvent(transaction, {
+        action: "PUBLICATION_PLACED",
+        articleId,
+        actor: admin,
+        details: {
+          pageKey,
+          zone,
+          channel,
+          priority,
+          previousArticleId:
+            currentPublication?.articleId ?? null,
+          movedArticles,
+        },
+      });
 
       return {
         publication,

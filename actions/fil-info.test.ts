@@ -7,6 +7,7 @@ const {
   updateMany,
   update,
   transaction,
+  editorialEventCreate,
   revalidateFilInfoPublicPages,
 } = vi.hoisted(() => ({
   requireAdmin: vi.fn(),
@@ -15,6 +16,7 @@ const {
   updateMany: vi.fn(),
   update: vi.fn(),
   transaction: vi.fn(),
+  editorialEventCreate: vi.fn(),
   revalidateFilInfoPublicPages: vi.fn(),
 }));
 
@@ -34,11 +36,17 @@ const updatedAt = new Date("2026-08-02T06:00:00.000Z");
 describe("updateFilInfoSettings", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    requireAdmin.mockResolvedValue(undefined);
+    requireAdmin.mockResolvedValue({
+      id: "admin-1",
+      email: "admin@example.com",
+    });
     findUnique.mockResolvedValue({
       id: 7,
       published: true,
       editorialStatus: "PUBLISHED",
+      filInfoVisible: false,
+      filInfoPinned: false,
+      publishedAt: new Date("2026-08-02T05:00:00.000Z"),
       updatedAt,
     });
     update.mockResolvedValue({
@@ -49,7 +57,10 @@ describe("updateFilInfoSettings", () => {
     });
     transaction.mockImplementation(
       async (callback: (client: unknown) => unknown) =>
-        callback({ article: { findUnique, updateMany, update } }),
+        callback({
+          article: { findUnique, updateMany, update },
+          editorialEvent: { create: editorialEventCreate },
+        }),
     );
   });
 
@@ -86,6 +97,22 @@ describe("updateFilInfoSettings", () => {
       "editorialStatus",
     );
     expect(revalidateFilInfoPublicPages).toHaveBeenCalledOnce();
+    expect(editorialEventCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: "FIL_INFO_UPDATED",
+        articleId: 7,
+        actorId: "admin-1",
+        actorEmail: "admin@example.com",
+        details: JSON.stringify({
+          previousVisible: false,
+          visible: true,
+          previousPinned: false,
+          pinned: true,
+          previousPublishedAt: "2026-08-02T05:00:00.000Z",
+          publishedAt: "2026-08-02T05:30:00.000Z",
+        }),
+      }),
+    });
   });
 
   it("refuse d’exposer un article non publié", async () => {
@@ -93,6 +120,9 @@ describe("updateFilInfoSettings", () => {
       id: 7,
       published: false,
       editorialStatus: "APPROVED",
+      filInfoVisible: false,
+      filInfoPinned: false,
+      publishedAt: null,
       updatedAt,
     });
 
@@ -110,6 +140,7 @@ describe("updateFilInfoSettings", () => {
         "Seul un article publié et approuvé peut apparaître dans le Fil info.",
     });
     expect(update).not.toHaveBeenCalled();
+    expect(editorialEventCreate).not.toHaveBeenCalled();
   });
 
   it("refuse une écriture fondée sur une version périmée", async () => {
