@@ -1024,3 +1024,21 @@ Avant de modifier le projet :
 10. tester, commiter et pousser chaque point stable.
 
 En cas de contradiction entre une conversation ancienne et les fichiers présents dans GitHub, considérer le code, l’historique Git et les documents commités comme les sources vérifiables, puis demander confirmation avant toute action irréversible.
+
+## 24. Intégration continue
+
+Le workflow `.github/workflows/ci.yml` contrôle automatiquement chaque pull request ciblant `audit/studio-v4` ainsi que chaque mise à jour de cette branche.
+
+Il utilise un jeton GitHub limité à la lecture et des valeurs de configuration réservées à la CI. Aucun secret de production ni aucune base locale ne sont transmis au workflow.
+
+Les étapes obligatoires sont exécutées dans cet ordre :
+
+1. installation reproductible avec `npm ci` ;
+2. génération du client Prisma ;
+3. application des migrations sur une base SQLite dédiée à la CI ;
+4. suite complète de tests ;
+5. contrôle TypeScript ;
+6. contrôle ESLint ;
+7. build Next.js de production.
+
+Une pull request ne doit pas être fusionnée tant que le contrôle `Tests, types, lint and build` n’est pas réussi. La validation locale reste recommandée pour détecter un problème avant le push.
