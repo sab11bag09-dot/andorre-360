@@ -60,7 +60,7 @@ export default async function MontagnePageV2() {
         <div className="grid gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 lg:flex lg:flex-col">
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
@@ -120,14 +120,14 @@ export default async function MontagnePageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2">
+              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block"
+                    className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -153,10 +153,10 @@ export default async function MontagnePageV2() {
                 {secondBottomCard && (
                   <Link
                     href={`/article/${secondBottomCard.slug}`}
-                    className="block"
+                    className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
