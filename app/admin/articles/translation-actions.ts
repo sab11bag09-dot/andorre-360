@@ -3,17 +3,20 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { requireAdmin } from "@/lib/admin/requireAdmin";
+import {
+  requireAdmin,
+  type AdminIdentity,
+} from "@/lib/admin/requireAdmin";
 import {
   createGenerateArticleTranslationsDependencies,
 } from "@/lib/article-engine/articleEngineComposition";
 import { generateArticleTranslations } from "@/lib/article-engine/generateArticleTranslations";
 import {
-  publishArticleTranslation,
-  transitionArticleTranslation,
-  updateArticleTranslation,
-  updateArticleTranslationSlug,
-} from "@/lib/article-engine/manageArticleTranslation";
+  publishAuditedArticleTranslation,
+  transitionAuditedArticleTranslation,
+  updateAuditedArticleTranslation,
+  updateAuditedArticleTranslationSlug,
+} from "@/lib/article-engine/auditedTranslationMutations";
 import {
   assertMultilingualPublicationEnabled,
 } from "@/lib/config/multilingualPublication";
@@ -36,13 +39,13 @@ async function runTranslationAction(
   articleId: number,
   locale: string,
   successMessage: string,
-  action: () => Promise<void>,
+  action: (admin: AdminIdentity) => Promise<void>,
 ): Promise<never> {
   let errorMessage: string | null = null;
 
   try {
-    await requireAdmin();
-    await action();
+    const admin = await requireAdmin();
+    await action(admin);
   } catch (error) {
     errorMessage = getErrorMessage(error);
   }
@@ -104,21 +107,24 @@ export async function updateArticleTranslationAction(
     articleId,
     locale,
     "Corrections enregistrées.",
-    async () => {
-      await updateArticleTranslation({
-        articleId,
-        locale,
-        title:
-          formData.get("title")?.toString() ??
-          "",
-        description:
-          formData
-            .get("description")
-            ?.toString() ?? "",
-        content:
-          formData.get("content")?.toString() ??
-          "",
-      });
+    async (admin) => {
+      await updateAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+          title:
+            formData.get("title")?.toString() ??
+            "",
+          description:
+            formData
+              .get("description")
+              ?.toString() ?? "",
+          content:
+            formData.get("content")?.toString() ??
+            "",
+        },
+        admin,
+      );
     },
   );
 }
@@ -132,14 +138,17 @@ export async function updateArticleTranslationSlugAction(
     articleId,
     locale,
     "Slug enregistré.",
-    async () => {
-      await updateArticleTranslationSlug({
-        articleId,
-        locale,
-        slug:
-          formData.get("slug")?.toString() ??
-          "",
-      });
+    async (admin) => {
+      await updateAuditedArticleTranslationSlug(
+        {
+          articleId,
+          locale,
+          slug:
+            formData.get("slug")?.toString() ??
+            "",
+        },
+        admin,
+      );
     },
   );
 }
@@ -152,12 +161,15 @@ export async function submitArticleTranslationForReviewAction(
     articleId,
     locale,
     "Traduction envoyée en relecture.",
-    async () => {
-      await transitionArticleTranslation({
-        articleId,
-        locale,
-        nextStatus: "REVIEW",
-      });
+    async (admin) => {
+      await transitionAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+          nextStatus: "REVIEW",
+        },
+        admin,
+      );
     },
   );
 }
@@ -170,12 +182,15 @@ export async function returnArticleTranslationToDraftAction(
     articleId,
     locale,
     "Traduction revenue au brouillon.",
-    async () => {
-      await transitionArticleTranslation({
-        articleId,
-        locale,
-        nextStatus: "DRAFT",
-      });
+    async (admin) => {
+      await transitionAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+          nextStatus: "DRAFT",
+        },
+        admin,
+      );
     },
   );
 }
@@ -188,12 +203,15 @@ export async function returnApprovedTranslationToReviewAction(
     articleId,
     locale,
     "Traduction renvoyée en relecture.",
-    async () => {
-      await transitionArticleTranslation({
-        articleId,
-        locale,
-        nextStatus: "REVIEW",
-      });
+    async (admin) => {
+      await transitionAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+          nextStatus: "REVIEW",
+        },
+        admin,
+      );
     },
   );
 }
@@ -206,12 +224,15 @@ export async function approveArticleTranslationAction(
     articleId,
     locale,
     "Traduction approuvée.",
-    async () => {
-      await transitionArticleTranslation({
-        articleId,
-        locale,
-        nextStatus: "APPROVED",
-      });
+    async (admin) => {
+      await transitionAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+          nextStatus: "APPROVED",
+        },
+        admin,
+      );
     },
   );
 }
@@ -224,13 +245,16 @@ export async function publishArticleTranslationAction(
     articleId,
     locale,
     "Traduction publiée.",
-    async () => {
+    async (admin) => {
       assertMultilingualPublicationEnabled();
 
-      await publishArticleTranslation({
-        articleId,
-        locale,
-      });
+      await publishAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+        },
+        admin,
+      );
     },
   );
 }
@@ -243,12 +267,15 @@ export async function archiveArticleTranslationAction(
     articleId,
     locale,
     "Traduction retirée de la publication.",
-    async () => {
-      await transitionArticleTranslation({
-        articleId,
-        locale,
-        nextStatus: "ARCHIVED",
-      });
+    async (admin) => {
+      await transitionAuditedArticleTranslation(
+        {
+          articleId,
+          locale,
+          nextStatus: "ARCHIVED",
+        },
+        admin,
+      );
     },
   );
 }
