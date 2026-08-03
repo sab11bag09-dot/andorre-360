@@ -10,6 +10,20 @@ export type CollectionResult = {
   created: number;
 };
 
+const MAX_ERROR_MESSAGE_LENGTH = 1_000;
+
+function getCollectionErrorMessage(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return "Une erreur inconnue est survenue pendant la collecte.";
+  }
+
+  const message = error.message
+    .trim()
+    .slice(0, MAX_ERROR_MESSAGE_LENGTH);
+
+  return message || "Une erreur inconnue est survenue pendant la collecte.";
+}
+
 export async function collectSource(
   sourceId: number,
   repository: CollectionSourceRepository =
@@ -29,18 +43,30 @@ export async function collectSource(
     throw new Error("Source introuvable.");
   }
 
-  const collector = factory.create(source);
-
-  const observations = await collector.collect(source);
-
-  const created =
-    await observationRepository.saveMany(
+  try {
+    const collector = factory.create(source);
+    const observations = await collector.collect(source);
+    const created = await observationRepository.saveMany(
       source.id,
       observations,
     );
 
-  return {
-    collected: observations.length,
-    created,
-  };
+    await repository.markCollectionSucceeded(
+      source.id,
+      new Date(),
+    );
+
+    return {
+      collected: observations.length,
+      created,
+    };
+  } catch (error) {
+    await repository.markCollectionFailed(
+      source.id,
+      new Date(),
+      getCollectionErrorMessage(error),
+    );
+
+    throw error;
+  }
 }
