@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicArticlePages } from "@/lib/public-revalidation";
 
 /* =========================================================
    TYPES
@@ -107,20 +108,12 @@ async function createUniqueSlug(
    REVALIDATION
 ========================================================= */
 
-function revalidatePublicPages(slug?: string) {
-  revalidatePath("/");
+function revalidatePublicPages(
+  slugs: string[] = [],
+  categories: string[] = [],
+) {
   revalidatePath("/admin");
-
-  revalidatePath("/actualite");
-  revalidatePath("/economie");
-  revalidatePath("/societe");
-  revalidatePath("/culture");
-  revalidatePath("/sports");
-  revalidatePath("/montagne");
-
-  if (slug) {
-    revalidatePath(`/article/${slug}`);
-  }
+  revalidatePublicArticlePages({ slugs, categories });
 }
 
 /* =========================================================
@@ -286,9 +279,8 @@ export async function createArticle(
     );
 
   revalidatePublicPages(
-    shouldPublish
-      ? createdArticle.slug
-      : undefined
+    shouldPublish ? [createdArticle.slug] : [],
+    [createdArticle.category],
   );
 
   revalidatePath(
@@ -422,7 +414,8 @@ export async function updateArticle(
     });
 
   revalidatePublicPages(
-    updatedArticle.slug
+    [updatedArticle.slug, existingArticle.slug],
+    [updatedArticle.category, existingArticle.category],
   );
 
   revalidatePath(
