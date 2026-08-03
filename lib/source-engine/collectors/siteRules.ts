@@ -55,8 +55,11 @@ export const siteRules: Record<string, SiteRule> = {
   listing: [
     'a[href^="/ca/article/"]',
   ],
+  articlePathPattern: /^\/ca\/article\/[^/]+\/?$/,
+  maxArticles: 24,
+  concurrency: 4,
   content: [
-    ".field--name-body",
+    ".content__body .field--name-body",
   ],
 },
 "elperiodic.ad": {

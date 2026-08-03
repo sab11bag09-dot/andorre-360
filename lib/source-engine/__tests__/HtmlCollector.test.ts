@@ -148,4 +148,42 @@ describe("HtmlCollector", () => {
     expect(htmlClient.receivedUrls).toHaveLength(25);
     expect(htmlClient.maxActiveRequests).toBe(4);
   });
+
+  it("extrait le corps éditorial de La Veu Lliure", async () => {
+    const source = {
+      ...createSource(),
+      name: "La Veu Lliure",
+      url: "https://www.laveulliure.ad/ca",
+    };
+    const articleUrl =
+      "https://www.laveulliure.ad/ca/article/article-test";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <a href="/ca/article/article-test">Article test</a>
+      `,
+      [articleUrl]: `
+        <div class="field--name-body">
+          <ul class="social-network"><li>Réseaux sociaux</li></ul>
+        </div>
+        <div class="content__body">
+          <div class="field--name-body">
+            <p>Premier paragraphe éditorial suffisamment long pour être conservé.</p>
+            <p>Second paragraphe éditorial utile pour vérifier toute l’extraction.</p>
+          </div>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Article test",
+        url: articleUrl,
+        content:
+          "Premier paragraphe éditorial suffisamment long pour être conservé.\n\nSecond paragraphe éditorial utile pour vérifier toute l’extraction.",
+      }),
+    ]);
+  });
 });
