@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
+import { recordEditorialEvent } from "@/lib/editorial-history";
 import { prisma } from "@/lib/prisma";
 import { revalidateFilInfoPublicPages } from "@/lib/public-revalidation";
 
@@ -37,7 +38,7 @@ export async function updateFilInfoSettings(
   input: UpdateFilInfoSettingsInput,
 ): Promise<UpdateFilInfoSettingsResult> {
   try {
-    await requireAdmin();
+    const admin = await requireAdmin();
 
     if (!Number.isInteger(input.articleId) || input.articleId <= 0) {
       return { success: false, message: "Article invalide." };
@@ -67,6 +68,9 @@ export async function updateFilInfoSettings(
           id: true,
           published: true,
           editorialStatus: true,
+          filInfoVisible: true,
+          filInfoPinned: true,
+          publishedAt: true,
           updatedAt: true,
         },
       });
@@ -96,7 +100,7 @@ export async function updateFilInfoSettings(
         });
       }
 
-      return transaction.article.update({
+      const updated = await transaction.article.update({
         where: { id: input.articleId },
         data: {
           filInfoVisible: input.visible,
@@ -110,6 +114,24 @@ export async function updateFilInfoSettings(
           updatedAt: true,
         },
       });
+
+      await recordEditorialEvent(transaction, {
+        action: "FIL_INFO_UPDATED",
+        articleId: input.articleId,
+        actor: admin,
+        details: {
+          previousVisible: article.filInfoVisible,
+          visible: updated.filInfoVisible,
+          previousPinned: article.filInfoPinned,
+          pinned: updated.filInfoPinned,
+          previousPublishedAt:
+            article.publishedAt?.toISOString() ?? null,
+          publishedAt:
+            updated.publishedAt?.toISOString() ?? null,
+        },
+      });
+
+      return updated;
     });
 
     revalidateFilInfoPublicPages();
