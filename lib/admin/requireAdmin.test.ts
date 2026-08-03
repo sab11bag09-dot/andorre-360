@@ -78,4 +78,23 @@ describe("autorisation administrateur", () => {
       error: "Accès administrateur requis.",
     });
   });
+
+  it("retourne une réponse 401 pour une API sans session", async () => {
+    auth.mockResolvedValue(null);
+
+    const response = await requireAdminApi();
+
+    expect(response?.status).toBe(401);
+    await expect(response?.json()).resolves.toEqual({
+      error: "Authentification requise.",
+    });
+    expect(findUnique).not.toHaveBeenCalled();
+  });
+
+  it("laisse passer une API pour un ADMIN actif", async () => {
+    auth.mockResolvedValue({ user: { email: "admin@example.com" } });
+    findUnique.mockResolvedValue({ active: true, role: "ADMIN" });
+
+    await expect(requireAdminApi()).resolves.toBeNull();
+  });
 });
