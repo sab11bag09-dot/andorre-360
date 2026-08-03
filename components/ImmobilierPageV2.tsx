@@ -184,7 +184,7 @@ export default async function ImmobilierPageV2() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2">
+          <aside className="space-y-6 lg:col-span-2 lg:flex lg:flex-col lg:gap-6 lg:space-y-0">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -226,14 +226,24 @@ export default async function ImmobilierPageV2() {
 
             {/* TROIS CARTES CLASSIQUES */}
 
-            {rightCards.map((article) => (
+            {rightCards.map((article, index) => (
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
-                className="block"
+                className={
+                  index === rightCards.length - 1
+                    ? "block lg:flex-1"
+                    : "block"
+                }
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                  <div
+                    className={`relative h-40 ${
+                      index === rightCards.length - 1
+                        ? "lg:h-auto lg:min-h-40 lg:flex-1"
+                        : ""
+                    }`}
+                  >
                     <SafeImage
                       src={article.image}
                       alt={article.title}
