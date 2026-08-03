@@ -2,7 +2,11 @@
 
 Date de cadrage : 2 août 2026
 
-Statut : lots 1 à 7 livrés ; lot 8 consacré à la validation et à la documentation
+Statut : chantier terminé ; lots 0 à 8 livrés, validés et documentés
+
+Date de clôture : 2 août 2026
+
+Référence Git de clôture : `audit/studio-v4` au commit `0f4dd6945d25c5fc8329121fd7d838dc54b1f3b6`
 
 Référence d’exploitation : `docs/14-fil-info-workflow.md`
 
@@ -12,7 +16,7 @@ Cette fiche définit la transformation progressive de la page `/fil-info` en un 
 
 La page actuelle possède une présentation éditoriale solide, mais son fonctionnement repose essentiellement sur une répartition visuelle des articles publiés. Le chantier doit corriger les anomalies existantes, rendre les informations récentes immédiatement accessibles et préparer un fonctionnement durable, administrable et multilingue.
 
-## État actuel
+## État de départ avant chantier
 
 Le Fil info actuel :
 
@@ -219,6 +223,8 @@ Le chantier sera considéré comme terminé lorsque :
 - les versions FR, CA et ES respectent le workflow de publication ;
 - les tests, le build, le contrôle visuel et la documentation sont validés.
 
-## Première étape recommandée
+## État de clôture
 
-Valider les règles du lot 0, puis ouvrir la branche `fix/fil-info-data-selection` pour corriger le tri, les doublons et la visibilité du flux avant toute refonte plus importante.
+Les lots 0 à 8 sont fusionnés. Le fonctionnement livré et la procédure d’exploitation sont décrits dans `docs/14-fil-info-workflow.md`.
+
+Toute évolution ultérieure du Fil info doit partir de la branche `audit/studio-v4`, préserver les règles de publication sécurisées et être traitée comme un nouveau chantier autonome.

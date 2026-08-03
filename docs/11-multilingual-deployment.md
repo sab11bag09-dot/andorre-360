@@ -72,7 +72,7 @@ npm test -- --run
 npm run build
 ```
 
-Résultat de référence au 1 août 2026 : 19 fichiers de tests et 113 tests. Les
+Résultat de référence au 3 août 2026 : 38 fichiers de tests et 205 tests. Les
 tests d'intégration créent leur propre base temporaire et ne touchent pas à la
 base configurée par `DATABASE_URL`.
 
@@ -125,7 +125,7 @@ npm run start
 ```
 
 Ne jamais utiliser `prisma migrate dev` en production. Le statut doit confirmer
-que les 21 migrations sont appliquées.
+que les 25 migrations sont appliquées.
 
 ## 7. Ouverture progressive
 
