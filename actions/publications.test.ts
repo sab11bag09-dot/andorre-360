@@ -79,4 +79,20 @@ describe("replacePublication", () => {
       "category:POLITIQUE",
     );
   });
+
+  it("refuse sans administrateur avant toute lecture ou transaction", async () => {
+    requireAdmin.mockRejectedValue(new Error("Accès refusé"));
+
+    await expect(
+      replacePublication({
+        articleId: 42,
+        pageKey: "home",
+        zone: "hero",
+      }),
+    ).rejects.toThrow("Accès refusé");
+
+    expect(findUnique).not.toHaveBeenCalled();
+    expect(transaction).not.toHaveBeenCalled();
+    expect(revalidateEditorialPublicPage).not.toHaveBeenCalled();
+  });
 });

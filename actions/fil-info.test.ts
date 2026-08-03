@@ -128,4 +128,24 @@ describe("updateFilInfoSettings", () => {
     });
     expect(update).not.toHaveBeenCalled();
   });
+
+  it("refuse sans administrateur avant toute transaction", async () => {
+    requireAdmin.mockRejectedValue(new Error("Accès refusé"));
+
+    await expect(
+      updateFilInfoSettings({
+        articleId: 7,
+        visible: true,
+        pinned: false,
+        publishedAt: "2026-08-02T05:30:00.000Z",
+        expectedUpdatedAt: updatedAt.toISOString(),
+      }),
+    ).resolves.toEqual({
+      success: false,
+      message: "La mise à jour du Fil info a échoué.",
+    });
+
+    expect(transaction).not.toHaveBeenCalled();
+    expect(revalidateFilInfoPublicPages).not.toHaveBeenCalled();
+  });
 });
