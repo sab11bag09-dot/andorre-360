@@ -8,21 +8,22 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  firstName     String
-  lastName      String
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  passwordHash  String?
-  image         String?
-  role          UserRole  @default(EDITOR)
-  active        Boolean   @default(true)
-  lastLoginAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
+  id              String           @id @default(cuid())
+  firstName       String
+  lastName        String
+  name            String?
+  email           String           @unique
+  emailVerified   DateTime?
+  passwordHash    String?
+  image           String?
+  role            UserRole         @default(EDITOR)
+  active          Boolean          @default(true)
+  lastLoginAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  accounts        Account[]
+  sessions        Session[]
+  editorialEvents EditorialEvent[]
 }
 
 model Account {
@@ -85,8 +86,9 @@ model Article {
   analytics       ArticleAnalytics[]
   publications    Publication[]
 
-  observations Observation[]
-  translations ArticleTranslation[]
+  observations    Observation[]
+  translations    ArticleTranslation[]
+  editorialEvents EditorialEvent[]
 
   @@index([category, published, publishedAt])
   @@index([category, published, editorialStatus, filInfoVisible, publishedAt, createdAt, id])
@@ -115,6 +117,43 @@ enum FilInfoFormat {
   ARTICLE
 }
 
+enum EditorialEventAction {
+  ARTICLE_CREATED
+  ARTICLE_UPDATED
+  ARTICLE_PUBLISHED
+  ARTICLE_UNPUBLISHED
+  ARTICLE_STATUS_CHANGED
+  TRANSLATION_GENERATED
+  TRANSLATION_UPDATED
+  TRANSLATION_STATUS_CHANGED
+  TRANSLATION_PUBLISHED
+  TRANSLATION_ARCHIVED
+  FIL_INFO_UPDATED
+  PUBLICATION_PLACED
+}
+
+model EditorialEvent {
+  id            Int                  @id @default(autoincrement())
+  action        EditorialEventAction
+  articleId     Int
+  translationId Int?
+  actorId       String?
+  actorEmail    String
+  fromStatus    EditorialStatus?
+  toStatus      EditorialStatus?
+  details       String?
+  createdAt     DateTime             @default(now())
+
+  article     Article             @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  translation ArticleTranslation? @relation(fields: [translationId], references: [id], onDelete: SetNull)
+  actor       User?               @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([articleId, createdAt])
+  @@index([translationId, createdAt])
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+}
+
 model ArticleTranslation {
   id             Int             @id @default(autoincrement())
   articleId      Int
@@ -132,7 +171,8 @@ model ArticleTranslation {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  article         Article          @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  editorialEvents EditorialEvent[]
 
   @@unique([articleId, locale])
   @@unique([locale, slug])

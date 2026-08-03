@@ -3,8 +3,13 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+export type AdminIdentity = {
+  id: string;
+  email: string;
+};
+
 export type AdminAuthorizationResult =
-  | { authorized: true; email: string }
+  | { authorized: true; admin: AdminIdentity }
   | { authorized: false; status: 401 | 403; message: string };
 
 export class AdminAuthorizationError extends Error {
@@ -34,6 +39,8 @@ export async function getAdminAuthorization(): Promise<AdminAuthorizationResult>
       email,
     },
     select: {
+      id: true,
+      email: true,
       role: true,
       active: true,
     },
@@ -47,10 +54,16 @@ export async function getAdminAuthorization(): Promise<AdminAuthorizationResult>
     };
   }
 
-  return { authorized: true, email };
+  return {
+    authorized: true,
+    admin: {
+      id: user.id,
+      email: user.email,
+    },
+  };
 }
 
-export async function requireAdmin(): Promise<void> {
+export async function requireAdmin(): Promise<AdminIdentity> {
   const authorization = await getAdminAuthorization();
 
   if (!authorization.authorized) {
@@ -59,6 +72,8 @@ export async function requireAdmin(): Promise<void> {
       authorization.message,
     );
   }
+
+  return authorization.admin;
 }
 
 export async function requireAdminApi() {

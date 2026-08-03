@@ -2,10 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireAdmin } from "@/lib/admin/requireAdmin";
+import {
+  requireAdmin,
+  type AdminIdentity,
+} from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicArticlePages } from "@/lib/public-revalidation";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
+import { recordEditorialEvent } from "@/lib/editorial-history";
 import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
 
 import {
@@ -203,7 +207,8 @@ function revalidateArticlePages(
 
 async function createArticle(
   input: SaveArticleInput,
-  draft: ArticleDraft
+  draft: ArticleDraft,
+  admin: AdminIdentity,
 ): Promise<SaveArticleResult> {
   const shouldPublish =
     input.intent === "publish";
@@ -317,6 +322,17 @@ if (media) {
           });
         }
 
+        await recordEditorialEvent(transaction, {
+          action: "ARTICLE_CREATED",
+          articleId: article.id,
+          actor: admin,
+          toStatus: "DRAFT",
+          details: {
+            slug: article.slug,
+            category: article.category,
+          },
+        });
+
         return article;
       }
     );
@@ -344,7 +360,8 @@ if (media) {
 
 async function updateArticle(
   input: SaveArticleInput,
-  draft: ArticleDraft
+  draft: ArticleDraft,
+  admin: AdminIdentity,
 ): Promise<SaveArticleResult> {
   if (draft.id === null) {
     return {
@@ -510,6 +527,21 @@ if (media) {
             },
           });
 
+          await recordEditorialEvent(transaction, {
+            action:
+              existingArticle.editorialStatus === "PUBLISHED"
+                ? "ARTICLE_UNPUBLISHED"
+                : "ARTICLE_UPDATED",
+            articleId: article.id,
+            actor: admin,
+            fromStatus: existingArticle.editorialStatus,
+            toStatus: article.editorialStatus,
+            details: {
+              slug: article.slug,
+              category: article.category,
+            },
+          });
+
           return article;
         }
 
@@ -608,6 +640,21 @@ if (media) {
           });
         }
 
+        await recordEditorialEvent(transaction, {
+          action:
+            existingArticle.editorialStatus === "PUBLISHED"
+              ? "ARTICLE_UPDATED"
+              : "ARTICLE_PUBLISHED",
+          articleId: article.id,
+          actor: admin,
+          fromStatus: existingArticle.editorialStatus,
+          toStatus: article.editorialStatus,
+          details: {
+            slug: article.slug,
+            category: article.category,
+          },
+        });
+
         return article;
       }
     );
@@ -640,7 +687,7 @@ if (media) {
 export async function saveArticle(
   input: SaveArticleInput
 ): Promise<SaveArticleResult> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   try {
     const draft = normalizeDraft(
@@ -681,13 +728,15 @@ export async function saveArticle(
     ) {
       return createArticle(
         input,
-        draft
+        draft,
+        admin,
       );
     }
 
     return updateArticle(
       input,
-      draft
+      draft,
+      admin,
     );
   } catch (error) {
     console.error(
