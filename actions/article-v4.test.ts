@@ -12,6 +12,7 @@ const {
   publicationUpdate,
   publicationUpdateMany,
   publicationCreate,
+  editorialEventCreate,
   revalidatePublicArticlePages,
   revalidatePath,
 } = vi.hoisted(() => ({
@@ -26,6 +27,7 @@ const {
   publicationUpdate: vi.fn(),
   publicationUpdateMany: vi.fn(),
   publicationCreate: vi.fn(),
+  editorialEventCreate: vi.fn(),
   revalidatePublicArticlePages: vi.fn(),
   revalidatePath: vi.fn(),
 }));
@@ -80,7 +82,10 @@ describe("durcissement de la sauvegarde principale", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     findUnique.mockReset();
-    requireAdmin.mockResolvedValue(undefined);
+    requireAdmin.mockResolvedValue({
+      id: "admin-1",
+      email: "admin@example.com",
+    });
     findUnique
       .mockResolvedValueOnce(existingArticle)
       .mockResolvedValueOnce({ id: 7 });
@@ -100,6 +105,9 @@ describe("durcissement de la sauvegarde principale", () => {
             update: publicationUpdate,
             updateMany: publicationUpdateMany,
             create: publicationCreate,
+          },
+          editorialEvent: {
+            create: editorialEventCreate,
           },
         }),
     );
@@ -133,6 +141,7 @@ describe("durcissement de la sauvegarde principale", () => {
         category: "POLITIQUE",
         title: "Nouveau titre",
         published,
+        editorialStatus: published ? "PUBLISHED" : "DRAFT",
       });
 
       const result = await saveArticle({
@@ -148,6 +157,48 @@ describe("durcissement de la sauvegarde principale", () => {
         categories: ["POLITIQUE", "ACTUALITÉ"],
         slugs: ["nouveau-titre", "ancien-titre"],
       });
+      expect(editorialEventCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          action: published
+            ? "ARTICLE_UPDATED"
+            : "ARTICLE_UNPUBLISHED",
+          articleId: 7,
+          actorId: "admin-1",
+          actorEmail: "admin@example.com",
+        }),
+      });
     },
   );
+
+  it("distingue une première publication d’une modification publiée", async () => {
+    findUnique.mockReset();
+    findUnique
+      .mockResolvedValueOnce({
+        ...existingArticle,
+        editorialStatus: "APPROVED",
+      })
+      .mockResolvedValueOnce({ id: 7 });
+    articleUpdate.mockResolvedValue({
+      id: 7,
+      slug: "nouveau-titre",
+      category: "POLITIQUE",
+      title: "Nouveau titre",
+      published: true,
+      editorialStatus: "PUBLISHED",
+    });
+
+    await saveArticle({
+      mode: "update",
+      intent: "publish",
+      article: createDraft(),
+    });
+
+    expect(editorialEventCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: "ARTICLE_PUBLISHED",
+        fromStatus: "APPROVED",
+        toStatus: "PUBLISHED",
+      }),
+    });
+  });
 });

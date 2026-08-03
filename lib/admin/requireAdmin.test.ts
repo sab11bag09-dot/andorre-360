@@ -35,8 +35,18 @@ describe("autorisation administrateur", () => {
 
   it.each([
     null,
-    { active: false, role: "ADMIN" },
-    { active: true, role: "EDITOR" },
+    {
+      id: "inactive-1",
+      email: "user@example.com",
+      active: false,
+      role: "ADMIN",
+    },
+    {
+      id: "editor-1",
+      email: "user@example.com",
+      active: true,
+      role: "EDITOR",
+    },
   ])("refuse un compte absent, inactif ou non ADMIN", async (user) => {
     auth.mockResolvedValue({ user: { email: "User@Example.com " } });
     findUnique.mockResolvedValue(user);
@@ -48,15 +58,28 @@ describe("autorisation administrateur", () => {
     });
     expect(findUnique).toHaveBeenCalledWith({
       where: { email: "user@example.com" },
-      select: { role: true, active: true },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        active: true,
+      },
     });
   });
 
   it("autorise un compte ADMIN actif", async () => {
     auth.mockResolvedValue({ user: { email: "admin@example.com" } });
-    findUnique.mockResolvedValue({ active: true, role: "ADMIN" });
+    findUnique.mockResolvedValue({
+      id: "admin-1",
+      email: "admin@example.com",
+      active: true,
+      role: "ADMIN",
+    });
 
-    await expect(requireAdmin()).resolves.toBeUndefined();
+    await expect(requireAdmin()).resolves.toEqual({
+      id: "admin-1",
+      email: "admin@example.com",
+    });
   });
 
   it("expose une erreur contrôlée aux actions serveur", async () => {
@@ -69,7 +92,12 @@ describe("autorisation administrateur", () => {
 
   it("retourne une réponse 403 pour une API interdite", async () => {
     auth.mockResolvedValue({ user: { email: "editor@example.com" } });
-    findUnique.mockResolvedValue({ active: true, role: "EDITOR" });
+    findUnique.mockResolvedValue({
+      id: "editor-1",
+      email: "editor@example.com",
+      active: true,
+      role: "EDITOR",
+    });
 
     const response = await requireAdminApi();
 
@@ -93,7 +121,12 @@ describe("autorisation administrateur", () => {
 
   it("laisse passer une API pour un ADMIN actif", async () => {
     auth.mockResolvedValue({ user: { email: "admin@example.com" } });
-    findUnique.mockResolvedValue({ active: true, role: "ADMIN" });
+    findUnique.mockResolvedValue({
+      id: "admin-1",
+      email: "admin@example.com",
+      active: true,
+      role: "ADMIN",
+    });
 
     await expect(requireAdminApi()).resolves.toBeNull();
   });

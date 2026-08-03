@@ -5,13 +5,14 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { canTransitionEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
+import { recordEditorialEvent } from "@/lib/editorial-history";
 import { prisma } from "@/lib/prisma";
 
 async function transitionArticleEditorialStatus(
   articleId: number,
   nextStatus: EditorialStatus,
 ): Promise<void> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   if (
     !Number.isInteger(articleId) ||
@@ -49,23 +50,33 @@ async function transitionArticleEditorialStatus(
     );
   }
 
-  const result =
-    await prisma.article.updateMany({
-      where: {
-        id: articleId,
-        editorialStatus:
-          article.editorialStatus,
-      },
-      data: {
-        editorialStatus: nextStatus,
-      },
-    });
+  await prisma.$transaction(async (transaction) => {
+    const result =
+      await transaction.article.updateMany({
+        where: {
+          id: articleId,
+          editorialStatus:
+            article.editorialStatus,
+        },
+        data: {
+          editorialStatus: nextStatus,
+        },
+      });
 
-  if (result.count !== 1) {
-    throw new Error(
-      "Le statut de l’article a changé. Recharge la page et réessaie.",
-    );
-  }
+    if (result.count !== 1) {
+      throw new Error(
+        "Le statut de l’article a changé. Recharge la page et réessaie.",
+      );
+    }
+
+    await recordEditorialEvent(transaction, {
+      action: "ARTICLE_STATUS_CHANGED",
+      articleId,
+      actor: admin,
+      fromStatus: article.editorialStatus,
+      toStatus: nextStatus,
+    });
+  });
 
   revalidatePath("/admin");
   revalidatePath("/admin/articles");
