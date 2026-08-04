@@ -4,7 +4,7 @@ import type { Collector, ObservationInput } from "./Collector";
 import { FetchHtmlClient } from "../html/FetchHtmlClient";
 import type { HtmlClient } from "../html/HtmlClient";
 
-type NewsItem = { title?: string; excerpt?: string; slug?: string };
+type NewsItem = { title?: string; excerpt?: string; slug?: string; publishedAt?: string };
 
 export class FcAndorraCollector implements Collector {
   constructor(private readonly htmlClient: HtmlClient = new FetchHtmlClient()) {}
@@ -27,8 +27,8 @@ export class FcAndorraCollector implements Collector {
       .map((item) => ({
         title: item.title!.trim(),
         url: new URL(`/es/noticias/${item.slug}`, source.url).toString(),
-        publishedAt: null,
-        content: item.excerpt?.trim() || null,
+        publishedAt: item.publishedAt ? new Date(item.publishedAt) : null,
+        content: item.excerpt?.trim() || item.title!.trim(),
       }));
   }
 }
