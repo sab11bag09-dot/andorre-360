@@ -145,6 +145,17 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+
+  "www.faciclisme.com": {
+    listing: ['a[href^="/ca/noticies/"][href$="/"]'],
+    articlePathPattern:
+      /^\/ca\/noticies\/[^/]+\/\d{4}\/\d{2}\/\d+\/\d+\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["main", ".content"],
+    remove: ["header", "footer", "nav", "script", "style"],
+  },
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
 };
