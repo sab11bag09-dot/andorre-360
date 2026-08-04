@@ -152,7 +152,7 @@ export const siteRules: Record<string, SiteRule> = {
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
-    content: [".entry-content"],
+    content: [".elementor-widget-theme-post-content"],
     remove: ["header", "footer", "nav", "script", "style", ".post_info"],
   },
   "comuencamp.ad": comuEncampRule,
