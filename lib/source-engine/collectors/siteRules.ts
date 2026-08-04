@@ -5,6 +5,7 @@ export type SiteRule = {
   articlePathPattern?: RegExp;
   maxArticles?: number;
   concurrency?: number;
+  requireContent?: boolean;
 };
 
 export const siteRules: Record<string, SiteRule> = {
@@ -21,6 +22,9 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.diariandorra.ad": {
   listing: ["h2 a"],
+  maxArticles: 24,
+  concurrency: 4,
+  requireContent: true,
   content: [
     ".c-detail__body",
   ],

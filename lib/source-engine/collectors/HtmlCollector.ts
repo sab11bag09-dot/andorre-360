@@ -336,22 +336,27 @@ export class HtmlCollector implements Collector {
     const selectedLinks = siteRule?.maxArticles
       ? links.slice(0, siteRule.maxArticles)
       : links;
-    const observations = await mapWithConcurrency(
+    const collectedObservations = await mapWithConcurrency(
       selectedLinks,
       siteRule?.concurrency ?? 1,
       async (link): Promise<ObservationInput> => {
         const article = await this.getArticleContent(link.url);
 
         return {
-        title: link.title,
-        url: link.url,
-        publishedAt:
-          article.publishedAt ??
-          link.publishedAt,
-        content: article.content,
+          title: link.title,
+          url: link.url,
+          publishedAt:
+            article.publishedAt ??
+            link.publishedAt,
+          content: article.content,
         };
       },
     );
+    const observations = siteRule?.requireContent
+      ? collectedObservations.filter(
+          (observation) => observation.content !== null,
+        )
+      : collectedObservations;
 
     console.info(
       `[HtmlCollector] ${observations.length} observation(s) trouvée(s).`,
