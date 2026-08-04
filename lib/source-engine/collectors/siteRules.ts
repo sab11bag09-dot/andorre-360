@@ -123,6 +123,10 @@ export const siteRules: Record<string, SiteRule> = {
   listing: [
     ".journal-content-article h3 a",
   ],
+  articlePathPattern: /^\/ca\/w\/[^/]+\/?$/,
+  maxArticles: 24,
+  concurrency: 4,
+  requireContent: true,
 
   content: [
     ".component-html",
