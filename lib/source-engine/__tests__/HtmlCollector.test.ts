@@ -402,4 +402,49 @@ describe("HtmlCollector", () => {
       articleUrl,
     ]);
   });
+
+  it("collecte uniquement les communiqués du Govern d'Andorra", async () => {
+    const source = {
+      ...createSource(),
+      name: "Gouvernement d'Andorre",
+      url: "https://www.govern.ad/ca/inici",
+    };
+    const articleUrl =
+      "https://www.govern.ad/ca/w/comunicat-de-prova";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <div class="journal-content-article">
+          <h3><a href="/ca/w/comunicat-de-prova">Communiqué officiel</a></h3>
+        </div>
+        <div class="journal-content-article">
+          <h3><a href="/ca/tematiques/habitatge">Thématique habitatge</a></h3>
+        </div>
+        <div class="journal-content-article">
+          <h3><a href="https://www.agenda.ad/">Agenda externe</a></h3>
+        </div>
+      `,
+      [articleUrl]: `
+        <div class="component-html">
+          <p>Premier paragraphe complet du communiqué officiel du Govern d'Andorra.</p>
+          <p>Second paragraphe qui confirme que le contenu est exploitable.</p>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Communiqué officiel",
+        url: articleUrl,
+        content:
+          "Premier paragraphe complet du communiqué officiel du Govern d'Andorra.\n\nSecond paragraphe qui confirme que le contenu est exploitable.",
+      }),
+    ]);
+    expect(htmlClient.receivedUrls).toEqual([
+      source.url,
+      articleUrl,
+    ]);
+  });
 });
