@@ -319,4 +319,42 @@ describe("HtmlCollector", () => {
     );
     expect(htmlClient.maxActiveRequests).toBe(4);
   });
+
+  it("extrait les articles Encamp redirigés vers le domaine www", async () => {
+    const source = {
+      ...createSource(),
+      name: "Encamp",
+      url: "https://comuencamp.ad/actualitat/noticies",
+    };
+    const articleUrl =
+      "https://www.comuencamp.ad/actualitat/noticies/article-test";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <h2 class="newsItem2__title">
+          <a class="newsItem2__link" href="${articleUrl}">Article Encamp</a>
+        </h2>
+      `,
+      [articleUrl]: `
+        <div id="content-core">
+          <div class="documentDescription">Résumé à ne pas dupliquer.</div>
+          <div id="parent-fieldname-text">
+            <p>Premier paragraphe complet publié par le Comú d'Encamp.</p>
+            <p>Second paragraphe qui confirme l'extraction du corps éditorial.</p>
+          </div>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Article Encamp",
+        url: articleUrl,
+        content:
+          "Premier paragraphe complet publié par le Comú d'Encamp.\n\nSecond paragraphe qui confirme l'extraction du corps éditorial.",
+      }),
+    ]);
+  });
 });
