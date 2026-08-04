@@ -226,4 +226,47 @@ describe("HtmlCollector", () => {
       articleUrl,
     ]);
   });
+
+  it("écarte les articles sans contenu de Diari d'Andorra", async () => {
+    const source = {
+      ...createSource(),
+      name: "Diari d'Andorra",
+      url: "https://www.diariandorra.ad",
+    };
+    const completeArticleUrl =
+      "https://www.diariandorra.ad/nacional/260804/article-complet_123.html";
+    const emptyArticleUrl =
+      "https://www.diariandorra.ad/dmg/en-set-tuits/260804/article-vide_456.html";
+    const htmlClient = new FakeHtmlClient(
+      {
+        [source.url]: `
+          <h2><a href="${completeArticleUrl}">Article complet</a></h2>
+          <h2><a href="${emptyArticleUrl}">Article vide</a></h2>
+        `,
+        [completeArticleUrl]: `
+          <div class="c-detail__body">
+            <p>Premier paragraphe complet publié par Diari d'Andorra.</p>
+            <p>Second paragraphe qui rend le contenu réellement exploitable.</p>
+          </div>
+        `,
+        [emptyArticleUrl]: `
+          <div class="c-detail__body"></div>
+        `,
+      },
+      1,
+    );
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Article complet",
+        url: completeArticleUrl,
+        content:
+          "Premier paragraphe complet publié par Diari d'Andorra.\n\nSecond paragraphe qui rend le contenu réellement exploitable.",
+      }),
+    ]);
+    expect(htmlClient.maxActiveRequests).toBe(2);
+  });
 });
