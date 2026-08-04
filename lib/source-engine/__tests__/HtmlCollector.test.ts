@@ -269,4 +269,54 @@ describe("HtmlCollector", () => {
     ]);
     expect(htmlClient.maxActiveRequests).toBe(2);
   });
+
+  it("limite et parallélise les articles d'El Periòdic", async () => {
+    const source = {
+      ...createSource(),
+      name: "El Periòdic d'Andorra",
+      url: "https://elperiodic.ad",
+    };
+    const articleLinks = Array.from(
+      { length: 30 },
+      (_, index) => `
+        <div class="e-loop-item">
+          <h2 class="elementor-heading-title">
+            <a href="/societat/article-${index}/">Article ${index}</a>
+          </h2>
+        </div>
+      `,
+    ).join("");
+    const articleResponses = Object.fromEntries(
+      Array.from({ length: 30 }, (_, index) => [
+        `https://elperiodic.ad/societat/article-${index}/`,
+        `<div class="elementor-widget-theme-post-content"><p>Contingut complet de l'article número ${index} publicat per El Periòdic d'Andorra.</p></div>`,
+      ]),
+    );
+    const htmlClient = new FakeHtmlClient(
+      {
+        [source.url]: `
+          <div class="e-loop-item">
+            <h2 class="elementor-heading-title">
+              <a href="/societat/">Rubrique société</a>
+            </h2>
+          </div>
+          ${articleLinks}
+        `,
+        ...articleResponses,
+      },
+      1,
+    );
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toHaveLength(24);
+    expect(observations[0]?.title).toBe("Article 0");
+    expect(observations[23]?.title).toBe("Article 23");
+    expect(htmlClient.receivedUrls).toHaveLength(25);
+    expect(htmlClient.receivedUrls).not.toContain(
+      "https://elperiodic.ad/societat/",
+    );
+    expect(htmlClient.maxActiveRequests).toBe(4);
+  });
 });
