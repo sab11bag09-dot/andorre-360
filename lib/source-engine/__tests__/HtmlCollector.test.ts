@@ -447,4 +447,43 @@ describe("HtmlCollector", () => {
       articleUrl,
     ]);
   });
+
+  it("collecte les actualités de la Police d'Andorre depuis la page de listing", async () => {
+    const source = {
+      ...createSource(),
+      name: "Policia d'Andorra",
+      url: "https://www.policia.ad/ca/noticies/",
+    };
+    const articleUrl =
+      "https://www.policia.ad/ca/noticies/noticies/2026/08/04/8312/balanc-d-accidents-de-circulacio-accident-amb-una-persona-ferida-a-andorra-la-vella/";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <a href="/ca/noticies/categoria/noticies/">Toutes les actualités</a>
+        <a href="/ca/noticies/">Accueil</a>
+        <a href="/ca/noticies/noticies/2026/08/04/8312/balanc-d-accidents-de-circulacio-accident-amb-una-persona-ferida-a-andorra-la-vella/">Balanç d’accidents</a>
+      `,
+      [articleUrl]: `
+        <div class="post_body font-20 m-t-20">
+          <p>Premier paragraphe complet publié par la Police d’Andorre.</p>
+          <p>Second paragraphe qui confirme l’extraction du corps éditorial.</p>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Balanç d’accidents",
+        url: articleUrl,
+        content:
+          "Premier paragraphe complet publié par la Police d’Andorre.\n\nSecond paragraphe qui confirme l’extraction du corps éditorial.",
+      }),
+    ]);
+    expect(htmlClient.receivedUrls).toEqual([
+      source.url,
+      articleUrl,
+    ]);
+  });
 });
