@@ -103,6 +103,22 @@ export const siteRules: Record<string, SiteRule> = {
     ".elementor-widget-theme-post-content",
   ],
 },
+"www.andorralavella.ad": {
+  listing: [
+    'h2 a[href*="q=noticia/"]',
+  ],
+  maxArticles: 24,
+  concurrency: 4,
+  requireContent: true,
+  content: [
+    ".field-name-body .field-item",
+  ],
+  remove: [
+    ".addtoany_list",
+    "script",
+    "style",
+  ],
+},
 "www.govern.ad": {
   listing: [
     ".journal-content-article h3 a",

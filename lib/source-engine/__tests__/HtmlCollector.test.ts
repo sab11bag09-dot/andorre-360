@@ -357,4 +357,49 @@ describe("HtmlCollector", () => {
       }),
     ]);
   });
+
+  it("extrait le corps complet des actualités d'Andorra la Vella", async () => {
+    const source = {
+      ...createSource(),
+      name: "Mairie d’Andorre",
+      url: "https://www.andorralavella.ad/comu/inici",
+    };
+    const articleUrl =
+      "https://www.andorralavella.ad/comu/?q=noticia/article-test";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <h2>
+          <a href="/comu/?q=noticia/article-test">Actualité communale</a>
+        </h2>
+        <h2>
+          <a href="/comu/?q=agenda/evenement-test">Événement</a>
+        </h2>
+      `,
+      [articleUrl]: `
+        <div class="post-content">Résumé trop court.</div>
+        <div class="field field-name-body">
+          <div class="field-item">
+            <p>Premier paragraphe complet publié par le Comú d'Andorra la Vella.</p>
+            <p>Second paragraphe qui garantit une observation éditoriale exploitable.</p>
+          </div>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Actualité communale",
+        url: articleUrl,
+        content:
+          "Premier paragraphe complet publié par le Comú d'Andorra la Vella.\n\nSecond paragraphe qui garantit une observation éditoriale exploitable.",
+      }),
+    ]);
+    expect(htmlClient.receivedUrls).toEqual([
+      source.url,
+      articleUrl,
+    ]);
+  });
 });
