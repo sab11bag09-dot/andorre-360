@@ -486,4 +486,38 @@ describe("HtmlCollector", () => {
       articleUrl,
     ]);
   });
+
+  it("collecte les actualités de la Cambra de Comerç", async () => {
+    const source = {
+      ...createSource(),
+      name: "Cambra de Comerç",
+      url: "https://www.ccis.ad/category/noticies/",
+    };
+    const articleUrl =
+      "https://www.ccis.ad/resultats-de-lenquesta-de-clima-empresarial/";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <h3 class="entry-title"><a href="${articleUrl}"><span class="light">Resultats de l’Enquesta de Clima Empresarial</span></a></h3>
+        <a href="https://www.ccis.ad/category/noticies/page/2/">Pàgina següent</a>
+      `,
+      [articleUrl]: `
+        <div class="entry-content post-content">
+          <p>Primer paràgraf de l’actualitat econòmica de la Cambra.</p>
+          <p>Segon paràgraf amb informació útil per a les empreses.</p>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Resultats de l’Enquesta de Clima Empresarial",
+        url: articleUrl,
+        content:
+          "Primer paràgraf de l’actualitat econòmica de la Cambra.\n\nSegon paràgraf amb informació útil per a les empreses.",
+      }),
+    ]);
+  });
 });
