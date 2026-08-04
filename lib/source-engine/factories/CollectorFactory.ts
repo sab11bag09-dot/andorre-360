@@ -22,7 +22,7 @@ export class CollectorFactory
 
         if (
           url.hostname === "www.fcandorra.com" &&
-          url.pathname === "/es/noticias"
+          /^\/es\/noticias\/?$/.test(url.pathname)
         ) {
           return new FcAndorraCollector();
         }
