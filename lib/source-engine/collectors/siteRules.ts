@@ -145,6 +145,22 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+  "www.feda.ad": {
+    listing: [".newsItem__title"],
+    articlePathPattern:
+      /^\/feda-comunica\/sala-de-premsa\/notes-de-premsa\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#content-core"],
+    remove: [
+      ".newsItem__date",
+      ".documentActions",
+      "script",
+      "style",
+    ],
+  },
+
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
 };
