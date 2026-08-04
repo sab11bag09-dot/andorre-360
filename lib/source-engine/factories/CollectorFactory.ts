@@ -3,6 +3,7 @@ import {
   SourceCollectionMode,
 } from "@/lib/generated/prisma/client";
 
+import { AndorraBusinessCollector } from "../collectors/AndorraBusinessCollector";
 import { Collector } from "../collectors/Collector";
 import { HtmlCollector } from "../collectors/HtmlCollector";
 import { RssCollector } from "../collectors/RssCollector";
@@ -17,6 +18,13 @@ export class CollectorFactory
         return new RssCollector();
 
       case SourceCollectionMode.HTML:
+        if (
+          new URL(source.url).hostname ===
+          "www.andorrabusiness.com"
+        ) {
+          return new AndorraBusinessCollector();
+        }
+
         return new HtmlCollector();
 
       default:
