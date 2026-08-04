@@ -74,6 +74,10 @@ export const siteRules: Record<string, SiteRule> = {
   listing: [
     ".e-loop-item .elementor-heading-title a",
   ],
+  articlePathPattern: /^\/[^/]+\/[^/]+\/?$/,
+  maxArticles: 24,
+  concurrency: 4,
+  requireContent: true,
   content: [
     ".elementor-widget-theme-post-content",
   ],
