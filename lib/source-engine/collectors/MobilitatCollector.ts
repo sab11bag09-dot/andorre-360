@@ -13,9 +13,21 @@ function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function createContentFingerprint(value: string): string {
+  let hash = 2_166_136_261;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16_777_619);
+  }
+
+  return (hash >>> 0).toString(36);
+}
+
 function createIncidentUrl(
   sourceUrl: string,
   title: string,
+  content: string,
 ): string {
   const slug = title
     .normalize("NFD")
@@ -23,11 +35,17 @@ function createIncidentUrl(
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
-    .slice(0, 120);
+    .slice(0, 100);
+  const fingerprint = createContentFingerprint(
+    `${title}\n${content}`,
+  );
 
   const url = new URL(sourceUrl);
   url.hash = "";
-  url.searchParams.set("incident", slug || "sans-titre");
+  url.searchParams.set(
+    "incident",
+    `${slug || "sans-titre"}-${fingerprint}`,
+  );
 
   return url.toString();
 }
@@ -78,7 +96,11 @@ export class MobilitatCollector implements Collector {
 
       observations.push({
         title,
-        url: createIncidentUrl(source.url, title),
+        url: createIncidentUrl(
+          source.url,
+          title,
+          content,
+        ),
         publishedAt: null,
         content: content.length >= 20 ? content : null,
       });
