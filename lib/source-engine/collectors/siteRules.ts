@@ -8,6 +8,27 @@ export type SiteRule = {
   requireContent?: boolean;
 };
 
+const comuEncampRule: SiteRule = {
+  listing: [
+    ".newsItem2__title a.newsItem2__link",
+  ],
+  articlePathPattern:
+    /^\/actualitat\/noticies\/[^/]+\/?$/,
+  maxArticles: 24,
+  concurrency: 4,
+  requireContent: true,
+  content: [
+    "#parent-fieldname-text",
+  ],
+  remove: [
+    "#content-core > time",
+    "#content-core > figure",
+    ".documentByLine",
+    "script",
+    "style",
+  ],
+};
+
 export const siteRules: Record<string, SiteRule> = {
   "www.altaveu.com": {
   listing: ['a[href*="/actualitat/"]'],
@@ -136,21 +157,6 @@ export const siteRules: Record<string, SiteRule> = {
     ".layout__region--second",
   ],
 },
-"comuencamp.ad": {
-  listing: [
-    ".newsItem2__title a.newsItem2__link",
-  ],
-
-  content: [
-    "#content-core",
-  ],
-
-  remove: [
-    "#content-core > time",
-    "#content-core > figure",
-    ".documentByLine",
-    "script",
-    "style",
-  ],
-},
+"comuencamp.ad": comuEncampRule,
+"www.comuencamp.ad": comuEncampRule,
 };
