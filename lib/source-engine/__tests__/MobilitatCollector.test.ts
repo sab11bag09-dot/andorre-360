@@ -59,7 +59,7 @@ describe("MobilitatCollector", () => {
       {
         title: "Tall de trànsit puntual a la CG1",
         url:
-          "https://www.mobilitat.ad/totes-incidencies?incident=tall-de-transit-puntual-a-la-cg1",
+          "https://www.mobilitat.ad/totes-incidencies?incident=tall-de-transit-puntual-a-la-cg1-kxe6qg",
         publishedAt: null,
         content:
           "Tall de deux minutes entre les rotondes.",
@@ -67,7 +67,7 @@ describe("MobilitatCollector", () => {
       {
         title: "Tancament túnel Dos Valires",
         url:
-          "https://www.mobilitat.ad/totes-incidencies?incident=tancament-tunel-dos-valires",
+          "https://www.mobilitat.ad/totes-incidencies?incident=tancament-tunel-dos-valires-11ejko3",
         publishedAt: null,
         content:
           "Fermeture nocturne pour maintenance.",
