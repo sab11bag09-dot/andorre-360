@@ -20,10 +20,7 @@ export class CollectorFactory
       case SourceCollectionMode.HTML: {
         const url = new URL(source.url);
 
-        if (
-          url.hostname === "www.fcandorra.com" &&
-          /^\/es\/noticias\/?$/.test(url.pathname)
-        ) {
+        if (url.hostname === "www.fcandorra.com") {
           return new FcAndorraCollector();
         }
 
