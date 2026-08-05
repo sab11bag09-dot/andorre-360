@@ -536,6 +536,23 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "www.psa.ad": {
+    listing: ['a[href*="/actualitat/noticies/"]'],
+    articlePathPattern:
+      /^\/actualitat\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#content-core"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
