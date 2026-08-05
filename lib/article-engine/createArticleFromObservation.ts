@@ -22,7 +22,7 @@ export interface CreateArticleFromObservationDependencies {
   >;
   articleRepository: Pick<
     ArticleRepository,
-    "createDraft" | "updateDraft"
+    "createDraft" | "updateDraft" | "publishDraft"
   >;
   editorialGenerator: Pick<
     EditorialGenerator,
@@ -87,18 +87,18 @@ export async function createArticleFromObservation(
     articleId = await dependencies.articleRepository.createDraft(draft);
   }
 
-  if (dependencies.editorialEventWriter) {
-    const autoPublication = prepareAutoPublication({
-      sourceId: observation.source.id,
-      observationId: observation.id,
-      sourceUrl: observation.source.url,
-      observationUrl: observation.url,
-      publicationMode: observation.source.publicationMode,
-      trustLevel: observation.source.trustLevel,
-      title: draft.title,
-      content: draft.content,
-    });
+  const autoPublication = prepareAutoPublication({
+    sourceId: observation.source.id,
+    observationId: observation.id,
+    sourceUrl: observation.source.url,
+    observationUrl: observation.url,
+    publicationMode: observation.source.publicationMode,
+    trustLevel: observation.source.trustLevel,
+    title: draft.title,
+    content: draft.content,
+  });
 
+  if (dependencies.editorialEventWriter) {
     await recordSystemEditorialEvent(
       dependencies.editorialEventWriter,
       {
@@ -110,6 +110,16 @@ export async function createArticleFromObservation(
         },
       },
     );
+  }
+
+  if (autoPublication.decision.allowed) {
+    if (!dependencies.articleRepository.publishDraft) {
+      throw new Error(
+        "La publication automatique est autorisée mais indisponible.",
+      );
+    }
+
+    await dependencies.articleRepository.publishDraft(articleId);
   }
 
   await dependencies.observationRepository.markProcessed(
