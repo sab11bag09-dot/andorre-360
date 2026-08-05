@@ -152,7 +152,7 @@ export const siteRules: Record<string, SiteRule> = {
     concurrency: 4,
     requireContent: true,
     content: [
-  ".MkContentNews",
+  "p.isSelectedEnd",
   ".MkContentBlocks__richText",
   ".MkRickText",
   ".MkContentBlocks",
