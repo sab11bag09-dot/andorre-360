@@ -149,8 +149,8 @@ export const siteRules: Record<string, SiteRule> = {
   "www.comuencamp.ad": comuEncampRule,
 
   "www.ordinoarcalis.com": {
-    listing: ['a[href*="/ca/noticies/"]'],
-    articlePathPattern: /^\/ca\/noticies\/[^/]+\/?$/,
+    listing: ['a[href*="/noticies/"], a[href*="/actualites/"], a[href*="/noticias/"], a[href*="/news/"]'],
+    articlePathPattern: /^\/(?:ca\/noticies|fr\/actualites|es\/noticias|en\/news)\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
@@ -158,8 +158,8 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
   "ordinoarcalis.com": {
-    listing: ['a[href*="/ca/noticies/"]'],
-    articlePathPattern: /^\/ca\/noticies\/[^/]+\/?$/,
+    listing: ['a[href*="/noticies/"], a[href*="/actualites/"], a[href*="/noticias/"], a[href*="/news/"]'],
+    articlePathPattern: /^\/(?:ca\/noticies|fr\/actualites|es\/noticias|en\/news)\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
