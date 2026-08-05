@@ -157,4 +157,13 @@ export const siteRules: Record<string, SiteRule> = {
     content: [".article__content.free-text"],
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
-};
+  "ordinoarcalis.com": {
+    listing: ['a.card__link[href^="/ca/noticies/"]'],
+    articlePathPattern: /^\/ca\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".article__content.free-text"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+\n};
