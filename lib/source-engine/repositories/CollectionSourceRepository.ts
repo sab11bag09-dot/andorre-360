@@ -11,4 +11,8 @@ export interface CollectionSourceRepository {
     checkedAt: Date,
     message: string,
   ): Promise<void>;
+  markCollectionEmpty?(
+    id: number,
+    checkedAt: Date,
+  ): Promise<void>;
 }
