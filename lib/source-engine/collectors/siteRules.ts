@@ -1,4 +1,4 @@
-export type SiteRule = {
+expo\nrt type SiteRule = {
   listing?: string[];
   content: string[];
   remove?: string[];
@@ -150,7 +150,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.ordinoarcalis.com": {
     listing: ['a.card__link[href^="/ca/noticies/"]'],
-    articlePathPattern: /^\\/ca\\/noticies\\/[^/]+\\/?$/,
+    articlePathPattern: /^\/ca\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
