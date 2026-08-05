@@ -79,9 +79,13 @@ export class SaasCollector implements Collector {
           .map((_, paragraph) =>
             normalizeText(article(paragraph).text()),
           )
-          .get()
+                    .get()
           .filter(Boolean)
-          .join("\\n\\n");
+          .filter(
+            (text) =>
+              !/^\d{1,2}\s*\/\s*\d{1,2}\s*\/\s*\d{4}$/.test(text),
+          )
+          .join("\n\n");
 
         return {
           title: link.title,
