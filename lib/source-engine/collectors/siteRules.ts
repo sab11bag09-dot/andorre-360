@@ -145,6 +145,17 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+
+  "www.grandvalira.com": {
+    listing: ["a.card__link"],
+    articlePathPattern:
+      /^\/fr\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".node__content", ".field--name-body", "main"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
 };
