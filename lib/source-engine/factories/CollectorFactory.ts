@@ -11,6 +11,7 @@ import { MobilitatCollector } from "../collectors/MobilitatCollector";
 import { RssCollector } from "../collectors/RssCollector";
 import { SaasCollector } from "../collectors/SaasCollector";
 import { CollectorFactoryInterface } from "./CollectorFactoryInterface";
+import { FcAndorraCollector } from "../collectors/FcAndorraCollector";
 
 export class CollectorFactory
   implements CollectorFactoryInterface
@@ -47,7 +48,12 @@ export class CollectorFactory
         ) {
           return new SaasCollector();
         }
-
+if (
+  url.hostname === "fcandorra.com" ||
+  url.hostname === "www.fcandorra.com"
+) {
+  return new FcAndorraCollector();
+}
         return new HtmlCollector();
       }
 
