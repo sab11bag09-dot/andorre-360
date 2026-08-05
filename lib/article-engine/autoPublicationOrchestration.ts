@@ -41,6 +41,7 @@ export function prepareAutoPublication(
 ): AutoPublicationPreparation {
   const runtimeDecision = evaluateAutoPublicationRuntime(
     input.runtimeConfig ?? readAutoPublicationRuntimeConfig(),
+    input.sourceId,
   );
 
   const contentDecision = evaluateAutoPublication({
@@ -59,12 +60,8 @@ export function prepareAutoPublication(
       : {
           allowed: false,
           reasons: [
-            ...(!runtimeDecision.allowed
-              ? [runtimeDecision.reason]
-              : []),
-            ...(!contentDecision.allowed
-              ? contentDecision.reasons
-              : []),
+            ...(!runtimeDecision.allowed ? [runtimeDecision.reason] : []),
+            ...(!contentDecision.allowed ? contentDecision.reasons : []),
           ],
         };
 
