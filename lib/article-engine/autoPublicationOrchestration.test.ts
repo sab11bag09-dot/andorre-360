@@ -5,6 +5,7 @@ import { prepareAutoPublication } from "./autoPublicationOrchestration";
 const enabledRuntime = {
   enabled: true,
   emergencyStop: false,
+  sourceIds: [5],
 };
 
 describe("prepareAutoPublication", () => {
@@ -58,6 +59,7 @@ describe("prepareAutoPublication", () => {
       runtimeConfig: {
         enabled: false,
         emergencyStop: false,
+        sourceIds: [5],
       },
     });
 
