@@ -26,4 +26,8 @@ export interface ArticleRepository {
     articleId: number,
     input: ArticleDraftInput,
   ): Promise<void>;
+
+  publishDraft?(
+    articleId: number,
+  ): Promise<void>;
 }

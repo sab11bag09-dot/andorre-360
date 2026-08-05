@@ -83,4 +83,26 @@ export class PrismaArticleRepository
       );
     }
   }
+  async publishDraft(
+    articleId: number,
+  ): Promise<void> {
+    const result = await this.client.article.updateMany({
+      where: {
+        id: articleId,
+        published: false,
+        editorialStatus: "AI_DRAFT",
+      },
+      data: {
+        published: true,
+        publishedAt: new Date(),
+        editorialStatus: "PUBLISHED",
+      },
+    });
+
+    if (result.count !== 1) {
+      throw new Error(
+        "Le brouillon ne peut pas être publié automatiquement.",
+      );
+    }
+  }
 }
