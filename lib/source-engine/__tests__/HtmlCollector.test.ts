@@ -486,36 +486,38 @@ describe("HtmlCollector", () => {
       articleUrl,
     ]);
   });
-  it("collecte les actualités de FEDA", async () => {
+
+  it("collecte les actualités de la Cambra de Comerç", async () => {
     const source = {
       ...createSource(),
-      name: "FEDA",
-      url: "https://www.feda.ad/",
+      name: "Cambra de Comerç",
+      url: "https://www.ccis.ad/category/noticies/",
     };
     const articleUrl =
-      "https://www.feda.ad/feda-comunica/sala-de-premsa/notes-de-premsa/article-test";
+      "https://www.ccis.ad/resultats-de-lenquesta-de-clima-empresarial/";
     const htmlClient = new FakeHtmlClient({
       [source.url]: `
-        <a class="newsItem__title" href="${articleUrl}">Actualitat FEDA</a>
-        <a class="newsItem__title" href="/feda-comunica/sala-de-premsa/notes-de-premsa/">Sala de premsa</a>
+        <h3 class="entry-title"><a href="${articleUrl}"><span class="light">Resultats de l’Enquesta de Clima Empresarial</span></a></h3>
+        <a href="https://www.ccis.ad/category/noticies/page/2/">Pàgina següent</a>
       `,
       [articleUrl]: `
-        <main id="content-core">
-          <p>FEDA presenta una actuació energètica rellevant per al país.</p>
-          <p>La iniciativa reforça la sostenibilitat i la transició energètica.</p>
-        </main>
+        <div class="entry-content post-content">
+          <p>Primer paràgraf de l’actualitat econòmica de la Cambra.</p>
+          <p>Segon paràgraf amb informació útil per a les empreses.</p>
+        </div>
       `,
     });
-    const observations = await new HtmlCollector(htmlClient).collect(source);
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
 
     expect(observations).toEqual([
       expect.objectContaining({
-        title: "Actualitat FEDA",
+        title: "Resultats de l’Enquesta de Clima Empresarial",
         url: articleUrl,
         content:
-          "FEDA presenta una actuació energètica rellevant per al país.\n\nLa iniciativa reforça la sostenibilitat i la transició energètica.",
+          "Primer paràgraf de l’actualitat econòmica de la Cambra.\n\nSegon paràgraf amb informació útil per a les empreses.",
       }),
     ]);
   });
-
 });

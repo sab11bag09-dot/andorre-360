@@ -416,6 +416,24 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "www.ccis.ad": {
+    listing: [
+      '.entry-title a[href^="https://www.ccis.ad/"]',
+    ],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".entry-content.post-content"],
+    remove: [
+      ".post-title",
+      ".post-meta",
+      ".post-read-more",
+      ".socials-sharing",
+      "script",
+      "style",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
