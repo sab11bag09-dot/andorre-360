@@ -1,4 +1,5 @@
-expo\nrt type SiteRule = {
+expo
+rt type SiteRule = {
   listing?: string[];
   content: string[];
   remove?: string[];
@@ -166,4 +167,5 @@ export const siteRules: Record<string, SiteRule> = {
     content: [".article__content.free-text"],
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
-\n};
+
+};
