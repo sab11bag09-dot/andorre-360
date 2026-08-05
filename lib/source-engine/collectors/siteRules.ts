@@ -149,7 +149,7 @@ export const siteRules: Record<string, SiteRule> = {
   "www.comuencamp.ad": comuEncampRule,
 
   "www.ordinoarcalis.com": {
-    listing: ['a.card__link[href^="/ca/noticies/"]'],
+    listing: ['a[href*="/ca/noticies/"]'],
     articlePathPattern: /^\/ca\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
@@ -158,7 +158,7 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
   "ordinoarcalis.com": {
-    listing: ['a.card__link[href^="/ca/noticies/"]'],
+    listing: ['a[href*="/ca/noticies/"]'],
     articlePathPattern: /^\/ca\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
