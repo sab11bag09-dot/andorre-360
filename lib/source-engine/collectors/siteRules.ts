@@ -148,7 +148,7 @@ export const siteRules: Record<string, SiteRule> = {
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
   "creuroja.ad": {
-    listing: ['h3.elementor-post__title a[href*="creuroja.ad/"]'],
+    listing: ['a[href*="creuroja.ad/"]'],
     articlePathPattern: /^\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
@@ -156,5 +156,15 @@ export const siteRules: Record<string, SiteRule> = {
     content: [".elementor-widget-text-editor"],
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
+  "www.creuroja.ad": {
+    listing: ['a[href*="creuroja.ad/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".elementor-widget-text-editor"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 
 };
