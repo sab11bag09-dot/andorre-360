@@ -1,5 +1,4 @@
-expo
-rt type SiteRule = {
+export type SiteRule = {
   listing?: string[];
   content: string[];
   remove?: string[];
