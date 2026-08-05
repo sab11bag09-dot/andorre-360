@@ -10,11 +10,14 @@ describe("autoPublicationRuntime", () => {
     expect(readAutoPublicationRuntimeConfig({})).toEqual({
       enabled: false,
       emergencyStop: false,
+      sourceIds: [],
     });
+
     expect(evaluateAutoPublicationRuntime({
       enabled: false,
       emergencyStop: false,
-    })).toEqual({
+      sourceIds: [],
+    }, 1)).toEqual({
       allowed: false,
       reason: "feature_disabled",
     });
@@ -24,17 +27,30 @@ describe("autoPublicationRuntime", () => {
     expect(evaluateAutoPublicationRuntime({
       enabled: true,
       emergencyStop: true,
-    })).toEqual({
+      sourceIds: [1],
+    }, 1)).toEqual({
       allowed: false,
       reason: "emergency_stop",
     });
   });
 
-  it("autorise uniquement une configuration explicitement activée", () => {
+  it("bloque les sources absentes de la liste blanche", () => {
     expect(evaluateAutoPublicationRuntime({
       enabled: true,
       emergencyStop: false,
-    })).toEqual({
+      sourceIds: [2],
+    }, 1)).toEqual({
+      allowed: false,
+      reason: "source_not_allowlisted",
+    });
+  });
+
+  it("autorise une source explicitement listée", () => {
+    expect(evaluateAutoPublicationRuntime({
+      enabled: true,
+      emergencyStop: false,
+      sourceIds: [1],
+    }, 1)).toEqual({
       allowed: true,
       reason: null,
     });
