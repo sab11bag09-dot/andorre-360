@@ -147,4 +147,15 @@ export const siteRules: Record<string, SiteRule> = {
 
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
+  "comusantjulia.ad": {
+    listing: ['a[href*="/ca/actualitat/noticies/"]'],
+    articlePathPattern:
+      /^\/ca\/actualitat\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".post-content"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 };
