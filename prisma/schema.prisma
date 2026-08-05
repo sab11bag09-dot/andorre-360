@@ -256,6 +256,7 @@ model Source {
   lastSuccessAt        DateTime?
   lastErrorAt          DateTime?
   lastErrorMessage     String?
+  consecutiveEmptyCollections Int @default(0)
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
   observations         Observation[]
