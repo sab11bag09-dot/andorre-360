@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateAutoPublication } from "./autoPublication";
 
 const validInput = {
+  publicationMode: "AUTO" as const,
   sourceTrustLevel: "OFFICIAL" as const,
   sourceUrl: "https://source.example",
   observationUrl: "https://source.example/news/item",
@@ -11,10 +12,22 @@ const validInput = {
 };
 
 describe("evaluateAutoPublication", () => {
-  it("autorise une source officielle avec une provenance cohérente", () => {
+  it("autorise une source AUTO officielle avec une provenance cohérente", () => {
     expect(evaluateAutoPublication(validInput)).toEqual({
       allowed: true,
       reasons: [],
+    });
+  });
+
+  it("bloque une source qui n'est pas explicitement en mode AUTO", () => {
+    const decision = evaluateAutoPublication({
+      ...validInput,
+      publicationMode: "MANUAL",
+    });
+
+    expect(decision).toEqual({
+      allowed: false,
+      reasons: ["source_auto_mode_not_enabled"],
     });
   });
 
