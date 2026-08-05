@@ -43,13 +43,13 @@ export class SaasCollector implements Collector {
   ): Promise<ObservationInput[]> {
     const listingHtml = await this.htmlClient.get(source.url);
     const $ = cheerio.load(listingHtml);
-    const links = $(".item-actualitat a.stretched-link")
-      .map((_, link) => {
-        const element = $(link);
-        const title = normalizeText(
-          element.closest(".item-actualitat").find("h2").text(),
-        );
-        const href = element.attr("href");
+    const links = $(".item-actualitat")
+      .map((_, card) => {
+        const element = $(card);
+        const title = normalizeText(element.find("h2, h3").first().text());
+        const href =
+          element.find("a.stretched-link").attr("href") ??
+          element.find("a[href]").first().attr("href");
 
         return href && title
           ? {
@@ -72,7 +72,7 @@ export class SaasCollector implements Collector {
         const articleHtml = await this.htmlClient.get(link.url);
         const article = cheerio.load(articleHtml);
         const body = article(
-          "noticiesdetail .text-detall .col-12 > div",
+          "noticiesdetail .text-detall .col-12 > div, .text-detall, main, article",
         ).first();
         const content = body
           .find("p")
@@ -81,7 +81,7 @@ export class SaasCollector implements Collector {
           )
           .get()
           .filter(Boolean)
-          .join("\n\n");
+          .join("\\n\\n");
 
         return {
           title: link.title,
