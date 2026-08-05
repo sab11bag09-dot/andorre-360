@@ -169,7 +169,28 @@ export const siteRules: Record<string, SiteRule> = {
       "style",
     ],
   },
+  "www.faciclisme.com": {
+    listing: ['a[href^="/ca/noticies/"][href$="/"]'],
+    articlePathPattern:
+      /^\/ca\/noticies\/[^/]+\/\d{4}\/\d{2}\/\d+\/\d+\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["div.m-b-40"],
+    remove: ["header", "footer", "nav", "script", "style"],
+  },
 
+  "faciclisme.com": {
+    listing: ['a[href^="/ca/noticies/"][href$="/"]'],
+    articlePathPattern:
+      /^\/ca\/noticies\/[^/]+\/\d{4}\/\d{2}\/\d+\/\d+\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["div.m-b-40"],
+    remove: ["header", "footer", "nav", "script", "style"],
+  },
+  
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
     listing: ["h4.post_title.entry-title a"],
