@@ -51,10 +51,22 @@ export async function collectSource(
       observations,
     );
 
+    const checkedAt = new Date();
+
     await repository.markCollectionSucceeded(
       source.id,
-      new Date(),
+      checkedAt,
     );
+
+    if (
+      observations.length === 0 &&
+      repository.markCollectionEmpty
+    ) {
+      await repository.markCollectionEmpty(
+        source.id,
+        checkedAt,
+      );
+    }
 
     return {
       collected: observations.length,
