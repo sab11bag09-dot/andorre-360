@@ -3,6 +3,8 @@ import { Source } from "@/lib/generated/prisma/client";
 
 import { CollectionSourceRepository } from "./CollectionSourceRepository";
 
+const EMPTY_COLLECTION_ALERT_THRESHOLD = 3;
+
 export class PrismaCollectionSourceRepository
   implements CollectionSourceRepository
 {
@@ -27,8 +29,47 @@ export class PrismaCollectionSourceRepository
         lastCheckedAt: checkedAt,
         lastSuccessAt: checkedAt,
         lastErrorMessage: null,
+        consecutiveEmptyCollections: 0,
       },
     });
+  }
+
+  async markCollectionEmpty(
+    id: number,
+    checkedAt: Date,
+  ): Promise<void> {
+    const source = await prisma.source.update({
+      where: { id },
+      data: {
+        consecutiveEmptyCollections: { increment: 1 },
+        lastCheckedAt: checkedAt,
+      },
+      select: {
+        name: true,
+        consecutiveEmptyCollections: true,
+      },
+    });
+
+    if (
+      source.consecutiveEmptyCollections ===
+      EMPTY_COLLECTION_ALERT_THRESHOLD
+    ) {
+      const message =
+        `Alerte : ${source.name} a retourné 0 observation lors de ${source.consecutiveEmptyCollections} collectes consécutives.`;
+
+      await prisma.source.update({
+        where: { id },
+        data: { lastErrorMessage: message },
+      });
+
+      console.warn("[SourceCollectionAlert]", JSON.stringify({
+        sourceId: id,
+        sourceName: source.name,
+        consecutiveEmptyCollections:
+          source.consecutiveEmptyCollections,
+        message,
+      }));
+    }
   }
 
   async markCollectionFailed(
