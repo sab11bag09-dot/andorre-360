@@ -196,8 +196,11 @@ export class HtmlCollector implements Collector {
           .find(removeSelectors.join(", "))
           .remove();
 
-        const paragraphs = element
-          .find("p")
+        const paragraphElements = element.is("p")
+          ? element
+          : element.find("p");
+
+        const paragraphs = paragraphElements
           .map((_, paragraph) =>
             normalizeText($(paragraph).text()),
           )
