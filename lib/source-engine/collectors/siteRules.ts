@@ -451,6 +451,58 @@ export const siteRules: Record<string, SiteRule> = {
       ".cookie",
     ],
   },
+    "www.cass.ad": {
+    listing: ['a[href^="/noticies/"]'],
+    articlePathPattern:
+      /^\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".node__content"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
+
+  "cass.ad": {
+    listing: ['a[href^="/noticies/"]'],
+    articlePathPattern:
+      /^\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".node__content"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
+    "www.coa.ad": {
+    listing: ['h2.entry-title a'],
+    articlePathPattern:
+      /^\/(?!noticies\/?$)[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".entry-content"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
