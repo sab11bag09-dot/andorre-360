@@ -148,7 +148,7 @@ export const siteRules: Record<string, SiteRule> = {
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
   "www.agenda.ad": {
-    listing: ['a.activitat__enllac[href^="/activitat/"]'],
+    listing: ['a[href*="/activitat/"]'],
     articlePathPattern:
       /^\/activitat\/[^/]+\/[^/]+\/[^/]+\/?$/,
     maxArticles: 24,
@@ -158,7 +158,7 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", "#activitat__altres"],
   },
   "agenda.ad": {
-    listing: ['a.activitat__enllac[href^="/activitat/"]'],
+    listing: ['a[href*="/activitat/"]'],
     articlePathPattern:
       /^\/activitat\/[^/]+\/[^/]+\/[^/]+\/?$/,
     maxArticles: 24,
