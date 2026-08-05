@@ -166,3 +166,47 @@ La publication automatique est acceptable uniquement si le système conserve :
 - des contrôles vérifiables ;
 - une reprise humaine immédiate ;
 - un mécanisme d’arrêt fiable.
+
+
+## 12. Audit du pipeline réel
+
+### Conclusion
+
+L’automatisation IA complète n’est pas encore implémentée. Le système fonctionne actuellement selon cette chaîne :
+
+```text
+Observation → brouillon d’article → traductions AI_DRAFT → validation → publication
+```
+
+### Fonctionnalités présentes
+
+- Une observation peut générer un brouillon d’article.
+- L’observation reste liée à l’article créé.
+- Les traductions catalane et espagnole sont enregistrées en statut `AI_DRAFT`.
+- La publication exige un article `APPROVED` ou déjà `PUBLISHED`.
+- Les actions d’administration sont protégées.
+- Les événements éditoriaux et les mutations de traduction sont tracés.
+
+### Écarts constatés
+
+1. Le champ `SourcePublicationMode.AUTO` existe en base, mais n’est pas utilisé pour déclencher une publication.
+2. La génération d’article par défaut utilise `DeterministicEditorialGenerator`, qui reprend et reformate le contenu source.
+3. OpenAI est actuellement utilisé pour les traductions, pas pour la préparation principale de l’article.
+4. La création directe d’un article publié est explicitement bloquée.
+5. Le modèle, le prompt, la version de génération et les résultats de contrôle ne sont pas encore conservés.
+6. Les contrôles existants vérifient surtout la présence du contenu et le statut éditorial ; ils ne contrôlent pas encore systématiquement les faits, chiffres, dates, noms ou contradictions.
+
+### Verdict
+
+Le produit est actuellement en mode assisté/manuellement validé. Le mode `AUTO` autorisant une publication sans validation humaine reste à construire.
+
+### Travaux nécessaires
+
+- brancher réellement `SourcePublicationMode.AUTO` ;
+- ajouter la génération IA des articles ;
+- contrôler la fidélité à l’observation ;
+- contrôler la complétude et les contradictions ;
+- contrôler les traductions ;
+- enregistrer modèle, prompt, version et résultats ;
+- publier automatiquement uniquement après contrôles réussis ;
+- ajouter l’arrêt global et la dépublication immédiate.
