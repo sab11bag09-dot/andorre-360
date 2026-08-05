@@ -149,7 +149,7 @@ export const siteRules: Record<string, SiteRule> = {
   "www.grandvalira.com": {
     listing: ["a.card__link"],
     articlePathPattern:
-      /^\/fr\/noticies\/[^/]+\/?$/,
+      /^\/fr\/(?:noticies|actualites)\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
