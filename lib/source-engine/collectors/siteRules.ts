@@ -157,5 +157,27 @@ export const siteRules: Record<string, SiteRule> = {
     content: [".post-content"],
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
+  "santjulia.ad": {
+    listing: ['a[href*="/ca/actualitat/noticies/"]'],
+    articlePathPattern:
+      /^\/ca\/actualitat\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".post-content"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
+  "www.santjulia.ad": {
+    listing: ['a[href*="/ca/actualitat/noticies/"]'],
+    articlePathPattern:
+      /^\/ca\/actualitat\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".post-content"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 
 };
