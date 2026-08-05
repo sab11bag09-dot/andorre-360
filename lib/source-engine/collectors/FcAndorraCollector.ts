@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as cheerio from "cheerio";
 import type { Source } from "@/lib/generated/prisma/client";
 import type { Collector, ObservationInput } from "./Collector";
