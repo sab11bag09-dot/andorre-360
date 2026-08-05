@@ -190,6 +190,21 @@ export const siteRules: Record<string, SiteRule> = {
     content: ["div.m-b-40"],
     remove: ["header", "footer", "nav", "script", "style"],
   },
+    "www.feda.ad": {
+    listing: [".newsItem__title"],
+    articlePathPattern:
+      /^\/feda-comunica\/sala-de-premsa\/notes-de-premsa\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#content-core"],
+    remove: [
+      ".newsItem__date",
+      ".documentActions",
+      "script",
+      "style",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {

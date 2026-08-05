@@ -486,4 +486,36 @@ describe("HtmlCollector", () => {
       articleUrl,
     ]);
   });
+  it("collecte les actualités de FEDA", async () => {
+    const source = {
+      ...createSource(),
+      name: "FEDA",
+      url: "https://www.feda.ad/",
+    };
+    const articleUrl =
+      "https://www.feda.ad/feda-comunica/sala-de-premsa/notes-de-premsa/article-test";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <a class="newsItem__title" href="${articleUrl}">Actualitat FEDA</a>
+        <a class="newsItem__title" href="/feda-comunica/sala-de-premsa/notes-de-premsa/">Sala de premsa</a>
+      `,
+      [articleUrl]: `
+        <main id="content-core">
+          <p>FEDA presenta una actuació energètica rellevant per al país.</p>
+          <p>La iniciativa reforça la sostenibilitat i la transició energètica.</p>
+        </main>
+      `,
+    });
+    const observations = await new HtmlCollector(htmlClient).collect(source);
+
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Actualitat FEDA",
+        url: articleUrl,
+        content:
+          "FEDA presenta una actuació energètica rellevant per al país.\n\nLa iniciativa reforça la sostenibilitat i la transició energètica.",
+      }),
+    ]);
+  });
+
 });
