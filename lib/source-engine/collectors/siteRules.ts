@@ -145,6 +145,31 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+  "www.fcandorra.com": {
+    listing: ['a[href^="/es/noticias/"]'],
+    articlePathPattern: /^\/es\/noticias\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      "main",
+      ".article-content",
+      ".content-noticia",
+      ".entry-content",
+    ],
+    remove: [
+      ".cookie",
+      ".cookies",
+      "[class*="cookie"]",
+      "[id*="cookie"]",
+      ".share",
+      ".social",
+      ".related",
+      "script",
+      "style",
+    ],
+  },
+
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
 };
