@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { recordEditorialEvent } from "./editorial-history";
+import {
+  recordEditorialEvent,
+  recordSystemEditorialEvent,
+} from "./editorial-history";
 
 describe("historique éditorial", () => {
   it("conserve l’acteur, la transition et les détails", async () => {
@@ -11,16 +14,10 @@ describe("historique éditorial", () => {
       {
         action: "ARTICLE_STATUS_CHANGED",
         articleId: 42,
-        actor: {
-          id: "admin-1",
-          email: "admin@example.com",
-        },
+        actor: { id: "admin-1", email: "admin@example.com" },
         fromStatus: "DRAFT",
         toStatus: "REVIEW",
-        details: {
-          source: "article-workflow",
-          automatic: false,
-        },
+        details: { source: "article-workflow", automatic: false },
       },
     );
 
@@ -49,18 +46,46 @@ describe("historique éditorial", () => {
       {
         action: "ARTICLE_CREATED",
         articleId: 7,
-        actor: {
-          id: "admin-2",
-          email: "redaction@example.com",
-        },
+        actor: { id: "admin-2", email: "redaction@example.com" },
         toStatus: "DRAFT",
       },
     );
 
     expect(create).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        details: undefined,
-      }),
+      data: expect.objectContaining({ details: undefined }),
+    });
+  });
+
+  it("enregistre une décision AUTO comme événement système", async () => {
+    const create = vi.fn().mockResolvedValue({ id: 3 });
+
+    await recordSystemEditorialEvent(
+      { editorialEvent: { create } },
+      {
+        action: "ARTICLE_CREATED",
+        articleId: 18,
+        details: {
+          eventType: "auto_publication_evaluated",
+          allowed: false,
+          reasons: ["feature_disabled"],
+        },
+      },
+    );
+
+    expect(create).toHaveBeenCalledWith({
+      data: {
+        action: "ARTICLE_CREATED",
+        articleId: 18,
+        translationId: undefined,
+        actorEmail: "system@andorre-360.local",
+        fromStatus: undefined,
+        toStatus: undefined,
+        details: JSON.stringify({
+          eventType: "auto_publication_evaluated",
+          allowed: false,
+          reasons: ["feature_disabled"],
+        }),
+      },
     });
   });
 });
