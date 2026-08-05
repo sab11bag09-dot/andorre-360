@@ -147,4 +147,15 @@ export const siteRules: Record<string, SiteRule> = {
 
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
+  "www.afa.ad": {
+    listing: ['a[href*="/ca/sala-premsa/comunicats-de-premsa/"][href$="/view"]'],
+    articlePathPattern:
+      /^\/ca\/sala-premsa\/comunicats-de-premsa\/[^/]+\/view\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#content-core"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 };
