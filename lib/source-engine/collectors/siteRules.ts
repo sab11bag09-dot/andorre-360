@@ -222,6 +222,23 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "www.grandvalira.com": {
+    listing: ["a.card__link"],
+    articlePathPattern:
+      /^\/fr\/(?:noticies|actualites)\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".article__content.free-text"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
