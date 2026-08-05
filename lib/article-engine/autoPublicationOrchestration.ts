@@ -6,6 +6,11 @@ import {
   evaluateAutoPublication,
   type AutoPublicationDecision,
 } from "./autoPublication";
+import {
+  evaluateAutoPublicationRuntime,
+  readAutoPublicationRuntimeConfig,
+  type AutoPublicationRuntimeConfig,
+} from "./autoPublicationRuntime";
 
 export type AutoPublicationPreparationInput = {
   sourceId: number;
@@ -22,6 +27,7 @@ export type AutoPublicationPreparationInput = {
     model?: string;
     promptVersion?: string;
   };
+  runtimeConfig?: AutoPublicationRuntimeConfig;
 };
 
 export type AutoPublicationPreparation = {
@@ -33,7 +39,11 @@ export type AutoPublicationPreparation = {
 export function prepareAutoPublication(
   input: AutoPublicationPreparationInput,
 ): AutoPublicationPreparation {
-  const decision = evaluateAutoPublication({
+  const runtimeDecision = evaluateAutoPublicationRuntime(
+    input.runtimeConfig ?? readAutoPublicationRuntimeConfig(),
+  );
+
+  const contentDecision = evaluateAutoPublication({
     publicationMode: input.publicationMode,
     sourceTrustLevel: input.trustLevel,
     sourceUrl: input.sourceUrl,
@@ -42,6 +52,21 @@ export function prepareAutoPublication(
     content: input.content,
     hasContradictorySignals: input.hasContradictorySignals,
   });
+
+  const decision: AutoPublicationDecision =
+    runtimeDecision.allowed && contentDecision.allowed
+      ? { allowed: true, reasons: [] }
+      : {
+          allowed: false,
+          reasons: [
+            ...(!runtimeDecision.allowed
+              ? [runtimeDecision.reason]
+              : []),
+            ...(!contentDecision.allowed
+              ? contentDecision.reasons
+              : []),
+          ],
+        };
 
   return {
     decision,
