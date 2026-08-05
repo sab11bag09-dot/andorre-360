@@ -6,26 +6,7 @@ export type SiteRule = {
   maxArticles?: number;
   concurrency?: number;
   requireContent?: boolean;
-  "www.palarinsal.com": {
-    listing: ['a[href*="/noticies/"], a[href*="/actualites/"], a[href*="/noticias/"], a[href*="/news/"]'],
-    articlePathPattern:
-      /^\/(?:ca\/noticies|fr\/actualites|es\/noticias|en\/news)\/[^/]+\/?$/,
-    maxArticles: 24,
-    concurrency: 4,
-    requireContent: true,
-    content: [".article__content.free-text"],
-    remove: ["header", "footer", "nav", "script", "style", ".share"],
-  },
-  "palarinsal.com": {
-    listing: ['a[href*="/noticies/"], a[href*="/actualites/"], a[href*="/noticias/"], a[href*="/news/"]'],
-    articlePathPattern:
-      /^\/(?:ca\/noticies|fr\/actualites|es\/noticias|en\/news)\/[^/]+\/?$/,
-    maxArticles: 24,
-    concurrency: 4,
-    requireContent: true,
-    content: [".article__content.free-text"],
-    remove: ["header", "footer", "nav", "script", "style", ".share"],
-  },
+
 
 };
 
@@ -168,4 +149,26 @@ export const siteRules: Record<string, SiteRule> = {
 
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
+"www.palarinsal.com": {
+    listing: ['a[href*="/noticies/"], a[href*="/actualites/"], a[href*="/noticias/"], a[href*="/news/"]'],
+    articlePathPattern:
+      /^\/(?:ca\/noticies|fr\/actualites|es\/noticias|en\/news)\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".article__content.free-text"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
+"palarinsal.com": {
+    listing: ['a[href*="/noticies/"], a[href*="/actualites/"], a[href*="/noticias/"], a[href*="/news/"]'],
+    articlePathPattern:
+      /^\/(?:ca\/noticies|fr\/actualites|es\/noticias|en\/news)\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".article__content.free-text"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 };
