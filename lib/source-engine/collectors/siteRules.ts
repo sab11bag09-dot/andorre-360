@@ -147,4 +147,14 @@ export const siteRules: Record<string, SiteRule> = {
 
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
+  "concordia.ad": {
+    listing: ['h4.entry-title a[href^="https://concordia.ad/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".mkdf-post-content"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 };
