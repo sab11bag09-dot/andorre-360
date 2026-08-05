@@ -503,6 +503,39 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "creuroja.ad": {
+    listing: ['a[href*="creuroja.ad/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".elementor-widget-text-editor"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
+
+  "www.creuroja.ad": {
+    listing: ['a[href*="creuroja.ad/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".elementor-widget-text-editor"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
