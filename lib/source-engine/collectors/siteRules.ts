@@ -284,6 +284,39 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "concordia.ad": {
+    listing: ['h4.entry-title a[href^="https://concordia.ad/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".mkdf-post-content"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
+
+  "www.concordia.ad": {
+    listing: ['h4.entry-title a[href^="https://concordia.ad/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".mkdf-post-content"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
