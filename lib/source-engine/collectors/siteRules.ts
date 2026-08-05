@@ -401,6 +401,21 @@ export const siteRules: Record<string, SiteRule> = {
       "#activitat__altres",
     ],
   },
+    "www.afa.ad": {
+    listing: ['a[href*="/comunicats-de-premsa/"]'],
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#content-core"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
