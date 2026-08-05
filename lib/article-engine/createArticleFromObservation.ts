@@ -78,13 +78,18 @@ export async function createArticleFromObservation(
     sourceCategory: observation.source.category,
   });
 
+  const editorialDraft = {
+    ...draft,
+    category: draft.category.trim().toUpperCase(),
+  };
+
   let articleId: number;
 
   if (observation.articleId !== null) {
     articleId = observation.articleId;
-    await dependencies.articleRepository.updateDraft(articleId, draft);
+    await dependencies.articleRepository.updateDraft(articleId, editorialDraft);
   } else {
-    articleId = await dependencies.articleRepository.createDraft(draft);
+    articleId = await dependencies.articleRepository.createDraft(editorialDraft);
   }
 
   const autoPublication = prepareAutoPublication({
