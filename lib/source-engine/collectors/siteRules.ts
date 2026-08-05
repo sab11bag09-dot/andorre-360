@@ -147,4 +147,14 @@ export const siteRules: Record<string, SiteRule> = {
 
   "comuencamp.ad": comuEncampRule,
   "www.comuencamp.ad": comuEncampRule,
+  "www.coa.ad": {
+    listing: ['a[href^="https://www.coa.ad/"][href*="/"]'],
+    articlePathPattern: /^\/(?!noticies\/?$)[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".entry-content"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 };
