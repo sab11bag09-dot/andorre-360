@@ -28,7 +28,7 @@ export interface CreateArticleFromObservationDependencies {
     EditorialGenerator,
     "prepareArticle"
   >;
-  editorialEventWriter: EditorialEventWriter;
+  editorialEventWriter?: EditorialEventWriter;
 }
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
@@ -87,28 +87,30 @@ export async function createArticleFromObservation(
     articleId = await dependencies.articleRepository.createDraft(draft);
   }
 
-  const autoPublication = prepareAutoPublication({
-    sourceId: observation.source.id,
-    observationId: observation.id,
-    sourceUrl: observation.source.url,
-    observationUrl: observation.url,
-    publicationMode: observation.source.publicationMode,
-    trustLevel: observation.source.trustLevel,
-    title: draft.title,
-    content: draft.content,
-  });
+  if (dependencies.editorialEventWriter) {
+    const autoPublication = prepareAutoPublication({
+      sourceId: observation.source.id,
+      observationId: observation.id,
+      sourceUrl: observation.source.url,
+      observationUrl: observation.url,
+      publicationMode: observation.source.publicationMode,
+      trustLevel: observation.source.trustLevel,
+      title: draft.title,
+      content: draft.content,
+    });
 
-  await recordSystemEditorialEvent(
-    dependencies.editorialEventWriter,
-    {
-      action: "ARTICLE_CREATED",
-      articleId,
-      details: {
-        eventType: "auto_publication_evaluated",
-        ...autoPublication.audit,
+    await recordSystemEditorialEvent(
+      dependencies.editorialEventWriter,
+      {
+        action: "ARTICLE_CREATED",
+        articleId,
+        details: {
+          eventType: "auto_publication_evaluated",
+          ...autoPublication.audit,
+        },
       },
-    },
-  );
+    );
+  }
 
   await dependencies.observationRepository.markProcessed(
     observation.id,
