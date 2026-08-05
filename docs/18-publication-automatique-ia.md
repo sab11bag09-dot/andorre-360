@@ -1,45 +1,168 @@
-# Publication automatique par IA
+# Fiche 18 — Publication automatique par IA
 
-## Objectif
+## 1. Objet du chantier
 
-Permettre à l’IA de publier automatiquement les contenus issus de toutes les sources autorisées, sans validation humaine systématique.
+Permettre à Andorre 360 de publier automatiquement certains contenus générés par l’IA, sans validation humaine préalable, tout en conservant la traçabilité, la possibilité de reprise humaine et un arrêt d’urgence.
 
-## Périmètre
+Le mode automatique ne signifie pas que l’IA dispose d’une liberté éditoriale illimitée : elle agit dans un cadre de sources, de formats, de règles et de contrôles techniques prédéfinis.
 
-- activation réelle du mode `AUTO` ;
-- génération des articles, brèves, contenus SEO et éléments du Fil info ;
-- traduction en français, catalan et espagnol ;
-- publication automatique ;
-- traçabilité complète ;
-- dépublication et arrêt d’urgence.
+## 2. Décision produit
 
-## Garde-fous obligatoires
+Toutes les sources peuvent être éligibles au mode `AUTO`.
 
-- conserver la source, l’URL et l’observation d’origine ;
-- ne produire aucune information inventée ou non sourcée ;
-- bloquer la publication si le contenu est vide, contradictoire ou insuffisant ;
-- enregistrer le modèle, le prompt, la version et la date de génération ;
-- conserver l’historique des modifications et publications ;
-- fournir un arrêt global de l’automatisation ;
-- permettre la dépublication immédiate.
+L’éligibilité ne garantit toutefois pas la publication de chaque contenu. Avant publication, le système doit vérifier que :
 
-## Travaux prévus
+- l’observation possède une URL et une source identifiables ;
+- le contenu collecté est exploitable ;
+- le texte généré reste fidèle à l’observation ;
+- les champs obligatoires sont présents ;
+- aucune règle de sécurité ou de cohérence n’est déclenchée.
 
-1. Auditer le pipeline `Observation → Article → Traductions → Publication`.
-2. Autoriser le mode `AUTO` pour toutes les sources.
-3. Ajouter les contrôles de cohérence avant publication.
-4. Enregistrer les événements IA dans l’historique éditorial.
-5. Ajouter l’arrêt d’urgence et la dépublication.
-6. Tester les cas normaux, les erreurs et les contenus douteux.
+Un journaliste peut reprendre la main à tout moment, corriger, dépublier ou désactiver l’automatisation.
 
-## Critères de validation
+## 3. Chaîne fonctionnelle cible
 
-- une source configurée en `AUTO` publie sans intervention ;
-- chaque publication reste reliée à son observation ;
-- les erreurs bloquent automatiquement la publication ;
-- une publication peut être retirée immédiatement ;
-- tous les événements sont auditables.
+```text
+Source
+  ↓
+Observation
+  ↓
+Analyse et extraction des faits
+  ↓
+Génération de l’article
+  ↓
+Contrôles de cohérence
+  ↓
+Traductions FR / CA / ES
+  ↓
+Contrôles des traductions
+  ↓
+Publication automatique
+  ↓
+Pages, Fil info et canaux de diffusion
+  ↓
+Historique et supervision
+```
 
-## Principe éditorial
+La source collectée ne doit jamais être transformée directement en publication sans passer par l’étape de génération et les contrôles associés.
 
-L’automatisation peut publier sans validation humaine préalable, mais elle ne doit jamais supprimer la traçabilité, la possibilité de reprise humaine ni le contrôle opérationnel.
+## 4. Contenus concernés
+
+Le mode `AUTO` peut produire :
+
+- articles courts issus de communiqués ou actualités structurées ;
+- brèves factuelles ;
+- résultats et informations sportives ;
+- événements et agenda ;
+- informations météo ;
+- communiqués institutionnels ;
+- versions courtes pour le Fil info ;
+- métadonnées SEO ;
+- traductions en français, catalan et espagnol.
+
+Les formats et la longueur doivent être déterminés par des règles éditoriales, et non uniquement par le modèle.
+
+## 5. Contrôles avant publication
+
+La publication doit être bloquée si :
+
+- le contenu source est vide, trop court ou inaccessible ;
+- l’URL source est absente ou invalide ;
+- le titre ou le corps est manquant ;
+- le texte introduit des faits, chiffres, noms ou citations absents de la source ;
+- des dates ou lieux importants sont incohérents ;
+- une traduction supprime ou modifie une information vérifiable ;
+- le modèle renvoie une réponse incomplète ou non conforme ;
+- une source est signalée comme défaillante ;
+- le système d’arrêt global est activé.
+
+Un blocage doit être explicable et visible dans l’administration.
+
+## 6. Traçabilité obligatoire
+
+Pour chaque contenu publié automatiquement, conserver :
+
+- l’identifiant de la source ;
+- l’identifiant de l’observation ;
+- l’URL originale ;
+- la date de collecte ;
+- la date de génération ;
+- le modèle utilisé et sa version ;
+- la configuration ou le mode éditorial ;
+- les langues générées ;
+- les résultats des contrôles ;
+- la date et l’auteur technique de la publication ;
+- les corrections, dépublications et reprises humaines.
+
+L’historique doit permettre de répondre à la question : « pourquoi cet article a-t-il été publié ? »
+
+## 7. Supervision et reprise humaine
+
+L’administration doit proposer :
+
+- un bouton d’arrêt global de la publication automatique ;
+- un arrêt par source ;
+- un arrêt par catégorie ou format ;
+- une liste des publications automatiques récentes ;
+- un indicateur des publications bloquées ;
+- une dépublication immédiate ;
+- une reprise manuelle avec conservation de l’historique ;
+- une possibilité de repasser une source de `AUTO` à `ASSISTÉ` ou `MANUEL`.
+
+La reprise humaine ne doit pas effacer les données produites par l’IA : elle doit créer un nouvel événement éditorial.
+
+## 8. Gestion des erreurs
+
+Les erreurs doivent être classées :
+
+- collecte impossible ;
+- contenu insuffisant ;
+- génération IA échouée ;
+- contrôle de cohérence échoué ;
+- traduction échouée ;
+- publication échouée ;
+- dépublication ou reprise humaine.
+
+Chaque erreur doit être journalisée avec un message lisible et un identifiant permettant le diagnostic.
+
+Une erreur ne doit jamais provoquer une publication partielle silencieuse.
+
+## 9. Plan de mise en œuvre
+
+1. Auditer le pipeline actuel `Observation → Article → Traductions → Publication`.
+2. Identifier les endroits où une validation humaine est aujourd’hui obligatoire.
+3. Ajouter le mode `AUTO` au niveau des sources et des formats.
+4. Centraliser les contrôles prépublication.
+5. Ajouter l’enregistrement complet des événements IA.
+6. Implémenter l’arrêt global et les arrêts ciblés.
+7. Ajouter les tests de publication automatique et de blocage.
+8. Tester les traductions et les reprises humaines.
+9. Activer progressivement l’automatisation sur des sources représentatives.
+10. Vérifier les journaux et les procédures de dépublication avant généralisation.
+
+## 10. Critères d’acceptation
+
+Le chantier sera considéré comme terminé lorsque :
+
+- une source configurée en `AUTO` peut publier sans intervention ;
+- une observation reste liée à l’article publié ;
+- les trois langues configurées sont traçables séparément ;
+- les contrôles bloquent les contenus incomplets ou incohérents ;
+- une erreur est visible et explicable dans l’administration ;
+- un administrateur peut arrêter toute l’automatisation ;
+- un journaliste peut corriger ou dépublier immédiatement ;
+- chaque action IA et humaine apparaît dans l’historique ;
+- les tests couvrent les succès, les échecs, les traductions et les reprises ;
+- la CI et le build sont verts.
+
+## 11. Principe éditorial
+
+L’IA peut publier automatiquement, mais elle ne doit jamais devenir une boîte noire éditoriale.
+
+La publication automatique est acceptable uniquement si le système conserve :
+
+- une source identifiable ;
+- une chaîne de décision reconstituable ;
+- des contrôles vérifiables ;
+- une reprise humaine immédiate ;
+- un mécanisme d’arrêt fiable.
