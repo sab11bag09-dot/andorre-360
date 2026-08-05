@@ -553,6 +553,45 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "www.tribunalconstitucional.ad": {
+    listing: ['a[href*="/causa/"]'],
+    articlePathPattern: /^\/causa\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      ".field--name-field-contingut",
+      ".node__content",
+    ],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
+
+  "tribunalconstitucional.ad": {
+    listing: ['a[href*="/causa/"]'],
+    articlePathPattern: /^\/causa\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      ".field--name-field-contingut",
+      ".node__content",
+    ],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
