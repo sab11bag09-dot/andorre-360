@@ -21,10 +21,7 @@ export type EditorialEventWriter = {
   };
 };
 
-type EditorialEventDetails = Record<
-  string,
-  string | number | boolean | null
->;
+type EditorialEventDetails = Record<string, unknown>;
 
 export type RecordEditorialEventInput = {
   action: EditorialEventAction;
