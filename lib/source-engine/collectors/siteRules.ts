@@ -205,6 +205,23 @@ export const siteRules: Record<string, SiteRule> = {
       "style",
     ],
   },
+    "www.who.int": {
+    listing: ['a.link-container[href^="/europe/news/item/"]'],
+    articlePathPattern:
+      /^\/europe\/news\/item\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".sf-detail-body-wrapper"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
