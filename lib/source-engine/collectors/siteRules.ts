@@ -57,7 +57,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
   "www.rtva.ad": {
-    listing: ['a[href^="/noticies/"]'],
+    listing: ['a[href*="/noticies/"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
@@ -156,5 +156,15 @@ export const siteRules: Record<string, SiteRule> = {
     content: [".node__content"],
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
+  "cass.ad": {
+    listing: ['a[href^="/noticies/"]'],
+    articlePathPattern: /^\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".node__content"],
+    remove: ["header", "footer", "nav", "script", "style", ".share"],
+  },
+
 
 };
