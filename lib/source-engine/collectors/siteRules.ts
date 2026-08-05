@@ -171,5 +171,21 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
   "comuencamp.ad": comuEncampRule,
+    "www.fae.ad": {
+    listing: ["h4.post_title.entry-title a"],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [".elementor-widget-theme-post-content"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".post_info",
+    ],
+  },
   "www.comuencamp.ad": comuEncampRule,
 };
