@@ -160,8 +160,8 @@ export const siteRules: Record<string, SiteRule> = {
     remove: [
       ".cookie",
       ".cookies",
-      "[class*="cookie"]",
-      "[id*="cookie"]",
+      '[class*="cookie"]',
+      '[id*="cookie"]',
       ".share",
       ".social",
       ".related",
