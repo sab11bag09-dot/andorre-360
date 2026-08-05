@@ -370,6 +370,37 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
+    "www.agenda.ad": {
+    listing: ['a[href*="/activitat/"]'],
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#activitat__contingut", "main"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      "#activitat__altres",
+    ],
+  },
+
+  "agenda.ad": {
+    listing: ['a[href*="/activitat/"]'],
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: ["#activitat__contingut", "main"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      "#activitat__altres",
+    ],
+  },
   
   "comuencamp.ad": comuEncampRule,
     "www.fae.ad": {
