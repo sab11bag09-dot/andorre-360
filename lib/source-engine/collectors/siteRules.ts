@@ -121,7 +121,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "canillo.ad": {
     listing: [".item-noticia a.btn-fletxa.stretched-link"],
-    title: [".item-noticia h2", ".item-noticia h3", ".item-noticia .field--name-title", "h2", "h3"],
+    title: [".item-noticia .titol", ".item-noticia h2", ".item-noticia h3", ".item-noticia .field--name-title", "h2", "h3"],
     content: [".field--name-field-content .field__item"],
     remove: [
       ".field--name-field-galeria-noticia",
@@ -131,7 +131,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.canillo.ad": {
     listing: [".item-noticia a.btn-fletxa.stretched-link"],
-    title: [".item-noticia h2", ".item-noticia h3", ".item-noticia .field--name-title", "h2", "h3"],
+    title: [".item-noticia .titol", ".item-noticia h2", ".item-noticia h3", ".item-noticia .field--name-title", "h2", "h3"],
     content: [".field--name-field-content .field__item"],
     remove: [".field--name-field-galeria-noticia", ".layout__region--second"],
   },
