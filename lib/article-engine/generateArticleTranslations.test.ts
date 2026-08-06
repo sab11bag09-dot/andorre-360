@@ -149,13 +149,13 @@ describe("generateArticleTranslations", () => {
       articleId: article.id,
       translations: [
         {
-          locale: "CA",
-          translationId: 101,
+          locale: "FR",
+          translationId: 102,
           action: "created",
         },
         {
-          locale: "ES",
-          translationId: 102,
+          locale: "CA",
+          translationId: 101,
           action: "created",
         },
       ],
@@ -169,16 +169,16 @@ describe("generateArticleTranslations", () => {
       articleId: article.id,
       locale: "FR",
       title: "[FR] Titre français",
-      description: "[CA] Chapô français",
-      content: "[CA] Contenu français",
+      description: "[FR] Chapô français",
+      content: "[FR] Contenu français",
     });
 
     expect(createDraft).toHaveBeenCalledWith({
       articleId: article.id,
       locale: "CA",
       title: "[CA] Titre français",
-      description: "[ES] Chapô français",
-      content: "[ES] Contenu français",
+      description: "[CA] Chapô français",
+      content: "[CA] Contenu français",
     });
 
     expect(updateDraft).not.toHaveBeenCalled();
