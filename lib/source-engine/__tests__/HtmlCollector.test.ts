@@ -521,4 +521,35 @@ describe("HtmlCollector", () => {
       }),
     ]);
   });
+
+  it("extrait le vrai titre des articles Canillo depuis leur conteneur", async () => {
+    const source = {
+      ...createSource(),
+      name: "Canillo",
+      url: "https://www.canillo.ad/noticies",
+    };
+    const articleUrl = "https://www.canillo.ad/noticia/prova";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <div class="item-noticia">
+          <h2>Actualitat de Canillo</h2>
+          <a class="btn-fletxa stretched-link" href="/noticia/prova">Continuer à lire</a>
+        </div>
+      `,
+      [articleUrl]: `
+        <div class="field--name-field-content">
+          <div class="field__item">
+            <p>Contingut complet de la notícia de Canillo.</p>
+          </div>
+        </div>
+      `,
+    });
+    const observations = await new HtmlCollector(htmlClient).collect(source);
+    expect(observations).toEqual([
+      expect.objectContaining({
+        title: "Actualitat de Canillo",
+        url: articleUrl,
+      }),
+    ]);
+  });
 });
