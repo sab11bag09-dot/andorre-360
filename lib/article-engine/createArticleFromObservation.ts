@@ -138,14 +138,16 @@ export async function createArticleFromObservation(
   }
 
   if (autoPublication.decision.allowed) {
-    if (!options.regenerate && !dependencies.articleRepository.publishDraft) {
+    const publishDraft = dependencies.articleRepository.publishDraft;
+
+    if (!options.regenerate && !publishDraft) {
       throw new Error(
         "La publication automatique est autorisée mais indisponible.",
       );
     }
 
     if (!options.regenerate) {
-      await dependencies.articleRepository.publishDraft(articleId);
+      await publishDraft(articleId);
     }
 
     try {
