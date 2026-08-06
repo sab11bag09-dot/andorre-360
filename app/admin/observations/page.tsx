@@ -1,11 +1,17 @@
 import { prisma } from "@/lib/prisma";
 
-import { createArticleFromObservationAction } from "./actions";
+import {
+  createArticleFromObservationAction,
+  regenerateArticleFromObservationAction,
+} from "./actions";
 
 export default async function ObservationsPage() {
   const observations = await prisma.observation.findMany({
     where: {
-      processed: false,
+      OR: [
+        { processed: false },
+        { id: 1105, processed: true, articleId: 263 },
+      ],
     },
     include: {
       source: true,
@@ -55,15 +61,23 @@ export default async function ObservationsPage() {
                 <form
                   action={async () => {
                     "use server";
-                    await createArticleFromObservationAction(
-                      observation.id,
-                    );
+                    if (observation.id === 1105) {
+                      await regenerateArticleFromObservationAction(
+                        observation.id,
+                      );
+                    } else {
+                      await createArticleFromObservationAction(
+                        observation.id,
+                      );
+                    }
                   }}
                 >
                   <button
                     className="rounded bg-blue-600 px-3 py-2 text-white"
                   >
-                    Créer un brouillon
+                    {observation.id === 1105
+                      ? "Régénérer l’article 263"
+                      : "Créer un brouillon"}
                   </button>
                 </form>
               </td>
