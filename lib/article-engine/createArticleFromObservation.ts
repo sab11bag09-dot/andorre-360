@@ -1,7 +1,7 @@
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
-import { OpenAIEditorialGenerator } from "./generators/OpenAIEditorialGenerator";
+import { OpenAiEditorialGenerator } from "./generators/OpenAiEditorialGenerator";
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
 import { prepareAutoPublication } from "./autoPublicationOrchestration";
 import { generateArticleTranslations } from "./generateArticleTranslations";
@@ -74,10 +74,14 @@ export async function createArticleFromObservation(
     );
   }
 
-  const editorialGenerator =
+  const aiGenerator =
     observation.source.id === 54 && process.env.OPENAI_API_KEY?.trim()
-      ? new OpenAIEditorialGenerator()
-      : dependencies.editorialGenerator;
+      ? new OpenAiEditorialGenerator({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: process.env.OPENAI_TRANSLATION_MODEL,
+        })
+      : null;
+  const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
 
   const draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
@@ -138,7 +142,7 @@ export async function createArticleFromObservation(
       const generatedTranslations = await generateArticleTranslations(articleId, {
         articleRepository: new PrismaArticleRepository(),
         translationRepository: new PrismaArticleTranslationRepository(),
-        editorialGenerator,
+        editorialGenerator: aiGenerator ?? new DeterministicEditorialGenerator(),
       });
 
       await Promise.all(
