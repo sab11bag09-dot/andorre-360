@@ -1,6 +1,7 @@
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
+import { OpenAIEditorialGenerator } from "./generators/OpenAIEditorialGenerator";
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
 import { prepareAutoPublication } from "./autoPublicationOrchestration";
 import { generateArticleTranslations } from "./generateArticleTranslations";
@@ -72,7 +73,12 @@ export async function createArticleFromObservation(
     );
   }
 
-  const draft = await dependencies.editorialGenerator.prepareArticle({
+  const editorialGenerator =
+    observation.source.id === 54 && process.env.OPENAI_API_KEY?.trim()
+      ? new OpenAIEditorialGenerator()
+      : dependencies.editorialGenerator;
+
+  const draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
     sourceName: observation.source.name,
