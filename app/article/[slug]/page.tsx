@@ -8,6 +8,7 @@ import { getArticleBySlug } from "@/lib/articles";
 import { getPublicArticleDate } from "@/lib/public-article";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -53,11 +54,27 @@ export default async function ArticlePage({
 
   await recordArticleView(article.id);
 
+  const variants = await prisma.articleTranslation.findMany({
+    where: { articleId: article.id, status: "PUBLISHED" },
+    select: { locale: true, slug: true },
+    orderBy: { locale: "asc" },
+  });
+
+  const languageVariants = [
+    { locale: "fr", label: "Français", href: `/article/${article.slug}` },
+    ...variants.map((variant) => ({
+      locale: variant.locale.toLowerCase(),
+      label: variant.locale === "CA" ? "Català" : "Español",
+      href: `/${variant.locale.toLowerCase()}/article/${variant.slug}`,
+    })),
+  ];
+
   return (
     <PublicArticleView
       article={{
         ...article,
         publishedAt: getPublicArticleDate(article),
+        languageVariants,
       }}
       dateLocale="fr-FR"
       contentLanguage="fr"
