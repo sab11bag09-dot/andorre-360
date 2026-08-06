@@ -25,7 +25,7 @@ function makeObservation(
     source: {
       id: 2,
       name: "Source test",
-      category: "Société",
+      category: "SOCIÉTÉ",
     },
     ...overrides,
   } as unknown as ObservationWithSource;
@@ -55,7 +55,7 @@ function makeDependencies(
       title: "Titre test",
       description: "Premier paragraphe.",
       content: "Premier paragraphe.",
-      category: "Société",
+      category: "SOCIÉTÉ",
       author: "Source test",
     }),
   );
@@ -212,7 +212,7 @@ describe("createArticleFromObservation", () => {
       title: "Titre test",
       description: "Premier paragraphe.",
       content: "Premier paragraphe.",
-      category: "Société",
+      category: "SOCIÉTÉ",
       author: "Source test",
     });
 
