@@ -36,7 +36,7 @@ function makeDependencies() {
   const findByArticleAndLocale = vi.fn().mockResolvedValue(null);
   const translateArticle = vi.fn(
     async (input: {
-      locale: "FR" | "CA";
+      locale: "CA" | "ES";
       title: string;
       description: string;
       content: string;
@@ -77,8 +77,8 @@ describe("génération de traductions auditée", () => {
     );
     transactionFindUnique.mockResolvedValue(null);
     transactionCreate.mockImplementation(
-      async ({ data }: { data: { locale: "FR" | "CA" } }) => ({
-        id: data.locale === "FR" ? 102 : 101,
+      async ({ data }: { data: { locale: "CA" | "ES" } }) => ({
+        id: data.locale === "CA" ? 101 : 102,
       }),
     );
     transactionUpdateMany.mockResolvedValue({ count: 1 });
@@ -93,8 +93,8 @@ describe("génération de traductions auditée", () => {
     ).resolves.toEqual({
       articleId: 7,
       translations: [
-        { locale: "FR", translationId: 102, action: "created" },
         { locale: "CA", translationId: 101, action: "created" },
+        { locale: "ES", translationId: 102, action: "created" },
       ],
     });
 
@@ -107,13 +107,13 @@ describe("génération de traductions auditée", () => {
       data: expect.objectContaining({
         action: "TRANSLATION_GENERATED",
         articleId: 7,
-        translationId: 102,
+        translationId: 101,
         actorId: "admin-1",
         actorEmail: "admin@example.com",
         fromStatus: undefined,
         toStatus: "AI_DRAFT",
         details: JSON.stringify({
-          locale: "FR",
+          locale: "CA",
           operation: "created",
         }),
       }),
@@ -140,11 +140,11 @@ describe("génération de traductions auditée", () => {
       async ({ where }: { where: Record<string, unknown> }) => {
         if ("articleId_locale" in where) {
           const reference = where.articleId_locale as {
-            locale: "FR" | "CA";
+            locale: "CA" | "ES";
           };
 
           return {
-            id: reference.locale === "FR" ? 22 : 21,
+            id: reference.locale === "CA" ? 21 : 22,
             status: "REVIEW",
             publishedAt: null,
           };
@@ -161,8 +161,8 @@ describe("génération de traductions auditée", () => {
     );
 
     expect(result.translations).toEqual([
-      { locale: "FR", translationId: 22, action: "skipped" },
       { locale: "CA", translationId: 21, action: "skipped" },
+      { locale: "ES", translationId: 22, action: "skipped" },
     ]);
     expect(transactionCreate).not.toHaveBeenCalled();
     expect(transactionUpdateMany).not.toHaveBeenCalled();

@@ -96,8 +96,8 @@ const defaultDependencies: GenerateArticleTranslationsDependencies = {
 };
 
 const targetLocales: TranslationLocale[] = [
-  "FR",
   "CA",
+  "ES",
 ];
 
 function isEditableStatus(

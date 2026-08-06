@@ -1,6 +1,7 @@
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
+import { OpenAiEditorialGenerator } from "./generators/OpenAiEditorialGenerator";
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
 import { prepareAutoPublication } from "./autoPublicationOrchestration";
 import { generateArticleTranslations } from "./generateArticleTranslations";
@@ -10,6 +11,7 @@ import {
 } from "../editorial-history";
 import type { ArticleRepository } from "./repositories/ArticleRepository";
 import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
+import { PrismaArticleTranslationRepository } from "./repositories/PrismaArticleTranslationRepository";
 import { prisma } from "../prisma";
 
 export interface CreateArticleFromObservationResult {
@@ -72,7 +74,16 @@ export async function createArticleFromObservation(
     );
   }
 
-  const draft = await dependencies.editorialGenerator.prepareArticle({
+  const aiGenerator =
+    observation.source.id === 54 && process.env.OPENAI_API_KEY?.trim()
+      ? new OpenAiEditorialGenerator({
+          apiKey: process.env.OPENAI_API_KEY,
+          model: process.env.OPENAI_TRANSLATION_MODEL,
+        })
+      : null;
+  const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
+
+  const draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
     sourceName: observation.source.name,
@@ -128,7 +139,26 @@ export async function createArticleFromObservation(
     await dependencies.articleRepository.publishDraft(articleId);
 
     try {
-      await generateArticleTranslations(articleId);
+      const generatedTranslations = await generateArticleTranslations(articleId, {
+        articleRepository: new PrismaArticleRepository(),
+        translationRepository: new PrismaArticleTranslationRepository(),
+        editorialGenerator: aiGenerator ?? new DeterministicEditorialGenerator(),
+      });
+
+      await Promise.all(
+        generatedTranslations.translations
+          .filter(({ action }) => action !== "skipped")
+          .map(({ translationId }) =>
+            prisma.articleTranslation.update({
+              where: { id: translationId },
+              data: {
+                status: "PUBLISHED",
+                approvedAt: new Date(),
+                publishedAt: new Date(),
+              },
+            }),
+          ),
+      );
     } catch (error) {
       console.error(
         "[AutoPublication] Traductions non générées",
