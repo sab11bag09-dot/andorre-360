@@ -100,7 +100,14 @@ export async function createArticleFromObservation(
 
   if (observation.articleId !== null) {
     articleId = observation.articleId;
-    await dependencies.articleRepository.updateDraft(articleId, editorialDraft);
+    if (options.regenerate) {
+      await prisma.article.update({
+        where: { id: articleId },
+        data: editorialDraft,
+      });
+    } else {
+      await dependencies.articleRepository.updateDraft(articleId, editorialDraft);
+    }
   } else {
     articleId = await dependencies.articleRepository.createDraft(editorialDraft);
   }
@@ -131,13 +138,15 @@ export async function createArticleFromObservation(
   }
 
   if (autoPublication.decision.allowed) {
-    if (!dependencies.articleRepository.publishDraft) {
+    if (!options.regenerate && !dependencies.articleRepository.publishDraft) {
       throw new Error(
         "La publication automatique est autorisée mais indisponible.",
       );
     }
 
-    await dependencies.articleRepository.publishDraft(articleId);
+    if (!options.regenerate) {
+      await dependencies.articleRepository.publishDraft(articleId);
+    }
 
     try {
       const generatedTranslations = await generateArticleTranslations(articleId, {
