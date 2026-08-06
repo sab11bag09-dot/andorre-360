@@ -34,6 +34,15 @@ export interface CreateArticleFromObservationDependencies {
   editorialEventWriter?: EditorialEventWriter;
 }
 
+function isAiMultilingualSource(sourceId: number): boolean {
+  const configured = process.env.AI_MULTILINGUAL_SOURCE_IDS
+    ?.split(",")
+    .map((value) => Number.parseInt(value.trim(), 10))
+    .filter(Number.isInteger);
+
+  return configured?.includes(sourceId) ?? sourceId === 54;
+}
+
 const defaultDependencies: CreateArticleFromObservationDependencies = {
   observationRepository: new PrismaObservationRepository(),
   articleRepository: new PrismaArticleRepository(),
@@ -76,7 +85,7 @@ export async function createArticleFromObservation(
   }
 
   const aiGenerator =
-    observation.source.id === 54 && process.env.OPENAI_API_KEY?.trim()
+    isAiMultilingualSource(observation.source.id) && process.env.OPENAI_API_KEY?.trim()
       ? new OpenAiEditorialGenerator({
           apiKey: process.env.OPENAI_API_KEY,
           model: process.env.OPENAI_TRANSLATION_MODEL,
