@@ -84,12 +84,28 @@ export async function createArticleFromObservation(
       : null;
   const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
 
-  const draft = await editorialGenerator.prepareArticle({
+  let draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
     sourceName: observation.source.name,
     sourceCategory: observation.source.category,
   });
+
+  if (aiGenerator) {
+    const french = await aiGenerator.translateArticle({
+      locale: "FR",
+      title: draft.title,
+      description: draft.description,
+      content: draft.content,
+    });
+
+    draft = {
+      ...draft,
+      title: french.title,
+      description: french.description,
+      content: french.content,
+    };
+  }
 
   const editorialDraft = {
     ...draft,

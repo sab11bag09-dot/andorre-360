@@ -11,6 +11,7 @@ export interface PublicArticleViewData {
   readingTime: string;
   videoUrl: string | null;
   publishedAt: Date;
+  languageVariants?: Array<{ locale: string; label: string; href: string }>;
 }
 
 type Props = {
@@ -136,6 +137,20 @@ export default function PublicArticleView({
       )}
 
       <article className="mx-auto max-w-4xl p-8">
+        {article.languageVariants && article.languageVariants.length > 0 && (
+          <nav className="mb-6 flex flex-wrap gap-2" aria-label="Versions linguistiques">
+            {article.languageVariants.map((variant) => (
+              <a
+                key={variant.locale}
+                href={variant.href}
+                className="rounded border border-yellow-500 px-3 py-1 text-sm text-yellow-500 hover:bg-yellow-500 hover:text-black"
+              >
+                {variant.label}
+              </a>
+            ))}
+          </nav>
+        )}
+
         <div className="flex flex-wrap gap-4 text-gray-400">
           <p>{article.publishedAt.toLocaleDateString(dateLocale)}</p>
           <p>• Par {article.author}</p>
