@@ -94,7 +94,7 @@ describe("génération de traductions auditée", () => {
       articleId: 7,
       translations: [
         { locale: "FR", translationId: 102, action: "created" },
-        { locale: "CA", translationId: 102, action: "created" },
+        { locale: "CA", translationId: 101, action: "created" },
       ],
     });
 
