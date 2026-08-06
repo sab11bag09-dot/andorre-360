@@ -289,25 +289,16 @@ export class HtmlCollector implements Collector {
         const container = link.closest(
           "article, .views-row, .node, .item, li, div",
         );
-        const titleContainer =
-          siteRule?.title?.some((selector) =>
-            container.closest(selector).length > 0,
-          )
-            ? container.closest(
-                siteRule.title.find((selector) =>
-                  container.closest(selector).length > 0,
-                )!,
-              )
-            : container;
+        const titleContainer = container.closest(".item-noticia").length
+          ? container.closest(".item-noticia")
+          : container;
 
         const title = normalizeText(
           siteRule?.title
             ?.map((selector) => titleContainer.find(selector).first().text())
-            .find((value) => normalizeText(value)) ??
-            (titleContainer.is(siteRule?.title ?? [])
-              ? titleContainer.text()
-              : link.text()),
+            .find((value) => normalizeText(value)) ?? link.text(),
         );
+
         const href = link.attr("href");
 
         if (!title || !href) {
