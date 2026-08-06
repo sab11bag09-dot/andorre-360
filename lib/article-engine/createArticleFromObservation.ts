@@ -11,6 +11,7 @@ import {
 } from "../editorial-history";
 import type { ArticleRepository } from "./repositories/ArticleRepository";
 import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
+import { PrismaArticleTranslationRepository } from "./repositories/PrismaArticleTranslationRepository";
 import { prisma } from "../prisma";
 
 export interface CreateArticleFromObservationResult {
@@ -134,7 +135,11 @@ export async function createArticleFromObservation(
     await dependencies.articleRepository.publishDraft(articleId);
 
     try {
-      await generateArticleTranslations(articleId);
+      await generateArticleTranslations(articleId, {
+        articleRepository: new PrismaArticleRepository(),
+        translationRepository: new PrismaArticleTranslationRepository(),
+        editorialGenerator,
+      });
     } catch (error) {
       console.error(
         "[AutoPublication] Traductions non générées",
