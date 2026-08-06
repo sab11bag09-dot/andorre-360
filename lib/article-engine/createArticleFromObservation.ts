@@ -61,7 +61,7 @@ export async function createArticleFromObservation(
     return { articleId: observation.articleId };
   }
 
-  if (observation.processed) {
+  if (observation.processed && !options.regenerate) {
     throw new Error(
       "Cette observation est marquée comme traitée sans article associé.",
     );
