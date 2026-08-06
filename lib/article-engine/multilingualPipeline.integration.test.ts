@@ -193,7 +193,7 @@ describe("pipeline multilingue avec SQLite isolé", () => {
     ).resolves.toBe(0);
   });
 
-  it("crée CA et ES puis les régénère sans doublon", async () => {
+  it("crée FR et CA puis les régénère sans doublon", async () => {
     const articleId = await createArticle();
 
     await generateArticleTranslations(articleId, generationDependencies);
@@ -205,7 +205,7 @@ describe("pipeline multilingue avec SQLite isolé", () => {
     });
 
     expect(translations).toHaveLength(2);
-    expect(translations.map(({ locale }) => locale).sort()).toEqual(["CA", "ES"]);
+    expect(translations.map(({ locale }) => locale).sort()).toEqual(["CA", "FR"]);
     expect(translations.every(({ status }) => status === "AI_DRAFT")).toBe(true);
   });
 
@@ -258,7 +258,7 @@ describe("pipeline multilingue avec SQLite isolé", () => {
       expect(persisted.content).toBe("Contenu CA");
       expect(translateArticle).toHaveBeenCalledTimes(1);
       expect(translateArticle).toHaveBeenCalledWith(
-        expect.objectContaining({ locale: "ES" }),
+        expect.objectContaining({ locale: "FR" }),
       );
     },
   );

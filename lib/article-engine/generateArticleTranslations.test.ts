@@ -47,7 +47,7 @@ function makeDependencies(
   const createDraft = vi.fn(
     async (
       input: ArticleTranslationDraftInput,
-    ) => input.locale === "CA" ? 101 : 102,
+    ) => input.locale === "FR" ? 102 : 101,
   );
 
   const updateDraft = vi.fn(
@@ -131,7 +131,7 @@ describe("generateArticleTranslations", () => {
     ).not.toHaveBeenCalled();
   });
 
-  it("crée les traductions catalane et espagnole", async () => {
+  it("crée les traductions française et catalane", async () => {
     const {
       dependencies,
       createDraft,
@@ -149,13 +149,13 @@ describe("generateArticleTranslations", () => {
       articleId: article.id,
       translations: [
         {
-          locale: "CA",
-          translationId: 101,
+          locale: "FR",
+          translationId: 102,
           action: "created",
         },
         {
-          locale: "ES",
-          translationId: 102,
+          locale: "CA",
+          translationId: 101,
           action: "created",
         },
       ],
@@ -167,18 +167,18 @@ describe("generateArticleTranslations", () => {
 
     expect(createDraft).toHaveBeenCalledWith({
       articleId: article.id,
-      locale: "CA",
-      title: "[CA] Titre français",
-      description: "[CA] Chapô français",
-      content: "[CA] Contenu français",
+      locale: "FR",
+      title: "[FR] Titre français",
+      description: "[FR] Chapô français",
+      content: "[FR] Contenu français",
     });
 
     expect(createDraft).toHaveBeenCalledWith({
       articleId: article.id,
-      locale: "ES",
-      title: "[ES] Titre français",
-      description: "[ES] Chapô français",
-      content: "[ES] Contenu français",
+      locale: "CA",
+      title: "[CA] Titre français",
+      description: "[CA] Chapô français",
+      content: "[CA] Contenu français",
     });
 
     expect(updateDraft).not.toHaveBeenCalled();
@@ -192,11 +192,11 @@ describe("generateArticleTranslations", () => {
     } = makeDependencies(
       article,
       {
-        CA: {
+        FR: {
           id: 11,
           status: "DRAFT",
         },
-        ES: {
+        CA: {
           id: 12,
           status: "AI_DRAFT",
         },
@@ -211,12 +211,12 @@ describe("generateArticleTranslations", () => {
 
     expect(result.translations).toEqual([
       {
-        locale: "CA",
+        locale: "FR",
         translationId: 11,
         action: "updated",
       },
       {
-        locale: "ES",
+        locale: "CA",
         translationId: 12,
         action: "updated",
       },
@@ -228,7 +228,7 @@ describe("generateArticleTranslations", () => {
       11,
       expect.objectContaining({
         articleId: article.id,
-        locale: "CA",
+        locale: "FR",
       }),
     );
 
@@ -236,7 +236,7 @@ describe("generateArticleTranslations", () => {
       12,
       expect.objectContaining({
         articleId: article.id,
-        locale: "ES",
+        locale: "CA",
       }),
     );
   });
@@ -250,11 +250,11 @@ describe("generateArticleTranslations", () => {
     } = makeDependencies(
       article,
       {
-        CA: {
+        FR: {
           id: 21,
           status: "REVIEW",
         },
-        ES: {
+        CA: {
           id: 22,
           status: "PUBLISHED",
         },
@@ -269,12 +269,12 @@ describe("generateArticleTranslations", () => {
 
     expect(result.translations).toEqual([
       {
-        locale: "CA",
+        locale: "FR",
         translationId: 21,
         action: "skipped",
       },
       {
-        locale: "ES",
+        locale: "CA",
         translationId: 22,
         action: "skipped",
       },
@@ -297,8 +297,8 @@ describe("generateArticleTranslations", () => {
     } = makeDependencies();
     translateArticle
       .mockResolvedValueOnce({
-        locale: "CA",
-        title: "Títol",
+        locale: "FR",
+        title: "Titre",
         description: "Descripció",
         content: "Contingut",
       })
