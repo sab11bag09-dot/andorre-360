@@ -44,6 +44,7 @@ const defaultDependencies: CreateArticleFromObservationDependencies = {
 export async function createArticleFromObservation(
   observationId: number,
   dependencies = defaultDependencies,
+  options: { regenerate?: boolean } = {},
 ): Promise<CreateArticleFromObservationResult> {
   if (!Number.isInteger(observationId) || observationId <= 0) {
     throw new Error("Identifiant d’observation invalide.");
@@ -56,7 +57,7 @@ export async function createArticleFromObservation(
     throw new Error("Observation introuvable.");
   }
 
-  if (observation.processed && observation.articleId !== null) {
+  if (observation.processed && observation.articleId !== null && !options.regenerate) {
     return { articleId: observation.articleId };
   }
 
