@@ -25,7 +25,7 @@ function makeObservation(
     source: {
       id: 2,
       name: "Source test",
-      category: "Société",
+      category: "SOCIÉTÉ",
     },
     ...overrides,
   } as unknown as ObservationWithSource;
