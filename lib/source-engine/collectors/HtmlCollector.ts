@@ -286,7 +286,15 @@ export class HtmlCollector implements Collector {
     for (const selector of listingSelectors) {
       $(selector).each((_, element) => {
         const link = $(element);
-        const title = normalizeText(link.text());
+        const container = link.closest(
+          "article, .views-row, .node, .item, li, div",
+        );
+
+        const title = normalizeText(
+          siteRule?.title
+            ?.map((selector) => container.find(selector).first().text())
+            .find((value) => normalizeText(value)) ?? link.text(),
+        );
         const href = link.attr("href");
 
         if (!title || !href) {
@@ -307,10 +315,6 @@ export class HtmlCollector implements Collector {
         ) {
           return;
         }
-
-        const container = link.closest(
-          "article, .views-row, .node, .item, li, div",
-        );
 
         const dateText =
           container
