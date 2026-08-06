@@ -13,7 +13,7 @@ export interface PreparedArticle {
   author: string;
 }
 
-export type TranslationLocale = "CA" | "ES";
+export type TranslationLocale = "FR" | "CA" | "ES";
 
 export interface TranslateArticleInput {
   locale: TranslationLocale;
