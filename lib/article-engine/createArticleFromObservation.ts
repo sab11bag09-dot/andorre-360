@@ -3,6 +3,7 @@ import { PrismaObservationRepository } from "../source-engine/repositories/Prism
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
 import { prepareAutoPublication } from "./autoPublicationOrchestration";
+import { generateArticleTranslations } from "./generateArticleTranslations";
 import {
   recordSystemEditorialEvent,
   type EditorialEventWriter,
@@ -125,6 +126,15 @@ export async function createArticleFromObservation(
     }
 
     await dependencies.articleRepository.publishDraft(articleId);
+
+    try {
+      await generateArticleTranslations(articleId);
+    } catch (error) {
+      console.error(
+        "[AutoPublication] Traductions non générées",
+        { articleId, error },
+      );
+    }
   }
 
   await dependencies.observationRepository.markProcessed(
