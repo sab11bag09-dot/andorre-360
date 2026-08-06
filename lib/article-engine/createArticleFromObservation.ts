@@ -135,11 +135,26 @@ export async function createArticleFromObservation(
     await dependencies.articleRepository.publishDraft(articleId);
 
     try {
-      await generateArticleTranslations(articleId, {
+      const generatedTranslations = await generateArticleTranslations(articleId, {
         articleRepository: new PrismaArticleRepository(),
         translationRepository: new PrismaArticleTranslationRepository(),
         editorialGenerator,
       });
+
+      await Promise.all(
+        generatedTranslations.translations
+          .filter(({ action }) => action !== "skipped")
+          .map(({ translationId }) =>
+            prisma.articleTranslation.update({
+              where: { id: translationId },
+              data: {
+                status: "PUBLISHED",
+                approvedAt: new Date(),
+                publishedAt: new Date(),
+              },
+            }),
+          ),
+      );
     } catch (error) {
       console.error(
         "[AutoPublication] Traductions non générées",
