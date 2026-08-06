@@ -126,7 +126,12 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
   async translateArticle(
     input: TranslateArticleInput,
   ): Promise<PreparedTranslation> {
-    const targetLanguage = input.locale === "CA" ? "catalan" : "espagnol";
+    const targetLanguage =
+      input.locale === "FR"
+        ? "français"
+        : input.locale === "CA"
+          ? "catalan"
+          : "espagnol";
 
     let output: string;
 
@@ -134,7 +139,7 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       output = await this.client.create({
         model: this.model,
         instructions: [
-          `Traduis fidèlement cet article journalistique du français vers le ${targetLanguage}.`,
+          `Traduis fidèlement cet article journalistique vers le ${targetLanguage}.`,
           "N’ajoute, ne retire et n’invente aucune information.",
           "Conserve les noms propres, nombres, URL et la structure HTML ou Markdown.",
           "Adopte un style journalistique naturel adapté à Andorre.",
