@@ -148,6 +148,14 @@ export async function createArticleFromObservation(
     content: draft.content,
   });
 
+  console.info("[AutoPublication] Évaluation", {
+    articleId,
+    sourceId: observation.source.id,
+    observationId: observation.id,
+    allowed: autoPublication.decision.allowed,
+    reasons: autoPublication.decision.reasons,
+  });
+
   if (dependencies.editorialEventWriter) {
     await recordSystemEditorialEvent(
       dependencies.editorialEventWriter,
