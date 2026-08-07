@@ -32,6 +32,25 @@ export const siteRules: Record<string, SiteRule> = {
     maxArticles: 24,
     concurrency: 3,
     requireContent: true,
+    content: [".content", ".article-content", "article", "main"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "aside",
+      "script",
+      "style",
+      ".share",
+      ".social",
+    ],
+  },
+
+  "www.ari.ad": {
+    listing: ['a[href^="/noticies/"]'],
+    articlePathPattern: /^\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 3,
+    requireContent: true,
     content: ["main"],
     remove: [
       "header",
