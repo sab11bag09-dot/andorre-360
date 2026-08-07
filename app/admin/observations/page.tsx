@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 import {
   createArticleFromObservationAction,
+  deleteAiDraftFromObservationAction,
   regenerateArticleFromObservationAction,
 } from "./actions";
 
@@ -58,6 +59,7 @@ export default async function ObservationsPage() {
               </td>
 
               <td className="border p-2 text-center">
+                <div className="flex flex-wrap justify-center gap-2">
                 <form
                   action={async () => {
                     "use server";
@@ -80,6 +82,30 @@ export default async function ObservationsPage() {
                       : "Créer un brouillon"}
                   </button>
                 </form>
+                {observation.articleId && (
+                  <form
+                    action={async () => {
+                      "use server";
+                      await deleteAiDraftFromObservationAction(
+                        observation.id,
+                      );
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      className="rounded bg-red-600 px-3 py-2 text-white"
+                      formAction={async () => {
+                        "use server";
+                        await deleteAiDraftFromObservationAction(
+                          observation.id,
+                        );
+                      }}
+                    >
+                      Supprimer le brouillon
+                    </button>
+                  </form>
+                )}
+                </div>
               </td>
             </tr>
           ))}
