@@ -28,7 +28,7 @@ const comuEncampRule: SiteRule = {
 export const siteRules: Record<string, SiteRule> = {
   "ari.ad": {
     listing: ['a[href^="/noticies/"]'],
-    articlePathPattern: /^\\/noticies\\/[^/]+\\/?$/,
+    articlePathPattern: /^\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 3,
     requireContent: true,
