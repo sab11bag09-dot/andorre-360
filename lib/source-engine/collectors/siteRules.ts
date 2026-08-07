@@ -65,7 +65,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
   "ari.ad": {
-    listing: ['a[href*="/noticies/"]'],
+    listing: ['h2 a, h3 a, a[href*="/noticies"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 3,
@@ -84,7 +84,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
   "www.ari.ad": {
-    listing: ['a[href^="/noticies/"]'],
+    listing: ['h2 a, h3 a, a[href*="/noticies"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 3,
