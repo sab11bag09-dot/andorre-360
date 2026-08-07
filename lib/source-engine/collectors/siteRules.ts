@@ -719,4 +719,56 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
 
+  "e-e.ad": {
+    listing: ['a[href*="/publicacio/"]'],
+    articlePathPattern: /^\/publicacio\/\d+\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      "article",
+      "main",
+      ".publication-content",
+      ".content",
+      "[class*=\"content\"]",
+      "body",
+    ],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "aside",
+      "script",
+      "style",
+      ".share",
+      ".social",
+    ],
+  },
+
+  "www.e-e.ad": {
+    listing: ['a[href*="/publicacio/"]'],
+    articlePathPattern: /^\/publicacio\/\d+\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      "article",
+      "main",
+      ".publication-content",
+      ".content",
+      "[class*=\"content\"]",
+      "body",
+    ],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "aside",
+      "script",
+      "style",
+      ".share",
+      ".social",
+    ],
+  },
+
 };
