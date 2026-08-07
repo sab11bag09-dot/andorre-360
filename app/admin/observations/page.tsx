@@ -12,10 +12,18 @@ export default async function ObservationsPage() {
       OR: [
         { processed: false },
         { id: 1105, processed: true, articleId: 263 },
+        { article: { editorialStatus: "AI_DRAFT" } },
       ],
     },
     include: {
       source: true,
+      article: {
+        select: {
+          id: true,
+          published: true,
+          editorialStatus: true,
+        },
+      },
     },
     orderBy: [
       {
@@ -82,7 +90,7 @@ export default async function ObservationsPage() {
                       : "Créer un brouillon"}
                   </button>
                 </form>
-                {observation.articleId && (
+                {observation.article?.editorialStatus === "AI_DRAFT" && (
                   <form
                     action={async () => {
                       "use server";
@@ -94,6 +102,11 @@ export default async function ObservationsPage() {
                     <button
                       type="submit"
                       className="rounded bg-red-600 px-3 py-2 text-white"
+                      onClick={() =>
+                        window.confirm(
+                          "Supprimer ce brouillon IA et ses traductions ? L’observation pourra être retraitée.",
+                        )
+                      }
                       formAction={async () => {
                         "use server";
                         await deleteAiDraftFromObservationAction(
