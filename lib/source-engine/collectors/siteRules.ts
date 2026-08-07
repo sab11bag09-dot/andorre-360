@@ -45,6 +45,25 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+  "www.lamassana.ad": {
+    listing: ['a[href*="/actualitat/"]'],
+    articlePathPattern: /^\/actualitat\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 3,
+    requireContent: true,
+    content: [".content", ".article-content", "article", "main", "body"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "aside",
+      "script",
+      "style",
+      ".share",
+      ".social",
+    ],
+  },
+
   "ari.ad": {
     listing: ['a[href*="/noticies/"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/?$/,
