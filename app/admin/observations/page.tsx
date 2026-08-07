@@ -102,11 +102,6 @@ export default async function ObservationsPage() {
                     <button
                       type="submit"
                       className="rounded bg-red-600 px-3 py-2 text-white"
-                      onClick={() =>
-                        window.confirm(
-                          "Supprimer ce brouillon IA et ses traductions ? L’observation pourra être retraitée.",
-                        )
-                      }
                       formAction={async () => {
                         "use server";
                         await deleteAiDraftFromObservationAction(
