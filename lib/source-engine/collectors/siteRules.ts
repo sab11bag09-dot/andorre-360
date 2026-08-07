@@ -32,7 +32,7 @@ export const siteRules: Record<string, SiteRule> = {
     maxArticles: 24,
     concurrency: 3,
     requireContent: true,
-    content: [".content", ".article-content", "article", "main", "body"],
+    content: [".field--name-body", "#content", ".content", ".article-content", "article", "main", "body"],
     remove: [
       "header",
       "footer",
