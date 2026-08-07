@@ -373,12 +373,12 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
     "concordia.ad": {
-    listing: ['h4.entry-title a[href^="https://concordia.ad/"]'],
+    listing: ["h4.entry-title a"],
     articlePathPattern: /^\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
-    content: [".mkdf-post-content"],
+    content: [".entry-content", ".mkdf-post-content", "article", "main"],
     remove: [
       "header",
       "footer",
