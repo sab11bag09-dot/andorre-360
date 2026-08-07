@@ -771,4 +771,29 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+  "commission.europa.eu": {
+    listing: ['a[href*="/news-and-media/news/"]'],
+    articlePathPattern: /^\/news-and-media\/news\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      "article",
+      "main",
+      ".ecl-u-mb-xl",
+      "[class*=\"content\"]",
+      "body",
+    ],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "aside",
+      "script",
+      "style",
+      ".share",
+      ".social",
+    ],
+  },
+
 };
