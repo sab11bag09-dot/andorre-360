@@ -116,6 +116,13 @@ export async function createArticleFromObservation(
     };
   }
 
+  if (draft.title.trim().length < 12) {
+    draft = {
+      ...draft,
+      title: `${observation.source.name} — ${draft.title.trim()}`.trim(),
+    };
+  }
+
   const editorialDraft = {
     ...draft,
     category: draft.category.trim().toUpperCase(),
