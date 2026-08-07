@@ -55,10 +55,7 @@ export default async function HomePageEditorial() {
    * Les articles disponibles complètent automatiquement
    * les zones encore vides.
    */
-  const hero =
-    editorialLayout.hero ??
-    availableArticles.shift() ??
-    null;
+  const hero = editorialLayout.hero ?? null;
 
   const feature =
     editorialLayout.feature ??
