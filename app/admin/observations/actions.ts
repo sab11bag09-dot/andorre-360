@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
+import { prisma } from "@/lib/prisma";
 import { createArticleFromObservation } from "@/lib/article-engine/createArticleFromObservation";
 
 export async function createArticleFromObservationAction(
@@ -20,7 +21,6 @@ export async function createArticleFromObservationAction(
   redirect(`/admin/articles/${articleId}`);
 }
 
-
 export async function regenerateArticleFromObservationAction(
   observationId: number,
 ) {
@@ -35,4 +35,45 @@ export async function regenerateArticleFromObservationAction(
   revalidatePath("/admin/observations");
   revalidatePath("/admin/articles");
   redirect(`/admin/articles/${articleId}`);
+}
+
+export async function deleteAiDraftFromObservationAction(
+  observationId: number,
+) {
+  await requireAdmin();
+
+  await prisma.$transaction(async (tx) => {
+    const observation = await tx.observation.findUnique({
+      where: { id: observationId },
+      select: { articleId: true },
+    });
+
+    if (!observation?.articleId) {
+      throw new Error("Aucun article associé à cette observation.");
+    }
+
+    const article = await tx.article.findUnique({
+      where: { id: observation.articleId },
+      select: { id: true, published: true, editorialStatus: true },
+    });
+
+    if (!article || article.published || article.editorialStatus !== "AI_DRAFT") {
+      throw new Error("Seuls les brouillons IA peuvent être supprimés.");
+    }
+
+    await tx.article.delete({ where: { id: article.id } });
+
+    await tx.observation.update({
+      where: { id: observationId },
+      data: {
+        articleId: null,
+        processed: false,
+        processedAt: null,
+      },
+    });
+  });
+
+  revalidatePath("/admin/observations");
+  revalidatePath("/admin/articles");
+  redirect("/admin/observations");
 }
