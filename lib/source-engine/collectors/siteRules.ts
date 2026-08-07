@@ -26,6 +26,25 @@ const comuEncampRule: SiteRule = {
 };
 
 export const siteRules: Record<string, SiteRule> = {
+  "lamassana.ad": {
+    listing: ['a[href*="/actualitat/"]'],
+    articlePathPattern: /^\\/actualitat\\/[^/]+\\/?$/,
+    maxArticles: 24,
+    concurrency: 3,
+    requireContent: true,
+    content: ["main"],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "aside",
+      "script",
+      "style",
+      ".share",
+      ".social",
+    ],
+  },
+
   "ari.ad": {
     listing: ['a[href*="/noticies/"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/?$/,
