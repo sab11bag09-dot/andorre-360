@@ -19,7 +19,7 @@ export default async function HomePageDB() {
     getPublishedArticles(),
   ]);
 
-  const featured = featuredArticle ?? publishedArticles[0];
+  const featured = featuredArticle;
 
   if (!featured) {
     return (
