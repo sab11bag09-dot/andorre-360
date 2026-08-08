@@ -120,7 +120,42 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
   }
 
   async prepareArticle(input: PrepareArticleInput): Promise<PreparedArticle> {
-    return this.deterministicGenerator.prepareArticle(input);
+    const baseline = await this.deterministicGenerator.prepareArticle(input);
+
+    let output: string;
+
+    try {
+      output = await this.client.create({
+        model: this.model,
+        instructions: [
+          "Réécris cet article journalistique en français dans un style original et naturel.",
+          "Ne fais pas une copie ni une traduction mot à mot.",
+          "Conserve strictement les faits, noms propres, chiffres, dates, citations et URL.",
+          "N’invente aucune information et ne supprime aucun élément factuel important.",
+          "Retourne un titre reformulé, un chapô et un article structuré.",
+          "Retourne uniquement les trois champs demandés.",
+        ].join(" "),
+        input: JSON.stringify({
+          sourceName: input.sourceName,
+          sourceCategory: input.sourceCategory,
+          originalTitle: input.originalTitle,
+          originalContent: input.originalContent,
+        }),
+        schema: translationSchema,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "erreur inconnue";
+      throw new Error(`La réécriture OpenAI a échoué : ${message}`);
+    }
+
+    const rewritten = parseTranslationResponse(output);
+
+    return {
+      ...baseline,
+      title: rewritten.title,
+      description: rewritten.description,
+      content: rewritten.content,
+    };
   }
 
   async translateArticle(
