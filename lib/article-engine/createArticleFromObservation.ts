@@ -84,13 +84,12 @@ export async function createArticleFromObservation(
     );
   }
 
-  const aiGenerator =
-    isAiMultilingualSource(observation.source.id) && process.env.OPENAI_API_KEY?.trim()
-      ? new OpenAiEditorialGenerator({
-          apiKey: process.env.OPENAI_API_KEY,
-          model: process.env.OPENAI_TRANSLATION_MODEL,
-        })
-      : null;
+  const aiGenerator = process.env.OPENAI_API_KEY?.trim()
+    ? new OpenAiEditorialGenerator({
+        apiKey: process.env.OPENAI_API_KEY,
+        model: process.env.OPENAI_TRANSLATION_MODEL,
+      })
+    : null;
   const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
 
   let draft = await editorialGenerator.prepareArticle({
