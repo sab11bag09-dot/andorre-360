@@ -135,7 +135,7 @@ export function mapArticleToDraft(
     published: article.published,
     editorialStatus: article.editorialStatus,
 
-    pageKey: publication?.pageKey ?? "home",
+    pageKey: publication?.pageKey ?? `category:${article.category}`,
     zone: publication?.zone ?? "standard",
     priority: publication?.priority ?? 0,
 
