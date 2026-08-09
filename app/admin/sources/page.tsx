@@ -170,7 +170,7 @@ export default async function AdminSourcesPage({
       <PageHeader
         backHref="/admin"
         backLabel="Retour au tableau de bord"
-        eyebrow="ANDORRE 360 Studio"
+        eyebrow="ANDORRA 360 Studio"
         title="Sources"
         description="Gère les organismes et les flux qui alimenteront la Veille et le Fil Info."
         actions={
