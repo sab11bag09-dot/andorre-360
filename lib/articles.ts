@@ -221,7 +221,8 @@ export async function getFeaturedArticle() {
   const eligible = candidates
     .map(normalizeImage)
     .filter((article) => !isUneExcluded(article))
-    .filter((article) => article.image);
+    .filter((article) => Boolean(article.image))
+    .map((article) => ({ ...article, image: article.image as string }));
 
   eligible.sort(
     (left, right) =>
