@@ -35,7 +35,7 @@ export default async function EditSourcePage({
         <PageHeader
           backHref="/admin/sources"
           backLabel="Retour aux sources"
-          eyebrow="ANDORRE 360 Studio"
+          eyebrow="ANDORRA 360 Studio"
           title="Modifier la source"
           description={source.name}
         />
