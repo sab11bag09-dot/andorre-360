@@ -132,10 +132,7 @@ export default async function HomePageEditorial() {
     ),
   ].slice(0, 5);
 
- const cards =
-  editorialLayout.card.length > 0
-    ? editorialLayout.card
-    : availableArticles.splice(0, 5);
+  const cards = availableArticles.splice(0, 5);
 
   const editorial = editorialLayout.editorial;
 
