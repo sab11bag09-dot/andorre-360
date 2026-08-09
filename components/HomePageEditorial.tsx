@@ -258,10 +258,10 @@ export default async function HomePageEditorial() {
 
             {/* BRÈVES + GRAND FORMAT */}
 
-            <div className="grid gap-8 md:grid-cols-4">
+            <div className="grid items-stretch gap-8 md:grid-cols-4">
               {/* BRÈVES */}
 
-              <section className="md:col-span-1">
+              <section className="flex h-full min-h-[520px] flex-col md:col-span-1">
                 <div className="mb-5 border-b border-yellow-500 pb-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     L’essentiel
@@ -298,7 +298,7 @@ export default async function HomePageEditorial() {
                   href={`/article/${grandFormat.slug}`}
                   className="group block md:col-span-3"
                 >
-                  <article className="border-l border-gray-800 pl-0 md:pl-7">
+                  <article className="flex h-full flex-col border-l border-gray-800 pl-0 md:pl-7">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grand Format · {grandFormat.category}
                     </p>
@@ -309,7 +309,7 @@ export default async function HomePageEditorial() {
                       {grandFormat.title}
                     </h2>
 
-                    <div className="mt-6 grid gap-6 md:grid-cols-3">
+                    <div className="mt-6 flex flex-1 items-stretch gap-6 md:grid md:grid-cols-3">
                       {/* Chapô : une colonne à gauche */}
 
                       <div className="flex flex-col justify-between md:col-span-1">
