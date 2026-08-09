@@ -122,7 +122,7 @@ export default async function AdminMediaPage({
       <PageHeader
         backHref="/admin"
         backLabel="Retour au Studio"
-        eyebrow="ANDORRE 360 Studio"
+        eyebrow="ANDORRA 360 Studio"
         title="Bibliothèque de médias"
         description="Téléverse, consulte et réutilise les images et vidéos de ton journal."
       />
