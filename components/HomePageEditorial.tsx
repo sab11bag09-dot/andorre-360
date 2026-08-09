@@ -203,7 +203,7 @@ export default async function HomePageEditorial() {
           candidate.category.trim().toLocaleLowerCase("fr") === category,
       ) === index
     );
-  }).slice(0, 5);
+  }).slice(0, 6);
 
   if (!hero) {
     return (
