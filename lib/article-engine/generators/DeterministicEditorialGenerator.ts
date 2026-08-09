@@ -25,7 +25,7 @@ export class DeterministicEditorialGenerator
       content,
       category:
         input.sourceCategory?.trim() ||
-        "Général",
+        "ACTUALITÉ",
       author: input.sourceName,
     };
   }
