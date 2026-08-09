@@ -81,10 +81,19 @@ export default async function HomePageEditorial() {
 
   const feature = editorialLayout.feature ?? automaticFeature ?? null;
 
+  const automaticBriefs = availableArticles
+    .filter((article) => article.content.trim().length < 800)
+    .slice(0, 4);
+
+  automaticBriefs.forEach((article) => {
+    const index = availableArticles.findIndex((item) => item.id === article.id);
+    if (index >= 0) availableArticles.splice(index, 1);
+  });
+
   const briefs =
     editorialLayout.briefs.length > 0
       ? editorialLayout.briefs
-      : availableArticles.splice(0, 4);
+      : automaticBriefs;
 
   const grandFormatIndex = availableArticles.findIndex((article) => {
     const text = [article.title, article.category, article.description]
