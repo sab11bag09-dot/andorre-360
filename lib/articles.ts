@@ -169,10 +169,45 @@ export async function getArticleBySlug(slug: string) {
   return article ? normalizeImage(article) : null;
 }
 
+function isUneExcluded(article: {
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+}) {
+  const text = [article.title, article.category, article.description]
+    .join(" ")
+    .toLocaleLowerCase("fr");
+
+  return /(parti politique|partis politiques|parti démocrate|parti socialiste|partit polític|partido político)/u.test(text);
+}
+
+function uneScore(article: {
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+  publishedAt: Date | null;
+}) {
+  const text = [article.title, article.category, article.description]
+    .join(" ")
+    .toLocaleLowerCase("fr");
+
+  let score = article.image.trim() ? 10 : 0;
+  if (/(gouvernement|loi|économie|société|international|sport|culture|sécurité|santé)/u.test(text)) {
+    score += 20;
+  }
+  if (article.publishedAt) {
+    const ageHours = (Date.now() - article.publishedAt.getTime()) / 3_600_000;
+    score += Math.max(0, 20 - Math.min(20, ageHours / 3));
+  }
+
+  return score;
+}
+
 export async function getFeaturedArticle() {
-  const article = await prisma.article.findFirst({
+  const candidates = await prisma.article.findMany({
     where: {
-      featured: true,
       ...PUBLIC_ARTICLE_FILTER,
     },
     orderBy: [
@@ -180,7 +215,20 @@ export async function getFeaturedArticle() {
       { createdAt: "desc" },
       { id: "desc" },
     ],
+    take: 50,
   });
 
-  return article ? normalizeImage(article) : null;
+  const eligible = candidates
+    .map(normalizeImage)
+    .filter((article) => !isUneExcluded(article))
+    .filter((article) => article.image);
+
+  eligible.sort(
+    (left, right) =>
+      uneScore(right) - uneScore(left) ||
+      (right.publishedAt?.getTime() ?? 0) - (left.publishedAt?.getTime() ?? 0) ||
+      right.id - left.id,
+  );
+
+  return eligible[0] ?? null;
 }
