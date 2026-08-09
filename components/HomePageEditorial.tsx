@@ -130,7 +130,7 @@ export default async function HomePageEditorial() {
       (article) =>
         !editorialLayout.briefs.some((manual) => manual.id === article.id),
     ),
-  ].slice(0, 4);
+  ].slice(0, 5);
 
  const cards =
   editorialLayout.card.length > 0
