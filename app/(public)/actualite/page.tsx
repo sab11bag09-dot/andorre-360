@@ -28,7 +28,7 @@ export default async function ActualitePage() {
 
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
+          <section className="relative h-[520px] overflow-hidden md:h-[620px]">
             <SafeImage
               src={featured.image}
               alt={featured.title}
@@ -108,7 +108,7 @@ export default async function ActualitePage() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[190px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
                       <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
@@ -196,8 +196,8 @@ export default async function ActualitePage() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                <article className="flex h-[300px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-40 shrink-0">
                     <SafeImage
                       src={article.image}
                       alt={article.title}
@@ -208,7 +208,7 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
@@ -227,7 +227,7 @@ export default async function ActualitePage() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="flex h-[320px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
@@ -236,7 +236,7 @@ export default async function ActualitePage() {
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
+                  <p className="mt-4 line-clamp-4 flex-1 leading-relaxed text-gray-400">
                     {bonASavoir.description}
                   </p>
 
