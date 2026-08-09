@@ -70,8 +70,8 @@ export default async function ActualitePage() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
+                <article className="flex h-[700px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[420px] shrink-0">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -81,7 +81,7 @@ export default async function ActualitePage() {
                     />
                   </div>
 
-                  <div className="p-6">
+                  <div className="flex flex-1 flex-col p-6">
                     <h2 className="line-clamp-2 font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
