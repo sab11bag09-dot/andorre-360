@@ -4,6 +4,7 @@ export interface ArticleDraftInput {
   content: string;
   category: string;
   author: string;
+  image?: string;
 }
 
 export interface ArticleForTranslation {
