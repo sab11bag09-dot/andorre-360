@@ -90,7 +90,7 @@ const {
         <PageHeader
           backHref="/admin"
           backLabel="Retour au tableau de bord"
-          eyebrow="ANDORRE 360 Studio"
+          eyebrow="ANDORRA 360 Studio"
           title="Centre éditorial"
           description="Visualisez la composition du journal, contrôlez les missions actives et préparez les prochaines diffusions depuis un seul cockpit."
           actions={
