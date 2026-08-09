@@ -281,7 +281,7 @@ export default async function HomePageEditorial() {
                 href={`/article/${feature.slug}`}
                 className="group block"
               >
-                <article className="flex h-[820px] flex-col border-y-4 border-yellow-500 py-8 md:h-[900px]">
+                <article className="flex h-[980px] flex-col border-y-4 border-yellow-500 py-8 md:h-[1100px]">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grande carte · {feature.category}
