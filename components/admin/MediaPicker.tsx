@@ -191,7 +191,7 @@ export default function MediaPicker({
             <header className="flex items-center justify-between border-b border-zinc-800 px-6 py-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                  ANDORRE 360 Studio
+                  ANDORRA 360 Studio
                 </p>
 
                 <h2
