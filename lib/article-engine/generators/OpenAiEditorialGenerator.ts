@@ -132,7 +132,7 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
           "Ne fais pas une copie ni une traduction mot à mot.",
           "Conserve strictement les faits, noms propres, chiffres, dates, citations et URL.",
           "N’invente aucune information et ne supprime aucun élément factuel important.",
-          "Retourne un titre reformulé, un chapô et un article structuré.",
+          "Retourne un titre reformulé, un chapô et un article structuré. La catégorie de la source est la catégorie éditoriale par défaut : conserve-la pour un journal généraliste, et ne la remplace que si le contenu est clairement spécialisé dans une autre rubrique.",
           "Retourne uniquement les trois champs demandés.",
         ].join(" "),
         input: JSON.stringify({
