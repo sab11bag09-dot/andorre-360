@@ -77,3 +77,38 @@ export async function deleteAiDraftFromObservationAction(
   revalidatePath("/admin/articles");
   redirect("/admin/observations");
 }
+
+export async function deleteAllDraftArticlesAction() {
+  await requireAdmin();
+
+  await prisma.$transaction(async (tx) => {
+    const drafts = await tx.article.findMany({
+      where: {
+        published: false,
+        editorialStatus: { in: ["DRAFT", "AI_DRAFT"] },
+      },
+      select: { id: true },
+    });
+
+    const draftIds = drafts.map(({ id }) => id);
+
+    if (draftIds.length > 0) {
+      await tx.observation.updateMany({
+        where: { articleId: { in: draftIds } },
+        data: {
+          articleId: null,
+          processed: false,
+          processedAt: null,
+        },
+      });
+
+      await tx.article.deleteMany({
+        where: { id: { in: draftIds } },
+      });
+    }
+  });
+
+  revalidatePath("/admin/observations");
+  revalidatePath("/admin/articles");
+  redirect("/admin/observations");
+}
