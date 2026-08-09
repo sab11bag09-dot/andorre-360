@@ -21,6 +21,10 @@ export default async function HomePageEditorial() {
     usedArticleIds.add(editorialLayout.hero.id);
   }
 
+  if (automaticHero) {
+    usedArticleIds.add(automaticHero.id);
+  }
+
   if (editorialLayout.feature) {
     usedArticleIds.add(editorialLayout.feature.id);
   }
