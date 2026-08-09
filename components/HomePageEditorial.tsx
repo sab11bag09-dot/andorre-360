@@ -129,6 +129,15 @@ export default async function HomePageEditorial() {
       ? editorialLayout.briefs
       : automaticBriefs;
 
+  console.info("[Homepage] zones", {
+    published: publishedArticles.length,
+    available: availableArticles.length,
+    manualBriefs: editorialLayout.briefs.length,
+    automaticBriefs: automaticBriefs.length,
+    feature: feature?.id ?? null,
+    grandFormat: grandFormat?.id ?? null,
+  });
+
  const cards =
   editorialLayout.card.length > 0
     ? editorialLayout.card
