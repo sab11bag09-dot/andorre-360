@@ -43,6 +43,33 @@ function isAiMultilingualSource(sourceId: number): boolean {
   return configured?.includes(sourceId) ?? sourceId === 54;
 }
 
+
+async function selectMediaImage(input: {
+  title: string;
+  description: string;
+  category: string;
+}): Promise<string> {
+  const media = await prisma.media.findMany({
+    where: { type: "IMAGE" },
+    select: { path: true, originalName: true, title: true, alt: true, caption: true, createdAt: true },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+
+  if (media.length === 0) return "";
+  const terms = (input.title + " " + input.description + " " + input.category)
+    .toLocaleLowerCase("fr")
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((term) => term.length >= 4);
+  const scored = media.map((item, index) => {
+    const searchable = [item.originalName, item.title, item.alt, item.caption]
+      .filter(Boolean).join(" ").toLocaleLowerCase("fr");
+    const score = terms.reduce((total, term) => total + (searchable.includes(term) ? 1 : 0), 0);
+    return { path: item.path, score, index };
+  });
+  scored.sort((left, right) => right.score - left.score || left.index - right.index);
+  return scored[0]?.path ?? "";
+}
 const defaultDependencies: CreateArticleFromObservationDependencies = {
   observationRepository: new PrismaObservationRepository(),
   articleRepository: new PrismaArticleRepository(),
@@ -122,8 +149,15 @@ export async function createArticleFromObservation(
     };
   }
 
+  const image = await selectMediaImage({
+    title: draft.title,
+    description: draft.description,
+    category: draft.category,
+  });
+
   const editorialDraft = {
     ...draft,
+    image,
     category: draft.category.trim().toUpperCase(),
   };
 
