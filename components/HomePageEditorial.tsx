@@ -2,6 +2,7 @@ import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getFeaturedArticle, getPublishedArticles } from "@/lib/articles";
+import { prisma } from "@/lib/prisma";
 import { buildEditorialLayout } from "@/lib/editorial/engine";
 
 export default async function HomePageEditorial() {
@@ -133,9 +134,48 @@ export default async function HomePageEditorial() {
   ].slice(0, 5);
 
   const cards = [
-    ...editorialLayout.card.filter((article) => Boolean(article.image)),
-    ...availableArticles.filter((article) => Boolean(article.image)),
+    ...editorialLayout.card,
+    ...availableArticles,
   ].slice(0, 5);
+
+  const media = await prisma.media.findMany({
+    where: { type: "IMAGE" },
+    select: {
+      path: true,
+      originalName: true,
+      title: true,
+      alt: true,
+      caption: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 200,
+  });
+
+  const cardsWithImages = cards.map((article) => {
+    if (article.image || media.length === 0) return article;
+
+    const terms = [article.title, article.category, article.description]
+      .join(" ")
+      .toLocaleLowerCase("fr")
+      .split(/[^\\p{L}\\p{N}]+/u)
+      .filter((term) => term.length >= 4);
+
+    const match = media
+      .map((item, index) => ({
+        item,
+        index,
+        score: terms.reduce((total, term) => {
+          const text = [item.originalName, item.title, item.alt, item.caption]
+            .filter(Boolean)
+            .join(" ")
+            .toLocaleLowerCase("fr");
+          return total + (text.includes(term) ? 1 : 0);
+        }, 0),
+      }))
+      .sort((left, right) => right.score - left.score || left.index - right.index)[0];
+
+    return { ...article, image: match?.item.path ?? "" };
+  });
 
   cards.forEach((article) => {
     const index = availableArticles.findIndex((item) => item.id === article.id);
@@ -430,7 +470,7 @@ export default async function HomePageEditorial() {
 </div>
 
   <div className="divide-y divide-gray-800">
-    {cards.slice(0, 5).map((article, index) => (
+    {cardsWithImages.slice(0, 5).map((article, index) => (
       <Link
         key={article.id}
         href={`/article/${article.slug}`}
