@@ -22,7 +22,7 @@ export default function FilInfoImage({
         className="absolute inset-0 grid place-items-center bg-gradient-to-br from-neutral-800 via-neutral-950 to-black"
       >
         <span className="border border-yellow-500/40 px-3 py-2 text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500/70">
-          Andorre 360
+          Andorra 360
         </span>
       </div>
       {hasImage && (
