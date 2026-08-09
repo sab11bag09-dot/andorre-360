@@ -10,7 +10,7 @@ const article = {
   description: "Description",
   content: "Contenu",
   image: "/images/test.jpg",
-  author: "ANDORRE 360",
+  author: "ANDORRA 360",
   readingTime: "2 min",
   contentType: "article",
   filInfoFormat: "BRIEF",
