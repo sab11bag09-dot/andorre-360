@@ -9,7 +9,7 @@ export default function NewSourcePage() {
         <PageHeader
           backHref="/admin/sources"
           backLabel="Retour aux sources"
-          eyebrow="ANDORRE 360 Studio"
+          eyebrow="ANDORRA 360 Studio"
           title="Nouvelle source"
           description="Enregistre un organisme ou un flux que la Veille pourra surveiller."
         />
