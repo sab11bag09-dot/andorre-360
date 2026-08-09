@@ -355,3 +355,31 @@ export async function collectSourceNow(
 
   revalidateSourcePages(sourceId);
 }
+
+
+export async function deleteSource(
+  sourceId: number,
+): Promise<void> {
+  await requireAdmin();
+
+  validateSourceId(sourceId);
+
+  try {
+    await prisma.source.delete({
+      where: {
+        id: sourceId,
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      throw new Error("Source introuvable.");
+    }
+
+    throw error;
+  }
+
+  revalidateSourcePages(sourceId);
+}
