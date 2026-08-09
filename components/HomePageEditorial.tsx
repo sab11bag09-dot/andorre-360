@@ -133,8 +133,8 @@ export default async function HomePageEditorial() {
   ].slice(0, 5);
 
   const cards = [
-    ...editorialLayout.card,
-    ...availableArticles,
+    ...editorialLayout.card.filter((article) => Boolean(article.image)),
+    ...availableArticles.filter((article) => Boolean(article.image)),
   ].slice(0, 5);
 
   cards.forEach((article) => {
