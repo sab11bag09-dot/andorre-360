@@ -11,7 +11,7 @@ import type { PageHeaderProps } from "./types";
 export default function PageHeader({
   backHref,
   backLabel = "Retour",
-  eyebrow = "ANDORRE 360 Studio",
+  eyebrow = "ANDORRA 360 Studio",
   title,
   description,
   actions,
