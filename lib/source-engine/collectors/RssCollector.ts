@@ -7,6 +7,7 @@ import {
   Collector,
   ObservationInput,
 } from "./Collector";
+import { FetchHtmlClient } from "../html/FetchHtmlClient";
 
 type XmlValue =
   | string
