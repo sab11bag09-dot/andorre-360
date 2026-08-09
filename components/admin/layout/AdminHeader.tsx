@@ -22,7 +22,7 @@ export function AdminHeader({
             href="/admin"
             className="min-w-0 truncate font-serif text-base font-semibold sm:text-lg"
           >
-            ANDORRE 360 Studio
+            ANDORRA 360 Studio
           </Link>
         </div>
 
