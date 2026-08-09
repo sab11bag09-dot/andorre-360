@@ -235,7 +235,7 @@ export default async function HomePageEditorial() {
         href={`/article/${hero.slug}`}
         className="block"
       >
-        <section className="relative h-[68vh] min-h-[520px] overflow-hidden">
+        <section className="relative h-[560px] overflow-hidden md:h-[680px]">
           <SafeImage
             src={hero.image}
             alt={hero.title}
@@ -322,7 +322,7 @@ export default async function HomePageEditorial() {
             <div className="grid items-stretch gap-8 md:grid-cols-4">
               {/* BRÈVES */}
 
-              <section className="flex h-full min-h-[520px] flex-col md:col-span-1">
+              <section className="flex h-[600px] flex-col overflow-hidden md:col-span-1 md:h-[640px]">
                 <div className="mb-5 border-b border-yellow-500 pb-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     L’essentiel
@@ -344,7 +344,7 @@ export default async function HomePageEditorial() {
                         {article.category}
                       </p>
 
-                      <h3 className="mt-2 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+                      <h3 className="mt-2 line-clamp-2 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
                         {article.title}
                       </h3>
                     </Link>
