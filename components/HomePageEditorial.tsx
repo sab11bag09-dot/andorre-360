@@ -273,7 +273,7 @@ export default async function HomePageEditorial() {
         <div className="grid gap-10 lg:grid-cols-6">
           {/* PARTIE GAUCHE */}
 
-          <div className="space-y-10 lg:col-span-4">
+          <div className="flex min-h-full flex-col gap-10 lg:col-span-4">
             {/* GRANDE CARTE */}
 
             {feature && (
@@ -406,7 +406,7 @@ export default async function HomePageEditorial() {
 
             <Link
               href="/"
-              className="group mt-10 block overflow-hidden rounded-xl border border-gray-800 bg-white transition hover:border-yellow-500 md:col-span-4"
+              className="group mt-auto block overflow-hidden rounded-xl border border-gray-800 bg-white transition hover:border-yellow-500 md:col-span-4"
             >
               <div className="relative aspect-[8/5] w-full bg-white">
                 <SafeImage
@@ -422,7 +422,7 @@ export default async function HomePageEditorial() {
 
           {/* COLONNE ÉDITORIALE DROITE */}
 
-          <aside className="space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
+          <aside className="h-full space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
             <section className="flex min-h-[360px] flex-col border-b border-gray-800 pb-8">
@@ -527,7 +527,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 min-h-[390px] rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-col">
+              <section className="mt-12 min-h-[390px] rounded-xl bg-zinc-900 p-6 lg:mt-auto lg:flex lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
