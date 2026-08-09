@@ -4,6 +4,7 @@ import {
   createArticleFromObservationAction,
   deleteAiDraftFromObservationAction,
   regenerateArticleFromObservationAction,
+  deleteAllDraftArticlesAction,
 } from "./actions";
 
 export default async function ObservationsPage() {
@@ -37,9 +38,20 @@ export default async function ObservationsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">
-        Observations à traiter
-      </h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl font-bold">
+          Observations à traiter
+        </h1>
+
+        <form action={deleteAllDraftArticlesAction}>
+          <button
+            type="submit"
+            className="rounded bg-red-700 px-3 py-2 text-sm font-semibold text-white"
+          >
+            Supprimer tous les brouillons
+          </button>
+        </form>
+      </div>
 
       <table className="w-full border-collapse border">
         <thead>
