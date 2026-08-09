@@ -293,7 +293,7 @@ export default async function HomePageEditorial() {
                   </div>
 
                   {feature.image ? (
-  <div className="relative mt-7 h-[520px] shrink-0 overflow-hidden md:h-[620px]">
+  <div className="relative mt-7 h-[560px] shrink-0 overflow-hidden md:h-[660px]">
     <SafeImage
       src={feature.image}
       alt={feature.title}
