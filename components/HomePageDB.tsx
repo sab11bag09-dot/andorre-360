@@ -141,7 +141,15 @@ export default async function HomePageDB() {
                         {article.category}
                       </p>
 
-                      <h3 className="font-serif text-sm leading-snug">
+                      <h3
+                        className="font-serif text-sm leading-snug"
+                        style={{
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 4,
+                          overflow: "hidden",
+                        }}
+                      >
                         {article.title}
                       </h3>
                     </article>
