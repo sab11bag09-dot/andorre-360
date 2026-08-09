@@ -81,9 +81,13 @@ export default async function HomePageEditorial() {
 
   const feature = editorialLayout.feature ?? automaticFeature ?? null;
 
-  const automaticBriefs = availableArticles
-    .filter((article) => article.content.trim().length < 800)
-    .slice(0, 4);
+  const shortArticles = availableArticles
+    .filter((article) => article.content.trim().length < 800);
+
+  const automaticBriefs = [
+    ...shortArticles,
+    ...availableArticles.filter((article) => !shortArticles.includes(article)),
+  ].slice(0, 4);
 
   automaticBriefs.forEach((article) => {
     const index = availableArticles.findIndex((item) => item.id === article.id);
