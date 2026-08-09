@@ -17,13 +17,13 @@ export const dynamic = "force-dynamic";
 const copy = {
   ca: {
     title: "Fil informatiu — L’actualitat d’Andorra en directe",
-    description: "Seguiu les últimes notícies, alertes i articles publicats per Andorre 360.",
+    description: "Seguiu les últimes notícies, alertes i articles publicats per Andorra 360.",
     heading: "L’actualitat en directe",
     intro: "Les últimes publicacions, ordenades segons l’hora de publicació.",
   },
   es: {
     title: "Hilo informativo — La actualidad de Andorra en directo",
-    description: "Siga las últimas noticias, alertas y artículos publicados por Andorre 360.",
+    description: "Siga las últimas noticias, alertas y artículos publicados por Andorra 360.",
     heading: "La actualidad en directo",
     intro: "Las últimas publicaciones, ordenadas según su hora de publicación.",
   },
@@ -71,7 +71,7 @@ export default async function LocalizedFilInfoPage({ params }: Props) {
     <main className="min-h-screen bg-black text-white" lang={locale}>
       <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 md:px-10 md:py-16">
         <header className="mb-10 border-b border-gray-800 pb-9 md:mb-14">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-yellow-500">Andorre 360</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-yellow-500">Andorra 360</p>
           <div className="mt-3 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <h1 className="max-w-4xl font-serif text-4xl leading-[0.95] tracking-[-0.025em] sm:text-5xl md:text-6xl">{copy[locale].heading}</h1>
             <p className="max-w-md text-base leading-8 text-gray-300 md:text-right md:text-lg">{copy[locale].intro}</p>
