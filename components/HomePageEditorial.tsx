@@ -281,7 +281,7 @@ export default async function HomePageEditorial() {
                 href={`/article/${feature.slug}`}
                 className="group block"
               >
-                <article className="flex h-[760px] flex-col border-y-4 border-yellow-500 py-8">
+                <article className="flex h-[820px] flex-col border-y-4 border-yellow-500 py-8 md:h-[900px]">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grande carte · {feature.category}
@@ -293,7 +293,7 @@ export default async function HomePageEditorial() {
                   </div>
 
                   {feature.image ? (
-  <div className="relative mt-7 min-h-0 flex-1 overflow-hidden md:h-auto">
+  <div className="relative mt-7 h-[520px] shrink-0 overflow-hidden md:h-[620px]">
     <SafeImage
       src={feature.image}
       alt={feature.title}
