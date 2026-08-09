@@ -63,7 +63,7 @@ export const EDITORIAL_PAGES = [
 ] as const;
 
 export const CHANNELS = [
-  { value: "site", label: "Site ANDORRE 360" },
+  { value: "site", label: "Site ANDORRA 360" },
   { value: "facebook", label: "Facebook" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "newsletter", label: "Newsletter" },
