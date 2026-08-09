@@ -81,12 +81,23 @@ export default async function HomePageEditorial() {
 
   const feature = editorialLayout.feature ?? automaticFeature ?? null;
 
-  const shortArticles = availableArticles
-    .filter((article) => article.content.trim().length < 800);
+  const briefPool =
+    availableArticles.length > 0
+      ? availableArticles
+      : publishedArticles.filter(
+          (article) =>
+            article.id !== hero?.id &&
+            article.id !== feature?.id &&
+            article.id !== grandFormat?.id,
+        );
+
+  const shortArticles = briefPool.filter(
+    (article) => article.content.trim().length < 800,
+  );
 
   const automaticBriefs = [
     ...shortArticles,
-    ...availableArticles.filter((article) => !shortArticles.includes(article)),
+    ...briefPool.filter((article) => !shortArticles.includes(article)),
   ].slice(0, 4);
 
   automaticBriefs.forEach((article) => {
