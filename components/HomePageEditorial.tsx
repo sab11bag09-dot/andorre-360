@@ -347,13 +347,13 @@ export default async function HomePageEditorial() {
               href="/"
               className="group mt-10 block overflow-hidden rounded-xl border border-gray-800 bg-white transition hover:border-yellow-500 md:col-span-4"
             >
-              <div className="relative aspect-[3/1] w-full">
+              <div className="relative aspect-[3/2] w-full bg-white">
                 <SafeImage
                   src="/images/andorre-360-promotion.png"
                   alt="Andorre 360 — Le briefing quotidien pour comprendre l’Andorre"
                   fill
                   sizes="(max-width: 1024px) 100vw, 66vw"
-                  className="object-cover transition duration-500 group-hover:scale-[1.01]"
+                  className="object-contain transition duration-500 group-hover:scale-[1.01]"
                 />
               </div>
             </Link>
