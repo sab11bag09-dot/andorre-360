@@ -43,7 +43,7 @@ export function AdminShell({
         >
           <SheetHeader className="border-b border-zinc-800 p-5 text-left">
             <SheetTitle className="font-serif text-lg text-white">
-              ANDORRE 360 Studio
+              ANDORRA 360 Studio
             </SheetTitle>
 
             <SheetDescription className="sr-only">
