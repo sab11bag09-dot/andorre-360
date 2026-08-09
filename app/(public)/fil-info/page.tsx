@@ -28,9 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
   if (es.length) languages.es = "/es/fil-info";
   return {
     title: "Fil info — L’actualité en continu en Andorre",
-    description: "Suivez les dernières actualités d’Andorre, les alertes, les brèves et les articles publiés par Andorre 360.",
+    description: "Suivez les dernières actualités d’Andorre, les alertes, les brèves et les articles publiés par Andorra 360.",
     alternates: { canonical: "/fil-info", languages },
-    openGraph: { title: "Fil info — Andorre 360", description: "Les dernières informations d’Andorre, classées selon leur heure de publication.", type: "website", url: "/fil-info" },
+    openGraph: { title: "Fil info — Andorra 360", description: "Les dernières informations d’Andorre, classées selon leur heure de publication.", type: "website", url: "/fil-info" },
   };
 }
 
@@ -80,7 +80,7 @@ export default async function FilInfoPage() {
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-yellow-500">
-                Andorre 360
+                Andorra 360
               </p>
 
               <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-[0.95] tracking-[-0.025em] sm:text-5xl md:text-6xl">
