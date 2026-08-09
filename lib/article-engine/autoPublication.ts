@@ -67,7 +67,25 @@ function isHttpsUrl(value: string): boolean {
 
 function sameOrigin(sourceUrl: string, observationUrl: string): boolean {
   try {
-    return new URL(sourceUrl).origin === new URL(observationUrl).origin;
+    const source = new URL(sourceUrl);
+    const observation = new URL(observationUrl);
+
+    if (source.origin === observation.origin) {
+      return true;
+    }
+
+    const bbcOrigins = new Set([
+      "https://feeds.bbci.co.uk",
+      "https://www.bbc.com",
+      "https://www.bbc.co.uk",
+      "https://bbc.com",
+      "https://bbc.co.uk",
+    ]);
+
+    return (
+      bbcOrigins.has(source.origin) &&
+      bbcOrigins.has(observation.origin)
+    );
   } catch {
     return false;
   }
