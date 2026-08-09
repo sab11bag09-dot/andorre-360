@@ -205,6 +205,41 @@ function uneScore(article: {
   return score;
 }
 
+export async function getFeaturedArticleByCategory(category: string) {
+  const normalizedCategory = category.trim();
+
+  if (!normalizedCategory) {
+    throw new Error("La catégorie est obligatoire.");
+  }
+
+  const candidates = await prisma.article.findMany({
+    where: {
+      category: normalizedCategory,
+      ...PUBLIC_ARTICLE_FILTER,
+    },
+    orderBy: [
+      { publishedAt: "desc" },
+      { createdAt: "desc" },
+      { id: "desc" },
+    ],
+    take: PUBLIC_ARTICLE_QUERY_LIMIT,
+  });
+
+  const eligible = candidates
+    .map(normalizeImage)
+    .filter((article) => Boolean(article.image))
+    .filter((article) => !isUneExcluded(article));
+
+  eligible.sort(
+    (left, right) =>
+      uneScore(right) - uneScore(left) ||
+      (right.publishedAt?.getTime() ?? 0) - (left.publishedAt?.getTime() ?? 0) ||
+      right.id - left.id,
+  );
+
+  return eligible[0] ?? null;
+}
+
 export async function getFeaturedArticle() {
   const candidates = await prisma.article.findMany({
     where: {
