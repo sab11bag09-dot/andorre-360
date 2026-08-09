@@ -364,7 +364,7 @@ export default async function HomePageEditorial() {
           <aside className="space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
-            <section className="border-b border-gray-800 pb-8">
+            <section className="flex min-h-[360px] flex-col border-b border-gray-800 pb-8">
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-500 text-3xl text-yellow-500">
                   ✒
@@ -384,13 +384,13 @@ export default async function HomePageEditorial() {
               {editorial ? (
                 <Link
                   href={`/article/${editorial.slug}`}
-                  className="group mt-6 block"
+                  className="group mt-6 flex flex-1 flex-col"
                 >
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
                     La voix de la rédaction
                   </p>
 
-                  <h3 className="mt-3 font-serif text-2xl leading-snug transition group-hover:text-yellow-500">
+                  <h3 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug transition group-hover:text-yellow-500">
                     {editorial.title}
                   </h3>
 
@@ -398,7 +398,7 @@ export default async function HomePageEditorial() {
                     {editorial.description}
                   </p>
 
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                  <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                     Lire l’édito →
                   </p>
                 </Link>
