@@ -281,7 +281,7 @@ export default async function HomePageEditorial() {
                 href={`/article/${feature.slug}`}
                 className="group block"
               >
-                <article className="flex h-[980px] flex-col border-y-4 border-yellow-500 py-8 md:h-[1100px]">
+                <article className="flex h-[980px] flex-col overflow-hidden border-y-4 border-yellow-500 py-8 md:h-[1100px]">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grande carte · {feature.category}
@@ -359,7 +359,7 @@ export default async function HomePageEditorial() {
                   href={`/article/${grandFormat.slug}`}
                   className="group block md:col-span-3"
                 >
-                  <article className="flex h-full flex-col border-l border-gray-800 pl-0 md:pl-7">
+                  <article className="flex h-full flex-col overflow-hidden border-l border-gray-800 pl-0 md:pl-7">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grand Format · {grandFormat.category}
                     </p>
