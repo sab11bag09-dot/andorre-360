@@ -184,13 +184,26 @@ export default async function HomePageEditorial() {
 
   const editorial = editorialLayout.editorial;
 
-  const discover = [
-    { slug: "economie", label: "Économie", description: "Entreprises, emploi et finances." },
-    { slug: "sports", label: "Sports", description: "Résultats et événements sportifs." },
-    { slug: "montagne", label: "Montagne", description: "Neige, stations et activités." },
-    { slug: "culture", label: "Culture", description: "Patrimoine, sorties et créations." },
-    { slug: "politique", label: "Politique", description: "Vie publique et décisions du pays." },
-  ];
+  const discoverPool =
+    availableArticles.length > 0
+      ? availableArticles
+      : publishedArticles.filter(
+          (article) =>
+            article.id !== hero?.id &&
+            article.id !== feature?.id &&
+            article.id !== grandFormat?.id,
+        );
+
+  const discover = discoverPool.filter((article, index, articles) => {
+    const category = article.category.trim().toLocaleLowerCase("fr");
+    return (
+      category &&
+      articles.findIndex(
+        (candidate) =>
+          candidate.category.trim().toLocaleLowerCase("fr") === category,
+      ) === index
+    );
+  }).slice(0, 5);
 
   if (!hero) {
     return (
@@ -524,27 +537,23 @@ export default async function HomePageEditorial() {
                 </h2>
 
                 <div className="mt-5 divide-y divide-zinc-700">
-                  {discover.map((page) => (
+                  {discover.map((article) => (
                     <Link
-                      key={page.slug}
-                      href={`/${page.slug}`}
-                      className="group flex items-start justify-between gap-4 py-3 first:pt-0 last:pb-0"
+                      key={article.id}
+                      href={`/article/${article.slug}`}
+                      className="group flex items-start justify-between gap-4 py-4 first:pt-0 last:pb-0"
                     >
                       <div>
                         <p className="text-[10px] uppercase tracking-[0.18em] text-gray-500">
-                          Rubrique
+                          {article.category}
                         </p>
 
                         <h3 className="mt-1 font-serif leading-snug transition group-hover:text-yellow-500">
-                          {page.label}
+                          {article.title}
                         </h3>
-
-                        <p className="mt-1 text-sm text-gray-400">
-                          {page.description}
-                        </p>
                       </div>
 
-                      <span className="mt-2 shrink-0 text-yellow-500">
+                      <span className="mt-4 shrink-0 text-yellow-500">
                         →
                       </span>
                     </Link>
