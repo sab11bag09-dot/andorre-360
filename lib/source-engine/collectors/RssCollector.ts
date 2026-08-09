@@ -1,3 +1,5 @@
+import * as cheerio from "cheerio";
+
 import { Source } from "@/lib/generated/prisma/client";
 import { XMLParser } from "fast-xml-parser";
 
@@ -168,6 +170,58 @@ function parseAtomEntry(
   };
 }
 
+
+const htmlClient = new FetchHtmlClient();
+
+async function enrichBbcContent(
+  observation: ObservationInput,
+): Promise<ObservationInput> {
+  const hostname = new URL(observation.url).hostname;
+
+  if (!["www.bbc.com", "bbc.com", "www.bbc.co.uk", "bbc.co.uk"].includes(hostname)) {
+    return observation;
+  }
+
+  try {
+    const html = await htmlClient.get(observation.url);
+    const $ = cheerio.load(html);
+    const selectors = [
+      "article",
+      "main",
+      '[data-component="text-block"]',
+      '[class*="article-body"]',
+      "body",
+    ];
+
+    for (const selector of selectors) {
+      const element = $(selector).first().clone();
+
+      if (!element.length) continue;
+
+      element.find("script, style, nav, header, footer, aside, form, figure").remove();
+
+      const paragraphs = element
+        .find("p")
+        .map((_, paragraph) => $(paragraph).text().replace(/\\s+/g, " ").trim())
+        .get()
+        .filter(Boolean);
+
+      const content = paragraphs.join("\\n\\n").trim();
+
+      if (content.length >= 280) {
+        return { ...observation, content };
+      }
+    }
+  } catch (error) {
+    console.error("[RssCollector] Impossible de récupérer l’article BBC", {
+      url: observation.url,
+      error,
+    });
+  }
+
+  return observation;
+}
+
 export class RssCollector implements Collector {
   async collect(
     source: Source,
@@ -204,7 +258,7 @@ export class RssCollector implements Collector {
         typeof channel === "object" &&
         !Array.isArray(channel)
       ) {
-        return toArray(channel.item)
+        const observations = toArray(channel.item)
           .filter(
             (item): item is XmlObject =>
               Boolean(
@@ -213,15 +267,15 @@ export class RssCollector implements Collector {
                   !Array.isArray(item),
               ),
           )
-          .map((item) =>
-            parseRssItem(item, source.url),
-          )
+          .map((item) => parseRssItem(item, source.url))
           .filter(
             (
               observation,
             ): observation is ObservationInput =>
               observation !== null,
           );
+
+        return Promise.all(observations.map(enrichBbcContent));
       }
     }
 
