@@ -117,7 +117,7 @@ export default async function HomePageEditorial() {
   const automaticBriefs = [
     ...shortArticles,
     ...briefPool.filter((article) => !shortArticles.includes(article)),
-  ].slice(0, 4);
+  ].slice(0, 5);
 
   automaticBriefs.forEach((article) => {
     const index = availableArticles.findIndex((item) => item.id === article.id);
@@ -273,7 +273,7 @@ export default async function HomePageEditorial() {
                 </div>
 
                 <div className="divide-y divide-gray-800">
-                  {briefs.slice(0, 4).map((article) => (
+                  {briefs.slice(0, 5).map((article) => (
                     <Link
                       key={article.id}
                       href={`/article/${article.slug}`}
