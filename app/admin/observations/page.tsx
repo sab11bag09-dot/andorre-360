@@ -7,9 +7,26 @@ import {
   deleteAllDraftArticlesAction,
 } from "./actions";
 
-export default async function ObservationsPage() {
+export default async function ObservationsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ source?: string }>;
+}) {
+  const params = (await searchParams) ?? {};
+  const sourceQuery = params.source?.trim() ?? "";
+
   const observations = await prisma.observation.findMany({
     where: {
+      ...(sourceQuery
+        ? {
+            source: {
+              name: {
+                contains: sourceQuery,
+                mode: "insensitive",
+              },
+            },
+          }
+        : {}),
       OR: [
         { processed: false },
         { id: 1105, processed: true, articleId: 263 },
@@ -38,10 +55,26 @@ export default async function ObservationsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">
           Observations à traiter
         </h1>
+
+        <form method="get" className="flex gap-2">
+          <input
+            type="search"
+            name="source"
+            defaultValue={sourceQuery}
+            placeholder="Rechercher une source"
+            className="rounded border px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            className="rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
+          >
+            Rechercher
+          </button>
+        </form>
 
         <form action={deleteAllDraftArticlesAction}>
           <button
