@@ -474,7 +474,7 @@ export default async function HomePageEditorial() {
 
             {/* CARTES ÉDITORIALES */}
 
-<section className="border-t-2 border-yellow-500 pt-5">
+<section className="min-h-[690px] border-t-2 border-yellow-500 pt-5">
   <div className="mb-4">
   <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
     La rédaction
@@ -490,10 +490,10 @@ export default async function HomePageEditorial() {
       <Link
         key={article.id}
         href={`/article/${article.slug}`}
-        className="group block py-6"
+        className="group block py-4"
       >
-        <article className="grid grid-cols-[110px_1fr] gap-4">
-          <div className="relative h-[110px] overflow-hidden">
+        <article className="grid grid-cols-[90px_1fr] gap-4">
+          <div className="relative h-[90px] overflow-hidden">
             <SafeImage
               src={article.image}
               alt={article.title}
@@ -527,7 +527,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-1 lg:flex-col">
+              <section className="mt-12 min-h-[390px] rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
