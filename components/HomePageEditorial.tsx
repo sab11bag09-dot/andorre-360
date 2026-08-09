@@ -281,19 +281,19 @@ export default async function HomePageEditorial() {
                 href={`/article/${feature.slug}`}
                 className="group block"
               >
-                <article className="border-y-4 border-yellow-500 py-8">
+                <article className="flex h-[760px] flex-col border-y-4 border-yellow-500 py-8">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grande carte · {feature.category}
                     </p>
 
-                    <h2 className="mt-4 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
+                    <h2 className="mt-4 line-clamp-2 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
                       {feature.title}
                     </h2>
                   </div>
 
                   {feature.image ? (
-  <div className="relative mt-7 h-[520px] overflow-hidden md:h-[620px]">
+  <div className="relative mt-7 min-h-0 flex-1 overflow-hidden md:h-auto">
     <SafeImage
       src={feature.image}
       alt={feature.title}
@@ -305,11 +305,11 @@ export default async function HomePageEditorial() {
 ) : null}
 
                   <div className="pt-6">
-                    <p className="max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
+                    <p className="line-clamp-3 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
                       {feature.description}
                     </p>
 
-                    <p className="mt-6 text-xs font-semibold uppercase tracking-[0.22em] text-yellow-500">
+                    <p className="mt-auto pt-6 text-xs font-semibold uppercase tracking-[0.22em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
