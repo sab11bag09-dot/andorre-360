@@ -92,7 +92,7 @@ const sectionTitle =
   backHref="/admin"
   backLabel="Retour au tableau de bord"
   title="Articles"
-  description="Consulte, crée et modifie les contenus publiés sur ANDORRE 360."
+  description="Consulte, crée et modifie les contenus publiés sur ANDORRA 360."
   actions={
     <Button href="/admin/articles/nouveau">
       Créer un article
