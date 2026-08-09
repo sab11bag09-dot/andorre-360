@@ -79,7 +79,7 @@ export default async function AdminPage() {
     {
       title: "Articles",
       description:
-        "Créer, consulter et modifier les contenus publiés sur ANDORRE 360.",
+        "Créer, consulter et modifier les contenus publiés sur ANDORRA 360.",
       href: "/admin/articles",
       action: "Gérer les articles",
     },
@@ -110,7 +110,7 @@ export default async function AdminPage() {
   <>
         <PageHeader
   title="Tableau de bord"
-  description="Pilote les contenus, les médias et la mise en avant éditoriale d’ANDORRE 360."
+  description="Pilote les contenus, les médias et la mise en avant éditoriale d’ANDORRA 360."
   actions={
     <>
       <Button
