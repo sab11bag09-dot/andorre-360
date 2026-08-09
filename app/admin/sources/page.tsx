@@ -16,6 +16,7 @@ import {
   SourcePublicationMode,
 } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
+import DeleteSourceButton from "@/components/admin/sources/DeleteSourceButton";
 import {
   COLLECTION_MODES,
   getOptionLabel,
@@ -26,6 +27,7 @@ import {
   checkSourceAvailability,
   collectSourceNow,
   toggleSource,
+  deleteSource,
 } from "@/app/admin/sources/actions";
 
 const SOURCE_GRID_TEMPLATE =
@@ -316,7 +318,9 @@ export default async function AdminSourcesPage({
                   null,
                   source.id,
                 );
-                const collectAction =
+                const deleteAction = deleteSource.bind(null, source.id);
+
+              const collectAction =
   collectSourceNow.bind(
     null,
     source.id,
@@ -422,6 +426,8 @@ export default async function AdminSourcesPage({
 
     Modifier
   </Button>
+
+  <DeleteSourceButton action={deleteAction} />
 
   <form action={toggleAction}>
     <Button
