@@ -7,7 +7,7 @@ export default function Navbar() {
         <Link href="/">
           <div>
             <h1 className="text-3xl font-bold tracking-widest">
-              ANDORRE 360
+              ANDORRA 360
             </h1>
 
             <p className="mt-1 text-sm text-gray-400">
