@@ -1,12 +1,15 @@
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
-import { getPublishedArticles } from "@/lib/articles";
+import { getFeaturedArticle, getPublishedArticles } from "@/lib/articles";
 import { buildEditorialLayout } from "@/lib/editorial/engine";
 
 export default async function HomePageEditorial() {
-  const editorialLayout = await buildEditorialLayout("home");
-  const publishedArticles = await getPublishedArticles();
+  const [editorialLayout, publishedArticles, automaticHero] = await Promise.all([
+    buildEditorialLayout("home"),
+    getPublishedArticles(),
+    getFeaturedArticle(),
+  ]);
 
   /*
    * Empêche un même article d’apparaître plusieurs fois
@@ -55,7 +58,7 @@ export default async function HomePageEditorial() {
    * Les articles disponibles complètent automatiquement
    * les zones encore vides.
    */
-  const hero = editorialLayout.hero ?? null;
+  const hero = automaticHero ?? editorialLayout.hero ?? null;
 
   const feature =
     editorialLayout.feature ??
