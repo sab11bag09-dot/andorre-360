@@ -322,7 +322,7 @@ export default async function HomePageEditorial() {
             <div className="grid items-stretch gap-8 md:grid-cols-4">
               {/* BRÈVES */}
 
-              <section className="flex h-[600px] flex-col overflow-hidden md:col-span-1 md:h-[640px]">
+              <section className="flex h-[700px] flex-col overflow-hidden md:col-span-1 md:h-[760px]">
                 <div className="mb-5 border-b border-yellow-500 pb-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     L’essentiel
