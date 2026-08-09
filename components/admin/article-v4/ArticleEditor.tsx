@@ -226,7 +226,7 @@ export default function ArticleEditor({
   return (
     <div className="mx-auto max-w-[1600px]">
       <PageHeader
-        eyebrow="ANDORRE 360 Studio"
+        eyebrow="ANDORRA 360 Studio"
         title={pageTitle}
         description={pageDescription}
         actions={
