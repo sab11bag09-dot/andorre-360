@@ -86,10 +86,24 @@ export default async function HomePageEditorial() {
       ? editorialLayout.briefs
       : availableArticles.splice(0, 4);
 
+  const grandFormatIndex = availableArticles.findIndex((article) => {
+    const text = [article.title, article.category, article.description]
+      .join(" ")
+      .toLocaleLowerCase("fr");
+    return (
+      article.content.trim().length >= 800 &&
+      Boolean(article.image) &&
+      !/(parti politique|partis politiques|parti démocrate|parti socialiste|partit polític|partido político)/u.test(text)
+    );
+  });
+
+  const automaticGrandFormat =
+    grandFormatIndex >= 0
+      ? availableArticles.splice(grandFormatIndex, 1)[0]
+      : null;
+
   const grandFormat =
-    editorialLayout.grandFormat ??
-    availableArticles.shift() ??
-    null;
+    editorialLayout.grandFormat ?? automaticGrandFormat ?? null;
 
  const cards =
   editorialLayout.card.length > 0
