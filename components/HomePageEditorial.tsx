@@ -132,7 +132,15 @@ export default async function HomePageEditorial() {
     ),
   ].slice(0, 5);
 
-  const cards = availableArticles.splice(0, 5);
+  const cards = [
+    ...editorialLayout.card,
+    ...availableArticles,
+  ].slice(0, 5);
+
+  cards.forEach((article) => {
+    const index = availableArticles.findIndex((item) => item.id === article.id);
+    if (index >= 0) availableArticles.splice(index, 1);
+  });
 
   const editorial = editorialLayout.editorial;
 
