@@ -24,7 +24,7 @@ export function makeArticle(
     description: "Résumé de l’article",
     content: "Contenu de l’article",
     image: "/images/test.jpg",
-    author: "ANDORRE 360",
+    author: "ANDORRA 360",
     readingTime: "3 min",
     contentType: "article",
     filInfoFormat: "ARTICLE",
