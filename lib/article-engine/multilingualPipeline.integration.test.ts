@@ -77,7 +77,7 @@ async function createArticle(title = "Article français"): Promise<number> {
       description: "Chapô français",
       content: "Contenu français",
       image: "",
-      author: "ANDORRE 360",
+      author: "ANDORRA 360",
       readingTime: "1 min",
       published: true,
       editorialStatus: "PUBLISHED",
