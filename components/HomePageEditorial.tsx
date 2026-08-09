@@ -124,19 +124,13 @@ export default async function HomePageEditorial() {
     if (index >= 0) availableArticles.splice(index, 1);
   });
 
-  const briefs =
-    editorialLayout.briefs.length > 0
-      ? editorialLayout.briefs
-      : automaticBriefs;
-
-  console.info("[Homepage] zones", {
-    published: publishedArticles.length,
-    available: availableArticles.length,
-    manualBriefs: editorialLayout.briefs.length,
-    automaticBriefs: automaticBriefs.length,
-    feature: feature?.id ?? null,
-    grandFormat: grandFormat?.id ?? null,
-  });
+  const briefs = [
+    ...editorialLayout.briefs,
+    ...automaticBriefs.filter(
+      (article) =>
+        !editorialLayout.briefs.some((manual) => manual.id === article.id),
+    ),
+  ].slice(0, 4);
 
  const cards =
   editorialLayout.card.length > 0
