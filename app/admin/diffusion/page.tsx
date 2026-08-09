@@ -39,7 +39,7 @@ function getZoneLabel(zone: string): string {
 
 function getChannelLabel(channel: string): string {
   const labels: Record<string, string> = {
-    site: "Site ANDORRE 360",
+    site: "Site ANDORRA 360",
     facebook: "Facebook",
     whatsapp: "WhatsApp",
     newsletter: "Newsletter",
@@ -101,7 +101,7 @@ export default async function DiffusionPage() {
         <PageHeader
           backHref="/admin"
           backLabel="Retour au tableau de bord"
-          eyebrow="ANDORRE 360 Studio"
+          eyebrow="ANDORRA 360 Studio"
           title="Diffusion éditoriale"
           description="Pilotez les emplacements, les canaux et les priorités des contenus du média."
           actions={
