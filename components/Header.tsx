@@ -68,7 +68,7 @@ export default function Header() {
         <div className="flex flex-col items-center gap-5">
           <Link href="/" className="shrink-0">
             <span className="font-serif text-2xl tracking-[0.25em] text-white">
-              ANDORRE <span className="text-yellow-500">360</span>
+              ANDORRA <span className="text-yellow-500">360</span>
             </span>
           </Link>
 
