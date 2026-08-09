@@ -402,7 +402,7 @@ export default async function HomePageEditorial() {
               )}
             </div>
 
-            {/* VISUEL PROMOTIONNEL ANDORRE 360 */}
+            {/* VISUEL PROMOTIONNEL ANDORRA 360 */}
 
             <Link
               href="/"
@@ -411,7 +411,7 @@ export default async function HomePageEditorial() {
               <div className="relative aspect-[8/5] w-full bg-white">
                 <SafeImage
                   src="/images/andorre-360-promotion.png"
-                  alt="Andorre 360 — Le briefing quotidien pour comprendre l’Andorre"
+                  alt="Andorra 360 — Le briefing quotidien pour comprendre l’Andorre"
                   fill
                   sizes="(max-width: 1024px) 100vw, 66vw"
                   className="object-contain transition duration-500 group-hover:scale-[1.01]"
@@ -433,7 +433,7 @@ export default async function HomePageEditorial() {
 
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-yellow-500">
-                    ANDORRE 360
+                    ANDORRA 360
                   </p>
 
                   <h2 className="mt-1 font-serif text-3xl">
