@@ -22,7 +22,6 @@ export default async function ObservationsPage({
             source: {
               name: {
                 contains: sourceQuery,
-                mode: "insensitive",
               },
             },
           }
