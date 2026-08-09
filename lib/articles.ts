@@ -228,6 +228,7 @@ export async function getFeaturedArticleByCategory(category: string) {
   const eligible = candidates
     .map(normalizeImage)
     .filter((article) => Boolean(article.image))
+    .map((article) => ({ ...article, image: article.image as string }))
     .filter((article) => !isUneExcluded(article));
 
   eligible.sort(
