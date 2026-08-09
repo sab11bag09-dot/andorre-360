@@ -118,7 +118,7 @@ export default async function HomePageEditorial() {
   const automaticBriefs = [
     ...shortArticles,
     ...briefPool.filter((article) => !shortArticles.includes(article)),
-  ].slice(0, 5);
+  ].slice(0, 6);
 
   automaticBriefs.forEach((article) => {
     const index = availableArticles.findIndex((item) => item.id === article.id);
