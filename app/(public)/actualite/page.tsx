@@ -1,20 +1,26 @@
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
-import { getArticlesByCategory } from "@/lib/articles";
+import { getArticlesByCategory, getFeaturedArticleByCategory } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
 export default async function ActualitePage() {
-  const items = await getArticlesByCategory("ACTUALITÉ");
+  const [items, selectedFeatured] = await Promise.all([
+    getArticlesByCategory("ACTUALITÉ"),
+    getFeaturedArticleByCategory("ACTUALITÉ"),
+  ]);
 
-  const featured = items[0];
-  const mainArticle = items[1];
-  const rightCards = items.slice(2, 6);
-  const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
-  const bonASavoir = items[14];
+  const featured = selectedFeatured ?? items[0];
+  const remainingItems = featured
+    ? items.filter((article) => article.id !== featured.id)
+    : items;
+  const mainArticle = remainingItems[0];
+  const rightCards = remainingItems.slice(1, 5);
+  const briefs = remainingItems.slice(5, 11);
+  const bottomCard = remainingItems[11];
+  const secondBottomCard = remainingItems[12];
+  const bonASavoir = remainingItems[13];
 
   return (
     <main className="min-h-screen bg-black text-white">
