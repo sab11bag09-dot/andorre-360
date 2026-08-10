@@ -24,7 +24,7 @@ export default async function InternationalPageV2() {
 
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
+          <section className="relative h-[560px] min-h-[560px] overflow-hidden">
             <SafeImage
               src={featured.image}
               alt={featured.title}
@@ -66,7 +66,7 @@ export default async function InternationalPageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <SafeImage
                       src={mainArticle.image}
@@ -104,7 +104,7 @@ export default async function InternationalPageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[170px] flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
                       <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
@@ -127,7 +127,7 @@ export default async function InternationalPageV2() {
                     href={`/article/${bottomCard.slug}`}
                     className="block"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className="h-[520px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
                         <SafeImage
                           src={bottomCard.image}
@@ -224,7 +224,7 @@ export default async function InternationalPageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[430px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
                     <SafeImage
                       src={questionArticle.image}
@@ -268,7 +268,7 @@ export default async function InternationalPageV2() {
                     : "block"
                 }
               >
-                <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                <article className="h-[300px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                   <div
                     className={`relative h-40 ${
                       index === rightCards.length - 1
@@ -305,7 +305,7 @@ export default async function InternationalPageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[330px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
