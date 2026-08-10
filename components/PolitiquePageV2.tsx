@@ -95,15 +95,15 @@ export default async function PolitiquePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="mt-8 grid h-[270px] gap-4 overflow-hidden md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                    <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -119,7 +119,7 @@ export default async function PolitiquePageV2() {
             {/* QUATRE CARTES DE PIED */}
 
             {footerCards.length > 0 && (
-              <div className="mt-10 grid h-[620px] gap-5 overflow-hidden md:grid-cols-4">
+              <div className="mt-10 grid h-[620px] gap-5 overflow-hidden md:mt-auto md:grid-cols-4">
                 {footerCards.map((article) => (
                   <Link
                     key={article.id}
