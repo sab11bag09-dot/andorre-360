@@ -352,25 +352,6 @@ export default async function FilInfoPage() {
                   })}
                 </div>
 
-                        <div className="flex min-w-0 flex-col justify-between">
-                          <div>
-                            <p className="mb-2 text-[8px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
-                              {getFilInfoFormatLabel(article.filInfoFormat)}
-                            </p>
-
-                            <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
-                              {article.title}
-                            </h3>
-                          </div>
-
-                          <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500 transition group-hover:text-yellow-500">
-                            Lire →
-                          </p>
-                        </div>
-                      </article>
-                    </Link>
-                  ))}
-                </div>
               </aside>
             )}
           </div>
