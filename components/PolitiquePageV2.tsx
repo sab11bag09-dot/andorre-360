@@ -144,6 +144,10 @@ export default async function PolitiquePageV2() {
                       <h2 className="mt-4 line-clamp-3 font-serif text-2xl leading-snug">
                         {footerFeature.title}
                       </h2>
+
+                      <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-gray-400">
+                        {footerFeature.description}
+                      </p>
                     </div>
 
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
