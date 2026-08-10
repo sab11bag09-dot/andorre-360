@@ -206,8 +206,8 @@ export default async function SociétéPageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                <article className="flex h-[360px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[226px] shrink-0">
                     <SafeImage
                       src={article.image}
                       alt={article.title}
@@ -217,7 +217,7 @@ export default async function SociétéPageV2() {
                     />
                   </div>
 
-                  <div className="p-4">
+                  <div className="mt-auto p-4">
                     <h3 className="font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
@@ -234,7 +234,7 @@ export default async function SociétéPageV2() {
 
             {bonASavoir && (
               <div className="mt-auto">
-                <article className="flex h-[420px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
+                <article className="flex h-[540px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
                   <Link
                     href={`/article/${bonASavoir.slug}`}
                     className="block transition hover:text-yellow-500"
@@ -252,7 +252,7 @@ export default async function SociétéPageV2() {
                     </p>
                   </Link>
 
-                  <div className="mt-auto max-h-[190px] overflow-hidden divide-y divide-zinc-700 border-t border-zinc-700">
+                  <div className="mt-auto max-h-[230px] overflow-hidden divide-y divide-zinc-700 border-t border-zinc-700">
                     {bonASavoirBriefs.map((article) => (
                       <Link
                         key={article.id}
