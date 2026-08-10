@@ -96,7 +96,7 @@ export default async function EconomiePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="mt-8 grid h-[270px] gap-4 overflow-hidden md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
@@ -120,7 +120,7 @@ export default async function EconomiePageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
+              <div className="mt-10 grid h-[540px] gap-8 overflow-hidden md:grid-cols-2">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
