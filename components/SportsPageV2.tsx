@@ -16,6 +16,7 @@ export default async function SportsPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -24,9 +25,9 @@ export default async function SportsPageV2() {
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
           <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
-            {featured.image ? (
+            {(featured.image || fallbackImage) ? (
               <SafeImage
-                src={featured.image}
+                src={featured.image || fallbackImage}
                 alt={featured.title}
                 fill
                 priority
@@ -68,10 +69,10 @@ export default async function SportsPageV2() {
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {mainArticle.image ? (
+                  {(mainArticle.image || fallbackImage) ? (
                     <div className="relative h-[420px]">
                       <SafeImage
-                        src={mainArticle.image}
+                        src={mainArticle.image || fallbackImage}
                         alt={mainArticle.title}
                         fill
                         sizes="(max-width: 1024px) 100vw, 66vw"
@@ -131,10 +132,10 @@ export default async function SportsPageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {bottomCard.image ? (
+                      {(bottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
-                            src={bottomCard.image}
+                            src={bottomCard.image || fallbackImage}
                             alt={bottomCard.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
@@ -162,10 +163,10 @@ export default async function SportsPageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {secondBottomCard.image ? (
+                      {(secondBottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
-                            src={secondBottomCard.image}
+                            src={secondBottomCard.image || fallbackImage}
                             alt={secondBottomCard.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
