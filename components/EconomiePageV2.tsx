@@ -264,7 +264,7 @@ export default async function EconomiePageV2() {
             {bonASavoir && (
               <Link
                 href={`/article/${bonASavoir.slug}`}
-                className="block"
+                className="mt-auto block"
               >
                 <article className="flex h-[540px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <div>
