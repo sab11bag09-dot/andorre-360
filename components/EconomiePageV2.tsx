@@ -11,7 +11,7 @@ export default async function EconomiePageV2() {
   const featured = items[0];
   const mainArticle = items[1];
   const questionArticle = items[2];
-  const rightCards = items.slice(3, 4);
+  const rightCards = [];
   const briefs = items.slice(6, 12);
   const bottomCard = items[12];
   const secondBottomCard = items[13];
