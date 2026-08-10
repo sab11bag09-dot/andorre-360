@@ -147,6 +147,10 @@ export default async function SociétéPageV2() {
                           {article.title}
                         </h2>
 
+                        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                          {article.description}
+                        </p>
+
                         <p className="mt-auto pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
                           Lire l’article →
                         </p>
