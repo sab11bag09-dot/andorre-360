@@ -197,7 +197,7 @@ export default async function FilInfoPage() {
         {briefs.length > 0 && (
           <section
             aria-labelledby="fil-info-briefs-title"
-            className="mt-16 md:mt-20"
+            className="mt-16 h-[520px] overflow-hidden md:mt-20"
           >
             <div className="mb-7 flex items-end justify-between gap-6 border-t border-gray-800 pt-5">
               <h2 id="fil-info-briefs-title" className="font-serif text-3xl">
@@ -250,7 +250,7 @@ export default async function FilInfoPage() {
             {cards.length > 0 && (
               <section
                 aria-labelledby="fil-info-follow-title"
-                className="flex h-full flex-col lg:col-span-4"
+                className="flex h-[720px] flex-col overflow-hidden lg:col-span-4"
               >
                 <div className="mb-7 border-t-2 border-yellow-500 pt-5">
                   <h2 id="fil-info-follow-title" className="font-serif text-3xl">
@@ -298,7 +298,7 @@ export default async function FilInfoPage() {
             {illustratedBriefs.length > 0 && (
               <aside
                 aria-labelledby="fil-info-remember-title"
-                className="h-full overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
+                className="h-[720px] overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
               >
                 <div className="border-b border-gray-800 px-5 py-6">
                   <h2
