@@ -23,7 +23,7 @@ export default async function EconomiePageV2() {
 
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[560px] overflow-hidden md:h-[640px]">
+          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
             <SafeImage
               src={featured.image}
               alt={featured.title}
@@ -65,8 +65,8 @@ export default async function EconomiePageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="flex h-[760px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px] shrink-0">
+                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[420px]">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -76,16 +76,16 @@ export default async function EconomiePageV2() {
                     />
                   </div>
 
-                  <div className="flex flex-1 flex-col overflow-hidden p-6">
-                    <h2 className="line-clamp-2 font-serif text-3xl">
+                  <div className="p-6">
+                    <h2 className="font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 line-clamp-3 text-gray-400">
+                    <p className="mt-4 text-gray-400">
                       {mainArticle.description}
                     </p>
 
-                    <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
@@ -96,15 +96,15 @@ export default async function EconomiePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid h-[270px] gap-4 overflow-hidden md:grid-cols-3">
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
+                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -120,7 +120,7 @@ export default async function EconomiePageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid h-[540px] gap-8 overflow-hidden md:grid-cols-2">
+              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
@@ -184,7 +184,7 @@ export default async function EconomiePageV2() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="h-[1580px] space-y-6 overflow-hidden lg:col-span-2">
+          <aside className="space-y-6 lg:col-span-2">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -208,7 +208,7 @@ export default async function EconomiePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
@@ -244,7 +244,7 @@ export default async function EconomiePageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="line-clamp-3 font-serif text-lg leading-snug">
+                    <h3 className="font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
@@ -268,7 +268,7 @@ export default async function EconomiePageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-3 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
