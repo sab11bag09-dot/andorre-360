@@ -276,7 +276,7 @@ export default async function SportsPageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="h-[360px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
+                <article className="h-[400px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
                   {(bonASavoir.image || fallbackImage) ? (
                     <div className="relative h-32">
                       <SafeImage
