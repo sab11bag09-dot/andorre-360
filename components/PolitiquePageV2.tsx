@@ -13,8 +13,7 @@ export default async function PolitiquePageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
+  const footerCards = items.slice(-4);
   const bonASavoir = items[14];
 
   return (
@@ -117,67 +116,43 @@ export default async function PolitiquePageV2() {
               </div>
             )}
 
-            {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
+            {/* QUATRE CARTES DE PIED */}
 
-            {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
-                {bottomCard && (
+            {footerCards.length > 0 && (
+              <div className="mt-10 grid h-[620px] gap-5 overflow-hidden md:grid-cols-4">
+                {footerCards.map((article) => (
                   <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="group block"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-[220px] shrink-0 overflow-hidden">
                         <SafeImage
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
+                          src={article.image}
+                          alt={article.title}
                           fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover transition duration-500 group-hover:scale-[1.03]"
                         />
                       </div>
 
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
-                          {bottomCard.title}
+                      <div className="flex flex-1 flex-col p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          {article.category}
+                        </p>
+
+                        <h2 className="mt-3 line-clamp-3 font-serif text-xl leading-snug">
+                          {article.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-auto pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
                     </article>
                   </Link>
-                )}
-
-                {secondBottomCard && (
-                  <Link
-                    href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={secondBottomCard.image}
-                          alt={secondBottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
-                          {secondBottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
+                ))}
               </div>
             )}
           </div>
