@@ -88,10 +88,6 @@ export default async function FilInfoPage() {
               </h1>
             </div>
 
-            <p className="max-w-md text-base leading-8 text-gray-300 md:text-right md:text-lg">
-              Les dernières publications, classées selon leur heure de mise en
-              ligne.
-            </p>
           </div>
         </header>
 
