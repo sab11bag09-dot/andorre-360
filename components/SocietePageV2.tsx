@@ -125,7 +125,7 @@ export default async function SociétéPageV2() {
                 href={`/article/${bottomCard.slug}`}
                 className="mt-10 block"
               >
-                <article className="grid h-[540px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 md:grid-cols-4">
+                <article className="grid h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 md:grid-cols-4">
                   <div className="relative md:col-span-3">
                     <SafeImage
                       src={bottomCard.image}
