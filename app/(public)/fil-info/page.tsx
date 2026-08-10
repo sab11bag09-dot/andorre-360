@@ -146,7 +146,7 @@ export default async function FilInfoPage() {
           {featured.length > 0 && (
             <aside
               aria-labelledby="fil-info-selection-title"
-              className="flex h-full flex-col"
+              className="flex h-full min-h-0 flex-col overflow-hidden"
             >
               <div className="mb-5 flex items-center gap-4 border-t-2 border-yellow-500 pt-4">
                 <h2
