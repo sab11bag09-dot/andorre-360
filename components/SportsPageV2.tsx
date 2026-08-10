@@ -17,6 +17,7 @@ export default async function SportsPageV2() {
   const secondBottomCard = items[13];
   const footerCards = items.slice(12, 16);
   const footerSideCards = items.slice(16, 18);
+  const footerSideFeature = items[18];
   const bonASavoir = items[14];
   const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
@@ -271,6 +272,36 @@ export default async function SportsPageV2() {
                   </Link>
                 ))}
               </div>
+            )}
+
+            {footerSideFeature && (
+              <Link
+                href={`/article/${footerSideFeature.slug}`}
+                className="mt-6 block h-[400px]"
+              >
+                <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  {(footerSideFeature.image || fallbackImage) ? (
+                    <div className="relative h-56">
+                      <SafeImage
+                        src={footerSideFeature.image || fallbackImage}
+                        alt={footerSideFeature.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
+
+                  <div className="p-5">
+                    <h2 className="line-clamp-2 font-serif text-2xl">
+                      {footerSideFeature.title}
+                    </h2>
+                    <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
+                      {footerSideFeature.description}
+                    </p>
+                  </div>
+                </article>
+              </Link>
             )}
           </aside>
         </div>
