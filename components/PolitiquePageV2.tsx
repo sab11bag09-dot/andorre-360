@@ -95,7 +95,7 @@ export default async function PolitiquePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-12 grid h-[330px] grid-rows-2 gap-4 overflow-hidden md:grid-cols-3">
+              <div className="mt-8 grid h-[330px] grid-rows-2 gap-4 overflow-hidden md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
