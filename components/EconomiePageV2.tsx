@@ -226,22 +226,24 @@ export default async function EconomiePageV2() {
 
             {/* TROIS CARTES CLASSIQUES */}
 
-            {rightCards.map((article) => (
+            {rightCards.map((article, index) => (
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[226px]">
-                    <SafeImage
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                  {index < rightCards.length - 1 && (
+                    <div className="relative h-[226px]">
+                      <SafeImage
+                        src={article.image}
+                        alt={article.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
 
                   <div className="p-4">
                     <h3 className="font-serif text-lg leading-snug">
