@@ -13,8 +13,7 @@ export default async function SociétéPageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 5);
   const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
+  const footerCards = items.slice(12, 16);
   const bonASavoir = items[14];
   const bonASavoirBriefs = items.slice(15, 18);
 
@@ -118,41 +117,44 @@ export default async function SociétéPageV2() {
               </div>
             )}
 
-            {/* BLOC DE PIED : 3 COLONNES PHOTO + 1 COLONNE TEXTE */}
+            {/* QUATRE CARTES DE PIED */}
 
-            {bottomCard && (
-              <Link
-                href={`/article/${bottomCard.slug}`}
-                className="mt-10 block"
-              >
-                <article className="grid h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 md:grid-cols-4">
-                  <div className="relative md:col-span-3">
-                    <SafeImage
-                      src={bottomCard.image}
-                      alt={bottomCard.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
-                    />
-                  </div>
+            {footerCards.length > 0 && (
+              <div className="mt-10 grid h-[620px] gap-5 overflow-hidden md:grid-cols-4">
+                {footerCards.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="group block"
+                  >
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-[220px] shrink-0 overflow-hidden">
+                        <SafeImage
+                          src={article.image}
+                          alt={article.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                        />
+                      </div>
 
-                  <div className="flex flex-col justify-between p-5">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                        {bottomCard.category}
-                      </p>
+                      <div className="flex flex-1 flex-col p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          {article.category}
+                        </p>
 
-                      <h2 className="mt-4 line-clamp-3 font-serif text-2xl">
-                        {bottomCard.title}
-                      </h2>
-                    </div>
+                        <h2 className="mt-3 line-clamp-3 font-serif text-xl leading-snug">
+                          {article.title}
+                        </h2>
 
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’article →
-                    </p>
-                  </div>
-                </article>
-              </Link>
+                        <p className="mt-auto pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
 
