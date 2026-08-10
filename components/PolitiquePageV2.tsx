@@ -246,7 +246,7 @@ export default async function PolitiquePageV2() {
                 className="block"
               >
                 <article className="flex h-[360px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                  <div className="relative h-[226px] shrink-0">
                     <SafeImage
                       src={article.image}
                       alt={article.title}
@@ -257,7 +257,7 @@ export default async function PolitiquePageV2() {
                   </div>
 
                   <div className="mt-auto p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
@@ -281,7 +281,7 @@ export default async function PolitiquePageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-3 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
