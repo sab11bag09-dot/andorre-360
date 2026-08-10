@@ -192,7 +192,7 @@ export default async function EconomiePageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[226px]">
                     <SafeImage
                       src={questionArticle.image}
@@ -203,7 +203,7 @@ export default async function EconomiePageV2() {
                     />
                   </div>
 
-                  <div className="p-4">
+                  <div className="flex flex-1 flex-col overflow-hidden p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Question à…
                     </p>
@@ -216,7 +216,7 @@ export default async function EconomiePageV2() {
                       {questionArticle.description}
                     </p>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’entretien →
                     </p>
                   </div>
