@@ -11,7 +11,7 @@ export default async function EconomiePageV2() {
   const featured = items[0];
   const mainArticle = items[1];
   const questionArticle = items[2];
-  const rightCards = items.slice(3, 6);
+  const rightCards = items.slice(3, 5);
   const briefs = items.slice(6, 12);
   const bottomCard = items[12];
   const secondBottomCard = items[13];
@@ -184,7 +184,7 @@ export default async function EconomiePageV2() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2">
+          <aside className="flex min-h-full flex-col gap-6 lg:col-span-2">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -265,7 +265,7 @@ export default async function EconomiePageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="mt-auto flex h-[540px] flex-col justify-between overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
