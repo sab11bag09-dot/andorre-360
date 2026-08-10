@@ -143,7 +143,7 @@ export default async function FilInfoPage() {
         >
           <FilInfoTimeline entries={newsFeedEntries} />
 
-          {featured && (
+          {featured.length > 0 && (
             <aside
               aria-labelledby="fil-info-selection-title"
               className="flex h-full flex-col"
@@ -157,40 +157,39 @@ export default async function FilInfoPage() {
                 </h2>
               </div>
 
-              <Link
-                href={`/article/${featured.slug}`}
-                className="group flex flex-1"
-              >
-                <article className="flex w-full flex-col">
-                  <div className="relative aspect-[4/5] min-h-[420px] overflow-hidden bg-neutral-900 sm:aspect-[16/11] lg:aspect-auto lg:min-h-0 lg:flex-1">
-                    <FilInfoImage
-                      src={featured.image}
-                      alt={featured.title}
-                      priority
-                      sizes="(max-width: 1024px) 100vw, 34vw"
-                      className="object-cover transition duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
-                    />
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-1">
+                {featured.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="group block"
+                  >
+                    <article>
+                      <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
+                        <FilInfoImage
+                          src={article.image}
+                          alt={article.title}
+                          priority
+                          sizes="(max-width: 1024px) 100vw, 34vw"
+                          className="object-cover transition duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
+                        />
+                      </div>
 
-                    <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-                  </div>
+                      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-yellow-500">
+                        Actualité
+                      </p>
 
-                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.24em] text-yellow-500">
-                    Actualité
-                  </p>
+                      <h3 className="mt-2 font-serif text-2xl leading-[1.08] tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
+                        {article.title}
+                      </h3>
 
-                  <h3 className="mt-3 font-serif text-3xl leading-[1.08] tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
-                    {featured.title}
-                  </h3>
-
-                  <p className="mt-4 line-clamp-3 text-sm leading-7 text-gray-400">
-                    {featured.description}
-                  </p>
-
-                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
-                    Lire l’article →
-                  </p>
-                </article>
-              </Link>
+                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-gray-400">
+                        {article.description}
+                      </p>
+                    </article>
+                  </Link>
+                ))}
+              </div>
             </aside>
           )}
         </div>
