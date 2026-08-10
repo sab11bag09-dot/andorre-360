@@ -17,7 +17,7 @@ export default async function InternationalPageV2() {
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
   const footerTextCards = items.slice(15, 17);
-  const bonASavoirBriefs = items.slice(17, 20);
+  const bonASavoirBriefs = items.slice(17, 18);
 
   return (
     <main className="min-h-screen bg-black text-white">
