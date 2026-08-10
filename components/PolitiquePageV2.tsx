@@ -15,9 +15,7 @@ export default async function PolitiquePageV2() {
   const briefs = items.slice(6, 12);
   const footerFeature = items[12];
   const bonASavoir = items[14];
-  const footerCards = items
-    .filter((article) => article !== footerFeature && article !== bonASavoir)
-    .slice(-4);
+  const footerCards = items.slice(0, 4);
 
   return (
     <main className="min-h-screen bg-black text-white">
