@@ -15,6 +15,7 @@ export default async function SportsPageV2() {
   const briefs = items.slice(6, 12);
   const bottomCard = items[12];
   const secondBottomCard = items[13];
+  const footerCards = items.slice(12, 16);
   const bonASavoir = items[14];
   const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
@@ -122,21 +123,22 @@ export default async function SportsPageV2() {
               </div>
             )}
 
-            {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
+            {/* QUATRE CARTES DE PIED */}
 
-            {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
-                {bottomCard && (
+            {footerCards.length > 0 && (
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                {footerCards.map((article) => (
                   <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-[400px]"
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="block h-[400px]"
                   >
-                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {(bottomCard.image || fallbackImage) ? (
-                        <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      {(article.image || fallbackImage) ? (
+                        <div className="relative h-56">
                           <SafeImage
-                            src={bottomCard.image || fallbackImage}
-                            alt={bottomCard.title}
+                            src={article.image || fallbackImage}
+                            alt={article.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
                             className="object-cover"
@@ -145,9 +147,13 @@ export default async function SportsPageV2() {
                       ) : null}
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
-                          {bottomCard.title}
+                        <h2 className="line-clamp-2 font-serif text-2xl">
+                          {article.title}
                         </h2>
+
+                        <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
+                          {article.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -155,38 +161,7 @@ export default async function SportsPageV2() {
                       </div>
                     </article>
                   </Link>
-                )}
-
-                {secondBottomCard && (
-                  <Link
-                    href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {(secondBottomCard.image || fallbackImage) ? (
-                        <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                          <SafeImage
-                            src={secondBottomCard.image || fallbackImage}
-                            alt={secondBottomCard.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : null}
-
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
-                          {secondBottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
+                ))}
               </div>
             )}
           </div>
