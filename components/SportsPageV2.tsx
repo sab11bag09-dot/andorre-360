@@ -24,7 +24,7 @@ export default async function SportsPageV2() {
 
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
+          <section className="relative h-[560px] min-h-[560px] overflow-hidden">
             {(featured.image || fallbackImage) ? (
               <SafeImage
                 src={featured.image || fallbackImage}
@@ -68,7 +68,7 @@ export default async function SportsPageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {(mainArticle.image || fallbackImage) ? (
                     <div className="relative h-[420px]">
                       <SafeImage
@@ -108,7 +108,7 @@ export default async function SportsPageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[170px] flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
                       <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
@@ -201,7 +201,7 @@ export default async function SportsPageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[560px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {(questionArticle.image || fallbackImage) ? (
                     <div className="relative h-80">
                       <SafeImage
@@ -243,7 +243,7 @@ export default async function SportsPageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[300px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {article.image ? (
                     <div className="relative h-40">
                       <SafeImage
