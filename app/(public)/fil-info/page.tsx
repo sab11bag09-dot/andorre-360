@@ -277,7 +277,7 @@ export default async function FilInfoPage() {
 
                         <div className="pt-5">
                           <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                            {getFilInfoFormatLabel(article.filInfoFormat)}
+                            {article.category}
                           </p>
 
                           <h3 className="font-serif text-2xl leading-[1.18] transition group-hover:text-yellow-500">
