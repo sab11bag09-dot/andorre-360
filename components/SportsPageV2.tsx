@@ -16,6 +16,7 @@ export default async function SportsPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const footerCards = items.slice(12, 16);
+  const footerSideCards = items.slice(16, 18);
   const bonASavoir = items[14];
   const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
@@ -244,33 +245,32 @@ export default async function SportsPageV2() {
               </Link>
             ))}
 
-            {/* BON À SAVOIR */}
+            {/* DEUX CARTES DE PIED À DROITE */}
 
-            {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block -mt-4 lg:h-[400px]"
-              >
-                <article className="h-[400px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
-                  <div className="p-6">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                      Bon à savoir
-                    </p>
+            {footerSideCards.length > 0 && (
+              <div className="space-y-6">
+                {footerSideCards.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="block"
+                  >
+                    <article className="h-[190px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                        Sports
+                      </p>
 
-                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
-                    {bonASavoir.title}
-                  </h2>
+                      <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
+                        {article.title}
+                      </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
-                    {bonASavoir.description}
-                  </p>
-
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    Lire l’article →
-                  </p>
-                  </div>
-                </article>
-              </Link>
+                      <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
+                        {article.description}
+                      </p>
+                    </article>
+                  </Link>
+                ))}
+              </div>
             )}
           </aside>
         </div>
