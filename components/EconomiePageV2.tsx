@@ -65,8 +65,8 @@ export default async function EconomiePageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
+                <article className="flex h-[700px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[360px] shrink-0">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -76,16 +76,16 @@ export default async function EconomiePageV2() {
                     />
                   </div>
 
-                  <div className="p-6">
+                  <div className="flex flex-1 flex-col overflow-hidden p-6">
                     <h2 className="line-clamp-2 font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-3 text-gray-400">
                       {mainArticle.description}
                     </p>
 
-                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
