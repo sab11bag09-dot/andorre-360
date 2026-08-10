@@ -185,7 +185,7 @@ export default async function EconomiePageV2() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="flex min-h-full flex-col gap-6 lg:col-span-2">
+          <aside className="flex h-full flex-col gap-6 lg:col-span-2">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -262,12 +262,12 @@ export default async function EconomiePageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="mt-auto block"
-              >
-                <article className="flex h-[540px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
-                  <div>
+              <div className="mt-auto">
+                <article className="flex h-[540px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
+                  <Link
+                    href={`/article/${bonASavoir.slug}`}
+                    className="block transition hover:text-yellow-500"
+                  >
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Bon à savoir
                     </p>
@@ -279,23 +279,27 @@ export default async function EconomiePageV2() {
                     <p className="mt-4 line-clamp-3 leading-relaxed text-gray-400">
                       {bonASavoir.description}
                     </p>
-                  </div>
 
-                  <div className="mt-6 divide-y divide-zinc-700 border-t border-zinc-700">
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      Lire l’article →
+                    </p>
+                  </Link>
+
+                  <div className="mt-auto divide-y divide-zinc-700 border-t border-zinc-700">
                     {bonASavoirBriefs.map((article) => (
-                      <div key={article.id} className="py-3 first:pt-4">
+                      <Link
+                        key={article.id}
+                        href={`/article/${article.slug}`}
+                        className="block py-3 first:pt-4 transition hover:text-yellow-500"
+                      >
                         <p className="line-clamp-2 font-serif text-base leading-snug">
                           {article.title}
                         </p>
-                      </div>
+                      </Link>
                     ))}
                   </div>
-
-                  <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    Lire l’article →
-                  </p>
                 </article>
-              </Link>
+              </div>
             )}
           </aside>
         </div>
