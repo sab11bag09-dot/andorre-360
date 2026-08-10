@@ -127,13 +127,13 @@ export default async function SportsPageV2() {
 
             {footerCards.length > 0 && (
               <div className="mt-10 grid gap-6 md:grid-cols-2">
-                {footerCards.map((article) => (
+                {footerCards.map((article, index) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
-                    className="block h-[400px]"
+                    className={index >= 2 ? "block h-[460px]" : "block h-[400px]"}
                   >
-                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className={index >= 2 ? "h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500" : "h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500"} overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       {(article.image || fallbackImage) ? (
                         <div className="relative h-56">
                           <SafeImage
