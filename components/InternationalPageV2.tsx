@@ -278,7 +278,7 @@ export default async function InternationalPageV2() {
                     }`}
                   >
                     <SafeImage
-                      src={article.image}
+                      src={article.image || featured?.image || mainArticle?.image || ""}
                       alt={article.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
@@ -287,9 +287,13 @@ export default async function InternationalPageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
+
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                      {article.description}
+                    </p>
 
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
