@@ -233,7 +233,7 @@ export default async function EconomiePageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[360px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {index < rightCards.length - 1 && (
                     <div className="relative h-[226px]">
                       <SafeImage
@@ -246,7 +246,7 @@ export default async function EconomiePageV2() {
                     </div>
                   )}
 
-                  <div className="p-4">
+                  <div className="mt-auto p-4">
                     <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
