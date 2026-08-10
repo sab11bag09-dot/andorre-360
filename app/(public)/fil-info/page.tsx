@@ -298,7 +298,7 @@ export default async function FilInfoPage() {
             {illustratedBriefs.length > 0 && (
               <aside
                 aria-labelledby="fil-info-remember-title"
-                className="h-[720px] overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
+                className="h-full overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
               >
                 <div className="border-b border-gray-800 px-5 py-6">
                   <h2
