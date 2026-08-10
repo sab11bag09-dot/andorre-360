@@ -5,6 +5,7 @@ export const FIL_INFO_NEWS_FEED_SIZE = 6;
 export const FIL_INFO_BRIEFS_SIZE = 6;
 export const FIL_INFO_CARDS_SIZE = 4;
 export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 3;
+export const FIL_INFO_SELECTION_SIZE = 2;
 export const FIL_INFO_PAGE_SIZE = 20;
 export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000;
 
@@ -28,17 +29,31 @@ export function partitionFilInfoArticles<T extends FilInfoPartitionArticle>(
       item.featured &&
       normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
   );
-  const selectionIndex =
+  const firstSelectionIndex =
     explicitSelectionIndex >= 0
       ? explicitSelectionIndex
       : unpinnedItems.findIndex(
           (item) =>
             normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
         );
-  const featured =
-    selectionIndex >= 0 ? unpinnedItems[selectionIndex] : null;
+  const selectionIndexes =
+    firstSelectionIndex >= 0
+      ? [
+          firstSelectionIndex,
+          ...unpinnedItems
+            .map((item, index) => ({ item, index }))
+            .filter(
+              ({ item, index }) =>
+                index !== firstSelectionIndex &&
+                normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
+            )
+            .slice(0, FIL_INFO_SELECTION_SIZE - 1)
+            .map(({ index }) => index),
+        ]
+      : [];
+  const featured = selectionIndexes.map((index) => unpinnedItems[index]);
   const remainingItems = unpinnedItems.filter(
-    (_, index) => index !== selectionIndex,
+    (_, index) => !selectionIndexes.includes(index),
   );
   let cursor = 0;
 
