@@ -309,22 +309,48 @@ export default async function FilInfoPage() {
                   </h2>
                 </div>
 
-                <div className="divide-y divide-gray-800">
-                  {illustratedBriefs.map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/article/${article.slug}`}
-                      className="group block px-5 py-5 transition-colors duration-300 hover:bg-white/[0.03]"
-                    >
-                      <article className="grid grid-cols-[112px_1fr] gap-4">
-                        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
-                          <FilInfoImage
-                            src={article.image}
-                            alt={article.title}
-                            sizes="112px"
-                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:transform-none"
-                          />
-                        </div>
+                <div className="grid gap-5">
+                  {illustratedBriefs.map((article, index) => {
+                    const isLast = index === illustratedBriefs.length - 1;
+
+                    return (
+                      <Link
+                        key={article.id}
+                        href={`/article/${article.slug}`}
+                        className="group block border-b border-gray-800 pb-5 last:border-b-0 last:pb-0"
+                      >
+                        <article>
+                          <div
+                            className={`relative overflow-hidden bg-neutral-900 ${
+                              isLast ? "aspect-[16/8]" : "aspect-[4/3]"
+                            }`}
+                          >
+                            <FilInfoImage
+                              src={article.image}
+                              alt={article.title}
+                              sizes="(max-width: 1024px) 100vw, 34vw"
+                              className="object-cover transition duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:transform-none"
+                            />
+                          </div>
+
+                          <div className="pt-4">
+                            <p className="mb-2 text-[8px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
+                              {getFilInfoFormatLabel(article.filInfoFormat)}
+                            </p>
+
+                            <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
+                              {article.title}
+                            </h3>
+
+                            <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500 transition group-hover:text-yellow-500">
+                              Lire →
+                            </p>
+                          </div>
+                        </article>
+                      </Link>
+                    );
+                  })}
+                </div>
 
                         <div className="flex min-w-0 flex-col justify-between">
                           <div>
