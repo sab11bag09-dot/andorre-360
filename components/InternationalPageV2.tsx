@@ -131,7 +131,7 @@ export default async function InternationalPageV2() {
                     <article className="h-[520px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
                         <SafeImage
-                          src={bottomCard.image}
+                          src={bottomCard.image || featured?.image || mainArticle?.image || ""}
                           alt={bottomCard.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 33vw"
@@ -143,6 +143,10 @@ export default async function InternationalPageV2() {
                         <h2 className="font-serif text-2xl">
                           {bottomCard.title}
                         </h2>
+
+                        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                          {bottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -160,7 +164,7 @@ export default async function InternationalPageV2() {
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
                         <SafeImage
-                          src={secondBottomCard.image}
+                          src={secondBottomCard.image || featured?.image || mainArticle?.image || ""}
                           alt={secondBottomCard.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 33vw"
@@ -172,6 +176,10 @@ export default async function InternationalPageV2() {
                         <h2 className="font-serif text-2xl">
                           {secondBottomCard.title}
                         </h2>
+
+                        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                          {secondBottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -278,7 +286,7 @@ export default async function InternationalPageV2() {
                     }`}
                   >
                     <SafeImage
-                      src={article.image || featured?.image || mainArticle?.image || ""}
+                      src={article.image}
                       alt={article.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
@@ -287,13 +295,9 @@ export default async function InternationalPageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                    <h3 className="font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
-
-                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-400">
-                      {article.description}
-                    </p>
 
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
