@@ -14,6 +14,7 @@ export default async function PolitiquePageV2() {
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
   const footerFeature = items[12];
+  const footerCards = items.slice(-4);
   const bonASavoir = items[14];
 
   return (
@@ -151,6 +152,46 @@ export default async function PolitiquePageV2() {
                   </div>
                 </article>
               </Link>
+            )}
+
+            {/* PIED DE PAGE : QUATRE CARTES */}
+
+            {footerCards.length > 0 && (
+              <div className="mt-10 grid h-[500px] gap-5 overflow-hidden border-t border-gray-800 pt-6 md:grid-cols-4">
+                {footerCards.map((article) => (
+                  <Link
+                    key={`footer-${article.id}`}
+                    href={`/article/${article.slug}`}
+                    className="group block"
+                  >
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-[160px] shrink-0 overflow-hidden">
+                        <SafeImage
+                          src={article.image}
+                          alt={article.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                        />
+                      </div>
+
+                      <div className="flex flex-1 flex-col p-4">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          {article.category}
+                        </p>
+
+                        <h3 className="mt-3 line-clamp-3 font-serif text-lg leading-snug">
+                          {article.title}
+                        </h3>
+
+                        <p className="mt-auto pt-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
             )}
           </div>
 
