@@ -252,18 +252,6 @@ export default async function SportsPageV2() {
                 className="block -mt-4 lg:h-[400px]"
               >
                 <article className="h-[400px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
-                  {(bonASavoir.image || fallbackImage) ? (
-                    <div className="relative h-48">
-                      <SafeImage
-                        src={bonASavoir.image || fallbackImage}
-                        alt={bonASavoir.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null}
-
                   <div className="p-6">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Bon à savoir
