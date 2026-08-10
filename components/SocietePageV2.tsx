@@ -166,7 +166,7 @@ export default async function SociétéPageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[580px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[226px] shrink-0">
                     <SafeImage
                       src={questionArticle.image}
