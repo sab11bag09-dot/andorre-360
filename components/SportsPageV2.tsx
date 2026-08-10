@@ -131,7 +131,7 @@ export default async function SportsPageV2() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {(bottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
