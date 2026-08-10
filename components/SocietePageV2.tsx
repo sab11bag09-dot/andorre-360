@@ -13,7 +13,7 @@ export default async function SociétéPageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 5);
   const briefs = items.slice(6, 12);
-  const footerCards = items.slice(12, 16);
+  const footerCards = items.slice(-4);
   const bonASavoir = items[14];
   const bonASavoirBriefs = items.slice(15, 18);
 
