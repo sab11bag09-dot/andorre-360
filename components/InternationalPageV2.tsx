@@ -16,6 +16,7 @@ export default async function InternationalPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const footerTextCards = items.slice(15, 17);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -178,6 +179,37 @@ export default async function InternationalPageV2() {
                     </article>
                   </Link>
                 )}
+              </div>
+            )}
+
+            {/* DEUX CARTES TEXTUELLES DE PIED */}
+
+            {footerTextCards.length > 0 && (
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
+                {footerTextCards.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="block"
+                  >
+                    <article className="flex h-[220px] flex-col justify-between rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                          International
+                        </p>
+                        <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
+                          {article.title}
+                        </h2>
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                          {article.description}
+                        </p>
+                      </div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
+                    </article>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
