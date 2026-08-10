@@ -203,7 +203,7 @@ export default async function SportsPageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {(questionArticle.image || fallbackImage) ? (
-                    <div className="relative h-72">
+                    <div className="relative h-56">
                       <SafeImage
                         src={questionArticle.image || fallbackImage}
                         alt={questionArticle.title}
@@ -278,7 +278,7 @@ export default async function SportsPageV2() {
               >
                 <article className="h-[400px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
                   {(bonASavoir.image || fallbackImage) ? (
-                    <div className="relative h-32">
+                    <div className="relative h-48">
                       <SafeImage
                         src={bonASavoir.image || fallbackImage}
                         alt={bonASavoir.title}
