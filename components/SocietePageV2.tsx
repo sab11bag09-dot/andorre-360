@@ -65,8 +65,8 @@ export default async function SociétéPageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="flex h-[700px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[395px] shrink-0">
+                <article className="flex h-[850px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[500px] shrink-0">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -122,7 +122,7 @@ export default async function SociétéPageV2() {
             {bottomCard && (
               <Link
                 href={`/article/${bottomCard.slug}`}
-                className="mt-10 block"
+                className="mt-10 block lg:mt-auto"
               >
                 <article className="grid h-[540px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 md:grid-cols-4">
                   <div className="relative md:col-span-3">
