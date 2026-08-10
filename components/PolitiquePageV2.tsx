@@ -22,7 +22,7 @@ export default async function PolitiquePageV2() {
 
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
+          <section className="relative h-[560px] overflow-hidden md:h-[640px]">
             <SafeImage
               src={featured.image}
               alt={featured.title}
@@ -64,8 +64,8 @@ export default async function PolitiquePageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
+                <article className="flex h-[700px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[395px] shrink-0">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -75,16 +75,16 @@ export default async function PolitiquePageV2() {
                     />
                   </div>
 
-                  <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                  <div className="flex flex-1 flex-col overflow-hidden p-6">
+                    <h2 className="line-clamp-2 font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-3 text-gray-400">
                       {mainArticle.description}
                     </p>
 
-                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
@@ -167,8 +167,8 @@ export default async function PolitiquePageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                <article className="flex h-[580px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[226px] shrink-0">
                     <SafeImage
                       src={questionArticle.image}
                       alt={questionArticle.title}
@@ -178,12 +178,12 @@ export default async function PolitiquePageV2() {
                     />
                   </div>
 
-                  <div className="p-4">
+                  <div className="flex flex-1 flex-col overflow-hidden p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
@@ -191,7 +191,7 @@ export default async function PolitiquePageV2() {
                       {questionArticle.description}
                     </p>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’entretien →
                     </p>
                   </div>
@@ -207,7 +207,7 @@ export default async function PolitiquePageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[360px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
                     <SafeImage
                       src={article.image}
@@ -218,7 +218,7 @@ export default async function PolitiquePageV2() {
                     />
                   </div>
 
-                  <div className="p-4">
+                  <div className="mt-auto p-4">
                     <h3 className="font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
@@ -238,7 +238,7 @@ export default async function PolitiquePageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="mt-auto flex h-[420px] flex-col justify-between overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
