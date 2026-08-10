@@ -285,7 +285,7 @@ export default async function EconomiePageV2() {
                     </p>
                   </Link>
 
-                  <div className="mt-auto divide-y divide-zinc-700 border-t border-zinc-700">
+                  <div className="mt-auto max-h-[230px] overflow-hidden divide-y divide-zinc-700 border-t border-zinc-700">
                     {bonASavoirBriefs.map((article) => (
                       <Link
                         key={article.id}
