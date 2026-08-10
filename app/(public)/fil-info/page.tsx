@@ -329,7 +329,7 @@ export default async function FilInfoPage() {
                         <div className="flex min-w-0 flex-col justify-between">
                           <div>
                             <p className="mb-2 text-[8px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
-                              {getFilInfoFormatLabel(article.filInfoFormat)}
+                              {article.category}
                             </p>
 
                             <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
