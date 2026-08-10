@@ -119,7 +119,7 @@ export default async function PolitiquePageV2() {
             {/* QUATRE CARTES DE PIED */}
 
             {footerCards.length > 0 && (
-              <div className="mt-10 grid h-[620px] gap-5 overflow-hidden border-t-2 border-yellow-500 pt-6 md:mt-auto md:grid-cols-4">
+              <div className="relative mt-10 grid h-[620px] gap-5 overflow-hidden pt-6 before:absolute before:-top-5 before:left-0 before:right-0 before:border-t-2 before:border-yellow-500 md:mt-auto md:grid-cols-4">
                 {footerCards.map((article) => (
                   <Link
                     key={article.id}
