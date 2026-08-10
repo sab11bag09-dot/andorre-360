@@ -16,6 +16,7 @@ export default async function SociétéPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const bonASavoirBriefs = items.slice(15, 18);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -232,28 +233,40 @@ export default async function SociétéPageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
-                <article className="mt-auto flex h-[420px] flex-col justify-between overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                    Bon à savoir
-                  </p>
+              <div className="mt-auto">
+                <article className="flex h-[420px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
+                  <Link
+                    href={`/article/${bonASavoir.slug}`}
+                    className="block transition hover:text-yellow-500"
+                  >
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                      Bon à savoir
+                    </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
-                    {bonASavoir.title}
-                  </h2>
+                    <h2 className="mt-4 line-clamp-3 font-serif text-2xl leading-snug">
+                      {bonASavoir.title}
+                    </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
-                    {bonASavoir.description}
-                  </p>
+                    <p className="mt-4 line-clamp-3 leading-relaxed text-gray-400">
+                      {bonASavoir.description}
+                    </p>
+                  </Link>
 
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    Lire l’article →
-                  </p>
+                  <div className="mt-auto max-h-[190px] overflow-hidden divide-y divide-zinc-700 border-t border-zinc-700">
+                    {bonASavoirBriefs.map((article) => (
+                      <Link
+                        key={article.id}
+                        href={`/article/${article.slug}`}
+                        className="block py-3 first:pt-4 transition hover:text-yellow-500"
+                      >
+                        <p className="line-clamp-2 font-serif text-base leading-snug">
+                          {article.title}
+                        </p>
+                      </Link>
+                    ))}
+                  </div>
                 </article>
-              </Link>
+              </div>
             )}
           </aside>
         </div>
