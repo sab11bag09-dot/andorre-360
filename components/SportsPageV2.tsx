@@ -129,7 +129,7 @@ export default async function SportsPageV2() {
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block lg:h-[400px]"
                   >
                     <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {(bottomCard.image || fallbackImage) ? (
@@ -274,7 +274,7 @@ export default async function SportsPageV2() {
             {bonASavoir && (
               <Link
                 href={`/article/${bonASavoir.slug}`}
-                className="block mt-24"
+                className="block mt-24 lg:h-[400px]"
               >
                 <article className="h-[400px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
                   {(bonASavoir.image || fallbackImage) ? (
