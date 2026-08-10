@@ -60,7 +60,7 @@ export default async function SociétéPageV2() {
         <div className="grid gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
-          <div className="self-start lg:col-span-4 lg:flex lg:flex-col">
+          <div className="lg:col-span-4 lg:flex lg:flex-col">
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
@@ -122,7 +122,7 @@ export default async function SociétéPageV2() {
             {bottomCard && (
               <Link
                 href={`/article/${bottomCard.slug}`}
-                className="mt-10 block"
+                className="mt-10 block lg:mt-auto"
               >
                 <article className="grid h-[540px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 md:grid-cols-4">
                   <div className="relative md:col-span-3">
