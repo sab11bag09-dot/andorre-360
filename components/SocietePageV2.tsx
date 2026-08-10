@@ -60,7 +60,7 @@ export default async function SociétéPageV2() {
         <div className="grid gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
-          <div className="lg:col-span-4 lg:flex lg:flex-col">
+          <div className="self-start lg:col-span-4 lg:flex lg:flex-col">
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
