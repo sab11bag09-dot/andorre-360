@@ -157,7 +157,7 @@ export default async function PolitiquePageV2() {
             {/* PIED DE PAGE : QUATRE CARTES */}
 
             {footerCards.length > 0 && (
-              <div className="mt-10 grid h-[500px] gap-5 overflow-hidden border-t border-gray-800 pt-6 md:grid-cols-4">
+              <div className="mt-10 grid h-[500px] gap-5 overflow-hidden border-t border-gray-800 pt-6 md:mt-auto md:grid-cols-4">
                 {footerCards.map((article) => (
                   <Link
                     key={`footer-${article.id}`}
@@ -197,7 +197,7 @@ export default async function PolitiquePageV2() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2">
+          <aside className="flex h-full flex-col gap-6 lg:col-span-2">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -276,7 +276,7 @@ export default async function PolitiquePageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="mt-auto flex h-[420px] flex-col justify-between overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="mt-auto flex h-[500px] flex-col justify-between overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
