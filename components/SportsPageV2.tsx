@@ -133,7 +133,7 @@ export default async function SportsPageV2() {
                     href={`/article/${article.slug}`}
                     className={index >= 2 ? "block h-[460px]" : "block h-[400px]"}
                   >
-                    <article className={index >= 2 ? "h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500" : "h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500"} overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className={index >= 2 ? "h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500" : "h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500"}>
                       {(article.image || fallbackImage) ? (
                         <div className="relative h-56">
                           <SafeImage
