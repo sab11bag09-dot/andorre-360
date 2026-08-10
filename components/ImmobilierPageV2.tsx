@@ -104,7 +104,7 @@ export default async function ImmobilierPageV2() {
                     className="block"
                   >
                     <article className="flex h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                      <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -138,7 +138,7 @@ export default async function ImmobilierPageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="line-clamp-3 font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl">
                           {bottomCard.title}
                         </h2>
 
@@ -208,7 +208,7 @@ export default async function ImmobilierPageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-2 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
@@ -278,7 +278,7 @@ export default async function ImmobilierPageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-3 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
