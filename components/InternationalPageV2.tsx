@@ -17,6 +17,7 @@ export default async function InternationalPageV2() {
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
   const footerTextCards = items.slice(15, 17);
+  const bonASavoirBriefs = items.slice(17, 20);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -305,7 +306,7 @@ export default async function InternationalPageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="h-[330px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[520px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
@@ -317,6 +318,20 @@ export default async function InternationalPageV2() {
                   <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
                     {bonASavoir.description}
                   </p>
+
+                  {bonASavoirBriefs.length > 0 && (
+                    <div className="mt-5 space-y-3 border-t border-gray-700 pt-4">
+                      {bonASavoirBriefs.map((article) => (
+                        <Link
+                          key={article.id}
+                          href={`/article/${article.slug}`}
+                          className="block border-b border-gray-700 pb-3 font-serif text-base leading-snug transition hover:text-yellow-500 last:border-b-0"
+                        >
+                          {article.title}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
 
                   <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                     Lire l’article →
