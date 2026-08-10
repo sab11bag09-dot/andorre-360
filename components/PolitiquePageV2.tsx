@@ -207,26 +207,20 @@ export default async function PolitiquePageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
-                    <SafeImage
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                <article className="flex h-[180px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      {article.category}
+                    </p>
 
-                  <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="mt-2 line-clamp-3 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
-
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’article →
-                    </p>
                   </div>
+
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    Lire l’article →
+                  </p>
                 </article>
               </Link>
             ))}
