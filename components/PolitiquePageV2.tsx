@@ -95,14 +95,14 @@ export default async function PolitiquePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-12 grid h-[330px] gap-4 overflow-hidden md:grid-cols-3">
+              <div className="mt-12 grid h-[330px] grid-rows-2 gap-4 overflow-hidden md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
                       <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
@@ -207,20 +207,26 @@ export default async function PolitiquePageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="flex h-[180px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                  <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      {article.category}
-                    </p>
-
-                    <h3 className="mt-2 line-clamp-3 font-serif text-lg leading-snug">
-                      {article.title}
-                    </h3>
+                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-40">
+                    <SafeImage
+                      src={article.image}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      className="object-cover"
+                    />
                   </div>
 
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    Lire l’article →
-                  </p>
+                  <div className="p-4">
+                    <h3 className="font-serif text-lg leading-snug">
+                      {article.title}
+                    </h3>
+
+                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      Lire l’article →
+                    </p>
+                  </div>
                 </article>
               </Link>
             ))}
