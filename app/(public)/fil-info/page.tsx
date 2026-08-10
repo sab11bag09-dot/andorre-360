@@ -250,7 +250,7 @@ export default async function FilInfoPage() {
             {cards.length > 0 && (
               <section
                 aria-labelledby="fil-info-follow-title"
-                className="flex h-[720px] flex-col overflow-hidden lg:col-span-4"
+                className="flex min-h-[720px] flex-col lg:col-span-4"
               >
                 <div className="mb-7 border-t-2 border-yellow-500 pt-5">
                   <h2 id="fil-info-follow-title" className="font-serif text-3xl">
