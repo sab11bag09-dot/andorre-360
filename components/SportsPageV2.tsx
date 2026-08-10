@@ -202,10 +202,10 @@ export default async function SportsPageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {questionArticle.image ? (
+                  {(questionArticle.image || fallbackImage) ? (
                     <div className="relative h-40">
                       <SafeImage
-                        src={questionArticle.image}
+                        src={questionArticle.image || fallbackImage}
                         alt={questionArticle.title}
                         fill
                         sizes="(max-width: 1024px) 100vw, 33vw"
@@ -276,12 +276,25 @@ export default async function SportsPageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                    Bon à savoir
-                  </p>
+                <article className="h-[360px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 transition hover:bg-zinc-800">
+                  {(bonASavoir.image || fallbackImage) ? (
+                    <div className="relative h-32">
+                      <SafeImage
+                        src={bonASavoir.image || fallbackImage}
+                        alt={bonASavoir.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <div className="p-6">
+                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                      Bon à savoir
+                    </p>
+
+                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
@@ -292,6 +305,7 @@ export default async function SportsPageV2() {
                   <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                     Lire l’article →
                   </p>
+                  </div>
                 </article>
               </Link>
             )}
