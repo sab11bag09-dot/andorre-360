@@ -334,7 +334,7 @@ export default async function InternationalPageV2() {
                     Lire l’article →
                   </p>
                 </article>
-              </Link>
+              </div>
             )}
           </aside>
         </div>
