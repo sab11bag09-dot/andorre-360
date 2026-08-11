@@ -126,9 +126,9 @@ export default async function MontagnePageV2() {
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
-                    className="block"
+                    className="block h-[400px]"
                   >
-                    <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
                         <SafeImage
                           src={article.image}
