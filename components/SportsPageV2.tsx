@@ -167,46 +167,6 @@ export default async function SportsPageV2() {
                 ))}
               </div>
             )}
-            {footerHorizontalFeature && (
-              <Link
-                href={`/article/${footerHorizontalFeature.slug}`}
-                className="mt-8 block h-[400px]"
-              >
-                <article className="grid h-[400px] grid-cols-2 overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {(footerHorizontalFeature.image || fallbackImage) ? (
-                    <div className="relative">
-                      <SafeImage
-                        src={footerHorizontalFeature.image || fallbackImage}
-                        alt={footerHorizontalFeature.title}
-                        fill
-                        sizes="(max-width: 1024px) 50vw, 100vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="bg-zinc-900" />
-                  )}
-
-                  <div className="flex flex-col justify-between p-6">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                        Sports
-                      </p>
-                      <h2 className="mt-4 line-clamp-2 font-serif text-2xl">
-                        {footerHorizontalFeature.title}
-                      </h2>
-                      <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
-                        {footerHorizontalFeature.description}
-                      </p>
-                    </div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’article →
-                    </p>
-                  </div>
-                </article>
-              </Link>
-            )}
-
           </div>
 
           {/* PARTIE DROITE : 2 COLONNES */}
@@ -315,10 +275,55 @@ export default async function SportsPageV2() {
               </div>
             )}
 
-            {footerSideFeature && (
+          </aside>
+
+        <div className="mt-10 grid items-stretch gap-8 lg:grid-cols-6">
+          <div className="lg:col-span-4">
+{footerHorizontalFeature && (
+              <Link
+                href={`/article/${footerHorizontalFeature.slug}`}
+                className="block h-[400px]"
+              >
+                <article className="grid h-[400px] grid-cols-2 overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  {(footerHorizontalFeature.image || fallbackImage) ? (
+                    <div className="relative">
+                      <SafeImage
+                        src={footerHorizontalFeature.image || fallbackImage}
+                        alt={footerHorizontalFeature.title}
+                        fill
+                        sizes="(max-width: 1024px) 50vw, 100vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-zinc-900" />
+                  )}
+
+                  <div className="flex flex-col justify-between p-6">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                        Sports
+                      </p>
+                      <h2 className="mt-4 line-clamp-2 font-serif text-2xl">
+                        {footerHorizontalFeature.title}
+                      </h2>
+                      <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
+                        {footerHorizontalFeature.description}
+                      </p>
+                    </div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      Lire l’article →
+                    </p>
+                  </div>
+                </article>
+              </Link>
+            )}
+          </div>
+          <div className="lg:col-span-2">
+{footerSideFeature && (
               <Link
                 href={`/article/${footerSideFeature.slug}`}
-                className="mt-6 block h-[400px]"
+                className="block h-[400px]"
               >
                 <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {(footerSideFeature.image || fallbackImage) ? (
@@ -344,7 +349,8 @@ export default async function SportsPageV2() {
                 </article>
               </Link>
             )}
-          </aside>
+          </div>
+        </div>
         </div>
       </section>
     </main>
