@@ -171,7 +171,7 @@ export default async function MontagnePageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                  <div className="relative h-56">
                     <SafeImage
                       src={questionArticle.image || fallbackImage}
                       alt={questionArticle.title}
