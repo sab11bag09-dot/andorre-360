@@ -214,13 +214,13 @@ export default async function SportsPageV2() {
 
             {/* TROIS CARTES CLASSIQUES */}
 
-            {rightCards.map((article) => (
+            {rightCards.map((article, index) => (
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className={article.title.toLowerCase().includes("basket") ? "h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500" : "overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500"}>
+                <article className={index === rightCards.length - 1 ? "h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500" : "overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500"}>
                   {article.image ? (
                     <div className="relative h-40">
                       <SafeImage
