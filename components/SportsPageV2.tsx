@@ -280,18 +280,6 @@ export default async function SportsPageV2() {
                 className="mt-6 block h-[400px]"
               >
                 <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {(footerSideFeature.image || fallbackImage) ? (
-                    <div className="relative h-56">
-                      <SafeImage
-                        src={footerSideFeature.image || fallbackImage}
-                        alt={footerSideFeature.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null}
-
                   <div className="p-5">
                     <h2 className="line-clamp-2 font-serif text-2xl">
                       {footerSideFeature.title}
