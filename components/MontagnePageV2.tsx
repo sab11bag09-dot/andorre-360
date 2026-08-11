@@ -204,7 +204,7 @@ export default async function MontagnePageV2() {
 
             {/* TROIS CARTES CLASSIQUES */}
 
-            {rightCards.map((article) => (
+            {rightCards.map((article, index) => (
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
@@ -222,7 +222,7 @@ export default async function MontagnePageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className={index === rightCards.length - 1 ? "line-clamp-2 font-serif text-lg leading-snug" : "font-serif text-lg leading-snug"}>
                       {article.title}
                     </h3>
 
