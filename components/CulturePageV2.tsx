@@ -16,6 +16,7 @@ export default async function CulturePageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -131,10 +132,10 @@ export default async function CulturePageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {bottomCard.image ? (
+                      {(bottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
-                            src={bottomCard.image}
+                            src={bottomCard.image || fallbackImage}
                             alt={bottomCard.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
@@ -162,10 +163,10 @@ export default async function CulturePageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {secondBottomCard.image ? (
+                      {(secondBottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
-                            src={secondBottomCard.image}
+                            src={secondBottomCard.image || fallbackImage}
                             alt={secondBottomCard.title}
                             fill
                             sizes="(max-width: 768px) 100vw, 33vw"
