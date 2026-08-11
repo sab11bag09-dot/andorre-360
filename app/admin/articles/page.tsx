@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Badge,
   Button,
@@ -86,6 +87,13 @@ const sectionTitle =
       ? "Brouillons"
       : "Tous les articles";
 
+const displayArticles =
+  activeStatus === "published"
+    ? [...filteredArticles].sort((left, right) =>
+        left.category.localeCompare(right.category, "fr"),
+      )
+    : filteredArticles;
+
   return (
   <>
         <PageHeader
@@ -169,7 +177,15 @@ description={`${filteredArticles.length} article${
    { key: "actions", label: "Action", align: "right" },
   ]}
 >
-  {filteredArticles.map((article) => (
+  {displayArticles.map((article, index) => (
+    <React.Fragment key={article.id}>
+      {(index === 0 ||
+        displayArticles[index - 1]?.category !== article.category) && (
+        <div className="col-span-full border-b border-yellow-500/40 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+          {article.category || "Sans catégorie"} ·{" "}
+          {displayArticles.filter((item) => item.category === article.category).length} article(s)
+        </div>
+      )}
     <DataTableRow
   key={article.id}
   className="py-5 transition hover:bg-zinc-900/70"
