@@ -267,6 +267,7 @@ description={`${filteredArticles.length} article${
 </Button>
                     </div>
                   </DataTableRow>
+    </React.Fragment>
                 ))}
             </DataTable>
           )}
