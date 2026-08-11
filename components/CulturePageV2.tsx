@@ -60,15 +60,15 @@ export default async function CulturePageV2() {
       )}
 
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
-        <div className="grid gap-8 lg:grid-cols-6">
+        <div className="grid items-start gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
-          <div className="lg:col-span-4 lg:flex lg:flex-col">
+          <div className="lg:col-span-4">
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {mainArticle.image ? (
                     <div className="relative h-[420px]">
                       <SafeImage
@@ -108,7 +108,7 @@ export default async function CulturePageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[170px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
                       <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
@@ -125,13 +125,13 @@ export default async function CulturePageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
+              <div className="mt-10 grid gap-8 md:grid-cols-2">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block h-[400px]"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {(bottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
@@ -201,7 +201,7 @@ export default async function CulturePageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[470px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionArticle.image ? (
                     <div className="relative h-40">
                       <SafeImage
@@ -243,7 +243,7 @@ export default async function CulturePageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[280px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {article.image ? (
                     <div className="relative h-40">
                       <SafeImage
@@ -276,7 +276,7 @@ export default async function CulturePageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[340px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
