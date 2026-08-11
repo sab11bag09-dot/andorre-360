@@ -17,6 +17,7 @@ export default async function MontagnePageV2() {
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
   const footerCards = items.slice(12, 16);
+  const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -172,7 +173,7 @@ export default async function MontagnePageV2() {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
                     <SafeImage
-                      src={questionArticle.image}
+                      src={questionArticle.image || fallbackImage}
                       alt={questionArticle.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
@@ -185,7 +186,7 @@ export default async function MontagnePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
