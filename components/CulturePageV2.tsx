@@ -24,7 +24,7 @@ export default async function CulturePageV2() {
 
       {featured && (
         <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
+          <section className="relative h-[560px] min-h-[560px] overflow-hidden">
             {featured.image ? (
               <SafeImage
                 src={featured.image}
@@ -68,7 +68,7 @@ export default async function CulturePageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {mainArticle.image ? (
                     <div className="relative h-[420px]">
                       <SafeImage
@@ -82,11 +82,11 @@ export default async function CulturePageV2() {
                   ) : null}
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="line-clamp-2 font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-4 text-gray-400">
                       {mainArticle.description}
                     </p>
 
@@ -108,8 +108,8 @@ export default async function CulturePageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                    <article className="flex h-[170px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -129,9 +129,9 @@ export default async function CulturePageV2() {
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block lg:h-[400px]"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {(bottomCard.image || fallbackImage) ? (
                         <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                           <SafeImage
@@ -201,7 +201,7 @@ export default async function CulturePageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[470px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionArticle.image ? (
                     <div className="relative h-40">
                       <SafeImage
@@ -219,11 +219,11 @@ export default async function CulturePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-2 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
                       {questionArticle.description}
                     </p>
 
@@ -243,7 +243,7 @@ export default async function CulturePageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[280px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {article.image ? (
                     <div className="relative h-40">
                       <SafeImage
@@ -257,7 +257,7 @@ export default async function CulturePageV2() {
                   ) : null}
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
@@ -276,7 +276,7 @@ export default async function CulturePageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[340px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
