@@ -19,6 +19,7 @@ export default async function SportsPageV2() {
   const footerSideCards = items.slice(16, 18);
   const footerSideFeature = items[18];
   const footerHorizontalFeature = items[19];
+  const skiBrief = items[20];
   const bonASavoir = items[14];
   const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
@@ -246,6 +247,22 @@ export default async function SportsPageV2() {
                 </article>
               </Link>
             ))}
+
+            {skiBrief && (
+              <Link
+                href={`/article/${skiBrief.slug}`}
+                className="block"
+              >
+                <article className="h-[150px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                    Sports
+                  </p>
+                  <h3 className="mt-3 line-clamp-2 font-serif text-lg leading-snug">
+                    {skiBrief.title}
+                  </h3>
+                </article>
+              </Link>
+            )}
 
             {/* DEUX CARTES DE PIED À DROITE */}
 
