@@ -16,6 +16,7 @@ export default async function CulturePageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const footerBriefs = items.slice(15, 17);
   const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
   return (
@@ -187,6 +188,26 @@ export default async function CulturePageV2() {
                     </article>
                   </Link>
                 )}
+              </div>
+            )}
+            {footerBriefs.length > 0 && (
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {footerBriefs.map((article) => (
+                  <Link
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="block"
+                  >
+                    <article className="h-[150px] overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Culture
+                      </p>
+                      <h3 className="mt-3 line-clamp-2 font-serif text-lg leading-snug">
+                        {article.title}
+                      </h3>
+                    </article>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
