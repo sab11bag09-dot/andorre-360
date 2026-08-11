@@ -297,7 +297,7 @@ export default async function CulturePageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[260px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
