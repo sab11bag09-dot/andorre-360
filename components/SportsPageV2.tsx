@@ -221,7 +221,7 @@ export default async function SportsPageV2() {
                 className="block"
               >
                 <article className={index === rightCards.length - 1 ? "h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500" : "overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500"}>
-                  {article.image ? (
+                  {index !== rightCards.length - 1 && article.image ? (
                     <div className="relative h-40">
                       <SafeImage
                         src={article.image}
