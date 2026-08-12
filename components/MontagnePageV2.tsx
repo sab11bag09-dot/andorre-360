@@ -168,9 +168,9 @@ export default async function MontagnePageV2() {
             {questionArticle && (
               <Link
                 href={`/article/${questionArticle.slug}`}
-                className="block"
+                className="block h-[520px]"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[520px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-56">
                     <SafeImage
                       src={questionArticle.image || fallbackImage}
@@ -190,7 +190,7 @@ export default async function MontagnePageV2() {
                       {questionArticle.title}
                     </h2>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
                       {questionArticle.description}
                     </p>
 
@@ -208,9 +208,9 @@ export default async function MontagnePageV2() {
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
-                className="block"
+                className="block h-[360px]"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[360px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className={index === 0 ? "relative h-56" : "relative h-40"}>
                     <SafeImage
                       src={article.image}
@@ -239,14 +239,14 @@ export default async function MontagnePageV2() {
             {bonASavoir && (
               <Link
                 href={`/article/${bonASavoir.slug}`}
-                className="block"
+                className="block h-[340px]"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[340px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
