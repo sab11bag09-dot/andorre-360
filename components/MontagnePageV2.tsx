@@ -66,9 +66,9 @@ export default async function MontagnePageV2() {
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
-              <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
+              <Link href={`/article/${mainArticle.slug}`} className="block h-[620px]">
+                <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[380px]">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -79,11 +79,11 @@ export default async function MontagnePageV2() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="line-clamp-2 font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-4 text-gray-400">
                       {mainArticle.description}
                     </p>
 
@@ -105,7 +105,7 @@ export default async function MontagnePageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
                       <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
