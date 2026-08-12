@@ -16,6 +16,8 @@ export default async function LifestylePageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const footerCards = items.slice(12, 16);
+  const fallbackImage = items.find((item) => item.image)?.image ?? "";
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -40,7 +42,7 @@ export default async function LifestylePageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 line-clamp-2 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
                 {featured.title}
               </h1>
 
@@ -60,13 +62,13 @@ export default async function LifestylePageV2() {
         <div className="grid gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 lg:flex lg:flex-col">
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
-              <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
+              <Link href={`/article/${mainArticle.slug}`} className="block h-[620px]">
+                <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className="relative h-[380px]">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
@@ -81,7 +83,7 @@ export default async function LifestylePageV2() {
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-4 text-gray-400">
                       {mainArticle.description}
                     </p>
 
@@ -103,8 +105,8 @@ export default async function LifestylePageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                    <article className="flex h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -117,20 +119,21 @@ export default async function LifestylePageV2() {
               </div>
             )}
 
-            {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
+            {/* QUATRE CARTES DE PIED SUR LES 4 COLONNES */}
 
-            {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2">
-                {bottomCard && (
+            {footerCards.length > 0 && (
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                {footerCards.map((article) => (
                   <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block"
+                    key={article.id}
+                    href={`/article/${article.slug}`}
+                    className="block h-[400px]"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
+                    <article className="h-[400px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-56">
                         <SafeImage
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
+                          src={article.image}
+                          alt={article.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 33vw"
                           className="object-cover"
@@ -139,8 +142,12 @@ export default async function LifestylePageV2() {
 
                       <div className="p-5">
                         <h2 className="line-clamp-2 font-serif text-2xl">
-                          {bottomCard.title}
+                          {article.title}
                         </h2>
+
+                        <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-gray-400">
+                          {article.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -148,43 +155,14 @@ export default async function LifestylePageV2() {
                       </div>
                     </article>
                   </Link>
-                )}
-
-                {secondBottomCard && (
-                  <Link
-                    href={`/article/${secondBottomCard.slug}`}
-                    className="block"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
-                        <SafeImage
-                          src={secondBottomCard.image}
-                          alt={secondBottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
-                          {secondBottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
+                ))}
               </div>
             )}
           </div>
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2 lg:flex lg:flex-col lg:gap-6 lg:space-y-0">
+          <aside className="space-y-6 lg:col-span-2">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -193,9 +171,9 @@ export default async function LifestylePageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                  <div className="relative h-56">
                     <SafeImage
-                      src={questionArticle.image}
+                      src={questionArticle.image || fallbackImage}
                       alt={questionArticle.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
@@ -208,7 +186,7 @@ export default async function LifestylePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-2 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
@@ -230,20 +208,10 @@ export default async function LifestylePageV2() {
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
-                className={
-                  index === rightCards.length - 1
-                    ? "block lg:flex-1"
-                    : "block"
-                }
+                className="block"
               >
-                <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                  <div
-                    className={`relative h-40 ${
-                      index === rightCards.length - 1
-                        ? "lg:h-auto lg:min-h-40 lg:flex-1"
-                        : ""
-                    }`}
-                  >
+                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  <div className={index === 0 ? "relative h-56" : "relative h-40"}>
                     <SafeImage
                       src={article.image}
                       alt={article.title}
@@ -254,7 +222,7 @@ export default async function LifestylePageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className={index === rightCards.length - 1 ? "line-clamp-2 font-serif text-lg leading-snug" : "font-serif text-lg leading-snug"}>
                       {article.title}
                     </h3>
 
@@ -278,7 +246,7 @@ export default async function LifestylePageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
