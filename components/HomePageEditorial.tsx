@@ -365,7 +365,7 @@ export default async function HomePageEditorial() {
                   href={`/article/${grandFormat.slug}`}
                   className="group block md:col-span-3"
                 >
-                  <article className="flex h-full flex-col overflow-hidden border-l border-gray-800 pl-0 md:pl-7">
+                  <article className="flex h-[760px] flex-col overflow-hidden border-l border-gray-800 pl-0 md:pl-7">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grand Format · {grandFormat.category}
                     </p>
