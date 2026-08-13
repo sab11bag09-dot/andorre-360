@@ -136,7 +136,7 @@ export default async function HomePageEditorial() {
   const cards = [
     ...editorialLayout.card,
     ...availableArticles,
-  ].slice(0, 5);
+  ].slice(0, 6);
 
   const media = await prisma.media.findMany({
     where: { type: "IMAGE" },
