@@ -332,6 +332,28 @@ export async function toggleSource(
   revalidateSourcePages(sourceId);
 }
 
+export async function checkAllSources(): Promise<void> {
+  await requireAdmin();
+
+  const sources = await prisma.source.findMany({
+    where: { active: true },
+    select: { id: true },
+  });
+
+  const results = await Promise.allSettled(
+    sources.map(({ id }) => checkSource(id)),
+  );
+
+  const failed = results.filter((result) => result.status === "rejected").length;
+  console.info("[Sources] Vérification globale terminée", {
+    total: sources.length,
+    failed,
+    available: sources.length - failed,
+  });
+
+  revalidateSourcePages();
+}
+
 export async function checkSourceAvailability(
   sourceId: number,
 ): Promise<void> {
