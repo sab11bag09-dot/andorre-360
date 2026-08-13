@@ -26,6 +26,7 @@ import {
 import {
   checkSourceAvailability,
   checkAllSources,
+  testAllCollections,
   collectSourceNow,
   toggleSource,
   deleteSource,
@@ -181,6 +182,11 @@ export default async function AdminSourcesPage({
             <form action={checkAllSources}>
               <Button type="submit" variant="secondary">
                 Vérifier toutes les sources
+              </Button>
+            </form>
+            <form action={testAllCollections}>
+              <Button type="submit" variant="secondary">
+                Tester toutes les collectes
               </Button>
             </form>
             <Button href="/admin/sources/nouveau">
