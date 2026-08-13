@@ -480,7 +480,7 @@ export default async function HomePageEditorial() {
 
             {/* CARTES ÉDITORIALES */}
 
-<section className="min-h-[690px] border-t-2 border-yellow-500 pt-5">
+<section className="min-h-[810px] border-t-2 border-yellow-500 pt-5">
   <div className="mb-4">
   <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
     La rédaction
@@ -492,7 +492,7 @@ export default async function HomePageEditorial() {
 </div>
 
   <div className="divide-y divide-gray-800">
-    {cardsWithImages.slice(0, 5).map((article, index) => (
+    {cardsWithImages.slice(0, 6).map((article, index) => (
       <Link
         key={article.id}
         href={`/article/${article.slug}`}
