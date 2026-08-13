@@ -328,9 +328,7 @@ export default async function HomePageEditorial() {
                     L’essentiel
                   </p>
 
-                  <h2 className="mt-1 font-serif text-2xl">
-                    Brèves
-                  </h2>
+
                 </div>
 
                 <div className="divide-y divide-gray-800">
