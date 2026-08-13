@@ -252,7 +252,7 @@ export default async function HomePageEditorial() {
               À la Une · {hero.category}
             </p>
 
-            <h1 className="max-w-5xl font-serif text-4xl leading-[1.05] md:text-6xl lg:text-7xl">
+            <h1 className="max-w-5xl overflow-hidden font-serif text-4xl leading-[1.05] line-clamp-2 md:text-6xl lg:text-7xl">
               {hero.title}
             </h1>
 
@@ -287,7 +287,7 @@ export default async function HomePageEditorial() {
                       Grande carte · {feature.category}
                     </p>
 
-                    <h2 className="mt-4 line-clamp-3 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
+                    <h2 className="mt-4 max-w-4xl overflow-hidden font-serif text-4xl leading-tight line-clamp-3 md:text-5xl">
                       {feature.title}
                     </h2>
                   </div>
@@ -372,7 +372,7 @@ export default async function HomePageEditorial() {
 
                     {/* Titre sur toute la largeur des trois colonnes */}
 
-                    <h2 className="mt-4 max-w-4xl font-serif text-3xl leading-tight md:text-4xl lg:text-5xl">
+                    <h2 className="mt-4 max-w-4xl overflow-hidden font-serif text-3xl leading-tight line-clamp-3 md:text-4xl lg:text-5xl">
                       {grandFormat.title}
                     </h2>
 
