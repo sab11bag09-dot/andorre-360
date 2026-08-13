@@ -252,11 +252,11 @@ export default async function HomePageEditorial() {
               À la Une · {hero.category}
             </p>
 
-            <h1 className="h-[8.4rem] max-w-5xl overflow-hidden font-serif text-4xl leading-[1.05] line-clamp-2 md:h-[12.6rem] md:text-6xl lg:text-7xl">
+            <h1 className="max-w-5xl font-serif text-4xl leading-[1.05] md:text-6xl lg:text-7xl">
               {hero.title}
             </h1>
 
-            <p className="mt-5 h-[6.5rem] max-w-2xl overflow-hidden text-base leading-relaxed text-gray-200 line-clamp-4 md:text-lg">
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-200 md:text-lg">
               {hero.description}
             </p>
 
@@ -287,7 +287,7 @@ export default async function HomePageEditorial() {
                       Grande carte · {feature.category}
                     </p>
 
-                    <h2 className="mt-4 h-[8.5rem] max-w-4xl overflow-hidden font-serif text-4xl leading-tight line-clamp-3 md:h-[10.5rem] md:text-5xl">
+                    <h2 className="mt-4 line-clamp-3 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
                       {feature.title}
                     </h2>
                   </div>
@@ -304,7 +304,7 @@ export default async function HomePageEditorial() {
   </div>
 ) : null}
 
-                  <div className="h-[8.5rem] overflow-hidden pt-6">
+                  <div className="pt-6">
                     <p className="line-clamp-3 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
                       {feature.description}
                     </p>
@@ -374,7 +374,7 @@ export default async function HomePageEditorial() {
 
                     {/* Titre sur toute la largeur des trois colonnes */}
 
-                    <h2 className="mt-4 h-[8.5rem] max-w-4xl overflow-hidden font-serif text-3xl leading-tight line-clamp-3 md:h-[10.5rem] md:text-4xl lg:text-5xl">
+                    <h2 className="mt-4 max-w-4xl font-serif text-3xl leading-tight md:text-4xl lg:text-5xl">
                       {grandFormat.title}
                     </h2>
 
@@ -382,7 +382,7 @@ export default async function HomePageEditorial() {
                       {/* Chapô : une colonne à gauche */}
 
                       <div className="flex flex-col justify-between md:col-span-1">
-                        <p className="line-clamp-4 leading-relaxed text-gray-300">
+                        <p className="leading-relaxed text-gray-300">
                           {grandFormat.description}
                         </p>
 
@@ -522,7 +522,7 @@ export default async function HomePageEditorial() {
               </p>
             </div>
 
-            <h3 className="mt-3 h-[5.2rem] overflow-hidden font-serif text-lg leading-snug line-clamp-3 transition group-hover:text-yellow-500">
+            <h3 className="mt-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
               {article.title}
             </h3>
           </div>
