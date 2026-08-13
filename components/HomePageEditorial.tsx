@@ -319,7 +319,7 @@ export default async function HomePageEditorial() {
 
             {/* BRÈVES + GRAND FORMAT */}
 
-            <div className="grid items-stretch gap-8 md:grid-cols-4">
+            <div className="grid items-stretch gap-8 md:grid-cols-5">
               {/* BRÈVES */}
 
               <section className="flex h-[700px] flex-col overflow-hidden md:col-span-1 md:h-[760px]">
@@ -365,7 +365,7 @@ export default async function HomePageEditorial() {
               {grandFormat && (
                 <Link
                   href={`/article/${grandFormat.slug}`}
-                  className="group block md:col-span-3"
+                  className="group block md:col-span-4"
                 >
                   <article className="flex h-full flex-col overflow-hidden border-l border-gray-800 pl-0 md:pl-7">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
