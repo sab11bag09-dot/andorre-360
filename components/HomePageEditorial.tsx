@@ -380,7 +380,7 @@ export default async function HomePageEditorial() {
                       {/* Chapô : une colonne à gauche */}
 
                       <div className="flex flex-col justify-between md:col-span-1">
-                        <p className="line-clamp-4 h-[7rem] overflow-hidden leading-relaxed text-gray-300">
+                        <p className="leading-relaxed text-gray-300">
                           {grandFormat.description}
                         </p>
 
@@ -414,7 +414,7 @@ export default async function HomePageEditorial() {
               href="/"
               className="group mt-auto block overflow-hidden rounded-xl border border-gray-800 bg-white transition hover:border-yellow-500 md:col-span-4"
             >
-              <div className="relative h-[320px] w-full overflow-hidden bg-white">
+              <div className="relative aspect-[8/5] w-full bg-white">
                 <SafeImage
                   src="/images/andorre-360-promotion.png"
                   alt="Andorra 360 — Le briefing quotidien pour comprendre l’Andorre"
@@ -431,7 +431,7 @@ export default async function HomePageEditorial() {
           <aside className="h-full space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
-            <section className="flex h-[360px] flex-col overflow-hidden border-b border-gray-800 pb-8">
+            <section className="flex min-h-[360px] flex-col border-b border-gray-800 pb-8">
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-500 text-3xl text-yellow-500">
                   ✒
@@ -480,7 +480,7 @@ export default async function HomePageEditorial() {
 
             {/* CARTES ÉDITORIALES */}
 
-<section className="h-[810px] overflow-hidden border-t-2 border-yellow-500 pt-5">
+<section className="min-h-[690px] border-t-2 border-yellow-500 pt-5">
   <div className="mb-4">
   <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
     La rédaction
@@ -533,7 +533,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 h-[390px] overflow-hidden rounded-xl bg-zinc-900 p-6 lg:mt-auto lg:flex lg:flex-col">
+              <section className="mt-12 min-h-[390px] rounded-xl bg-zinc-900 p-6 lg:mt-auto lg:flex lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
