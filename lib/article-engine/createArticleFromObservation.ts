@@ -34,6 +34,11 @@ export interface CreateArticleFromObservationDependencies {
   editorialEventWriter?: EditorialEventWriter;
 }
 
+function isPoliticalPartySource(source: { name: string; url: string }): boolean {
+  const text = `${source.name} ${source.url}`.toLocaleLowerCase("fr");
+  return /(parti|partit|partido|concordia|demòcrata|democrata|socialdemòcrata|socialdemocrata|psd|liberal)/u.test(text);
+}
+
 function isAiMultilingualSource(sourceId: number): boolean {
   const configured = process.env.AI_MULTILINGUAL_SOURCE_IDS
     ?.split(",")
@@ -158,7 +163,9 @@ export async function createArticleFromObservation(
   const editorialDraft = {
     ...draft,
     image,
-    category: draft.category.trim().toUpperCase(),
+    category: isPoliticalPartySource(observation.source)
+      ? "IMMOBILIER"
+      : draft.category.trim().toUpperCase(),
   };
 
   let articleId: number;
