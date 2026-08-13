@@ -13,7 +13,7 @@ const navigationFirstRow = [
 ];
 
 const navigationSecondRow = [
-  { label: "IMMOBILIER", href: "/immobilier" },
+  { label: "ILS EN PARLENT", href: "/immobilier" },
   { label: "INTERNATIONAL", href: "/international" },
   { label: "SPORTS", href: "/sports" },
   { label: "CULTURE", href: "/culture" },
