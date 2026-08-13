@@ -25,6 +25,7 @@ import {
 } from "@/lib/sources/constants";
 import {
   checkSourceAvailability,
+  checkAllSources,
   collectSourceNow,
   toggleSource,
   deleteSource,
@@ -176,9 +177,16 @@ export default async function AdminSourcesPage({
         title="Sources"
         description="Gère les organismes et les flux qui alimenteront la Veille et le Fil Info."
         actions={
-          <Button href="/admin/sources/nouveau">
-            Ajouter une source
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <form action={checkAllSources}>
+              <Button type="submit" variant="secondary">
+                Vérifier toutes les sources
+              </Button>
+            </form>
+            <Button href="/admin/sources/nouveau">
+              Ajouter une source
+            </Button>
+          </div>
         }
       />
 
