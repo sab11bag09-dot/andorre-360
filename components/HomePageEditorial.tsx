@@ -273,7 +273,7 @@ export default async function HomePageEditorial() {
         <div className="grid gap-10 lg:grid-cols-6">
           {/* PARTIE GAUCHE */}
 
-          <div className="flex min-h-full flex-col gap-10 lg:col-span-4">
+          <div className="flex self-start flex-col gap-10 lg:col-span-4">
             {/* GRANDE CARTE */}
 
             {feature && (
@@ -428,7 +428,7 @@ export default async function HomePageEditorial() {
 
           {/* COLONNE ÉDITORIALE DROITE */}
 
-          <aside className="h-full space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
+          <aside className="self-start space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
             <section className="flex min-h-[360px] flex-col border-b border-gray-800 pb-8">
