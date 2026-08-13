@@ -533,7 +533,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 h-[390px] overflow-hidden rounded-xl bg-zinc-900 p-6 lg:mt-auto lg:flex lg:flex-col">
+              <section className="mt-12 min-h-[390px] rounded-xl bg-zinc-900 p-6 lg:mt-auto lg:flex lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
