@@ -354,6 +354,53 @@ export async function checkAllSources(): Promise<void> {
   revalidateSourcePages();
 }
 
+export async function testAllCollections(): Promise<void> {
+  await requireAdmin();
+
+  const sources = await prisma.source.findMany({
+    where: { active: true },
+    select: { id: true, name: true },
+  });
+
+  const results = await Promise.allSettled(
+    sources.map(async (source) => ({
+      source,
+      result: await collectSource(source.id),
+    })),
+  );
+
+  const summary = results.map((result, index) =>
+    result.status === "fulfilled"
+      ? {
+          id: result.value.source.id,
+          name: result.value.source.name,
+          collected: result.value.result.collected,
+          created: result.value.result.created,
+          error: null,
+        }
+      : {
+          id: sources[index].id,
+          name: sources[index].name,
+          collected: 0,
+          created: 0,
+          error: result.reason instanceof Error
+            ? result.reason.message
+            : "Erreur inconnue",
+        },
+  );
+
+  console.info("[Sources] Test global des collectes terminé", {
+    total: summary.length,
+    successful: summary.filter((item) => !item.error).length,
+    failed: summary.filter((item) => item.error).length,
+    observations: summary.reduce((total, item) => total + item.collected, 0),
+    newObservations: summary.reduce((total, item) => total + item.created, 0),
+    details: summary,
+  });
+
+  revalidateSourcePages();
+}
+
 export async function checkSourceAvailability(
   sourceId: number,
 ): Promise<void> {
