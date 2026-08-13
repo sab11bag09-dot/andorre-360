@@ -167,7 +167,7 @@ export default async function LifestylePageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl">
                           {secondBottomCard.title}
                         </h2>
 
@@ -254,7 +254,7 @@ export default async function LifestylePageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
