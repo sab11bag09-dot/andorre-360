@@ -5,7 +5,7 @@ import { getArticlesByCategory } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
-export default async function LifestylePageV2() {
+export default async function LoisirsPageV2() {
   const items = await getArticlesByCategory("LIFESTYLE");
 
   const featured = items[0];
@@ -37,7 +37,7 @@ export default async function LifestylePageV2() {
 
             <div className="absolute bottom-10 left-8 max-w-3xl">
               <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category}
+                LOISIRS
               </p>
 
               <h1 className="mt-4 line-clamp-2 font-serif text-4xl md:text-5xl">
