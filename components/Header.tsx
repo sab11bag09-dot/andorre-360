@@ -18,7 +18,7 @@ const navigationSecondRow = [
   { label: "SPORTS", href: "/sports" },
   { label: "CULTURE", href: "/culture" },
   { label: "MONTAGNE", href: "/montagne" },
-  { label: "LIFESTYLE", href: "/lifestyle" },
+  { label: "LOISIRS", href: "/loisirs" },
 ];
 
 type NavigationItem = {
