@@ -378,7 +378,7 @@ export default async function HomePageEditorial() {
                       {grandFormat.title}
                     </h2>
 
-                    <div className="mt-6 flex flex-1 items-stretch gap-6 md:grid md:grid-cols-4">
+                    <div className="mt-6 flex flex-1 items-stretch gap-6 md:grid md:grid-cols-[1fr_3fr]">
                       {/* Chapô : une colonne à gauche */}
 
                       <div className="flex flex-col justify-between md:col-span-1">
@@ -394,7 +394,7 @@ export default async function HomePageEditorial() {
                       {/* Photo : deux colonnes à droite */}
 
                      {grandFormat.image ? (
-  <div className="relative h-[320px] overflow-hidden md:col-span-3 md:h-[440px]">
+  <div className="relative h-[320px] overflow-hidden md:col-span-1 md:h-[440px]">
     <SafeImage
       src={grandFormat.image}
       alt={grandFormat.title}
