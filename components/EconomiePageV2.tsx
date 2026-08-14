@@ -239,7 +239,7 @@ export default async function EconomiePageV2() {
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
-                className="mt-20 block"
+                className="block"
               >
                 <article className="flex h-[400px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[226px] shrink-0">
@@ -272,7 +272,7 @@ export default async function EconomiePageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <div className="mt-auto">
+              <div className="mt-0">
                 <article className="flex h-[480px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
                   <Link
                     href={`/article/${bonASavoir.slug}`}
