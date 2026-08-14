@@ -224,9 +224,13 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="line-clamp-3 font-serif text-lg leading-snug">
+                    <h3 className="h-[3.5rem] overflow-hidden font-serif text-xl leading-tight line-clamp-2">
                       {article.title}
                     </h3>
+
+                    <p className="mt-2 h-[3.5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-2">
+                      {article.description}
+                    </p>
 
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
