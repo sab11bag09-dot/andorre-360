@@ -2,11 +2,11 @@ import { normalizeFilInfoFormat } from "./fil-info-format";
 import { getPublicArticleDate } from "./public-article";
 
 export const FIL_INFO_NEWS_FEED_SIZE = 6;
-export const FIL_INFO_BRIEFS_SIZE = 6;
+export const FIL_INFO_BRIEFS_SIZE = 9;
 export const FIL_INFO_CARDS_SIZE = 4;
 export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 6;
 export const FIL_INFO_SELECTION_SIZE = 2;
-export const FIL_INFO_PAGE_SIZE = 24;
+export const FIL_INFO_PAGE_SIZE = 30;
 export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000;
 
 export const FIL_INFO_QUERY_LIMIT =
