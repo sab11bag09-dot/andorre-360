@@ -57,7 +57,7 @@ export default async function ActualitePage() {
                 {featured.title}
               </h1>
 
-              <p className="mt-4 h-[3.5rem] overflow-hidden text-gray-300 line-clamp-2">
+              <p className="mt-4 h-14 overflow-hidden text-gray-300 leading-7 line-clamp-2">
                 {featured.description}
               </p>
 
@@ -228,7 +228,7 @@ export default async function ActualitePage() {
                       {article.title}
                     </h3>
 
-                    <p className="mt-2 h-[3.5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-2">
+                    <p className="mt-2 h-14 overflow-hidden leading-7 text-gray-400 line-clamp-2">
                       {article.description}
                     </p>
 
