@@ -125,11 +125,11 @@ export default async function LifestylePageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2">
+              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block"
+                    className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
@@ -162,7 +162,7 @@ export default async function LifestylePageV2() {
                 {secondBottomCard && (
                   <Link
                     href={`/article/${secondBottomCard.slug}`}
-                    className="block"
+                    className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
@@ -193,7 +193,7 @@ export default async function LifestylePageV2() {
                 )}
 
                 {thirdBottomCard && (
-                  <Link href={`/article/${thirdBottomCard.slug}`} className="block">
+                  <Link href={`/article/${thirdBottomCard.slug}`} className="block lg:h-full">
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
                         <SafeImage
@@ -220,7 +220,7 @@ export default async function LifestylePageV2() {
                 )}
 
                 {fourthBottomCard && (
-                  <Link href={`/article/${fourthBottomCard.slug}`} className="block">
+                  <Link href={`/article/${fourthBottomCard.slug}`} className="block lg:h-full">
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
                         <SafeImage
