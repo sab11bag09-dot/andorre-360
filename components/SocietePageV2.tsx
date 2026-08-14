@@ -40,7 +40,7 @@ export default async function SociétéPageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-5xl md:text-7xl">
+              <h1 className="mt-4 h-[10rem] overflow-hidden font-serif text-5xl md:text-7xl line-clamp-2">
                 {featured.title}
               </h1>
 
