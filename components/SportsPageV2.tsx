@@ -261,6 +261,10 @@ export default async function SportsPageV2() {
                       {article.title}
                     </h3>
 
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                      {article.description}
+                    </p>
+
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
