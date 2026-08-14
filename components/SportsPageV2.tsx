@@ -201,9 +201,9 @@ export default async function SportsPageV2() {
                 href={`/article/${questionArticle.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[360px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionArticle.image ? (
-                    <div className="relative h-40">
+                    <div className="relative h-40 flex-none">
                       <SafeImage
                         src={questionArticle.image}
                         alt={questionArticle.title}
@@ -214,7 +214,7 @@ export default async function SportsPageV2() {
                     </div>
                   ) : null}
 
-                  <div className="p-4">
+                  <div className="flex min-h-0 flex-1 flex-col justify-between p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Question à…
                     </p>
@@ -243,9 +243,9 @@ export default async function SportsPageV2() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[260px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {article.image ? (
-                    <div className="relative h-40">
+                    <div className="relative h-40 flex-none">
                       <SafeImage
                         src={article.image}
                         alt={article.title}
@@ -256,8 +256,8 @@ export default async function SportsPageV2() {
                     </div>
                   ) : null}
 
-                  <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                  <div className="flex min-h-0 flex-1 flex-col justify-between p-4">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
@@ -276,12 +276,12 @@ export default async function SportsPageV2() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="flex h-[300px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
