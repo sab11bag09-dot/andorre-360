@@ -6,7 +6,7 @@ import { getArticlesByCategory } from "@/lib/articles";
 export const dynamic = "force-dynamic";
 
 export default async function ImmobilierPageV2() {
-  const items = await getArticlesByCategory("IMMOBILIER");
+  const items = await getArticlesByCategory("ILS_EN_PARLENT");
 
   const featured = items[0];
   const mainArticle = items[1];
