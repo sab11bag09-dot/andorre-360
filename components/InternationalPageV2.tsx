@@ -79,11 +79,11 @@ export default async function InternationalPageV2() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="h-[6rem] overflow-hidden font-serif text-4xl leading-tight line-clamp-2">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 h-14 overflow-hidden text-gray-400 leading-7 line-clamp-2">
                       {mainArticle.description}
                     </p>
 
