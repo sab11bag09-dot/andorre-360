@@ -237,7 +237,7 @@ export default async function SociétéPageV2() {
                     />
                   </div>
 
-                  <div className="mt-auto p-4">
+                  <div className="flex flex-1 flex-col overflow-hidden p-4">
                     <h3 className="h-14 overflow-hidden font-serif text-2xl leading-7 line-clamp-2">
                       {article.title}
                     </h3>
