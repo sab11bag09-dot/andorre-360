@@ -121,7 +121,7 @@ export default async function EconomiePageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid h-[540px] gap-8 overflow-hidden md:grid-cols-2">
+              <div className="mt-10 grid h-[480px] gap-8 overflow-hidden md:grid-cols-2">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
