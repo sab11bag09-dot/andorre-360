@@ -216,7 +216,7 @@ export default async function FilInfoPage() {
                       : ""
                   } ${index % 3 !== 2 ? "md:pr-7" : ""}`}
                 >
-                  <article className="flex h-full min-h-48 flex-col justify-between py-8">
+                  <article className="flex h-[220px] flex-col justify-between overflow-hidden py-8">
                     <div>
                       <div className="flex items-center gap-3">
                         <span className="font-serif text-2xl text-yellow-500">
@@ -226,12 +226,16 @@ export default async function FilInfoPage() {
                         <span aria-hidden="true" className="h-px flex-1 bg-gray-800" />
                       </div>
 
-                      <h3 className="mt-5 font-serif text-xl leading-[1.22] transition-colors duration-300 group-hover:text-yellow-500">
+                      <h3 className="mt-5 h-14 overflow-hidden font-serif text-xl leading-7 line-clamp-2 transition-colors duration-300 group-hover:text-yellow-500">
                         {article.title}
                       </h3>
+
+                      <p className="mt-2 h-10 overflow-hidden text-sm leading-5 text-gray-400 line-clamp-2">
+                        {article.description}
+                      </p>
                     </div>
 
-                    <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
                       {getFilInfoFormatLabel(article.filInfoFormat)} →
                     </p>
                   </article>
