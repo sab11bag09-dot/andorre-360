@@ -189,7 +189,7 @@ export default async function PolitiquePageV2() {
                           {article.title}
                         </h3>
 
-                        <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                        <p className="mt-3 h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400 line-clamp-3">
                           {article.description}
                         </p>
 
@@ -230,7 +230,7 @@ export default async function PolitiquePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 h-[7.5rem] overflow-hidden font-serif text-3xl leading-10 line-clamp-3">
                       {questionArticle.title}
                     </h2>
 
