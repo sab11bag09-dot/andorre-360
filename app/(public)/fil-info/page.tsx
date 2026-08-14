@@ -236,7 +236,7 @@ export default async function FilInfoPage() {
                     </div>
 
                     <p className="text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
-                      {getFilInfoFormatLabel(article.filInfoFormat)} →
+                      Lire →
                     </p>
                   </article>
                 </Link>
