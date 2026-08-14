@@ -239,7 +239,7 @@ export default async function EconomiePageV2() {
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
-                className="block"
+                className="mt-8 block"
               >
                 <article className="flex h-[400px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[226px] shrink-0">
