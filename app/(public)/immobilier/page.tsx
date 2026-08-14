@@ -1,7 +1,7 @@
-import ImmobilierPageV2 from "@/components/ImmobilierPageV2";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function ImmobilierPage() {
-  return <ImmobilierPageV2 />;
+  redirect("/ils-en-parlent");
 }
