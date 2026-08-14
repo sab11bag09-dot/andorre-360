@@ -138,11 +138,15 @@ export default async function ImmobilierPageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl">
+                        <h2 className="h-[4rem] overflow-hidden font-serif text-2xl leading-snug line-clamp-2">
                           {bottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-3 h-[6rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-4">
+                          {bottomCard.description}
+                        </p>
+
+                        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
@@ -167,11 +171,15 @@ export default async function ImmobilierPageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-[4rem] overflow-hidden font-serif text-2xl leading-snug line-clamp-2">
                           {secondBottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-3 h-[6rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-4">
+                          {secondBottomCard.description}
+                        </p>
+
+                        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
