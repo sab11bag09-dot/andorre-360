@@ -265,7 +265,7 @@ export default async function ActualitePage() {
                   </Link>
 
                   <div className="mt-4 divide-y divide-gray-700 overflow-hidden">
-                    {briefs.slice(0, 3).map((brief) => (
+                    {briefs.slice(0, 5).map((brief) => (
                       <Link
                         key={brief.id}
                         href={`/article/${brief.slug}`}
