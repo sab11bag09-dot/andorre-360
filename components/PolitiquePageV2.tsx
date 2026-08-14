@@ -41,7 +41,7 @@ export default async function PolitiquePageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 h-[8rem] overflow-hidden font-serif text-5xl leading-tight line-clamp-2 md:text-7xl">
                 {featured.title}
               </h1>
 
