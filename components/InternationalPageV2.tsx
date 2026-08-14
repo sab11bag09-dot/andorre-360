@@ -68,7 +68,7 @@ export default async function InternationalPageV2() {
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="h-[620px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
+                  <div className="relative h-[360px]">
                     <SafeImage
                       src={mainArticle.image}
                       alt={mainArticle.title}
