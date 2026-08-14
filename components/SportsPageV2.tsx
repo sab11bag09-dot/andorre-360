@@ -81,11 +81,11 @@ export default async function SportsPageV2() {
                   ) : null}
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-2 text-gray-400">
                       {mainArticle.description}
                     </p>
 
