@@ -257,7 +257,7 @@ export default async function SociétéPageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <div className="mt-0">
+              <div className="-mt-20">
                 <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
                   <Link
                     href={`/article/${bonASavoir.slug}`}
