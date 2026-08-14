@@ -16,8 +16,8 @@ export default async function LifestylePageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
-  const thirdBottomCard = items[15];
-  const fourthBottomCard = items[16];
+  const thirdBottomCard = items[15] ?? items[0];
+  const fourthBottomCard = items[16] ?? items[1];
   const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
