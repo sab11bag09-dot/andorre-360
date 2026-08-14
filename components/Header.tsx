@@ -13,12 +13,12 @@ const navigationFirstRow = [
 ];
 
 const navigationSecondRow = [
-  { label: "IMMOBILIER", href: "/immobilier" },
+  { label: "ILS EN PARLENT", href: "/ils-en-parlent" },
   { label: "INTERNATIONAL", href: "/international" },
   { label: "SPORTS", href: "/sports" },
   { label: "CULTURE", href: "/culture" },
   { label: "MONTAGNE", href: "/montagne" },
-  { label: "LIFESTYLE", href: "/lifestyle" },
+  { label: "LOISIRS", href: "/loisirs" },
 ];
 
 type NavigationItem = {
