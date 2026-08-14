@@ -116,9 +116,16 @@ export async function createArticleFromObservation(
     };
   }
 
+  const sourceEditorialCategory = observation.source.category
+    ?.trim()
+    .toUpperCase();
+
   const editorialDraft = {
     ...draft,
-    category: draft.category.trim().toUpperCase(),
+    category:
+      sourceEditorialCategory === "ILS_EN_PARLENT"
+        ? "ILS_EN_PARLENT"
+        : draft.category.trim().toUpperCase(),
   };
 
   let articleId: number;
