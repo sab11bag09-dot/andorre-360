@@ -49,8 +49,7 @@ function isAiMultilingualSource(
     .replace(/\s+/g, "_");
 
   return (
-    configured?.includes(sourceId) ??
-    sourceId === 54 ||
+    (configured?.includes(sourceId) ?? sourceId === 54) ||
     normalizedCategory === "ILS_EN_PARLENT"
   );
 }
@@ -229,5 +228,3 @@ export async function createArticleFromObservation(
     articleId,
   );
 
-  return { articleId };
-}
