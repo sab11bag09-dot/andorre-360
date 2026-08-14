@@ -245,10 +245,6 @@ export default async function InternationalPageV2() {
                   </div>
 
                   <div className="p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                      Question à…
-                    </p>
-
                     <h2 className="mt-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
