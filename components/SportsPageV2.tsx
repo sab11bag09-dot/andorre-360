@@ -42,11 +42,11 @@ export default async function SportsPageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 line-clamp-2 font-serif text-5xl leading-[1.05] md:text-6xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 line-clamp-2 text-gray-300">
                 {featured.description}
               </p>
 
