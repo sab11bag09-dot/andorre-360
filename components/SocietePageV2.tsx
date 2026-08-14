@@ -258,7 +258,7 @@ export default async function SociétéPageV2() {
 
             {bonASavoir && (
               <div className="mt-0">
-                <article className="flex h-[588px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
+                <article className="flex h-[500px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6">
                   <Link
                     href={`/article/${bonASavoir.slug}`}
                     className="block transition hover:text-yellow-500"
