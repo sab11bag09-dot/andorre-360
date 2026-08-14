@@ -6,7 +6,16 @@ import { getArticlesByCategory } from "@/lib/articles";
 export const dynamic = "force-dynamic";
 
 export default async function LifestylePageV2() {
-  const items = await getArticlesByCategory("LIFESTYLE");
+  const [currentItems, legacyItems] = await Promise.all([
+    getArticlesByCategory("LOISIRS"),
+    getArticlesByCategory("LIFESTYLE"),
+  ]);
+
+  const items = [...currentItems, ...legacyItems].sort((a, b) => {
+    const aDate = a.publishedAt?.getTime() ?? a.createdAt.getTime();
+    const bDate = b.publishedAt?.getTime() ?? b.createdAt.getTime();
+    return bDate - aDate;
+  });
 
   const featured = items[0];
   const mainArticle = items[1];
@@ -39,7 +48,7 @@ export default async function LifestylePageV2() {
 
             <div className="absolute bottom-10 left-8 max-w-3xl">
               <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category === "LIFESTYLE"
+                {featured.category === "LIFESTYLE" || featured.category === "LOISIRS"
                   ? "LOISIRS"
                   : featured.category}
               </p>
