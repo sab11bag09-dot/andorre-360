@@ -67,9 +67,9 @@ export default async function SportsPageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {mainArticle.image ? (
-                    <div className="relative h-[420px]">
+                    <div className="relative h-[420px] flex-none">
                       <SafeImage
                         src={mainArticle.image}
                         alt={mainArticle.title}
@@ -80,7 +80,7 @@ export default async function SportsPageV2() {
                     </div>
                   ) : null}
 
-                  <div className="p-6">
+                  <div className="flex min-h-0 flex-1 flex-col justify-between p-6">
                     <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
                       {mainArticle.title}
                     </h2>
@@ -100,15 +100,15 @@ export default async function SportsPageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="mt-8 grid gap-4 md:auto-rows-[150px] md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                    <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -130,7 +130,7 @@ export default async function SportsPageV2() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {bottomCard.image ? (
                         <div className="relative h-64">
                           <SafeImage
@@ -161,7 +161,7 @@ export default async function SportsPageV2() {
                     href={`/article/${secondBottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {secondBottomCard.image ? (
                         <div className="relative h-64">
                           <SafeImage
