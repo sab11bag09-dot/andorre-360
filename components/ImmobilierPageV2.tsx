@@ -25,6 +25,7 @@ export default async function ImmobilierPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -51,11 +52,11 @@ export default async function ImmobilierPageV2() {
                   : featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 line-clamp-2 font-serif text-5xl leading-[1.05] md:text-6xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 line-clamp-2 text-gray-300">
                 {featured.description}
               </p>
 
@@ -71,7 +72,7 @@ export default async function ImmobilierPageV2() {
         <div className="grid gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 lg:flex lg:flex-col">
             {/* ARTICLE PRINCIPAL */}
 
             {mainArticle && (
@@ -88,11 +89,11 @@ export default async function ImmobilierPageV2() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-2 text-gray-400">
                       {mainArticle.description}
                     </p>
 
@@ -112,10 +113,10 @@ export default async function ImmobilierPageV2() {
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
-                    className="block"
+                    className="block lg:h-full"
                   >
                     <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -131,7 +132,7 @@ export default async function ImmobilierPageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2">
+              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
@@ -149,9 +150,13 @@ export default async function ImmobilierPageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
                           {bottomCard.title}
                         </h2>
+
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                          {bottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -164,7 +169,7 @@ export default async function ImmobilierPageV2() {
                 {secondBottomCard && (
                   <Link
                     href={`/article/${secondBottomCard.slug}`}
-                    className="block"
+                    className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
@@ -178,9 +183,13 @@ export default async function ImmobilierPageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
                           {secondBottomCard.title}
                         </h2>
+
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                          {secondBottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -204,22 +213,24 @@ export default async function ImmobilierPageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                  {questionImage ? (
+                  <div className="relative h-72">
                     <SafeImage
-                      src={questionArticle.image}
+                      src={questionImage}
                       alt={questionArticle.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
                       className="object-cover"
                     />
                   </div>
+                  ) : null}
 
                   <div className="p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
@@ -265,9 +276,13 @@ export default async function ImmobilierPageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
+
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                      {article.description}
+                    </p>
 
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
@@ -289,7 +304,7 @@ export default async function ImmobilierPageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
