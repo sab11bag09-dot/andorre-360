@@ -1,6 +1,5 @@
 import OpenAI from "openai";
 
-import { DeterministicEditorialGenerator } from "./DeterministicEditorialGenerator";
 import type {
   EditorialGenerator,
   PrepareArticleInput,
@@ -103,8 +102,6 @@ function parseTranslationResponse(output: string): TranslationResponse {
 export class OpenAiEditorialGenerator implements EditorialGenerator {
   private readonly model: string;
   private readonly client: StructuredResponseClient;
-  private readonly deterministicGenerator = new DeterministicEditorialGenerator();
-
   constructor(options: OpenAiEditorialGeneratorOptions) {
     if (!options.apiKey.trim()) {
       throw new Error("La variable OPENAI_API_KEY est absente.");
@@ -120,7 +117,38 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
   }
 
   async prepareArticle(input: PrepareArticleInput): Promise<PreparedArticle> {
-    return this.deterministicGenerator.prepareArticle(input);
+    let output: string;
+
+    try {
+      output = await this.client.create({
+        model: this.model,
+        instructions: [
+          "Réécris cet article en français dans un style journalistique clair et factuel adapté à Andorre.",
+          "Crée un titre informatif et original, un chapô synthétique et un article réécrit.",
+          "Conserve strictement les faits, noms propres, chiffres, dates, citations et liens présents dans la source.",
+          "N’invente aucune information et ne mentionne pas le processus de réécriture.",
+          "Retourne uniquement les trois champs demandés.",
+        ].join(" "),
+        input: JSON.stringify({
+          title: input.originalTitle,
+          content: input.originalContent,
+        }),
+        schema: translationSchema,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "erreur inconnue";
+      throw new Error(`La réécriture OpenAI a échoué : ${message}`);
+    }
+
+    const rewritten = parseTranslationResponse(output);
+
+    return {
+      title: rewritten.title,
+      description: rewritten.description,
+      content: rewritten.content,
+      category: input.sourceCategory?.trim() || "Général",
+      author: input.sourceName,
+    };
   }
 
   async translateArticle(
