@@ -256,13 +256,27 @@ export default async function ActualitePage() {
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 line-clamp-4 flex-1 leading-relaxed text-gray-400">
+                  <p className="mt-4 h-[5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-3">
                     {bonASavoir.description}
                   </p>
 
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                     Lire l’article →
                   </p>
+
+                  <div className="mt-4 divide-y divide-gray-700 overflow-hidden">
+                    {briefs.slice(0, 3).map((brief) => (
+                      <Link
+                        key={brief.id}
+                        href={`/article/${brief.slug}`}
+                        className="block py-2 first:pt-0 last:pb-0"
+                      >
+                        <h3 className="line-clamp-1 font-serif text-sm leading-snug">
+                          {brief.title}
+                        </h3>
+                      </Link>
+                    ))}
+                  </div>
                 </article>
               </Link>
             )}
