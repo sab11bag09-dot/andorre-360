@@ -120,7 +120,7 @@ export default async function SociétéPageV2() {
             {/* QUATRE CARTES DE PIED */}
 
             {footerCards.length > 0 && (
-              <div className="mt-10 grid h-[620px] gap-5 overflow-hidden md:grid-cols-4">
+              <div className="mt-16 grid h-[620px] gap-5 overflow-hidden md:grid-cols-4">
                 {footerCards.map((article) => (
                   <Link
                     key={article.id}
