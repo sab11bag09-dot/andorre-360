@@ -41,7 +41,7 @@ export const CATEGORIES = [
   { value: "SPORTS", label: "Sports" },
   { value: "MONTAGNE", label: "Montagne" },
   { value: "POLITIQUE", label: "Politique" },
-  { value: "IMMOBILIER", label: "Immobilier" },
+  { value: "ILS_EN_PARLENT", label: "Ils en parlent" },
   { value: "LIFESTYLE", label: "Lifestyle" },
   { value: "INTERNATIONAL", label: "International" },
   { value: "ÉDITORIAL", label: "Éditorial" },
