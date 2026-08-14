@@ -16,6 +16,7 @@ export default async function SportsPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const rightBottomCard = items[15];
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -291,6 +292,37 @@ export default async function SportsPageV2() {
                   <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                     Lire l’article →
                   </p>
+                </article>
+              </Link>
+            )}
+
+            {rightBottomCard && (
+              <Link
+                href={`/article/${rightBottomCard.slug}`}
+                className="block"
+              >
+                <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                  {rightBottomCard.image ? (
+                    <div className="relative h-64">
+                      <SafeImage
+                        src={rightBottomCard.image}
+                        alt={rightBottomCard.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : null}
+
+                  <div className="p-5">
+                    <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                      {rightBottomCard.title}
+                    </h2>
+
+                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      Lire l’article →
+                    </p>
+                  </div>
                 </article>
               </Link>
             )}
