@@ -57,7 +57,7 @@ export default async function ActualitePage() {
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 h-[3.5rem] overflow-hidden text-gray-300 line-clamp-2">
                 {featured.description}
               </p>
 
@@ -94,7 +94,7 @@ export default async function ActualitePage() {
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 h-[4.5rem] overflow-hidden text-gray-400 line-clamp-3">
                       {mainArticle.description}
                     </p>
 
@@ -150,7 +150,7 @@ export default async function ActualitePage() {
                         />
                       </div>
 
-                      <div className="p-5">
+                      <div className="flex flex-1 flex-col overflow-hidden p-5">
                         <h2 className="h-[4rem] overflow-hidden font-serif text-2xl leading-tight line-clamp-2">
                           {bottomCard.title}
                         </h2>
