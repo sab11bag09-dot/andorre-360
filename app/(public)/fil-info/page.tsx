@@ -332,7 +332,7 @@ export default async function FilInfoPage() {
                               {article.category}
                             </p>
 
-                            <h3 className="h-[3.25rem] overflow-hidden font-serif text-[1.05rem] leading-[1.25] line-clamp-2 transition group-hover:text-yellow-500">
+                            <h3 className="h-10 overflow-hidden font-serif text-[1.05rem] leading-5 line-clamp-2 transition group-hover:text-yellow-500">
                               {article.title}
                             </h3>
                           </div>
