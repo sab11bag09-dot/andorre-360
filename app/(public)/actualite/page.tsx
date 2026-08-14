@@ -46,7 +46,7 @@ export default async function ActualitePage() {
               </p>
 
               <h1
-                className="mt-4 h-[10rem] max-w-5xl overflow-hidden font-serif text-5xl leading-[1.05] md:h-[11rem] md:text-7xl"
+                className="mt-4 h-[9.5rem] max-w-5xl overflow-hidden font-serif text-5xl leading-[1.05] md:h-[9.5rem] md:text-7xl"
                 style={{
                   display: "-webkit-box",
                   WebkitBoxOrient: "vertical",
