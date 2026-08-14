@@ -34,13 +34,25 @@ export interface CreateArticleFromObservationDependencies {
   editorialEventWriter?: EditorialEventWriter;
 }
 
-function isAiMultilingualSource(sourceId: number): boolean {
+function isAiMultilingualSource(
+  sourceId: number,
+  sourceCategory?: string | null,
+): boolean {
   const configured = process.env.AI_MULTILINGUAL_SOURCE_IDS
     ?.split(",")
     .map((value) => Number.parseInt(value.trim(), 10))
     .filter(Number.isInteger);
 
-  return configured?.includes(sourceId) ?? sourceId === 54;
+  const normalizedCategory = sourceCategory
+    ?.trim()
+    .toUpperCase()
+    .replace(/\s+/g, "_");
+
+  return (
+    configured?.includes(sourceId) ??
+    sourceId === 54 ||
+    normalizedCategory === "ILS_EN_PARLENT"
+  );
 }
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
@@ -85,7 +97,10 @@ export async function createArticleFromObservation(
   }
 
   const aiGenerator =
-    isAiMultilingualSource(observation.source.id) && process.env.OPENAI_API_KEY?.trim()
+    isAiMultilingualSource(
+      observation.source.id,
+      observation.source.category,
+    ) && process.env.OPENAI_API_KEY?.trim()
       ? new OpenAiEditorialGenerator({
           apiKey: process.env.OPENAI_API_KEY,
           model: process.env.OPENAI_TRANSLATION_MODEL,
