@@ -13,7 +13,6 @@ export default async function MontagnePageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
-  const bonASavoir = items[14];
   const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
@@ -104,7 +103,7 @@ export default async function MontagnePageV2() {
                   >
                     <article className="flex h-full min-h-[240px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       {index >= 2 && article.image ? (
-                        <div className="relative h-40 flex-none">
+                        <div className="relative h-64 flex-none">
                           <SafeImage
                             src={article.image}
                             alt={article.title}
@@ -225,32 +224,6 @@ export default async function MontagnePageV2() {
               </Link>
             ))}
 
-            {/* BON À SAVOIR */}
-
-            {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                    Bon à savoir
-                  </p>
-
-                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
-                    {bonASavoir.title}
-                  </h2>
-
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
-                    {bonASavoir.description}
-                  </p>
-
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    Lire l’article →
-                  </p>
-                </article>
-              </Link>
-            )}
           </aside>
         </div>
       </section>
