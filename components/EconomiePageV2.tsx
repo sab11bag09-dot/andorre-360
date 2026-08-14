@@ -12,7 +12,7 @@ export default async function EconomiePageV2() {
   const mainArticle = items[1];
   const questionArticle = items[2];
   const rightCards = items.slice(3, 4);
-  const briefs = items.slice(6, 12);
+  const briefs = items.slice(6, 15);
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
@@ -97,7 +97,7 @@ export default async function EconomiePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid h-[270px] gap-4 overflow-hidden md:grid-cols-3">
+              <div className="mt-8 grid h-[400px] gap-4 overflow-hidden md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
