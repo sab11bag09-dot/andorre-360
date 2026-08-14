@@ -182,6 +182,10 @@ export default async function FilInfoPage() {
                       <p className="mt-3 h-12 overflow-hidden text-sm leading-6 text-gray-400 line-clamp-2">
                         {article.description}
                       </p>
+
+                      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire →
+                      </p>
                     </article>
                   </Link>
                 ))}
