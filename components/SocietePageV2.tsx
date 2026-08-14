@@ -238,11 +238,15 @@ export default async function SociétéPageV2() {
                   </div>
 
                   <div className="mt-auto p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="h-14 overflow-hidden font-serif text-2xl leading-7 line-clamp-2">
                       {article.title}
                     </h3>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-3 h-10 overflow-hidden text-sm leading-5 text-gray-400 line-clamp-2">
+                      {article.description}
+                    </p>
+
+                    <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
