@@ -9,9 +9,10 @@ import {
 export default async function ObservationsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ source?: string }>;
+  searchParams?: Promise<{ source?: string; view?: string }>;
 }) {
   const params = (await searchParams) ?? {};
+  const showAll = params.view === "all";
   const parsedSourceId = Number(params.source);
   const sourceId = Number.isInteger(parsedSourceId) && parsedSourceId > 0
     ? parsedSourceId
@@ -25,11 +26,15 @@ export default async function ObservationsPage({
   const observations = await prisma.observation.findMany({
     where: {
       ...(sourceId ? { sourceId } : {}),
-      OR: [
-        { processed: false },
-        { id: 1105, processed: true, articleId: 263 },
-        { article: { editorialStatus: "AI_DRAFT" } },
-      ],
+      ...(showAll
+        ? {}
+        : {
+            OR: [
+              { processed: false },
+              { id: 1105, processed: true, articleId: 263 },
+              { article: { editorialStatus: "AI_DRAFT" } },
+            ],
+          }),
     },
     include: {
       source: true,
@@ -71,6 +76,17 @@ export default async function ObservationsPage({
                 {source.name}
               </option>
             ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-sm font-medium">
+          Affichage
+          <select
+            name="view"
+            defaultValue={showAll ? "all" : "pending"}
+            className="rounded border px-3 py-2"
+          >
+            <option value="pending">À traiter</option>
+            <option value="all">Toutes les observations</option>
           </select>
         </label>
         <button className="rounded bg-blue-600 px-3 py-2 text-white">
