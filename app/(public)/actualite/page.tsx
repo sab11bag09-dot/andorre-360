@@ -139,8 +139,8 @@ export default async function ActualitePage() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                    <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-[300px] shrink-0">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -151,9 +151,13 @@ export default async function ActualitePage() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-[4rem] overflow-hidden font-serif text-2xl leading-tight line-clamp-2">
                           {bottomCard.title}
                         </h2>
+
+                        <p className="mt-3 h-[3.5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-2">
+                          {bottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -168,8 +172,8 @@ export default async function ActualitePage() {
                     href={`/article/${secondBottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                    <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-[300px] shrink-0">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
@@ -180,9 +184,13 @@ export default async function ActualitePage() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-[4rem] overflow-hidden font-serif text-2xl leading-tight line-clamp-2">
                           {secondBottomCard.title}
                         </h2>
+
+                        <p className="mt-3 h-[3.5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-2">
+                          {secondBottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
