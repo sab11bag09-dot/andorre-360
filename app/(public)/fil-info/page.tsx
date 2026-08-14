@@ -193,7 +193,7 @@ export default async function FilInfoPage() {
         {briefs.length > 0 && (
           <section
             aria-labelledby="fil-info-briefs-title"
-            className="mt-16 h-[560px] overflow-hidden md:mt-20"
+            className="mt-16 h-[620px] overflow-hidden md:mt-20"
           >
             <div className="mb-7 flex items-end justify-between gap-6 border-t border-gray-800 pt-5">
               <h2 id="fil-info-briefs-title" className="font-serif text-3xl">
@@ -205,7 +205,7 @@ export default async function FilInfoPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3">
+            <div className="grid auto-rows-[220px] md:grid-cols-3">
               {briefs.map((article, index) => (
                 <Link
                   key={article.id}
@@ -216,7 +216,7 @@ export default async function FilInfoPage() {
                       : ""
                   } ${index % 3 !== 2 ? "md:pr-7" : ""}`}
                 >
-                  <article className="flex h-[190px] flex-col justify-between overflow-hidden py-6">
+                  <article className="flex h-[220px] flex-col justify-between overflow-hidden py-6">
                     <div>
                       <div className="flex items-center gap-3">
                         <span className="font-serif text-2xl text-yellow-500">
