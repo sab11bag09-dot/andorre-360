@@ -6,9 +6,25 @@ import {
   regenerateArticleFromObservationAction,
 } from "./actions";
 
-export default async function ObservationsPage() {
+export default async function ObservationsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ source?: string }>;
+}) {
+  const params = (await searchParams) ?? {};
+  const parsedSourceId = Number(params.source);
+  const sourceId = Number.isInteger(parsedSourceId) && parsedSourceId > 0
+    ? parsedSourceId
+    : undefined;
+
+  const sources = await prisma.source.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
   const observations = await prisma.observation.findMany({
     where: {
+      ...(sourceId ? { sourceId } : {}),
       OR: [
         { processed: false },
         { id: 1105, processed: true, articleId: 263 },
@@ -40,6 +56,27 @@ export default async function ObservationsPage() {
       <h1 className="text-2xl font-bold">
         Observations à traiter
       </h1>
+
+      <form method="get" className="flex flex-wrap items-end gap-3">
+        <label className="flex flex-col gap-1 text-sm font-medium">
+          Source
+          <select
+            name="source"
+            defaultValue={sourceId?.toString() ?? ""}
+            className="rounded border px-3 py-2"
+          >
+            <option value="">Toutes les sources</option>
+            {sources.map((source) => (
+              <option key={source.id} value={source.id}>
+                {source.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button className="rounded bg-blue-600 px-3 py-2 text-white">
+          Filtrer
+        </button>
+      </form>
 
       <table className="w-full border-collapse border">
         <thead>
