@@ -37,7 +37,9 @@ export default async function ImmobilierPageV2() {
 
             <div className="absolute bottom-10 left-8 max-w-3xl">
               <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category}
+                {featured.category === "IMMOBILIER"
+                  ? "ILS EN PARLENT"
+                  : featured.category}
               </p>
 
               <h1 className="mt-4 font-serif text-4xl md:text-5xl">
