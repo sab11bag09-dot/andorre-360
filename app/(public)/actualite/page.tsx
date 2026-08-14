@@ -247,7 +247,7 @@ export default async function ActualitePage() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="flex h-[320px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="flex h-[470px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
