@@ -82,7 +82,7 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="flex flex-1 flex-col p-6">
-                    <h2 className="line-clamp-2 font-serif text-3xl">
+                    <h2 className="h-[7.5rem] overflow-hidden font-serif text-5xl leading-tight line-clamp-2">
                       {mainArticle.title}
                     </h2>
 
