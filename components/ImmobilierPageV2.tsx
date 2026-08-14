@@ -6,7 +6,16 @@ import { getArticlesByCategory } from "@/lib/articles";
 export const dynamic = "force-dynamic";
 
 export default async function ImmobilierPageV2() {
-  const items = await getArticlesByCategory("ILS_EN_PARLENT");
+  const [currentItems, legacyItems] = await Promise.all([
+    getArticlesByCategory("ILS_EN_PARLENT"),
+    getArticlesByCategory("IMMOBILIER"),
+  ]);
+
+  const items = [...currentItems, ...legacyItems].sort((a, b) => {
+    const aDate = a.publishedAt?.getTime() ?? a.createdAt.getTime();
+    const bDate = b.publishedAt?.getTime() ?? b.createdAt.getTime();
+    return bDate - aDate;
+  });
 
   const featured = items[0];
   const mainArticle = items[1];
