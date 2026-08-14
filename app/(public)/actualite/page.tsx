@@ -224,7 +224,7 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="h-[3.5rem] overflow-hidden font-serif text-xl leading-tight line-clamp-2">
+                    <h3 className="h-14 overflow-hidden font-serif text-xl leading-7 line-clamp-2">
                       {article.title}
                     </h3>
 
