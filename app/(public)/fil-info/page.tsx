@@ -193,7 +193,7 @@ export default async function FilInfoPage() {
         {briefs.length > 0 && (
           <section
             aria-labelledby="fil-info-briefs-title"
-            className="mt-16 h-[520px] overflow-hidden md:mt-20"
+            className="mt-16 h-[560px] overflow-hidden md:mt-20"
           >
             <div className="mb-7 flex items-end justify-between gap-6 border-t border-gray-800 pt-5">
               <h2 id="fil-info-briefs-title" className="font-serif text-3xl">
@@ -205,7 +205,7 @@ export default async function FilInfoPage() {
               </p>
             </div>
 
-            <div className="grid border-b border-gray-800 md:grid-cols-3">
+            <div className="grid md:grid-cols-3">
               {briefs.map((article, index) => (
                 <Link
                   key={article.id}
