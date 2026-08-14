@@ -1,19 +1,3 @@
-232 lib/article-engine/createArticleFromObservation.ts
-    } catch (error) {
-      console.error(
-        "[AutoPublication] Traductions non générées",
-        { articleId, error },
-      );
-    }
-  }
-
-  await dependencies.observationRepository.markProcessed(
-    observation.id,
-    articleId,
-  );
-
-  return { articleId };
-}
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
