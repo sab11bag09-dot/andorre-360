@@ -16,7 +16,7 @@ export default async function SociétéPageV2() {
   const extraBriefs = items.slice(12, 15);
   const footerCards = items.slice(-4);
   const bonASavoir = items[14];
-  const bonASavoirBriefs = items.slice(15, 18);
+  const bonASavoirBriefs = items.slice(15, 21);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -276,7 +276,7 @@ export default async function SociétéPageV2() {
                     </p>
                   </Link>
 
-                  <div className="mt-auto max-h-[230px] overflow-hidden divide-y divide-zinc-700 border-t border-zinc-700">
+                  <div className="mt-auto max-h-[330px] overflow-y-auto divide-y divide-zinc-700 border-t border-zinc-700">
                     {bonASavoirBriefs.map((article) => (
                       <Link
                         key={article.id}
