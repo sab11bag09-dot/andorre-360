@@ -44,7 +44,7 @@ export default async function ImmobilierPageV2() {
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 h-14 overflow-hidden text-gray-300 leading-7 line-clamp-2">
                 {featured.description}
               </p>
 
