@@ -232,7 +232,7 @@ export default async function ActualitePage() {
                       {article.title}
                     </h3>
 
-                    <p className="mt-2 h-14 overflow-hidden leading-7 text-gray-400 line-clamp-2">
+                    <p className="mt-2 h-7 overflow-hidden leading-7 text-gray-400 line-clamp-1">
                       {article.description}
                     </p>
 
