@@ -13,6 +13,7 @@ export default async function SociétéPageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 5);
   const briefs = items.slice(6, 12);
+  const extraBriefs = items.slice(12, 15);
   const footerCards = items.slice(-4);
   const bonASavoir = items[14];
   const bonASavoirBriefs = items.slice(15, 18);
@@ -111,6 +112,19 @@ export default async function SociétéPageV2() {
                       <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                         Lire l’article →
                       </p>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {extraBriefs.length > 0 && (
+              <div className="mt-8 grid h-[170px] gap-4 overflow-hidden md:grid-cols-3">
+                {extraBriefs.map((article) => (
+                  <Link key={article.id} href={\`/article/\${article.slug}\`} className="block">
+                    <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-2 font-serif text-lg leading-snug">{article.title}</h3>
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
                     </article>
                   </Link>
                 ))}
