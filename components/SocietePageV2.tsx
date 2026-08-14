@@ -77,15 +77,15 @@ export default async function SociétéPageV2() {
                   </div>
 
                   <div className="flex flex-1 flex-col overflow-hidden p-6">
-                    <h2 className="line-clamp-2 font-serif text-3xl">
+                    <h2 className="h-[5.5rem] overflow-hidden font-serif text-4xl leading-tight line-clamp-2">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 line-clamp-3 text-gray-400">
+                    <p className="mt-4 h-14 overflow-hidden text-gray-400 leading-7 line-clamp-2">
                       {mainArticle.description}
                     </p>
 
-                    <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-4 pt-0 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
