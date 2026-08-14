@@ -116,7 +116,11 @@ export default async function MontagnePageV2() {
 
                       <div className="flex flex-1 flex-col justify-between p-5">
                         <div>
-                          <h3 className="line-clamp-3 font-serif text-xl leading-snug">
+                          <h3
+                            className={`line-clamp-3 font-serif leading-snug ${
+                              index < 2 ? "text-2xl" : "text-xl"
+                            }`}
+                          >
                             {article.title}
                           </h3>
 
