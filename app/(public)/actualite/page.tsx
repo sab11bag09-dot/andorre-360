@@ -103,7 +103,7 @@ export default async function ActualitePage() {
                     </p>
                   </div>
                 </article>
-              </Link>
+              </div>
             )}
 
             {/* TROIS BRÈVES */}
@@ -243,10 +243,7 @@ export default async function ActualitePage() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
+              <div className="block">
                 <article className="flex h-[430px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
@@ -260,9 +257,12 @@ export default async function ActualitePage() {
                     {bonASavoir.description}
                   </p>
 
-                  <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                  <Link
+                    href={`/article/${bonASavoir.slug}`}
+                    className="mt-4 block text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500"
+                  >
                     Lire l’article →
-                  </p>
+                  </Link>
 
                   <div className="mt-4 divide-y divide-gray-700 overflow-hidden">
                     {briefs.slice(0, 3).map((brief) => (
