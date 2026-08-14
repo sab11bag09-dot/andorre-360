@@ -41,7 +41,7 @@ export default async function EconomiePageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 h-[8.5rem] overflow-hidden font-serif text-5xl leading-7 md:text-7xl md:leading-[1.05] line-clamp-2">
+              <h1 className="mt-4 h-[10rem] overflow-hidden font-serif text-5xl leading-7 md:text-7xl md:leading-[1.05] line-clamp-2">
                 {featured.title}
               </h1>
 
