@@ -270,7 +270,7 @@ export default async function FilInfoPage() {
                       className="group block"
                     >
                       <article className="flex h-full flex-col border-b border-gray-800 pb-8">
-                        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
+                        <div className="relative aspect-[16/8] overflow-hidden bg-neutral-900">
                           <FilInfoImage
                             src={article.image}
                             alt={article.title}
@@ -288,7 +288,7 @@ export default async function FilInfoPage() {
                             {article.title}
                           </h3>
 
-                          <p className="mt-3 line-clamp-3 text-sm leading-7 text-gray-400">
+                          <p className="mt-3 h-14 overflow-hidden text-sm leading-7 text-gray-400 line-clamp-2">
                             {article.description}
                           </p>
 
