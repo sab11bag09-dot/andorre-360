@@ -103,7 +103,7 @@ export default async function ActualitePage() {
                     </p>
                   </div>
                 </article>
-              </div>
+              </Link>
             )}
 
             {/* TROIS BRÈVES */}
@@ -278,7 +278,7 @@ export default async function ActualitePage() {
                     ))}
                   </div>
                 </article>
-              </Link>
+              </div>
             )}
           </aside>
         </div>
