@@ -117,11 +117,15 @@ export default async function ActualitePage() {
                     className="block"
                   >
                     <article className="flex h-[190px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                      <h3 className="h-[3.5rem] overflow-hidden font-serif text-lg leading-7 line-clamp-2">
                         {article.title}
                       </h3>
 
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      <p className="h-10 overflow-hidden text-sm leading-5 text-gray-400 line-clamp-2">
+                        {article.description}
+                      </p>
+
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                         Lire l’article →
                       </p>
                     </article>
