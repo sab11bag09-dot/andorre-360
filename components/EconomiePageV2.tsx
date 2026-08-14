@@ -242,24 +242,26 @@ export default async function EconomiePageV2() {
                 className="block"
               >
                 <article className="flex h-[400px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {index < rightCards.length - 1 && (
-                    <div className="relative h-[226px]">
-                      <SafeImage
-                        src={article.image}
-                        alt={article.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
+                  <div className="relative h-[226px] shrink-0">
+                    <SafeImage
+                      src={article.image}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      className="object-cover"
+                    />
+                  </div>
 
-                  <div className="mt-auto p-4">
-                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                  <div className="flex flex-1 flex-col overflow-hidden p-4">
+                    <h3 className="h-14 overflow-hidden font-serif text-lg leading-7 line-clamp-2">
                       {article.title}
                     </h3>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    <p className="mt-3 h-10 overflow-hidden text-sm leading-5 text-gray-400 line-clamp-2">
+                      {article.description}
+                    </p>
+
+                    <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
                     </p>
                   </div>
