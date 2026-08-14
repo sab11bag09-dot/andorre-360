@@ -155,7 +155,7 @@ export default async function ActualitePage() {
                           {bottomCard.title}
                         </h2>
 
-                        <p className="mt-3 h-[3.5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-2">
+                        <p className="mt-3 h-[7rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-4">
                           {bottomCard.description}
                         </p>
 
@@ -188,7 +188,7 @@ export default async function ActualitePage() {
                           {secondBottomCard.title}
                         </h2>
 
-                        <p className="mt-3 h-[3.5rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-2">
+                        <p className="mt-3 h-[7rem] overflow-hidden leading-relaxed text-gray-400 line-clamp-4">
                           {secondBottomCard.description}
                         </p>
 
