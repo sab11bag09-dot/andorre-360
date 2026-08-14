@@ -16,6 +16,7 @@ export default async function CulturePageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -42,11 +43,11 @@ export default async function CulturePageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 line-clamp-2 font-serif text-5xl leading-[1.05] md:text-6xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 line-clamp-2 text-gray-300">
                 {featured.description}
               </p>
 
@@ -67,9 +68,9 @@ export default async function CulturePageV2() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {mainArticle.image ? (
-                    <div className="relative h-[420px]">
+                    <div className="relative h-[380px] flex-none">
                       <SafeImage
                         src={mainArticle.image}
                         alt={mainArticle.title}
@@ -80,12 +81,12 @@ export default async function CulturePageV2() {
                     </div>
                   ) : null}
 
-                  <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                  <div className="flex min-h-0 flex-1 flex-col justify-between p-6">
+                    <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-2 text-gray-400">
                       {mainArticle.description}
                     </p>
 
@@ -100,15 +101,15 @@ export default async function CulturePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
+              <div className="mt-8 grid gap-4 md:auto-rows-[150px] md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                    <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -130,9 +131,9 @@ export default async function CulturePageV2() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {bottomCard.image ? (
-                        <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                        <div className="relative h-64">
                           <SafeImage
                             src={bottomCard.image}
                             alt={bottomCard.title}
@@ -144,7 +145,7 @@ export default async function CulturePageV2() {
                       ) : null}
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
                           {bottomCard.title}
                         </h2>
 
@@ -161,9 +162,9 @@ export default async function CulturePageV2() {
                     href={`/article/${secondBottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       {secondBottomCard.image ? (
-                        <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                        <div className="relative h-64">
                           <SafeImage
                             src={secondBottomCard.image}
                             alt={secondBottomCard.title}
@@ -175,7 +176,7 @@ export default async function CulturePageV2() {
                       ) : null}
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
                           {secondBottomCard.title}
                         </h2>
 
@@ -192,7 +193,7 @@ export default async function CulturePageV2() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2">
+          <aside className="space-y-6 lg:col-span-2 lg:flex lg:flex-col lg:gap-6 lg:space-y-0">
             {/* QUESTION À... */}
 
             {questionArticle && (
@@ -201,10 +202,10 @@ export default async function CulturePageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {questionArticle.image ? (
-                    <div className="relative h-40">
+                  {questionImage ? (
+                    <div className="relative h-72">
                       <SafeImage
-                        src={questionArticle.image}
+                        src={questionImage}
                         alt={questionArticle.title}
                         fill
                         sizes="(max-width: 1024px) 100vw, 33vw"
@@ -236,15 +237,25 @@ export default async function CulturePageV2() {
 
             {/* TROIS CARTES CLASSIQUES */}
 
-            {rightCards.map((article) => (
+            {rightCards.map((article, index) => (
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
-                className="block"
+                className={
+                  index === rightCards.length - 1
+                    ? "block lg:flex-1"
+                    : "block"
+                }
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                   {article.image ? (
-                    <div className="relative h-40">
+                    <div
+                      className={`relative h-40 ${
+                        index === rightCards.length - 1
+                          ? "lg:h-auto lg:min-h-40 lg:flex-1"
+                          : ""
+                      }`}
+                    >
                       <SafeImage
                         src={article.image}
                         alt={article.title}
@@ -256,9 +267,13 @@ export default async function CulturePageV2() {
                   ) : null}
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
+
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                      {article.description}
+                    </p>
 
                     <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                       Lire l’article →
@@ -280,7 +295,7 @@ export default async function CulturePageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
