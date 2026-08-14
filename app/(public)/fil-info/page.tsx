@@ -216,7 +216,7 @@ export default async function FilInfoPage() {
                       : ""
                   } ${index % 3 !== 2 ? "md:pr-7" : ""}`}
                 >
-                  <article className="flex h-[220px] flex-col justify-between overflow-hidden py-8">
+                  <article className="flex h-[190px] flex-col justify-between overflow-hidden py-6">
                     <div>
                       <div className="flex items-center gap-3">
                         <span className="font-serif text-2xl text-yellow-500">
