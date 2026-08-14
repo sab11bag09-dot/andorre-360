@@ -139,7 +139,7 @@ export default async function ActualitePage() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className="flex h-[560px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-[300px] shrink-0">
                         <SafeImage
                           src={bottomCard.image}
@@ -172,7 +172,7 @@ export default async function ActualitePage() {
                     href={`/article/${secondBottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="flex h-[620px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className="flex h-[560px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-[300px] shrink-0">
                         <SafeImage
                           src={secondBottomCard.image}
