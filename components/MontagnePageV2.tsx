@@ -164,7 +164,7 @@ export default async function MontagnePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
                       {questionArticle.title}
                     </h2>
 
