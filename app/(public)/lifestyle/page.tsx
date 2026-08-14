@@ -1,7 +1,7 @@
-import LifestylePageV2 from "@/components/LifestylePageV2";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function LifestylePage() {
-  return <LifestylePageV2 />;
+  redirect("/loisirs");
 }
