@@ -128,7 +128,7 @@ export default async function EconomiePageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                      <div className="relative h-56 shrink-0">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -139,11 +139,15 @@ export default async function EconomiePageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-14 overflow-hidden font-serif text-2xl leading-7 line-clamp-2">
                           {bottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-3 h-10 overflow-hidden text-sm leading-5 text-gray-400 line-clamp-2">
+                          {bottomCard.description}
+                        </p>
+
+                        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
@@ -157,7 +161,7 @@ export default async function EconomiePageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                      <div className="relative h-56 shrink-0">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
@@ -168,11 +172,15 @@ export default async function EconomiePageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-14 overflow-hidden font-serif text-2xl leading-7 line-clamp-2">
                           {secondBottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-3 h-10 overflow-hidden text-sm leading-5 text-gray-400 line-clamp-2">
+                          {secondBottomCard.description}
+                        </p>
+
+                        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
