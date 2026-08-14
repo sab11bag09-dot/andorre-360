@@ -103,12 +103,12 @@ export default async function ImmobilierPageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                    <article className="flex h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-3 transition hover:border-yellow-500">
                       <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      <p className="mt-2 shrink-0 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                         Lire l’article →
                       </p>
                     </article>
