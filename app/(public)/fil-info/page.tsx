@@ -175,11 +175,11 @@ export default async function FilInfoPage() {
                         Actualité
                       </p>
 
-                      <h3 className="mt-2 font-serif text-2xl leading-[1.08] tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
+                      <h3 className="mt-2 h-[3.5rem] overflow-hidden font-serif text-2xl leading-7 tracking-[-0.02em] line-clamp-2 transition-colors duration-300 group-hover:text-yellow-500">
                         {article.title}
                       </h3>
 
-                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-gray-400">
+                      <p className="mt-3 h-12 overflow-hidden text-sm leading-6 text-gray-400 line-clamp-2">
                         {article.description}
                       </p>
                     </article>
@@ -294,7 +294,7 @@ export default async function FilInfoPage() {
             {illustratedBriefs.length > 0 && (
               <aside
                 aria-labelledby="fil-info-remember-title"
-                className="h-full overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
+                className="h-full overflow-hidden border border-gray-800 bg-neutral-950/90 lg:h-[980px] lg:col-span-2"
               >
                 <div className="border-b border-gray-800 px-5 py-6">
                   <h2
@@ -328,7 +328,7 @@ export default async function FilInfoPage() {
                               {article.category}
                             </p>
 
-                            <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
+                            <h3 className="h-[3.25rem] overflow-hidden font-serif text-[1.05rem] leading-[1.25] line-clamp-2 transition group-hover:text-yellow-500">
                               {article.title}
                             </h3>
                           </div>
