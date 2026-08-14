@@ -13,8 +13,6 @@ export default async function MontagnePageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
   const bonASavoir = items[14];
   const questionImage = questionArticle?.image ?? featured?.image;
 
@@ -94,99 +92,47 @@ export default async function MontagnePageV2() {
               </Link>
             )}
 
-            {/* SIX BRÈVES */}
+            {/* BLOC INFÉRIEUR : 2 CARTES SANS PHOTO + 4 CARTES AVEC PHOTO */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3">
-                {briefs.map((article) => (
+              <div className="mt-8 grid gap-6 md:grid-cols-3">
+                {briefs.map((article, index) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
-                        {article.title}
-                      </h3>
+                    <article className="flex h-full min-h-[240px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      {index >= 2 && article.image ? (
+                        <div className="relative h-40 flex-none">
+                          <SafeImage
+                            src={article.image}
+                            alt={article.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 33vw"
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : null}
 
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                        Lire l’article →
-                      </p>
+                      <div className="flex flex-1 flex-col justify-between p-5">
+                        <div>
+                          <h3 className="line-clamp-3 font-serif text-xl leading-snug">
+                            {article.title}
+                          </h3>
+
+                          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                            {article.description}
+                          </p>
+                        </div>
+
+                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </div>
                     </article>
                   </Link>
                 ))}
-              </div>
-            )}
-
-            {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
-
-            {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
-                {bottomCard && (
-                  <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
-                          {bottomCard.title}
-                        </h2>
-
-                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
-                          {bottomCard.description}
-                        </p>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
-
-                {secondBottomCard && (
-                  <Link
-                    href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={secondBottomCard.image}
-                          alt={secondBottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
-                          {secondBottomCard.title}
-                        </h2>
-
-                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
-                          {secondBottomCard.description}
-                        </p>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
               </div>
             )}
           </div>
