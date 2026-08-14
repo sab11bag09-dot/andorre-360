@@ -95,7 +95,7 @@ export default async function MontagnePageV2() {
             {/* BLOC INFÉRIEUR : 2 CARTES SANS PHOTO + 4 CARTES AVEC PHOTO */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-6 md:grid-cols-3">
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
                 {briefs.map((article, index) => (
                   <Link
                     key={article.id}
