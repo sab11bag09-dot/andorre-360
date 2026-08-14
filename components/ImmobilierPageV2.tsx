@@ -216,11 +216,11 @@ export default async function ImmobilierPageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-2 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 h-[7.5rem] overflow-hidden font-serif text-3xl leading-snug line-clamp-3">
                       {questionArticle.title}
                     </h2>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 h-[6rem] overflow-hidden text-sm leading-relaxed text-gray-400 line-clamp-4">
                       {questionArticle.description}
                     </p>
 
