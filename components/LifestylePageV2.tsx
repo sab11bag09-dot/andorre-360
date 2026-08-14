@@ -16,6 +16,8 @@ export default async function LifestylePageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
+  const thirdBottomCard = items[15];
+  const fourthBottomCard = items[16];
   const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
@@ -128,7 +130,7 @@ export default async function LifestylePageV2() {
                     className="block"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
+                      <div className="relative h-56">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -161,7 +163,7 @@ export default async function LifestylePageV2() {
                     className="block"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-64">
+                      <div className="relative h-56">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
@@ -180,6 +182,60 @@ export default async function LifestylePageV2() {
                           {secondBottomCard.description}
                         </p>
 
+                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </div>
+                    </article>
+                  </Link>
+                )}
+
+                {thirdBottomCard && (
+                  <Link href={`/article/${thirdBottomCard.slug}`} className="block">
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-56">
+                        <SafeImage
+                          src={thirdBottomCard.image}
+                          alt={thirdBottomCard.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="p-5">
+                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                          {thirdBottomCard.title}
+                        </h2>
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                          {thirdBottomCard.description}
+                        </p>
+                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </div>
+                    </article>
+                  </Link>
+                )}
+
+                {fourthBottomCard && (
+                  <Link href={`/article/${fourthBottomCard.slug}`} className="block">
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-56">
+                        <SafeImage
+                          src={fourthBottomCard.image}
+                          alt={fourthBottomCard.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="p-5">
+                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                          {fourthBottomCard.title}
+                        </h2>
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                          {fourthBottomCard.description}
+                        </p>
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
