@@ -37,10 +37,10 @@ export default async function ImmobilierPageV2() {
 
             <div className="absolute bottom-10 left-8 max-w-3xl">
               <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category}
+                Politique
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 h-[10.5rem] overflow-hidden font-serif text-5xl leading-tight line-clamp-2 md:text-7xl">
                 {featured.title}
               </h1>
 
