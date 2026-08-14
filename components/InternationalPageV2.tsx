@@ -42,11 +42,11 @@ export default async function InternationalPageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 h-[10.5rem] overflow-hidden font-serif text-5xl leading-tight line-clamp-2 md:text-7xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 h-14 overflow-hidden text-gray-300 leading-7 line-clamp-2">
                 {featured.description}
               </p>
 
