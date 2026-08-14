@@ -16,7 +16,7 @@ export default async function SportsPageV2() {
   const bottomCard = items[12];
   const secondBottomCard = items[13];
   const bonASavoir = items[14];
-  const rightBottomCard = items[15];
+  const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -202,10 +202,10 @@ export default async function SportsPageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {questionArticle.image ? (
+                  {questionImage ? (
                     <div className="relative h-40">
                       <SafeImage
-                        src={questionArticle.image}
+                        src={questionImage}
                         alt={questionArticle.title}
                         fill
                         sizes="(max-width: 1024px) 100vw, 33vw"
@@ -296,36 +296,6 @@ export default async function SportsPageV2() {
               </Link>
             )}
 
-            {rightBottomCard && (
-              <Link
-                href={`/article/${rightBottomCard.slug}`}
-                className="block"
-              >
-                <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  {rightBottomCard.image ? (
-                    <div className="relative h-64">
-                      <SafeImage
-                        src={rightBottomCard.image}
-                        alt={rightBottomCard.title}
-                        fill
-                        sizes="(max-width: 1024px) 100vw, 33vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : null}
-
-                  <div className="p-5">
-                    <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
-                      {rightBottomCard.title}
-                    </h2>
-
-                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’article →
-                    </p>
-                  </div>
-                </article>
-              </Link>
-            )}
           </aside>
         </div>
       </section>
