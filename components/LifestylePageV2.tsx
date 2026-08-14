@@ -40,7 +40,9 @@ export default async function LifestylePageV2() {
 
             <div className="absolute bottom-10 left-8 max-w-3xl">
               <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category}
+                {featured.category === "LIFESTYLE"
+                  ? "LOISIRS"
+                  : featured.category}
               </p>
 
               <h1 className="mt-4 line-clamp-2 font-serif text-5xl leading-[1.05] md:text-6xl">
