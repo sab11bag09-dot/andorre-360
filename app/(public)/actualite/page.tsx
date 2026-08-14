@@ -205,7 +205,7 @@ export default async function ActualitePage() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2 lg:flex lg:h-[1522px] lg:flex-col">
+          <aside className="space-y-6 lg:col-span-2">
             {rightCards.map((article) => (
               <Link
                 key={article.id}
@@ -245,9 +245,9 @@ export default async function ActualitePage() {
             {bonASavoir && (
               <Link
                 href={`/article/${bonASavoir.slug}`}
-                className="block lg:mt-auto"
+                className="block"
               >
-                <article className="flex h-[200px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="flex h-[320px] flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
