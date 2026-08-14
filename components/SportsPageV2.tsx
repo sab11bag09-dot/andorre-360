@@ -203,7 +203,7 @@ export default async function SportsPageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionImage ? (
-                    <div className="relative h-40">
+                    <div className="relative h-56">
                       <SafeImage
                         src={questionImage}
                         alt={questionArticle.title}
