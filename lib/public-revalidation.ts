@@ -6,6 +6,7 @@ export const PUBLIC_CATEGORY_PATHS: Record<string, string> = {
   "SOCIÉTÉ": "/societe",
   POLITIQUE: "/politique",
   IMMOBILIER: "/immobilier",
+  ILS_EN_PARLENT: "/ils-en-parlent",
   INTERNATIONAL: "/international",
   SPORTS: "/sports",
   CULTURE: "/culture",
