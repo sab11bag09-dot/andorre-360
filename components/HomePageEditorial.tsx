@@ -429,6 +429,15 @@ export default async function HomePageEditorial() {
           </aside>
         </div>
       </section>
+      <section className="mx-auto max-w-7xl px-6 pb-14 md:px-10">
+        <div className="overflow-hidden border-y border-gray-800 bg-white">
+          <img
+            src="/uploads/andorra-360-pub.jpeg"
+            alt="Andorra 360 — Le briefing quotidien pour comprendre l’Andorre"
+            className="h-auto w-full object-cover"
+          />
+        </div>
+      </section>
     </main>
   );
 }
