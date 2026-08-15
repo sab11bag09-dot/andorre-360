@@ -1,6 +1,6 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## ANDORRE 360
+## ANDORRA 360
 
 La procédure de préparation, de déploiement progressif et de retour arrière du
 pipeline éditorial multilingue se trouve dans
