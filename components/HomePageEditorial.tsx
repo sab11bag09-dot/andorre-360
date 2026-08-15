@@ -389,6 +389,10 @@ export default async function HomePageEditorial() {
             <h3 className="mt-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
               {article.title}
             </h3>
+
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+              Lire l’article →
+            </p>
           </div>
         </article>
       </Link>
