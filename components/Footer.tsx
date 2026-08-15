@@ -62,7 +62,7 @@ export default function Footer() {
 
         <div className="mt-12 border-t border-gray-800 pt-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-300">
-            © ANDORRE 360 Studio
+            © ANDORRA 360 Studio
           </p>
 
           <p className="mt-2 font-serif text-lg text-gray-500">
