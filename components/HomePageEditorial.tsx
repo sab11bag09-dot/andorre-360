@@ -258,7 +258,7 @@ export default async function HomePageEditorial() {
                         </p>
 
                         <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire le Grand Format →
+                          Lire l’article →
                         </p>
                       </div>
 
