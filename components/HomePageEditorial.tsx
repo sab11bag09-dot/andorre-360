@@ -226,6 +226,10 @@ export default async function HomePageEditorial() {
                       <h3 className="mt-2 line-clamp-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
                         {article.title}
                       </h3>
+
+                      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
                     </Link>
                   ))}
                 </div>
@@ -297,7 +301,7 @@ export default async function HomePageEditorial() {
           <aside className="space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
-            <section className="h-[300px] overflow-hidden border-b border-gray-800 pb-8">
+            <section className="h-[380px] overflow-hidden border-b border-gray-800 pb-8">
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-500 text-3xl text-yellow-500">
                   ✒
@@ -362,7 +366,7 @@ export default async function HomePageEditorial() {
       <Link
         key={article.id}
         href={`/article/${article.slug}`}
-        className="group block h-[142px] overflow-hidden py-6"
+        className="group block h-[175px] overflow-hidden py-6"
       >
         <article className="grid grid-cols-[110px_1fr] gap-4">
           <div className="relative h-[110px] overflow-hidden">
