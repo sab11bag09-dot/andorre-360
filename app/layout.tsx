@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ??
       "http://localhost:3000",
   ),
-  title: "ANDORRE 360",
+  title: "ANDORRA 360",
   description: "Actualités, économie et lifestyle en Andorre",
 };
 
