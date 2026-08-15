@@ -39,11 +39,11 @@ export default async function ActualitePage() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 line-clamp-2 font-serif text-4xl md:text-5xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 line-clamp-2 text-gray-300">
                 {featured.description}
               </p>
 
