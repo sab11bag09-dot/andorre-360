@@ -323,11 +323,11 @@ export default async function HomePageEditorial() {
                     La voix de la rédaction
                   </p>
 
-                  <h3 className="mt-3 font-serif text-2xl leading-snug transition group-hover:text-yellow-500">
+                  <h3 className="mt-3 line-clamp-3 font-serif text-3xl leading-snug transition group-hover:text-yellow-500">
                     {editorial.title}
                   </h3>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
+                  <p className="mt-4 line-clamp-3 leading-relaxed text-gray-400">
                     {editorial.description}
                   </p>
 
