@@ -87,6 +87,8 @@ export default async function HomePageEditorial() {
       ? editorialLayout.discover
       : availableArticles.splice(0, 4);
 
+  const bottomCards = availableArticles.splice(0, 4);
+
   if (!hero) {
     return (
       <main className="min-h-screen bg-black p-8 text-white">
@@ -429,6 +431,37 @@ export default async function HomePageEditorial() {
           </aside>
         </div>
       </section>
+
+      {bottomCards.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-14 md:px-10">
+          <div className="mb-6 border-b border-yellow-500 pb-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+              À la suite
+            </p>
+            <h2 className="mt-1 font-serif text-2xl">À découvrir</h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {bottomCards.map((article) => (
+              <Link key={article.id} href={`/article/${article.slug}`} className="group block">
+                <article className="flex h-full flex-col justify-between border border-gray-800 p-5 transition hover:border-yellow-500">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      {article.category}
+                    </p>
+                    <h3 className="mt-3 line-clamp-3 font-serif text-xl leading-snug transition group-hover:text-yellow-500">
+                      {article.title}
+                    </h3>
+                  </div>
+                  <p className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                    Lire l’article →
+                  </p>
+                </article>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
