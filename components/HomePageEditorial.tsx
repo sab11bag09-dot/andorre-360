@@ -258,7 +258,7 @@ export default async function HomePageEditorial() {
                       {/* Chapô : une colonne à gauche */}
 
                       <div className="flex flex-col justify-between md:col-span-1">
-                        <p className="leading-relaxed text-gray-300">
+                        <p className="line-clamp-10 leading-relaxed text-gray-300">
                           {grandFormat.description}
                         </p>
 
