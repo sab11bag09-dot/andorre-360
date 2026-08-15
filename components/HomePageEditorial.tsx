@@ -300,7 +300,7 @@ export default async function HomePageEditorial() {
 
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-yellow-500">
-                    ANDORRE 360
+                    ANDORRA 360
                   </p>
 
                   <h2 className="mt-1 font-serif text-3xl">
