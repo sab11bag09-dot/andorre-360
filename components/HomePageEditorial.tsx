@@ -187,7 +187,7 @@ export default async function HomePageEditorial() {
 ) : null}
 
                   <div className="pt-6">
-                    <p className="line-clamp-3 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
+                    <p className="line-clamp-2 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
                       {feature.description}
                     </p>
 
