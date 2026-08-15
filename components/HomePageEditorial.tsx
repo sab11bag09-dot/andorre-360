@@ -110,7 +110,7 @@ export default async function HomePageEditorial() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen overflow-x-hidden bg-black text-white">
       {/* UNE PRINCIPALE */}
 
       <Link
@@ -163,7 +163,7 @@ export default async function HomePageEditorial() {
                 href={`/article/${feature.slug}`}
                 className="group block"
               >
-                <article className="border-y-4 border-yellow-500 py-8">
+                <article className="h-[760px] overflow-hidden border-y-4 border-yellow-500 py-8">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grande carte · {feature.category}
@@ -238,7 +238,7 @@ export default async function HomePageEditorial() {
                   href={`/article/${grandFormat.slug}`}
                   className="group block md:col-span-3"
                 >
-                  <article className="border-l border-gray-800 pl-0 md:pl-7">
+                  <article className="h-[520px] overflow-hidden border-l border-gray-800 pl-0 md:pl-7">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grand Format · {grandFormat.category}
                     </p>
@@ -297,7 +297,7 @@ export default async function HomePageEditorial() {
           <aside className="space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
             {/* ÉDITO */}
 
-            <section className="border-b border-gray-800 pb-8">
+            <section className="h-[300px] overflow-hidden border-b border-gray-800 pb-8">
               <div className="flex items-center gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-500 text-3xl text-yellow-500">
                   ✒
@@ -346,7 +346,7 @@ export default async function HomePageEditorial() {
 
             {/* CARTES ÉDITORIALES */}
 
-<section className="border-t-2 border-yellow-500 pt-5">
+<section className="h-[760px] overflow-hidden border-t-2 border-yellow-500 pt-5">
   <div className="mb-4">
   <span className="text-xs uppercase tracking-[0.2em] text-gray-500">
     La rédaction
@@ -362,7 +362,7 @@ export default async function HomePageEditorial() {
       <Link
         key={article.id}
         href={`/article/${article.slug}`}
-        className="group block py-6"
+        className="group block h-[142px] overflow-hidden py-6"
       >
         <article className="grid grid-cols-[110px_1fr] gap-4">
           <div className="relative h-[110px] overflow-hidden">
@@ -403,7 +403,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 min-h-0 overflow-hidden rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-1 lg:flex-col">
+              <section className="mt-12 h-[520px] overflow-hidden rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-1 lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
