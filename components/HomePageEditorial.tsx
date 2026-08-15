@@ -248,14 +248,14 @@ export default async function HomePageEditorial() {
 
                     {/* Titre sur toute la largeur des trois colonnes */}
 
-                    <h2 className="mt-4 max-w-4xl font-serif text-3xl leading-tight md:text-4xl lg:text-5xl">
+                    <h2 className="mt-4 line-clamp-2 max-w-4xl font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
                       {grandFormat.title}
                     </h2>
 
                     <div className="mt-6 grid gap-6 md:grid-cols-3">
                       {/* Chapô : une colonne à gauche */}
 
-                      <div className="flex flex-col justify-between md:col-span-1">
+                      <div className="flex flex-col justify-between md:col-span-1 md:min-h-[440px]">
                         <p className="leading-relaxed text-gray-300">
                           {grandFormat.description}
                         </p>
