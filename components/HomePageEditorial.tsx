@@ -386,7 +386,7 @@ export default async function HomePageEditorial() {
               </p>
             </div>
 
-            <h3 className="mt-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+            <h3 className="mt-3 line-clamp-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
               {article.title}
             </h3>
 
