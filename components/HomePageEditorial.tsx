@@ -429,6 +429,22 @@ export default async function HomePageEditorial() {
           </aside>
         </div>
       </section>
+      <section className="mx-auto max-w-7xl px-6 pb-14 md:px-10">
+        <div className="relative overflow-hidden border-y-2 border-yellow-500 bg-zinc-950 px-8 py-10 md:px-14 md:py-14">
+          <div className="absolute -right-10 -top-16 font-serif text-[180px] leading-none text-yellow-500/5 md:text-[240px]">
+            360
+          </div>
+          <p className="relative text-xs font-semibold uppercase tracking-[0.35em] text-yellow-500">
+            Publicité
+          </p>
+          <h2 className="relative mt-3 font-serif text-5xl leading-none tracking-tight md:text-7xl">
+            ANDORRA 360
+          </h2>
+          <p className="relative mt-4 max-w-xl text-sm uppercase tracking-[0.22em] text-gray-400 md:text-base">
+            La Principauté autrement
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
