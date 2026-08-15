@@ -297,12 +297,17 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
     "concordia.ad": {
-    listing: ['h4.entry-title a[href^="https://concordia.ad/"]'],
+    listing: [
+      'h4.entry-title a[href^="https://concordia.ad/"]',
+      'h4.entry-title a[href^="https://www.concordia.ad/"]',
+      'article h4 a[href*="concordia.ad/"]',
+      'h4 a[href*="concordia.ad/"]',
+    ],
     articlePathPattern: /^\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
-    content: [".mkdf-post-content"],
+    content: [".mkdf-post-content", ".entry-content", ".article-content"],
     remove: [
       "header",
       "footer",
@@ -314,12 +319,17 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
   "www.concordia.ad": {
-    listing: ['h4.entry-title a[href^="https://concordia.ad/"]'],
+    listing: [
+      'h4.entry-title a[href^="https://concordia.ad/"]',
+      'h4.entry-title a[href^="https://www.concordia.ad/"]',
+      'article h4 a[href*="concordia.ad/"]',
+      'h4 a[href*="concordia.ad/"]',
+    ],
     articlePathPattern: /^\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
-    content: [".mkdf-post-content"],
+    content: [".mkdf-post-content", ".entry-content", ".article-content"],
     remove: [
       "header",
       "footer",
