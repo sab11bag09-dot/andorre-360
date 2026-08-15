@@ -248,7 +248,7 @@ export default async function HomePageEditorial() {
 
                     {/* Titre sur toute la largeur des trois colonnes */}
 
-                    <h2 className="mt-4 max-w-4xl font-serif text-3xl leading-tight md:text-4xl lg:text-5xl">
+                    <h2 className="mt-4 line-clamp-2 max-w-4xl font-serif text-3xl leading-tight md:text-4xl lg:text-5xl">
                       {grandFormat.title}
                     </h2>
 
