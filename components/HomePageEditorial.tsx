@@ -403,7 +403,7 @@ export default async function HomePageEditorial() {
             {/* À DÉCOUVRIR */}
 
             {discover.length > 0 && (
-              <section className="mt-12 rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-1 lg:flex-col">
+              <section className="mt-12 min-h-0 overflow-hidden rounded-xl bg-zinc-900 p-6 lg:mt-0 lg:flex lg:flex-1 lg:flex-col">
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                   Continuer la lecture
                 </p>
@@ -412,7 +412,7 @@ export default async function HomePageEditorial() {
                   À découvrir
                 </h2>
 
-                <div className="mt-5 divide-y divide-zinc-700">
+                <div className="mt-5 min-h-0 overflow-hidden divide-y divide-zinc-700">
                   {discover.slice(0, 4).map((article) => (
                     <Link
                       key={article.id}
@@ -424,9 +424,13 @@ export default async function HomePageEditorial() {
                           {article.category}
                         </p>
 
-                        <h3 className="mt-1 font-serif leading-snug transition group-hover:text-yellow-500">
+                        <h3 className="mt-1 line-clamp-3 font-serif leading-snug transition group-hover:text-yellow-500">
                           {article.title}
                         </h3>
+
+                        <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          Lire l’article →
+                        </p>
                       </div>
 
                       <span className="mt-4 shrink-0 text-yellow-500">
