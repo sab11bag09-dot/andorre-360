@@ -169,13 +169,13 @@ export default async function HomePageEditorial() {
                       Grande carte · {feature.category}
                     </p>
 
-                    <h2 className="mt-4 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
+                    <h2 className="mt-4 line-clamp-2 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
                       {feature.title}
                     </h2>
                   </div>
 
                   {feature.image ? (
-  <div className="relative mt-7 h-[520px] overflow-hidden md:h-[620px]">
+  <div className="relative mt-7 h-[360px] overflow-hidden md:h-[440px]">
     <SafeImage
       src={feature.image}
       alt={feature.title}
@@ -187,7 +187,7 @@ export default async function HomePageEditorial() {
 ) : null}
 
                   <div className="pt-6">
-                    <p className="max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
+                    <p className="line-clamp-3 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
                       {feature.description}
                     </p>
 
