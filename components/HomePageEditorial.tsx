@@ -204,18 +204,15 @@ export default async function HomePageEditorial() {
             <div className="grid gap-8 md:grid-cols-4">
               {/* BRÈVES */}
 
-              <section className="md:col-span-1">
+              <section className="flex md:col-span-1 md:min-h-[440px] md:flex-col">
                 <div className="mb-5 border-b border-yellow-500 pb-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     L’essentiel
                   </p>
 
-                  <h2 className="mt-1 font-serif text-2xl">
-                    Brèves
-                  </h2>
                 </div>
 
-                <div className="divide-y divide-gray-800">
+                <div className="flex-1 divide-y divide-gray-800">
                   {briefs.slice(0, 4).map((article) => (
                     <Link
                       key={article.id}
@@ -226,7 +223,7 @@ export default async function HomePageEditorial() {
                         {article.category}
                       </p>
 
-                      <h3 className="mt-2 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+                      <h3 className="mt-2 line-clamp-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
                         {article.title}
                       </h3>
                     </Link>
