@@ -134,11 +134,11 @@ export default async function HomePageEditorial() {
               À la Une · {hero.category}
             </p>
 
-            <h1 className="max-w-5xl font-serif text-4xl leading-[1.05] md:text-6xl lg:text-7xl">
+            <h1 className="line-clamp-2 max-w-5xl font-serif text-4xl leading-[1.05] md:text-6xl lg:text-7xl">
               {hero.title}
             </h1>
 
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-gray-200 md:text-lg">
+            <p className="mt-5 line-clamp-2 max-w-2xl text-base leading-relaxed text-gray-200 md:text-lg">
               {hero.description}
             </p>
 
