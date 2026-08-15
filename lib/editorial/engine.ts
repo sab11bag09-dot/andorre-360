@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
+import type { Article } from "@/lib/generated/prisma/client";
 
 import {
   EDITORIAL_ZONES,
@@ -62,43 +63,63 @@ export async function buildEditorialLayout(
       (publication) => publication.zone === zone
     );
 
+  const usedArticleIds = new Set<number>();
+  const takeUnique = (articles: Article[]) =>
+    articles.filter((article) => {
+      if (usedArticleIds.has(article.id)) {
+        return false;
+      }
+
+      usedArticleIds.add(article.id);
+      return true;
+    });
+
+  const takeFirstUnique = (zone: EditorialZone) =>
+    takeUnique(
+      getZone(zone)
+        .map((publication) => publication.article)
+        .slice(0, 1)
+    )[0] ?? null;
+
   return {
-    hero:
-      getZone(EDITORIAL_ZONES.HERO)[0]?.article ?? null,
+    hero: takeFirstUnique(EDITORIAL_ZONES.HERO),
 
-    feature:
-      getZone(EDITORIAL_ZONES.FEATURE)[0]?.article ?? null,
+    feature: takeFirstUnique(EDITORIAL_ZONES.FEATURE),
 
-    secondary: getZone(
-      EDITORIAL_ZONES.SECONDARY
-    ).map((publication) => publication.article),
-
-    card: getZone(EDITORIAL_ZONES.CARD).map(
-      (publication) => publication.article
+    secondary: takeUnique(
+      getZone(EDITORIAL_ZONES.SECONDARY).map(
+        (publication) => publication.article
+      )
     ),
 
-    briefs: getZone(EDITORIAL_ZONES.BRIEF).map(
-      (publication) => publication.article
+    card: takeUnique(
+      getZone(EDITORIAL_ZONES.CARD).map(
+        (publication) => publication.article
+      )
     ),
 
-    grandFormat:
-      getZone(EDITORIAL_ZONES.GRAND_FORMAT)[0]?.article ??
-      null,
+    briefs: takeUnique(
+      getZone(EDITORIAL_ZONES.BRIEF).map(
+        (publication) => publication.article
+      )
+    ),
 
-    question:
-      getZone(EDITORIAL_ZONES.QUESTION)[0]?.article ??
-      null,
+    grandFormat: takeFirstUnique(EDITORIAL_ZONES.GRAND_FORMAT),
 
-    goodToKnow: getZone(
-      EDITORIAL_ZONES.GOOD_TO_KNOW
-    ).map((publication) => publication.article),
+    question: takeFirstUnique(EDITORIAL_ZONES.QUESTION),
 
-    editorial:
-      getZone(EDITORIAL_ZONES.EDITORIAL)[0]?.article ??
-      null,
+    goodToKnow: takeUnique(
+      getZone(EDITORIAL_ZONES.GOOD_TO_KNOW).map(
+        (publication) => publication.article
+      )
+    ),
 
-    discover: getZone(
-      EDITORIAL_ZONES.DISCOVER
-    ).map((publication) => publication.article),
+    editorial: takeFirstUnique(EDITORIAL_ZONES.EDITORIAL),
+
+    discover: takeUnique(
+      getZone(EDITORIAL_ZONES.DISCOVER).map(
+        (publication) => publication.article
+      )
+    ),
   };
 }
