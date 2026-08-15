@@ -64,7 +64,7 @@ export default async function ActualitePage() {
 
             {mainArticle && (
               <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[760px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <SafeImage
                       src={mainArticle.image}
@@ -76,11 +76,11 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="line-clamp-2 font-serif text-3xl">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 line-clamp-2 text-gray-400">
                       {mainArticle.description}
                     </p>
 
@@ -102,8 +102,8 @@ export default async function ActualitePage() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                    <article className="h-[150px] overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -125,7 +125,7 @@ export default async function ActualitePage() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                    <article className="h-[520px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
                       <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
                         <SafeImage
                           src={bottomCard.image}
@@ -137,7 +137,7 @@ export default async function ActualitePage() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 font-serif text-2xl">
                           {bottomCard.title}
                         </h2>
 
@@ -190,7 +190,7 @@ export default async function ActualitePage() {
                 href={`/article/${article.slug}`}
                 className="block"
               >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                <article className="h-[350px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
                     <SafeImage
                       src={article.image}
@@ -202,7 +202,7 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
@@ -221,12 +221,12 @@ export default async function ActualitePage() {
                 href={`/article/${bonASavoir.slug}`}
                 className="block"
               >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+                <article className="h-[330px] overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-3 font-serif text-2xl leading-snug">
                     {bonASavoir.title}
                   </h2>
 
