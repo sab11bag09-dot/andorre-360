@@ -29,4 +29,19 @@ describe("buildEditorialLayout", () => {
       }),
     );
   });
+
+  it("ne place jamais le même article dans plusieurs zones", async () => {
+    const article = { id: 42 };
+    findMany.mockResolvedValue([
+      { zone: "hero", article },
+      { zone: "feature", article },
+      { zone: "brief", article },
+    ]);
+
+    const layout = await buildEditorialLayout("home");
+
+    expect(layout.hero).toEqual(article);
+    expect(layout.feature).toBeNull();
+    expect(layout.briefs).toEqual([]);
+  });
 });
