@@ -1,10 +1,12 @@
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
+import { getPublishedArticles } from "@/lib/articles";
 import { buildEditorialLayout } from "@/lib/editorial/engine";
 
 export default async function HomePageEditorial() {
   const editorialLayout = await buildEditorialLayout("home");
+  const publishedArticles = await getPublishedArticles();
 
   /*
    * Empêche un même article d’apparaître plusieurs fois
@@ -44,14 +46,46 @@ export default async function HomePageEditorial() {
     usedArticleIds.add(article.id);
   });
 
-  const hero = editorialLayout.hero;
-  const feature = editorialLayout.feature;
-  const briefs = editorialLayout.briefs;
-  const grandFormat = editorialLayout.grandFormat;
-  const cards = editorialLayout.card;
+  const availableArticles = publishedArticles.filter(
+    (article) => !usedArticleIds.has(article.id)
+  );
+
+  /*
+   * Les zones définies manuellement sont prioritaires.
+   * Les articles disponibles complètent automatiquement
+   * les zones encore vides.
+   */
+  const hero =
+    editorialLayout.hero ??
+    availableArticles.shift() ??
+    null;
+
+  const feature =
+    editorialLayout.feature ??
+    availableArticles.shift() ??
+    null;
+
+  const briefs =
+    editorialLayout.briefs.length > 0
+      ? editorialLayout.briefs
+      : availableArticles.splice(0, 4);
+
+  const grandFormat =
+    editorialLayout.grandFormat ??
+    availableArticles.shift() ??
+    null;
+
+ const cards =
+  editorialLayout.card.length > 0
+    ? editorialLayout.card
+    : availableArticles.splice(0, 5);
+
   const editorial = editorialLayout.editorial;
-  const discover = editorialLayout.discover;
-  const bottomCards: typeof editorialLayout.card = [];
+
+  const discover =
+    editorialLayout.discover.length > 0
+      ? editorialLayout.discover
+      : availableArticles.splice(0, 4);
 
   if (!hero) {
     return (
