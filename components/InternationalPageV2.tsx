@@ -287,7 +287,7 @@ export default async function InternationalPageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
                       {article.title}
                     </h3>
 
@@ -311,7 +311,7 @@ export default async function InternationalPageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7">
                     {bonASavoir.title}
                   </h2>
 
