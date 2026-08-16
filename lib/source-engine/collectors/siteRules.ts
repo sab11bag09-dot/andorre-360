@@ -306,7 +306,7 @@ export const siteRules: Record<string, SiteRule> = {
       'article h4 a[href*="concordia.ad/"]',
       'h4 a[href*="concordia.ad/"]',
     ],
-    articlePathPattern: /^\/(?!qui-som\/?$|servei-de-teleassistencia-mobil\/?$|formacions\/?$|fes-te-voluntari\/?$|col%c2%b7laboradors\/?$|contacte\/?$|treballa-amb-nosaltres\/?$)[^/]+\/?$/,
+    articlePathPattern: /^\/[^/]+\/?$/
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
@@ -530,7 +530,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
     "creuroja.ad": {
     listing: ['a[href*="creuroja.ad/"]'],
-    articlePathPattern: /^\/[^/]+\/?$/,
+    articlePathPattern: /^\/(?!qui-som\/?$|servei-de-teleassistencia-mobil\/?$|formacions\/?$|fes-te-voluntari\/?$|col%c2%b7laboradors\/?$|contacte\/?$|treballa-amb-nosaltres\/?$)[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
@@ -547,7 +547,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.creuroja.ad": {
     listing: ['a[href*="creuroja.ad/"]'],
-    articlePathPattern: /^\/[^/]+\/?$/,
+    articlePathPattern: /^\/(?!qui-som\/?$|servei-de-teleassistencia-mobil\/?$|formacions\/?$|fes-te-voluntari\/?$|col%c2%b7laboradors\/?$|contacte\/?$|treballa-amb-nosaltres\/?$)[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
