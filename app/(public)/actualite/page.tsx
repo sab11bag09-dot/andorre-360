@@ -184,14 +184,14 @@ export default async function ActualitePage() {
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2">
-            {rightCards.map((article) => (
+            {rightCards.map((article, index) => (
               <Link
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                  <div className={`relative ${index === 3 ? "h-48" : "h-40"}`}>
                     <SafeImage
                       src={article.image}
                       alt={article.title}
