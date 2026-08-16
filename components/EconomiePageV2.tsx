@@ -271,17 +271,16 @@ export default async function EconomiePageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {index !== 2 && (
-                  <div className="relative h-40">
-                    <SafeImage
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
+                    <div className="relative h-40">
+                      <SafeImage
+                        src={article.image}
+                        alt={article.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                   )}
-
-                  </div>
 
                   <div className="p-4">
                     <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
