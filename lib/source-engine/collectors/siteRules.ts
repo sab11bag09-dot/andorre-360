@@ -709,7 +709,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
 
 
-  "www.ari.ad": {
+  "ari.ad": {
     listing: ['a[href*="/noticies/"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
