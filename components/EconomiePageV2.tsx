@@ -305,11 +305,11 @@ export default async function EconomiePageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
+                  <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
                     {bonASavoir.description}
                   </p>
 
