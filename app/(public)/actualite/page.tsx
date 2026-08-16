@@ -202,7 +202,7 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                    <h3 className="h-[3.5rem] max-h-[3.5rem] overflow-hidden line-clamp-2 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 
