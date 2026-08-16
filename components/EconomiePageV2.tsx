@@ -126,21 +126,19 @@ export default async function EconomiePageV2() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {bottomCard.title}
                         </h2>
+
+                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                          {bottomCard.description}
+                        </p>
+
+                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                          {secondBottomCard.description}
+                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -155,17 +153,7 @@ export default async function EconomiePageV2() {
                     href={`/article/${secondBottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={secondBottomCard.image}
-                          alt={secondBottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="p-5">
                         <h2 className="font-serif text-2xl">
                           {secondBottomCard.title}
