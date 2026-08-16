@@ -219,7 +219,7 @@ export default async function ActualitePage() {
             {bonASavoir && (
               <Link
                 href={`/article/${bonASavoir.slug}`}
-                className="block lg:mt-auto"
+                className="block lg:mt-auto lg:relative lg:top-12"
               >
                 <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
