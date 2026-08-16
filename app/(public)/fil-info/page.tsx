@@ -316,7 +316,7 @@ export default async function FilInfoPage() {
                 </div>
 
                 <div className="divide-y divide-gray-800">
-                  {illustratedBriefs.map((article) => (
+                  {illustratedBriefs.slice(0, 4).map((article) => (
                     <Link
                       key={article.id}
                       href={`/article/${article.slug}`}
