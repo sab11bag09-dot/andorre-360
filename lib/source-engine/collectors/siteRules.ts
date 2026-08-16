@@ -775,4 +775,16 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", '[data-tms-ad-container]'],
   },
 
+
+  "www.lamassana.ad": {
+    listing: ['a[href*="/actualitat/"]'],
+    articlePathPattern: /^\/actualitat\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    title: ["h1"],
+    content: [".container .row .col-md-8", ".col-md-8"],
+    remove: ["header", "footer", "nav", "script", "style", ".date"],
+  },
+
 };
