@@ -778,7 +778,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.lamassana.ad": {
     listing: ['a[href*="/actualitat/"]'],
-    articlePathPattern: /^\/actualitat\/[^/]+\/?$/,
+    articlePathPattern: /^\/actualitat\/(?!cultura\/?$|turisme\/?$|area-social\/?$)[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
