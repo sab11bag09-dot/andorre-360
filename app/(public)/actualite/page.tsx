@@ -39,11 +39,11 @@ export default async function ActualitePage() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 line-clamp-2 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-4xl leading-9 md:text-5xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 line-clamp-2 text-gray-300">
+              <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-300 leading-6">
                 {featured.description}
               </p>
 
@@ -76,11 +76,11 @@ export default async function ActualitePage() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="h-18 max-h-18 overflow-hidden font-serif text-3xl leading-9">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-gray-400 leading-6">
                       {mainArticle.description}
                     </p>
 
