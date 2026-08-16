@@ -109,6 +109,7 @@ export const siteRules: Record<string, SiteRule> = {
   "andorraara.com": {
     listing: [".uael-post__title a"],
     content: [
+      "#main-content .elementor-widget-text-editor",
       ".elementor-widget-text-editor",
       ".elementor-widget-text-editor .page .layoutArea .column",
     ],
