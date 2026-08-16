@@ -708,4 +708,16 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style"],
   },
 
+
+  "www.ari.ad": {
+    listing: ['a[href*="/noticies/"]'],
+    articlePathPattern: /^\/noticies\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    title: [".page-title", "h1"],
+    content: [".single-post .textlarge.pt-4", ".textlarge.pt-4"],
+    remove: ["header", "footer", "nav", "script", "style", ".post-meta"],
+  },
+
 };
