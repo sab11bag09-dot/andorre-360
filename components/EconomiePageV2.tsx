@@ -15,7 +15,9 @@ export default async function EconomiePageV2() {
   const briefs = items.slice(6, 12);
   const middleCard = items[14];
   const secondMiddleCard = items[15];
-  const bonASavoir = items[16];
+  const bottomCard = items[16];
+  const secondBottomCard = items[17];
+  const bonASavoir = items[18];
 
   return (
     <main className="min-h-screen bg-black text-white">
