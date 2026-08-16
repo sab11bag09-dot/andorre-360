@@ -13,8 +13,10 @@ export default async function InternationalPageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
+  const middleCard = items[14];
+  const secondMiddleCard = items[15];
+  const bottomCard = items[16];
+  const secondBottomCard = items[17];
   const bonASavoir = items[14];
 
   return (
@@ -114,6 +116,29 @@ export default async function InternationalPageV2() {
                     </article>
                   </Link>
                 ))}
+              </div>
+            )}
+
+            {(middleCard || secondMiddleCard) && (
+              <div className="mt-10 grid gap-8 md:grid-cols-2">
+                {middleCard && (
+                  <Link href={`/article/${middleCard.slug}`} className="block">
+                    <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{middleCard.title}</h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{middleCard.description}</p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
+                    </article>
+                  </Link>
+                )}
+                {secondMiddleCard && (
+                  <Link href={`/article/${secondMiddleCard.slug}`} className="block">
+                    <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{secondMiddleCard.title}</h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{secondMiddleCard.description}</p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
+                    </article>
+                  </Link>
+                )}
               </div>
             )}
 
