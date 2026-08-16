@@ -269,7 +269,7 @@ export default async function SociétéPageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="font-serif text-lg leading-snug">
+                    <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
                       {article.title}
                     </h3>
 
