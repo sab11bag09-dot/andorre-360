@@ -210,7 +210,7 @@ export default async function CulturePageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionImage ? (
-                    <div className="relative h-72">
+                    <div className="relative h-48">
                       <SafeImage
                         src={questionImage}
                         alt={questionArticle.title}
@@ -226,11 +226,11 @@ export default async function CulturePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7">
                       {questionArticle.title}
                     </h2>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
                       {questionArticle.description}
                     </p>
 
