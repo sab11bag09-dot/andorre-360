@@ -152,7 +152,7 @@ export default async function SociétéPageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-48 lg:h-auto lg:min-h-48 lg:flex-1">
+                      <div className="relative h-48 max-h-48">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -181,7 +181,7 @@ export default async function SociétéPageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-48 lg:h-auto lg:min-h-48 lg:flex-1">
+                      <div className="relative h-48 max-h-48">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
