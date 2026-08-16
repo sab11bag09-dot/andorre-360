@@ -13,9 +13,9 @@ export default async function EconomiePageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
-  const bonASavoir = items[14];
+  const middleCard = items[14];
+  const secondMiddleCard = items[15];
+  const bonASavoir = items[16];
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -96,15 +96,15 @@ export default async function EconomiePageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3 md:auto-rows-[150px]">
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
-                    className="block h-full"
+                    className="block"
                   >
-                    <article className="flex h-full max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
+                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -117,6 +117,41 @@ export default async function EconomiePageV2() {
               </div>
             )}
 
+            {(middleCard || secondMiddleCard) && (
+              <div className="mt-10 grid gap-8 md:grid-cols-2">
+                {middleCard && (
+                  <Link href={`/article/${middleCard.slug}`} className="block">
+                    <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        {middleCard.title}
+                      </h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                        {middleCard.description}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
+                    </article>
+                  </Link>
+                )}
+                {secondMiddleCard && (
+                  <Link href={`/article/${secondMiddleCard.slug}`} className="block">
+                    <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        {secondMiddleCard.title}
+                      </h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                        {secondMiddleCard.description}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
+                    </article>
+                  </Link>
+                )}
+              </div>
+            )}
+
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
@@ -126,19 +161,21 @@ export default async function EconomiePageV2() {
                     href={`/article/${bottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                        <SafeImage
+                          src={bottomCard.image}
+                          alt={bottomCard.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
+
                       <div className="p-5">
-                        <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        <h2 className="font-serif text-2xl">
                           {bottomCard.title}
                         </h2>
-
-                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
-                          {bottomCard.description}
-                        </p>
-
-                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
-                          {secondBottomCard.description}
-                        </p>
 
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
@@ -153,7 +190,17 @@ export default async function EconomiePageV2() {
                     href={`/article/${secondBottomCard.slug}`}
                     className="block lg:h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
+                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                        <SafeImage
+                          src={secondBottomCard.image}
+                          alt={secondBottomCard.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover"
+                        />
+                      </div>
+
                       <div className="p-5">
                         <h2 className="font-serif text-2xl">
                           {secondBottomCard.title}
