@@ -655,6 +655,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.bca.ad": {
     listing: [
+      'a[href^="/"][href$="/"]',
       "article h2 a",
       "article h3 a",
       "h2 a",
