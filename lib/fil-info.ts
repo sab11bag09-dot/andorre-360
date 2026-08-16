@@ -4,8 +4,8 @@ import { getPublicArticleDate } from "./public-article";
 export const FIL_INFO_NEWS_FEED_SIZE = 6;
 export const FIL_INFO_BRIEFS_SIZE = 6;
 export const FIL_INFO_CARDS_SIZE = 4;
-export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 3;
-export const FIL_INFO_PAGE_SIZE = 20;
+export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 7;
+export const FIL_INFO_PAGE_SIZE = 24;
 export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000;
 
 export const FIL_INFO_QUERY_LIMIT =
