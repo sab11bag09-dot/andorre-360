@@ -230,7 +230,7 @@ export default async function EconomiePageV2() {
                 className="block"
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
+                  <div className="relative h-64">
                     <SafeImage
                       src={questionArticle.image}
                       alt={questionArticle.title}
