@@ -167,6 +167,14 @@ export default async function InternationalPageV2() {
                           {bottomCard.title}
                         </h2>
 
+                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                          {bottomCard.description}
+                        </p>
+
+                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                          {secondBottomCard.description}
+                        </p>
+
                         <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
