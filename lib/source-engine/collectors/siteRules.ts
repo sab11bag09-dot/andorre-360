@@ -675,6 +675,8 @@ export const siteRules: Record<string, SiteRule> = {
     concurrency: 4,
     requireContent: true,
     content: [
+      "#eut-single-content .eut-container",
+      "#eut-single-content",
       ".entry-content",
       ".post-content",
       ".article-content",
