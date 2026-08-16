@@ -716,7 +716,7 @@ export const siteRules: Record<string, SiteRule> = {
     concurrency: 4,
     requireContent: true,
     title: [".page-title", "h1"],
-    content: [".single-post .textlarge.pt-4", ".textlarge.pt-4"],
+    content: [".single-post .textllarg.pt-4", ".textllarg.pt-4"],
     remove: ["header", "footer", "nav", "script", "style", ".post-meta"],
   },
 
