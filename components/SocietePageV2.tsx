@@ -293,7 +293,7 @@ export default async function SociétéPageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                     {bonASavoir.title}
                   </h2>
 
