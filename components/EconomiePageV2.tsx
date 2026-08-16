@@ -164,7 +164,7 @@ export default async function EconomiePageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                      <div className="relative h-48 lg:h-auto lg:min-h-48 lg:flex-1">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -193,7 +193,7 @@ export default async function EconomiePageV2() {
                     className="block lg:h-full"
                   >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
+                      <div className="relative h-48 lg:h-auto lg:min-h-48 lg:flex-1">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
