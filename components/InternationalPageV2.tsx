@@ -163,7 +163,7 @@ export default async function InternationalPageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {bottomCard.title}
                         </h2>
 
