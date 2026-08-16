@@ -720,4 +720,16 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", ".post-meta"],
   },
 
+
+  "somaccio.org": {
+    listing: ['a[href^="/"]'],
+    articlePathPattern: /^\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    title: ["h1", ".entry-title"],
+    content: [".et_pb_post_content"],
+    remove: ["header", "footer", "nav", "script", "style", ".et_pb_post_title"],
+  },
+
 };
