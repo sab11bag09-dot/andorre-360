@@ -42,7 +42,7 @@ export default async function CulturePageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 h-[7rem] max-h-[7rem] overflow-hidden font-serif text-5xl leading-[1.15] md:text-6xl">
+              <h1 className="mt-4 h-[9rem] max-h-[9rem] overflow-hidden font-serif text-5xl leading-[1.15] md:text-6xl">
                 {featured.title}
               </h1>
 
