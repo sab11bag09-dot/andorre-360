@@ -297,7 +297,7 @@ export default async function SociétéPageV2() {
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
+                  <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
                     {bonASavoir.description}
                   </p>
 
