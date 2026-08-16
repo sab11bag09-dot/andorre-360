@@ -241,11 +241,11 @@ export default async function InternationalPageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7">
                       {questionArticle.title}
                     </h2>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400">
                       {questionArticle.description}
                     </p>
 
@@ -315,7 +315,7 @@ export default async function InternationalPageV2() {
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
+                  <p className="mt-4 h-24 max-h-24 overflow-hidden leading-6 text-gray-400">
                     {bonASavoir.description}
                   </p>
 
