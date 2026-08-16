@@ -103,7 +103,7 @@ export default async function ActualitePage() {
                     className="block h-full"
                   >
                     <article className="flex h-full max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                      <h3 className="h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-lg leading-6">
                         {article.title}
                       </h3>
 
