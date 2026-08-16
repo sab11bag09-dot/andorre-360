@@ -83,7 +83,7 @@ export default async function SociétéPageV2() {
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-400 leading-6">
                       {mainArticle.description}
                     </p>
 
