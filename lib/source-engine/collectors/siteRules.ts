@@ -763,4 +763,16 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style"],
   },
 
+
+  "www.france24.com": {
+    listing: ['a[href^="/fr/"]'],
+    articlePathPattern: /^\/fr\/(?!vidéo\/|émissions\/)[^/]+\/\d{8}-[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    title: ["h1"],
+    content: [".t-content__body"],
+    remove: ["header", "footer", "nav", "script", "style", '[data-tms-ad-container]'],
+  },
+
 };
