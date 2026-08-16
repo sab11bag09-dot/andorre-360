@@ -696,4 +696,16 @@ export const siteRules: Record<string, SiteRule> = {
     ],
   },
 
+
+  "www.faf.ad": {
+    listing: ['a[href*="/pnfg/NNws_ShwNewDup?"]'],
+    articlePathPattern: /^\/pnfg\/NNws_ShwNewDup$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    title: ["h1"],
+    content: ["main .container", "main", ".container"],
+    remove: ["header", "footer", "nav", "script", "style"],
+  },
+
 };
