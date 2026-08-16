@@ -236,7 +236,7 @@ export default async function FilInfoPage() {
                         <span aria-hidden="true" className="h-px flex-1 bg-gray-800" />
                       </div>
 
-                      <h3 className="mt-5 font-serif text-xl leading-[1.22] transition-colors duration-300 group-hover:text-yellow-500">
+                      <h3 className="mt-5 h-24 max-h-24 overflow-hidden font-serif text-xl leading-6 transition-colors duration-300 group-hover:text-yellow-500">
                         {article.title}
                       </h3>
                     </div>
