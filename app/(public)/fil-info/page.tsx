@@ -286,12 +286,16 @@ export default async function FilInfoPage() {
                             {getFilInfoFormatLabel(article.filInfoFormat)}
                           </p>
 
-                          <h3 className="font-serif text-2xl leading-[1.18] transition group-hover:text-yellow-500">
+                          <h3 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7 transition group-hover:text-yellow-500">
                             {article.title}
                           </h3>
 
-                          <p className="mt-3 line-clamp-3 text-sm leading-7 text-gray-400">
+                          <p className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
                             {article.description}
+                          </p>
+
+                          <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.21em] text-yellow-500">
+                            Lire l’article →
                           </p>
                         </div>
                       </article>
