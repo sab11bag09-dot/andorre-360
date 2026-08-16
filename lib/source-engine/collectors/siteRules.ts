@@ -306,7 +306,7 @@ export const siteRules: Record<string, SiteRule> = {
       'article h4 a[href*="concordia.ad/"]',
       'h4 a[href*="concordia.ad/"]',
     ],
-    articlePathPattern: /^\/[^/]+\/?$/
+    articlePathPattern: /^\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
