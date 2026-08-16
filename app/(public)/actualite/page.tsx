@@ -183,7 +183,7 @@ export default async function ActualitePage() {
 
           {/* PARTIE DROITE : 2 COLONNES */}
 
-          <aside className="space-y-6 lg:col-span-2">
+          <aside className="space-y-6 lg:col-span-2 lg:flex lg:h-full lg:flex-col">
             {rightCards.map((article, index) => (
               <Link
                 key={article.id}
@@ -219,7 +219,7 @@ export default async function ActualitePage() {
             {bonASavoir && (
               <Link
                 href={`/article/${bonASavoir.slug}`}
-                className="block"
+                className="block lg:mt-auto"
               >
                 <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
