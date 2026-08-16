@@ -77,11 +77,11 @@ export default async function EconomiePageV2() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
+                    <h2 className="h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-3xl leading-9">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 text-gray-400">
+                    <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-400 leading-6">
                       {mainArticle.description}
                     </p>
 
