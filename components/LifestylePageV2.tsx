@@ -285,11 +285,11 @@ export default async function LifestylePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                       {questionArticle.title}
                     </h2>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400">
                       {questionArticle.description}
                     </p>
 
@@ -331,11 +331,11 @@ export default async function LifestylePageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                    <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
                       {article.title}
                     </h3>
 
-                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                    <p className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
                       {article.description}
                     </p>
 
