@@ -722,7 +722,7 @@ export const siteRules: Record<string, SiteRule> = {
 
 
   "somaccio.org": {
-    listing: ['a[href^="/"]'],
+    listing: ['a[href^="/"]', 'a[href^="https://somaccio.org/"]'],
     articlePathPattern: /^\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
