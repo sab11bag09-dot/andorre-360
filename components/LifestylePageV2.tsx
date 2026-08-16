@@ -53,11 +53,11 @@ export default async function LifestylePageV2() {
                   : featured.category}
               </p>
 
-              <h1 className="mt-4 line-clamp-2 font-serif text-5xl leading-[1.05] md:text-6xl">
+              <h1 className="mt-4 h-[9rem] max-h-[9rem] overflow-hidden font-serif text-5xl leading-[1.15] md:text-6xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 line-clamp-2 text-gray-300">
+              <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-300 leading-6">
                 {featured.description}
               </p>
 
@@ -90,11 +90,11 @@ export default async function LifestylePageV2() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
+                    <h2 className="h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-4xl leading-9">
                       {mainArticle.title}
                     </h2>
 
-                    <p className="mt-4 line-clamp-2 text-gray-400">
+                    <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-400 leading-6">
                       {mainArticle.description}
                     </p>
 
@@ -117,7 +117,7 @@ export default async function LifestylePageV2() {
                     className="block"
                   >
                     <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
+                      <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
                         {article.title}
                       </h3>
 
@@ -151,11 +151,11 @@ export default async function LifestylePageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                        <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {bottomCard.title}
                         </h2>
 
-                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+                        <p className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
                           {bottomCard.description}
                         </p>
 
