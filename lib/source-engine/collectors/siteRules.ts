@@ -653,4 +653,43 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", ".share"],
   },
 
+  "www.bca.ad": {
+    listing: [
+      "article h2 a",
+      "article h3 a",
+      "h2 a",
+      "h3 a",
+    ],
+    title: [
+      "h1",
+      ".entry-title",
+      ".post-title",
+      "article h2",
+      "article h3",
+    ],
+    articlePathPattern:
+      /^\/(?!category\/|tag\/|page\/|wp-)[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    content: [
+      ".entry-content",
+      ".post-content",
+      ".article-content",
+      "article",
+      "main",
+    ],
+    remove: [
+      "header",
+      "footer",
+      "nav",
+      "script",
+      "style",
+      ".share",
+      ".social",
+      ".related",
+      ".cookie",
+    ],
+  },
+
 };
