@@ -311,7 +311,7 @@ export default async function EconomiePageV2() {
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                  <p className="mt-4 h-[4.5rem] max-h-[4.5rem] overflow-hidden leading-6 text-gray-400">
                     {bonASavoir.description}
                   </p>
 
