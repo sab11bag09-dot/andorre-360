@@ -735,4 +735,20 @@ export const siteRules: Record<string, SiteRule> = {
     remove: ["header", "footer", "nav", "script", "style", ".et_pb_post_title"],
   },
 
+
+  "www.bbc.co.uk": {
+    listing: ['a[href*="/news/articles/"]'],
+    articlePathPattern: /^\/news\/articles\/[^/]+\/?$/,
+    maxArticles: 24,
+    concurrency: 4,
+    requireContent: true,
+    title: ["h1"],
+    content: [
+      '[class*="LayoutBlockStyled"]',
+      "article",
+      "main",
+    ],
+    remove: ["header", "footer", "nav", "script", "style", '[data-component="advertisement-block"]'],
+  },
+
 };
