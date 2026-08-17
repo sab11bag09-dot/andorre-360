@@ -60,7 +60,11 @@ export default async function FilInfoPage() {
     illustratedBriefs,
     newsFeed,
   } = partitionFilInfoArticles(visibleItems);
-  const selection = [featured, cards[0]].filter(Boolean);
+
+  const selection = [featured, cards[0]].filter(
+    (article): article is NonNullable<typeof article> => article !== null,
+  );
+
   const oldestVisibleItem = visibleItems.at(-1);
   const latestChronologicalItem = visibleItems.find(
     (article) => !article.filInfoPinned,

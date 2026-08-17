@@ -14,13 +14,12 @@ function normalizeImage<T extends { image: string | null }>(article: T): T {
 export async function getPublishedArticles() {
   const articles = await prisma.article.findMany({
     where: {
+      category: {
+        not: "ILS_EN_PARLENT",
+      },
       ...PUBLIC_ARTICLE_FILTER,
     },
-    orderBy: [
-      { publishedAt: "desc" },
-      { createdAt: "desc" },
-      { id: "desc" },
-    ],
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
     take: PUBLIC_ARTICLE_QUERY_LIMIT,
   });
 
@@ -89,11 +88,7 @@ export async function getArticlesByCategory(
       category: normalizedCategory,
       ...PUBLIC_ARTICLE_FILTER,
     },
-    orderBy: [
-      { publishedAt: "desc" },
-      { createdAt: "desc" },
-      { id: "desc" },
-    ],
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
     take: options.limit ?? PUBLIC_ARTICLE_QUERY_LIMIT,
   });
 
@@ -173,13 +168,12 @@ export async function getFeaturedArticle() {
   const article = await prisma.article.findFirst({
     where: {
       featured: true,
+      category: {
+        not: "ILS_EN_PARLENT",
+      },
       ...PUBLIC_ARTICLE_FILTER,
     },
-    orderBy: [
-      { publishedAt: "desc" },
-      { createdAt: "desc" },
-      { id: "desc" },
-    ],
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }, { id: "desc" }],
   });
 
   return article ? normalizeImage(article) : null;
