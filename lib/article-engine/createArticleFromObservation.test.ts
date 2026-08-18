@@ -31,34 +31,19 @@ function makeObservation(
   } as unknown as ObservationWithSource;
 }
 
-function makeDependencies(
-  observation: ObservationWithSource | null,
-) {
-  const findById = vi.fn(
-    async () => observation,
-  );
+function makeDependencies(observation: ObservationWithSource | null) {
+  const findById = vi.fn(async () => observation);
+  const markProcessed = vi.fn(async () => undefined);
+  const createDraft = vi.fn(async () => 42);
+  const updateDraft = vi.fn(async () => undefined);
 
-  const markProcessed = vi.fn(
-    async () => undefined,
-  );
-
-  const createDraft = vi.fn(
-    async () => 42,
-  );
-
-  const updateDraft = vi.fn(
-    async () => undefined,
-  );
-
-  const prepareArticle = vi.fn(
-    async () => ({
-      title: "Titre test",
-      description: "Premier paragraphe.",
-      content: "Premier paragraphe.",
-      category: "SOCIÉTÉ",
-      author: "Source test",
-    }),
-  );
+  const prepareArticle = vi.fn(async () => ({
+    title: "Titre test",
+    description: "Premier paragraphe.",
+    content: "Premier paragraphe.",
+    category: "SOCIÉTÉ",
+    author: "Source test",
+  }));
 
   const dependencies: CreateArticleFromObservationDependencies = {
     observationRepository: {
@@ -86,40 +71,23 @@ function makeDependencies(
 
 describe("createArticleFromObservation", () => {
   it("refuse un identifiant invalide", async () => {
-    const { dependencies, findById } =
-      makeDependencies(null);
+    const { dependencies, findById } = makeDependencies(null);
 
     await expect(
-      createArticleFromObservation(
-        0,
-        dependencies,
-      ),
-    ).rejects.toThrow(
-      "Identifiant d’observation invalide.",
-    );
+      createArticleFromObservation(0, dependencies),
+    ).rejects.toThrow("Identifiant d’observation invalide.");
 
     expect(findById).not.toHaveBeenCalled();
   });
 
   it("refuse une observation vide", async () => {
-    const observation = makeObservation({
-      content: "   ",
-    });
-
-    const {
-      dependencies,
-      createDraft,
-      updateDraft,
-    } = makeDependencies(observation);
+    const observation = makeObservation({ content: "   " });
+    const { dependencies, createDraft, updateDraft } =
+      makeDependencies(observation);
 
     await expect(
-      createArticleFromObservation(
-        observation.id,
-        dependencies,
-      ),
-    ).rejects.toThrow(
-      "Le contenu collecté est insuffisant",
-    );
+      createArticleFromObservation(observation.id, dependencies),
+    ).rejects.toThrow("Le contenu collecté est insuffisant");
 
     expect(createDraft).not.toHaveBeenCalled();
     expect(updateDraft).not.toHaveBeenCalled();
@@ -138,16 +106,12 @@ describe("createArticleFromObservation", () => {
       markProcessed,
     } = makeDependencies(observation);
 
-    const result =
-      await createArticleFromObservation(
-        observation.id,
-        dependencies,
-      );
+    const result = await createArticleFromObservation(
+      observation.id,
+      dependencies,
+    );
 
-    expect(result).toEqual({
-      articleId: 12,
-    });
-
+    expect(result).toEqual({ articleId: 12 });
     expect(createDraft).not.toHaveBeenCalled();
     expect(updateDraft).not.toHaveBeenCalled();
     expect(markProcessed).not.toHaveBeenCalled();
@@ -166,11 +130,10 @@ describe("createArticleFromObservation", () => {
       markProcessed,
     } = makeDependencies(observation);
 
-    const result =
-      await createArticleFromObservation(
-        observation.id,
-        dependencies,
-      );
+    const result = await createArticleFromObservation(
+      observation.id,
+      dependencies,
+    );
 
     expect(result.articleId).toBe(12);
     expect(createDraft).not.toHaveBeenCalled();
@@ -180,13 +143,11 @@ describe("createArticleFromObservation", () => {
       expect.objectContaining({
         title: "Titre test",
         content: "Premier paragraphe.",
+        aiRewrittenAt: expect.any(Date),
       }),
     );
 
-    expect(markProcessed).toHaveBeenCalledWith(
-      1,
-      12,
-    );
+    expect(markProcessed).toHaveBeenCalledWith(1, 12);
   });
 
   it("crée un brouillon puis rattache l’observation", async () => {
@@ -199,11 +160,10 @@ describe("createArticleFromObservation", () => {
       markProcessed,
     } = makeDependencies(observation);
 
-    const result =
-      await createArticleFromObservation(
-        observation.id,
-        dependencies,
-      );
+    const result = await createArticleFromObservation(
+      observation.id,
+      dependencies,
+    );
 
     expect(result.articleId).toBe(42);
     expect(updateDraft).not.toHaveBeenCalled();
@@ -214,11 +174,9 @@ describe("createArticleFromObservation", () => {
       content: "Premier paragraphe.",
       category: "SOCIÉTÉ",
       author: "Source test",
+      aiRewrittenAt: expect.any(Date),
     });
 
-    expect(markProcessed).toHaveBeenCalledWith(
-      1,
-      42,
-    );
+    expect(markProcessed).toHaveBeenCalledWith(1, 42);
   });
 });

@@ -389,6 +389,7 @@ describe("manageArticleTranslation", () => {
     } = makeDependencies({
       id: 12,
       status: "APPROVED",
+            articleAiRewrittenAt: new Date("2026-08-18T02:33:55.003Z"),
     });
 
     const result =
@@ -479,6 +480,7 @@ describe("manageArticleTranslation", () => {
     } = makeDependencies({
       id: 12,
       status: "APPROVED",
+            articleAiRewrittenAt: new Date("2026-08-18T02:33:55.003Z"),
     });
 
     publishApproved.mockRejectedValueOnce(

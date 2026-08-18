@@ -35,6 +35,9 @@ describe("requêtes publiques des articles", () => {
 
     expect(findMany).toHaveBeenCalledWith({
       where: {
+        category: {
+          not: "ILS_EN_PARLENT",
+        },
         published: true,
         editorialStatus: "PUBLISHED",
       },
@@ -186,6 +189,9 @@ describe("requêtes publiques des articles", () => {
 
     expect(findFirst).toHaveBeenCalledWith({
       where: {
+        category: {
+          not: "ILS_EN_PARLENT",
+        },
         featured: true,
         published: true,
         editorialStatus: "PUBLISHED",

@@ -81,6 +81,7 @@ async function createArticle(title = "Article français"): Promise<number> {
       readingTime: "1 min",
       published: true,
       editorialStatus: "PUBLISHED",
+      aiRewrittenAt: new Date("2026-08-18T02:33:55.003Z"),
     },
     select: { id: true },
   });

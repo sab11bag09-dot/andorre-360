@@ -95,18 +95,27 @@ export async function createArticleFromObservation(
     );
   }
 
-  if (!process.env.OPENAI_API_KEY?.trim()) {
-  throw new Error(
-    "OPENAI_API_KEY est obligatoire pour préparer un article.",
-  );
-}
+   const usesProductionPipeline = dependencies === defaultDependencies;
 
-const aiGenerator = new OpenAiEditorialGenerator({
-  apiKey: process.env.OPENAI_API_KEY,
-  model: process.env.OPENAI_TRANSLATION_MODEL,
-});
+  const aiGenerator = usesProductionPipeline
+    ? (() => {
+        const apiKey = process.env.OPENAI_API_KEY?.trim();
 
-const editorialGenerator = aiGenerator;
+        if (!apiKey) {
+          throw new Error(
+            "OPENAI_API_KEY est obligatoire pour préparer un article.",
+          );
+        }
+
+        return new OpenAiEditorialGenerator({
+          apiKey,
+          model: process.env.OPENAI_TRANSLATION_MODEL,
+        });
+      })()
+    : null;
+
+  const editorialGenerator =
+    aiGenerator ?? dependencies.editorialGenerator;
   let draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
@@ -114,7 +123,7 @@ const editorialGenerator = aiGenerator;
     sourceCategory: observation.source.category,
   });
 
-  if (aiGenerator) {
+    if (aiGenerator !== null) {
     const french = await aiGenerator.translateArticle({
       locale: "FR",
       title: draft.title,

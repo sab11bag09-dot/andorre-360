@@ -22,6 +22,7 @@ describe("revalidation publique", () => {
   it("référence toutes les rubriques publiques", () => {
     expect(PUBLIC_CATEGORY_PATHS).toEqual({
       "ACTUALITÉ": "/actualite",
+      "ILS_EN_PARLENT": "/ils-en-parlent",
       "ÉCONOMIE": "/economie",
       "SOCIÉTÉ": "/societe",
       POLITIQUE: "/politique",

@@ -30,6 +30,7 @@ const actor = {
 describe("mutations de traduction auditées", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
     transaction.mockImplementation(
       async (callback: (client: unknown) => unknown) =>
         callback({
@@ -37,9 +38,12 @@ describe("mutations de traduction auditées", () => {
             findUnique: translationFindUnique,
             updateMany: translationUpdateMany,
           },
-          editorialEvent: { create: editorialEventCreate },
+          editorialEvent: {
+            create: editorialEventCreate,
+          },
         }),
     );
+
     translationUpdateMany.mockResolvedValue({ count: 1 });
     editorialEventCreate.mockResolvedValue({ id: 99 });
   });
@@ -138,11 +142,16 @@ describe("mutations de traduction auditées", () => {
     });
 
     vi.clearAllMocks();
+
     translationFindUnique.mockResolvedValue({
       id: 12,
       status: "APPROVED",
       publishedAt: null,
+      article: {
+        aiRewrittenAt: new Date("2026-08-18T02:33:55.003Z"),
+      },
     });
+
     translationUpdateMany.mockResolvedValue({ count: 1 });
 
     await publishAuditedArticleTranslation(
@@ -165,6 +174,7 @@ describe("mutations de traduction auditées", () => {
       status: "REVIEW",
       publishedAt: null,
     });
+
     translationUpdateMany.mockResolvedValue({ count: 0 });
 
     await expect(

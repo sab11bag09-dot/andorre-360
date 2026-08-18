@@ -18,6 +18,7 @@ describe("OpenAiEditorialGenerator", () => {
         content: "Contingut català",
       }),
     );
+
     const generator = new OpenAiEditorialGenerator({
       apiKey: "test-key",
       model: "test-model",
@@ -57,6 +58,7 @@ describe("OpenAiEditorialGenerator", () => {
         content: "Contenido",
       }),
     );
+
     const generator = new OpenAiEditorialGenerator({
       apiKey: "test-key",
       client,
@@ -118,6 +120,7 @@ describe("OpenAiEditorialGenerator", () => {
     const client: StructuredResponseClient = {
       create: vi.fn().mockRejectedValue(new Error("délai dépassé")),
     };
+
     const generator = new OpenAiEditorialGenerator({
       apiKey: "test-key",
       client,
@@ -133,10 +136,16 @@ describe("OpenAiEditorialGenerator", () => {
     ).rejects.toThrow("La traduction OpenAI a échoué : délai dépassé");
   });
 
-  it("ne modifie pas la préparation française", async () => {
+  it("prépare un article français avec la réponse structurée", async () => {
     const generator = new OpenAiEditorialGenerator({
       apiKey: "test-key",
-      client: makeClient("{}"),
+      client: makeClient(
+        JSON.stringify({
+          title: "Titre français",
+          description: "Description française",
+          content: "Contenu français",
+        }),
+      ),
     });
 
     await expect(
@@ -148,6 +157,7 @@ describe("OpenAiEditorialGenerator", () => {
       }),
     ).resolves.toMatchObject({
       title: "Titre français",
+      description: "Description française",
       content: "Contenu français",
     });
   });

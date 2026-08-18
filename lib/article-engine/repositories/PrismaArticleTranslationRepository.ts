@@ -58,7 +58,7 @@ async findByArticleAndLocale(
         id: translation.id,
         status: translation.status,
         publishedAt: translation.publishedAt,
-        articleAiRewrittenAt: translation.article.aiRewrittenAt,
+        articleAiRewrittenAt: translation.article?.aiRewrittenAt ?? null,
       }
     : null;
 }
