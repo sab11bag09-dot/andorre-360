@@ -93,6 +93,9 @@ export class PrismaArticleRepository
         id: articleId,
         published: false,
         editorialStatus: "AI_DRAFT",
+        aiRewrittenAt: {
+  not: null,
+},
       },
       data: {
         published: true,
