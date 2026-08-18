@@ -137,7 +137,7 @@ export default async function ActualitePage() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 overflow-hidden font-serif text-2xl leading-tight">
                           {bottomCard.title}
                         </h2>
 

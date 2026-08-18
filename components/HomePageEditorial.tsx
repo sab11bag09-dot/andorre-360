@@ -65,10 +65,13 @@ export default async function HomePageEditorial() {
     availableArticles.shift() ??
     null;
 
-  const briefs =
-    editorialLayout.briefs.length > 0
-      ? editorialLayout.briefs
-      : availableArticles.splice(0, 4);
+  const briefs = [
+  ...editorialLayout.briefs,
+  ...availableArticles.splice(
+    0,
+    Math.max(0, 3 - editorialLayout.briefs.length),
+  ),
+];
 
   const grandFormat =
     editorialLayout.grandFormat ??
@@ -175,7 +178,7 @@ export default async function HomePageEditorial() {
                   </div>
 
                   {feature.image ? (
-  <div className="relative mt-7 h-[360px] overflow-hidden md:h-[440px]">
+  <div className="relative mt-7 h-[330px] overflow-hidden md:h-[390px]">
     <SafeImage
       src={feature.image}
       alt={feature.title}
