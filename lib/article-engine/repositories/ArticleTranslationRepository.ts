@@ -13,6 +13,7 @@ export interface ArticleTranslationRecord {
   id: number;
   status: ArticleTranslationStatus;
   publishedAt?: Date | null;
+  articleAiRewrittenAt?: Date | null;
 }
 
 export interface ArticleTranslationDraftInput {

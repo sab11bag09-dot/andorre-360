@@ -23,28 +23,45 @@ function isUniqueConstraintError(error: unknown): boolean {
 export class PrismaArticleTranslationRepository
   implements ArticleTranslationRepository
 {
-  constructor(
-    private readonly client: Pick<PrismaClient, "articleTranslation"> = prisma,
-  ) {}
+ constructor(
+  private readonly client: Pick<
+    PrismaClient,
+    "articleTranslation" | "article"
+  > = prisma,
+) {}
 
-  async findByArticleAndLocale(
-    articleId: number,
-    locale: TranslationLocale,
-  ): Promise<ArticleTranslationRecord | null> {
-    return this.client.articleTranslation.findUnique({
-      where: {
-        articleId_locale: {
-          articleId,
-          locale,
+async findByArticleAndLocale(
+  articleId: number,
+  locale: TranslationLocale,
+): Promise<ArticleTranslationRecord | null> {
+  const translation = await this.client.articleTranslation.findUnique({
+    where: {
+      articleId_locale: {
+        articleId,
+        locale,
+      },
+    },
+    select: {
+      id: true,
+      status: true,
+      publishedAt: true,
+      article: {
+        select: {
+          aiRewrittenAt: true,
         },
       },
-      select: {
-        id: true,
-        status: true,
-        publishedAt: true,
-      },
-    });
-  }
+    },
+  });
+
+  return translation
+    ? {
+        id: translation.id,
+        status: translation.status,
+        publishedAt: translation.publishedAt,
+        articleAiRewrittenAt: translation.article.aiRewrittenAt,
+      }
+    : null;
+}
 
   async createDraft(
     input: ArticleTranslationDraftInput,

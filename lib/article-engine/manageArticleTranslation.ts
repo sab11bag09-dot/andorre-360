@@ -277,6 +277,11 @@ export async function publishArticleTranslation(
       "La traduction doit être approuvée avant publication.",
     );
   }
+if (!translation.articleAiRewrittenAt) {
+  throw new Error(
+    "L’article doit être réécrit par l’IA avant publication.",
+  );
+}
 
   await dependencies.translationRepository
     .publishApproved(
