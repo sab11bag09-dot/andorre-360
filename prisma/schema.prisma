@@ -83,6 +83,7 @@ model Article {
   publishedAt     DateTime?
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
+  aiRewrittenAt DateTime?
   analytics       ArticleAnalytics[]
   publications    Publication[]
 

@@ -39,6 +39,7 @@ export function makeArticle(
     publishedAt: now,
     createdAt: now,
     updatedAt: now,
+    aiRewrittenAt: null,
     ...overrides,
   };
 }
