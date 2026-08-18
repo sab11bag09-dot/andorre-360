@@ -145,6 +145,7 @@ export async function createArticleFromObservation(
 
   const editorialDraft = {
     ...draft,
+    image: "/images/global/hero.jpg",
     aiRewrittenAt: new Date(),
     category:
       sourceEditorialCategory === "ILS_EN_PARLENT"

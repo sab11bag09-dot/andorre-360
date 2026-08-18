@@ -125,6 +125,21 @@ export async function DELETE(
         { status: 404 }
       );
     }
+    const usageCount = await prisma.mediaUsage.count({
+  where: {
+    mediaId,
+  },
+});
+
+if (usageCount > 0) {
+  return NextResponse.json(
+    {
+      error:
+        "Ce média est encore utilisé dans un ou plusieurs articles.",
+    },
+    { status: 409 },
+  );
+}
 
     if (media.path.startsWith("/uploads/")) {
       const relativePath = media.path.replace(/^\/+/, "");

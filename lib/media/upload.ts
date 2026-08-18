@@ -24,15 +24,15 @@ const ALLOWED_VIDEO_TYPES = [
 
 export async function uploadMedia(file: File): Promise<Media> {
   if (!file) {
-    throw new Error("No file provided");
+   throw new Error("Aucun fichier n’a été fourni.");
   }
 
   if (file.size === 0) {
-    throw new Error("The uploaded file is empty");
+    throw new Error("Le fichier téléversé est vide.");
   }
 
     if (file.size > MAX_FILE_SIZE) {
-    throw new Error("The uploaded file exceeds the 100 MB limit");
+    throw new Error("Le fichier dépasse la limite de 300 Mo.");
   }
 
   const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);

@@ -174,6 +174,7 @@ describe("createArticleFromObservation", () => {
       content: "Premier paragraphe.",
       category: "SOCIÉTÉ",
       author: "Source test",
+      image: "/images/global/hero.jpg",
       aiRewrittenAt: expect.any(Date),
     });
 

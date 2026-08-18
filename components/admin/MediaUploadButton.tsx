@@ -83,7 +83,7 @@ export default function MediaUploadButton() {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+        accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
         onChange={handleFileChange}
         className="hidden"
       />
