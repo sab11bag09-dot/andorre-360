@@ -95,18 +95,18 @@ export async function createArticleFromObservation(
     );
   }
 
-  const aiGenerator =
-    isAiMultilingualSource(
-      observation.source.id,
-      observation.source.category,
-    ) && process.env.OPENAI_API_KEY?.trim()
-      ? new OpenAiEditorialGenerator({
-          apiKey: process.env.OPENAI_API_KEY,
-          model: process.env.OPENAI_TRANSLATION_MODEL,
-        })
-      : null;
-  const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
+  if (!process.env.OPENAI_API_KEY?.trim()) {
+  throw new Error(
+    "OPENAI_API_KEY est obligatoire pour préparer un article.",
+  );
+}
 
+const aiGenerator = new OpenAiEditorialGenerator({
+  apiKey: process.env.OPENAI_API_KEY,
+  model: process.env.OPENAI_TRANSLATION_MODEL,
+});
+
+const editorialGenerator = aiGenerator;
   let draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
