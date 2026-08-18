@@ -4,6 +4,7 @@ export interface ArticleDraftInput {
   content: string;
   category: string;
   author: string;
+  aiRewrittenAt?: Date | null;
 }
 
 export interface ArticleForTranslation {

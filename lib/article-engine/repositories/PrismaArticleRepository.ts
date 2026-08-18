@@ -45,6 +45,7 @@ export class PrismaArticleRepository
         readingTime: "1 min",
         published: false,
         editorialStatus: "AI_DRAFT",
+        aiRewrittenAt: input.aiRewrittenAt ?? null,
       },
       select: {
         id: true,
@@ -74,6 +75,7 @@ export class PrismaArticleRepository
         author: input.author,
         readingTime: "1 min",
         editorialStatus: "AI_DRAFT",
+        aiRewrittenAt: input.aiRewrittenAt ?? null,
       },
     });
 

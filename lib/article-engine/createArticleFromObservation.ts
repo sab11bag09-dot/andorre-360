@@ -136,6 +136,7 @@ const editorialGenerator = aiGenerator;
 
   const editorialDraft = {
     ...draft,
+    aiRewrittenAt: new Date(),
     category:
       sourceEditorialCategory === "ILS_EN_PARLENT"
         ? "ILS_EN_PARLENT"
