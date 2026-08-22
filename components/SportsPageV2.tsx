@@ -159,8 +159,7 @@ export default async function SportsPageV2() {
     ))}
   </div>
 )}
-        
-          </div>
+        </div>
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2 lg:flex lg:flex-col lg:gap-6 lg:space-y-0">
