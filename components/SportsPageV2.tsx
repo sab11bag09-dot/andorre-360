@@ -13,8 +13,7 @@ export default async function SportsPageV2() {
   const questionArticle = items[2];
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
+  const bottomCards = items.slice(12, 16);
   const bonASavoir = items[14];
   const questionImage = questionArticle?.image ?? featured?.image;
 
@@ -60,7 +59,7 @@ export default async function SportsPageV2() {
       )}
 
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
-        <div className="grid gap-8 lg:grid-cols-6">
+        <div className="grid items-start gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
 
           <div className="lg:col-span-4 lg:flex lg:flex-col">
@@ -122,75 +121,46 @@ export default async function SportsPageV2() {
               </div>
             )}
 
-            {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
+            {/* QUATRE CARTES DE PIED SUR LES 4 COLONNES */}
 
-            {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
-                {bottomCard && (
-                  <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {bottomCard.image ? (
-                        <div className="relative h-64">
-                          <SafeImage
-                            src={bottomCard.image}
-                            alt={bottomCard.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : null}
-
-                      <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
-                          {bottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
-
-                {secondBottomCard && (
-                  <Link
-                    href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-[420px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      {secondBottomCard.image ? (
-                        <div className="relative h-64">
-                          <SafeImage
-                            src={secondBottomCard.image}
-                            alt={secondBottomCard.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : null}
-
-                      <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
-                          {secondBottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
-              </div>
-            )}
+{bottomCards.length > 0 && (
+  <div className="mt-10 grid gap-8 md:grid-cols-2">
+    {bottomCards.map((article) => (
+      <Link
+        key={article.id}
+        href={`/article/${article.slug}`}
+        className="block"
+      >
+        <article className="h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+          <div className="relative h-64">
+            <SafeImage
+              src={article.image || "/images/global/hero.jpg"}
+              alt={article.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-cover"
+            />
           </div>
 
+          <div className="p-5">
+            <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+              {article.title}
+            </h2>
+            <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+  {article.description}
+</p>
+
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+              Lire l’article →
+            </p>
+          </div>
+        </article>
+      </Link>
+    ))}
+  </div>
+)}
+        
+          </div>
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2 lg:flex lg:flex-col lg:gap-6 lg:space-y-0">
@@ -299,7 +269,7 @@ export default async function SportsPageV2() {
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 line-clamp-4 leading-relaxed text-gray-400">
+                  <p className="mt-4 line-clamp-5 leading-relaxed text-gray-400">
                     {bonASavoir.description}
                   </p>
 
