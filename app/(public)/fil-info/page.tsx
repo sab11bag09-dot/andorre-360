@@ -85,7 +85,7 @@ export default async function FilInfoPage() {
           <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-yellow-500">
-                Andorre 360
+                Andorra 360
               </p>
 
               <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-[0.95] tracking-[-0.025em] sm:text-5xl md:text-6xl">
@@ -93,10 +93,6 @@ export default async function FilInfoPage() {
               </h1>
             </div>
 
-            <p className="max-w-md text-base leading-8 text-gray-300 md:text-right md:text-lg">
-              Les dernières publications, classées selon leur heure de mise en
-              ligne.
-            </p>
           </div>
         </header>
 
@@ -290,11 +286,11 @@ export default async function FilInfoPage() {
                             {getFilInfoFormatLabel(article.filInfoFormat)}
                           </p>
 
-                          <h3 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7 transition group-hover:text-yellow-500">
+                          <h3 className="h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7 transition group-hover:text-yellow-500">
                             {article.title}
                           </h3>
 
-                          <p className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
+                          <p className="mt-3 h-24 max-h-24 overflow-hidden text-sm leading-6 text-gray-400">
                             {article.description}
                           </p>
 
