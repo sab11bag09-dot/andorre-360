@@ -277,7 +277,10 @@ export async function publishArticleTranslation(
       "La traduction doit être approuvée avant publication.",
     );
   }
-if (!translation.articleAiRewrittenAt) {
+if (
+  !translation.articleAiRewrittenAt &&
+  translation.articleContentType !== "editorial"
+) {
   throw new Error(
     "L’article doit être réécrit par l’IA avant publication.",
   );

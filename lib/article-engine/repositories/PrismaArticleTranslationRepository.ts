@@ -47,8 +47,9 @@ async findByArticleAndLocale(
       publishedAt: true,
       article: {
         select: {
-          aiRewrittenAt: true,
-        },
+  aiRewrittenAt: true,
+  contentType: true,
+},
       },
     },
   });
@@ -59,6 +60,7 @@ async findByArticleAndLocale(
         status: translation.status,
         publishedAt: translation.publishedAt,
         articleAiRewrittenAt: translation.article?.aiRewrittenAt ?? null,
+        articleContentType: translation.article?.contentType ?? null,
       }
     : null;
 }

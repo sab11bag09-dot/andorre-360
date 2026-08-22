@@ -100,11 +100,18 @@ export const EDITORIAL_ZONES: EditorialZone[] = [
     description:
       "Contenu mis en avant dans une zone éditoriale.",
   },
+    {
+    value: "editorial",
+    label: "Édito",
+    description:
+      "Édito quotidien affiché dans la zone éditoriale de la page.",
+  },
   {
     value: "standard",
     label: "Flux standard",
     description:
       "Contenu affiché dans le flux normal de la page.",
+
   },
   {
     value: "secondary",
