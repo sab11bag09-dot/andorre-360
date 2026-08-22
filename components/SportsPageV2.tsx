@@ -131,7 +131,7 @@ export default async function SportsPageV2() {
         href={`/article/${article.slug}`}
         className="block"
       >
-        <article className="h-[460px] overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+        <article className="flex h-[460px] flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
           <div className="relative h-64">
             <SafeImage
               src={article.image || "/images/global/hero.jpg"}
@@ -142,7 +142,7 @@ export default async function SportsPageV2() {
             />
           </div>
 
-          <div className="p-5">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-5">
             <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
               {article.title}
             </h2>
