@@ -1,5 +1,6 @@
 import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
+import MediaPreview from "@/components/article/MediaPreview";
 
 import { getArticlesByCategory } from "@/lib/articles";
 
@@ -69,13 +70,12 @@ export default async function SociétéPageV2() {
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
-                    <SafeImage
-                      src={mainArticle.image}
-                      alt={mainArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 66vw"
-                      className="object-cover"
-                    />
+                    <MediaPreview
+  image={mainArticle.image}
+  videoUrl={mainArticle.videoUrl}
+  title={mainArticle.title}
+  mode="featured"
+/>
                   </div>
 
                   <div className="p-6">
@@ -219,13 +219,12 @@ export default async function SociétéPageV2() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
-                    <SafeImage
-                      src={questionArticle.image}
-                      alt={questionArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
+                    <MediaPreview
+  image={questionArticle.image}
+  videoUrl={questionArticle.videoUrl}
+  title={questionArticle.title}
+  mode="featured"
+/>
                   </div>
 
                   <div className="p-4">
