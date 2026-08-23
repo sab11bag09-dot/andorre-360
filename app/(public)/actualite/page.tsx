@@ -2,6 +2,7 @@ import SafeImage from "@/components/SafeImage";
 import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
+import MediaPreview from "@/components/article/MediaPreview";
 
 export const dynamic = "force-dynamic";
 
@@ -24,13 +25,13 @@ export default async function ActualitePage() {
         <Link href={`/article/${featured.slug}`} className="block">
           <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
             <SafeImage
-              src={featured.image}
-              alt={featured.title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
+  src={featured.image}
+  alt={featured.title}
+  fill
+  priority
+  sizes="100vw"
+  className="object-cover"
+/>
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
@@ -66,13 +67,12 @@ export default async function ActualitePage() {
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
-                    <SafeImage
-                      src={mainArticle.image}
-                      alt={mainArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 66vw"
-                      className="object-cover"
-                    />
+                    <MediaPreview
+  image={mainArticle.image}
+  videoUrl={mainArticle.videoUrl}
+  title={mainArticle.title}
+  mode="featured"
+/>
                   </div>
 
                   <div className="p-6">
@@ -192,13 +192,12 @@ export default async function ActualitePage() {
               >
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className={`relative ${index === 3 ? "h-48" : "h-40"}`}>
-                    <SafeImage
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
+                    <MediaPreview
+  image={article.image}
+  videoUrl={article.videoUrl}
+  title={article.title}
+  mode={index === 0 ? "featured" : "thumbnail"}
+/>
                   </div>
 
                   <div className="p-4">
