@@ -43,7 +43,9 @@ export default function ArticleEditor({
 
   // Média
   const [image, setImage] = useState(initialValues.image);
-  const [contentType] = useState(initialValues.contentType);
+  const [contentType, setContentType] = useState(
+  initialValues.contentType,
+);
   const [videoUrl, setVideoUrl] = useState(initialValues.videoUrl);
   const [videoDuration, setVideoDuration] = useState(
     initialValues.videoDuration
@@ -170,14 +172,15 @@ export default function ArticleEditor({
           />
 
           <ArticleMedia
-            image={image}
-            setImage={setImage}
-            contentType={contentType}
-            videoUrl={videoUrl}
-            setVideoUrl={setVideoUrl}
-            videoDuration={videoDuration}
-            setVideoDuration={setVideoDuration}
-          />
+  image={image}
+  setImage={setImage}
+  contentType={contentType}
+  setContentType={setContentType}
+  videoUrl={videoUrl}
+  setVideoUrl={setVideoUrl}
+  videoDuration={videoDuration}
+  setVideoDuration={setVideoDuration}
+/>
         </div>
 
         <aside className="space-y-8">

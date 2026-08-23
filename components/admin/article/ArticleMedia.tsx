@@ -4,6 +4,7 @@ import MediaPicker from "@/components/admin/MediaPicker";
 import {
   Input,
   SectionHeader,
+  Select,
 } from "@/components/admin/ui";
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
   setImage: (value: string) => void;
 
   contentType: string;
+  setContentType: (value: string) => void;
 
   videoUrl: string;
   setVideoUrl: (value: string) => void;
@@ -23,13 +25,16 @@ export default function ArticleMedia({
   image,
   setImage,
   contentType,
+  setContentType,
   videoUrl,
   setVideoUrl,
   videoDuration,
   setVideoDuration,
 }: Props) {
+  const isVideo = contentType === "video";
+
   return (
-    <section className="space-y-7 rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-sm">
+    <section className="space-y-7 rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
       <SectionHeader
         eyebrow="Médias"
         title="Image et vidéo"
@@ -37,69 +42,90 @@ export default function ArticleMedia({
 
       <div>
         <label
-          htmlFor="image"
+          htmlFor="article-media-type"
           className="mb-2 block font-semibold text-zinc-200"
         >
-          Image de couverture
+          Média principal
         </label>
 
-        <input
-          id="image"
-          name="image"
-          type="hidden"
-          value={image}
-        />
-
-       <MediaPicker
-  value={image}
-  onChange={setImage}
-  type="image"
-/>
-
-        <div className="mt-5 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
-          {image ? (
-            <img
-              src={image}
-              alt="Aperçu de la couverture"
-              className="h-72 w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-72 items-center justify-center text-sm text-zinc-600">
-              Aucune image sélectionnée
-            </div>
-          )}
-        </div>
+        <Select
+          id="article-media-type"
+          value={isVideo ? "video" : "image"}
+          onChange={(event) =>
+            setContentType(event.target.value)
+          }
+          className="mt-0"
+        >
+          <option value="image">Photo</option>
+          <option value="video">Vidéo</option>
+        </Select>
       </div>
 
-      {contentType === "video" && (
+      {!isVideo && (
+        <div>
+          <label
+            htmlFor="image"
+            className="mb-2 block font-semibold text-zinc-200"
+          >
+            Image de couverture
+          </label>
+
+          <input
+            id="image"
+            name="image"
+            type="hidden"
+            value={image}
+          />
+
+          <MediaPicker
+            value={image}
+            onChange={setImage}
+            type="image"
+          />
+
+          <div className="mt-5 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950">
+            {image ? (
+              <img
+                src={image}
+                alt="Aperçu de la couverture"
+                className="h-72 w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-72 items-center justify-center text-sm text-zinc-600">
+                Aucune image sélectionnée
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isVideo && (
         <div className="grid gap-5 border-t border-zinc-800 pt-6">
           <div>
             <label
               htmlFor="videoUrl"
               className="mb-2 block font-semibold text-zinc-200"
             >
-              URL de la vidéo
+              Vidéo
             </label>
 
-            <>
-  <MediaPicker
-    value={videoUrl}
-    onChange={setVideoUrl}
-    type="video"
-  />
+            <MediaPicker
+              value={videoUrl}
+              onChange={setVideoUrl}
+              type="video"
+            />
 
-  <Input
-    id="videoUrl"
-    name="videoUrl"
-    type="url"
-    value={videoUrl}
-    onChange={(event) =>
-      setVideoUrl(event.target.value)
-    }
-    className="mt-4"
-    placeholder="...ou collez directement une URL"
-  />
-</>
+            <Input
+              id="videoUrl"
+              name="videoUrl"
+              type="url"
+              value={videoUrl}
+              onChange={(event) =>
+                setVideoUrl(event.target.value)
+              }
+              className="mt-4"
+              placeholder="Ou collez directement une URL"
+            />
           </div>
 
           <div>

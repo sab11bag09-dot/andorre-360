@@ -65,9 +65,9 @@ export default async function CategoryPageDB({
               {title}
             </p>
 
-            <h1 className="mt-4 max-w-4xl font-serif text-4xl leading-tight md:text-5xl lg:text-6xl">
-              {featured.title}
-            </h1>
+            <h1 className="mt-4 h-[7rem] max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl">
+  {featured.title}
+</h1>
 
             <p className="mt-5 max-w-2xl leading-relaxed text-gray-200 md:text-lg">
               {featured.description}

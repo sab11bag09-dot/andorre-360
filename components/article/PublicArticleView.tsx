@@ -99,7 +99,42 @@ export default function PublicArticleView({
       lang={contentLanguage}
       className="min-h-screen bg-black text-white"
     >
-      {article.image ? (
+            {article.videoUrl &&
+      (isUploadedVideo(article.videoUrl) || videoEmbedUrl) ? (
+        <div className="relative h-[500px] w-full overflow-hidden bg-black">
+          {isUploadedVideo(article.videoUrl) ? (
+            <video
+              src={article.videoUrl}
+              controls
+              autoPlay={false}
+              preload="metadata"
+              className="h-full w-full object-contain"
+            >
+              Votre navigateur ne prend pas en charge la lecture vidéo.
+            </video>
+          ) : (
+            <iframe
+              src={videoEmbedUrl ?? undefined}
+              title={`Vidéo : ${article.title}`}
+              className="h-full w-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          )}
+
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+          <div className="absolute bottom-0 left-0 p-10">
+            <p className="tracking-widest text-yellow-500">
+              {article.category}
+            </p>
+
+            <h1 className="mt-4 max-w-4xl font-serif text-5xl md:text-6xl">
+              {article.title}
+            </h1>
+          </div>
+        </div>
+      ) : article.image ? (
         <div className="relative h-[500px] w-full">
           <SafeImage
             src={article.image}
@@ -163,40 +198,6 @@ export default function PublicArticleView({
         <p className="mt-8 text-xl leading-relaxed text-gray-200">
           {article.description}
         </p>
-
-        {article.videoUrl && (
-          <div className="mt-10 overflow-hidden rounded-2xl border border-gray-800 bg-zinc-950">
-            {isUploadedVideo(article.videoUrl) ? (
-              <video
-                src={article.videoUrl}
-                controls
-                preload="metadata"
-                className="aspect-video w-full bg-black"
-              >
-                Votre navigateur ne prend pas en charge la lecture vidéo.
-              </video>
-            ) : videoEmbedUrl ? (
-              <iframe
-                src={videoEmbedUrl}
-                title={`Vidéo : ${article.title}`}
-                className="aspect-video w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            ) : (
-              <div className="p-6 text-center">
-                <a
-                  href={article.videoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-semibold text-yellow-500 hover:text-yellow-400"
-                >
-                  Ouvrir la vidéo
-                </a>
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="mt-10">
           <ArticleRenderer content={article.content} />

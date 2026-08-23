@@ -425,6 +425,12 @@ export default function ArticleEditor({
               updateField("image", value)
             }
             contentType={draft.contentType}
+            setContentType={(value) =>
+  updateField(
+    "contentType",
+    value as ArticleContentType,
+  )
+}
             videoUrl={draft.videoUrl}
             setVideoUrl={(value) =>
               updateField(

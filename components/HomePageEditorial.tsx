@@ -4,6 +4,46 @@ import Link from "next/link";
 import { getPublishedArticles } from "@/lib/articles";
 import { buildEditorialLayout } from "@/lib/editorial/engine";
 
+function getVideoEmbedUrl(url: string): string | null {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.toLowerCase();
+
+    if (hostname.includes("youtube.com")) {
+      const videoId = parsedUrl.searchParams.get("v");
+
+      return videoId
+        ? `https://www.youtube.com/embed/${videoId}`
+        : null;
+    }
+
+    if (hostname.includes("youtu.be")) {
+      const videoId = parsedUrl.pathname
+        .split("/")
+        .filter(Boolean)[0];
+
+      return videoId
+        ? `https://www.youtube.com/embed/${videoId}`
+        : null;
+    }
+
+    if (hostname.includes("vimeo.com")) {
+      const videoId = parsedUrl.pathname
+        .split("/")
+        .filter(Boolean)
+        .find((part) => /^\d+$/.test(part));
+
+      return videoId
+        ? `https://player.vimeo.com/video/${videoId}`
+        : null;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default async function HomePageEditorial() {
   const editorialLayout = await buildEditorialLayout("home");
   const publishedArticles = await getPublishedArticles();
@@ -89,6 +129,10 @@ export default async function HomePageEditorial() {
     editorialLayout.discover.length > 0
       ? editorialLayout.discover
       : availableArticles.splice(0, 4);
+
+        const editorialVideoUrl = editorial?.videoUrl
+    ? getVideoEmbedUrl(editorial.videoUrl)
+    : null;
 
   if (!hero) {
     return (
@@ -337,14 +381,24 @@ export default async function HomePageEditorial() {
                   <p className="mt-4 line-clamp-2 leading-relaxed text-gray-400">
                     {editorial.description}
                   </p>
-                  <div className="relative mt-5 h-64 overflow-hidden rounded-xl">
-  <SafeImage
-    src={editorial.image || "/images/global/hero.jpg"}
-    alt={editorial.title}
-    fill
-    sizes="(max-width: 1024px) 100vw, 33vw"
-    className="object-cover"
-  />
+                  <div className="relative mt-5 h-64 overflow-hidden rounded-xl bg-black">
+  {editorialVideoUrl ? (
+    <iframe
+      src={editorialVideoUrl}
+      title={`Vidéo : ${editorial.title}`}
+      className="h-full w-full border-0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowFullScreen
+    />
+  ) : (
+    <SafeImage
+      src={editorial.image || "/images/global/hero.jpg"}
+      alt={editorial.title}
+      fill
+      sizes="(max-width: 1024px) 100vw, 33vw"
+      className="object-cover"
+    />
+  )}
 </div>
 
                   <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
