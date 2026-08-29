@@ -222,43 +222,55 @@ export default async function EconomiePageV2() {
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2">
-            {/* QUESTION À... */}
+           {/* QUESTION À... */}
 
-            {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-64">
-                    <SafeImage
-                      src={questionArticle.image}
-                      alt={questionArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+{questionArticle && (
+  <>
+    <a
+      href="https://www.andorracorporate.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mb-3 block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
+    >
+      Visiter Andorra Corporate
+    </a>
 
-                  <div className="p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                      Question à…
-                    </p>
+    <Link
+      href={`/article/${questionArticle.slug}`}
+      className="block"
+    >
+      <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+        <div className="relative h-64">
+          <SafeImage
+            src={questionArticle.image}
+            alt={questionArticle.title}
+            fill
+            sizes="(max-width: 1024px) 100vw, 33vw"
+            className="object-cover"
+          />
+        </div>
 
-                    <h2 className="mt-3 font-serif text-2xl leading-snug">
-                      {questionArticle.title}
-                    </h2>
+        <div className="p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+            Question à…
+          </p>
 
-                    <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
-                      {questionArticle.description}
-                    </p>
+          <h2 className="mt-3 font-serif text-2xl leading-snug">
+            {questionArticle.title}
+          </h2>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’entretien →
-                    </p>
-                  </div>
-                </article>
-              </Link>
+          <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+            {questionArticle.description}
+          </p>
+
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+            Lire l’entretien →
+          </p>
+        </div>
+      </article>
+    </Link>
+  </>
+
             )}
 
             {/* TROIS CARTES CLASSIQUES */}

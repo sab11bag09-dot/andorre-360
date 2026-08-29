@@ -212,40 +212,52 @@ export default async function SociétéPageV2() {
           <aside className="space-y-6 lg:col-span-2">
             {/* QUESTION À... */}
 
-            {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-40">
-                    <MediaPreview
-  image={questionArticle.image}
-  videoUrl={questionArticle.videoUrl}
-  title={questionArticle.title}
-  mode="featured"
-/>
-                  </div>
+{questionArticle && (
+  <>
+    <a
+      href="https://www.andorrasignature.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mb-3 block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
+    >
+      Visiter Andorra Signature
+    </a>
 
-                  <div className="p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                      Question à…
-                    </p>
+    <Link
+      href={`/article/${questionArticle.slug}`}
+      className="block"
+    >
+      <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+        <div className="relative h-40">
+          <MediaPreview
+            image={questionArticle.image}
+            videoUrl={questionArticle.videoUrl}
+            title={questionArticle.title}
+            mode="featured"
+          />
+        </div>
 
-                    <h2 className="mt-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7">
-                      {questionArticle.title}
-                    </h2>
+        <div className="p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+            Question à…
+          </p>
 
-                    <p className="mt-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400">
-                      {questionArticle.description}
-                    </p>
+          <h2 className="mt-3 h-[3.5rem] max-h-[3.5rem] line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
+            {questionArticle.title}
+          </h2>
 
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’entretien →
-                    </p>
-                  </div>
-                </article>
-              </Link>
+          <p className="mt-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400">
+            {questionArticle.description}
+          </p>
+
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+            Lire l’entretien →
+          </p>
+        </div>
+      </article>
+    </Link>
+  </>
+
             )}
 
             {/* TROIS CARTES CLASSIQUES */}

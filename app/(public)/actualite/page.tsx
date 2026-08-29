@@ -184,6 +184,14 @@ export default async function ActualitePage() {
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2">
+            <a
+  href="https://www.andorracorporate.com"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
+>
+  Visiter Andorra Corporate
+</a>
             {rightCards.map((article, index) => (
               <Link
                 key={article.id}
