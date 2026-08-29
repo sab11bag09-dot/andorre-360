@@ -3,11 +3,32 @@ import Link from "next/link";
 
 import { getArticlesByCategory } from "@/lib/articles";
 import MediaPreview from "@/components/article/MediaPreview";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function ActualitePage() {
-  const items = await getArticlesByCategory("ACTUALITÉ");
+  const [items, advertisements] = await Promise.all([
+  getArticlesByCategory("ACTUALITÉ"),
+  prisma.advertisement.findMany({
+    where: {
+      pageKey: "actualite",
+      active: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  }),
+]);
+
+const activeAdvertisement = advertisements.find((advertisement) => {
+  const now = new Date();
+
+  return (
+    (!advertisement.startsAt || advertisement.startsAt <= now) &&
+    (!advertisement.endsAt || advertisement.endsAt >= now)
+  );
+});
 
   const featured = items[0];
   const mainArticle = items[1];
@@ -116,9 +137,88 @@ export default async function ActualitePage() {
               </div>
             )}
 
+            {activeAdvertisement?.format === "FOUR_COLUMNS" && (
+  <div className="mt-10 overflow-hidden rounded-xl border border-yellow-500">
+    <a
+      href={activeAdvertisement.targetUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block"
+    >
+      <div className="relative h-[480px]">
+        <SafeImage
+          src={activeAdvertisement.imagePath}
+          alt="Publicité"
+          fill
+          sizes="(max-width: 1024px) 100vw, 66vw"
+          className="object-cover"
+        />
+      </div>
+
+      <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
+        Découvrir le site
+      </div>
+    </a>
+  </div>
+)}
+{activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" && (
+  <div className="mt-10 grid items-start gap-8 md:grid-cols-2">
+    <div className="overflow-hidden rounded-xl border border-yellow-500">
+      <a
+        href={activeAdvertisement.targetUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        <div className="relative h-[480px]">
+          <SafeImage
+            src={activeAdvertisement.imagePath}
+            alt="Publicité"
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+          />
+        </div>
+
+        <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
+          Découvrir le site
+        </div>
+      </a>
+    </div>
+
+    {bottomCard && (
+      <Link
+        href={`/article/${bottomCard.slug}`}
+        className="block"
+      >
+        <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+          <div className="relative h-[370px]">
+            <SafeImage
+              src={bottomCard.image}
+              alt={bottomCard.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+
+          <div className="p-5">
+            <h2 className="font-serif text-2xl">
+              {bottomCard.title}
+            </h2>
+
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+              Lire l’article →
+            </p>
+          </div>
+        </article>
+      </Link>
+    )}
+  </div>
+)}
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
-            {(bottomCard || secondBottomCard) && (
+            {!activeAdvertisement && (bottomCard || secondBottomCard) && (
               <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
                 {bottomCard && (
                   <Link

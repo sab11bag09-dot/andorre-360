@@ -408,3 +408,22 @@ enum ExternalVideoProvider {
   TIKTOK
   FACEBOOK
 }
+enum AdvertisementFormat {
+  FOUR_COLUMNS
+  TWO_COLUMNS_WITH_CARD
+}
+
+model Advertisement {
+  id          Int                  @id @default(autoincrement())
+  imagePath   String
+  targetUrl   String
+  format      AdvertisementFormat
+  pageKey     String               @default("actualite")
+  active      Boolean              @default(false)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@index([pageKey, active, startsAt, endsAt])
+}
