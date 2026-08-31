@@ -31,6 +31,7 @@ describe("revalidation publique", () => {
       SPORTS: "/sports",
       CULTURE: "/culture",
       MONTAGNE: "/montagne",
+      LOISIRS: "/loisirs",
       LIFESTYLE: "/lifestyle",
     });
   });

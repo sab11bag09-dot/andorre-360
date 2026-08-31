@@ -11,6 +11,7 @@ export const PUBLIC_CATEGORY_PATHS: Record<string, string> = {
   SPORTS: "/sports",
   CULTURE: "/culture",
   MONTAGNE: "/montagne",
+  LOISIRS: "/loisirs",
   LIFESTYLE: "/lifestyle",
 };
 
