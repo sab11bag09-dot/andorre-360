@@ -25,12 +25,14 @@ export default async function EditArticlePage({
       },
       include: {
         publications: {
-          where: {
-            active: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
+          orderBy: [
+            {
+              active: "desc",
+            },
+            {
+              createdAt: "desc",
+            },
+          ],
           take: 1,
         },
         translations: {
