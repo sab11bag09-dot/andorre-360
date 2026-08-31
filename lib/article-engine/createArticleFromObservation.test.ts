@@ -181,6 +181,34 @@ describe("createArticleFromObservation", () => {
     expect(markProcessed).toHaveBeenCalledWith(1, 42);
   });
 
+  it("normalise la catégorie proposée par le générateur", async () => {
+    const observation = makeObservation();
+    const {
+      dependencies,
+      createDraft,
+      prepareArticle,
+    } = makeDependencies(observation);
+
+    prepareArticle.mockResolvedValue({
+      title: "Titre test",
+      description: "Premier paragraphe.",
+      content: "Premier paragraphe.",
+      category: "PRESSE",
+      author: "Source test",
+    });
+
+    await createArticleFromObservation(
+      observation.id,
+      dependencies,
+    );
+
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: "ACTUALITÉ",
+      }),
+    );
+  });
+
   it("conserve ILS_EN_PARLENT pour une source de communiqué politique", async () => {
     const observation = makeObservation({
       source: {

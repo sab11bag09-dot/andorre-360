@@ -5,6 +5,7 @@ import { OpenAiEditorialGenerator } from "./generators/OpenAiEditorialGenerator"
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
 import { prepareAutoPublication } from "./autoPublicationOrchestration";
 import { generateArticleTranslations } from "./generateArticleTranslations";
+import { normalizeEditorialCategory } from "./normalizeEditorialCategory";
 import {
   recordSystemEditorialEvent,
   type EditorialEventWriter,
@@ -34,25 +35,6 @@ export interface CreateArticleFromObservationDependencies {
   editorialEventWriter?: EditorialEventWriter;
 }
 
-function isAiMultilingualSource(
-  sourceId: number,
-  sourceCategory?: string | null,
-): boolean {
-  const configured = process.env.AI_MULTILINGUAL_SOURCE_IDS
-    ?.split(",")
-    .map((value) => Number.parseInt(value.trim(), 10))
-    .filter(Number.isInteger);
-
-  const normalizedCategory = sourceCategory
-    ?.trim()
-    .toUpperCase()
-    .replace(/\s+/g, "_");
-
-  return (
-    (configured?.includes(sourceId) ?? sourceId === 54) ||
-    normalizedCategory === "ILS_EN_PARLENT"
-  );
-}
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
   observationRepository: new PrismaObservationRepository(),
@@ -95,23 +77,23 @@ export async function createArticleFromObservation(
     );
   }
 
-   const usesProductionPipeline = dependencies === defaultDependencies;
+  const usesProductionPipeline = dependencies === defaultDependencies;
 
   const aiGenerator = usesProductionPipeline
     ? (() => {
-        const apiKey = process.env.OPENAI_API_KEY?.trim();
+      const apiKey = process.env.OPENAI_API_KEY?.trim();
 
-        if (!apiKey) {
-          throw new Error(
-            "OPENAI_API_KEY est obligatoire pour préparer un article.",
-          );
-        }
+      if (!apiKey) {
+        throw new Error(
+          "OPENAI_API_KEY est obligatoire pour préparer un article.",
+        );
+      }
 
-        return new OpenAiEditorialGenerator({
-          apiKey,
-          model: process.env.OPENAI_TRANSLATION_MODEL,
-        });
-      })()
+      return new OpenAiEditorialGenerator({
+        apiKey,
+        model: process.env.OPENAI_TRANSLATION_MODEL,
+      });
+    })()
     : null;
 
   const editorialGenerator =
@@ -123,7 +105,7 @@ export async function createArticleFromObservation(
     sourceCategory: observation.source.category,
   });
 
-    if (aiGenerator !== null) {
+  if (aiGenerator !== null) {
     const french = await aiGenerator.translateArticle({
       locale: "FR",
       title: draft.title,
@@ -139,9 +121,10 @@ export async function createArticleFromObservation(
     };
   }
 
-  const sourceEditorialCategory = observation.source.category
-    ?.trim()
-    .toUpperCase();
+  const sourceEditorialCategory =
+    normalizeEditorialCategory(
+      observation.source.category,
+    );
 
   const editorialDraft = {
     ...draft,
@@ -150,7 +133,7 @@ export async function createArticleFromObservation(
     category:
       sourceEditorialCategory === "ILS_EN_PARLENT"
         ? "ILS_EN_PARLENT"
-        : draft.category.trim().toUpperCase(),
+        : normalizeEditorialCategory(draft.category),
   };
 
   let articleId: number;
