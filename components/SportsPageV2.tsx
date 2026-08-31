@@ -15,7 +15,7 @@ export default async function SportsPageV2() {
   const rightCards = items.slice(3, 6);
   const briefs = items.slice(6, 12);
   const bottomCards = items.slice(12, 16);
-  const bonASavoir = items[14];
+  const bonASavoir = items[16];
   const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
