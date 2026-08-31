@@ -180,4 +180,28 @@ describe("createArticleFromObservation", () => {
 
     expect(markProcessed).toHaveBeenCalledWith(1, 42);
   });
+
+  it("conserve ILS_EN_PARLENT pour une source de communiqué politique", async () => {
+    const observation = makeObservation({
+      source: {
+        id: 2,
+        name: "Parti test",
+        category: "ILS_EN_PARLENT",
+      },
+    } as Partial<ObservationWithSource>);
+
+    const { dependencies, createDraft } =
+      makeDependencies(observation);
+
+    await createArticleFromObservation(
+      observation.id,
+      dependencies,
+    );
+
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: "ILS_EN_PARLENT",
+      }),
+    );
+  });
 });
