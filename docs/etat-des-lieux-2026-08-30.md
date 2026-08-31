@@ -401,6 +401,43 @@ Définir ensuite :
 * nettoyer les branches obsolètes ;
 * mettre en place une stratégie de releases.
 
+## Suivi des priorités — 31 août 2026
+
+### Rotation et protection de la clé OpenAI
+
+État : **contrôle du dépôt terminé**.
+
+* la clé utilisée par le projet a été remplacée récemment ;
+* aucun motif correspondant à une clé OpenAI complète n’a été détecté dans les fichiers suivis ;
+* les deux anciens commits signalés par une recherche large ne contiennent pas de motif de clé complet ;
+* seul `.env.example` est suivi par Git et il contient des valeurs factices ;
+* la révocation de l’ancienne clé doit rester confirmée dans le compte OpenAI.
+
+### Collecte automatique toutes les 15 minutes
+
+État : **socle techniquement prêt, activation différée jusqu’au choix de l’hébergeur**.
+
+Les éléments déjà disponibles sont :
+
+* la route interne `GET` ou `POST /api/internal/sources/collect` ;
+* une authentification par `Authorization: Bearer <secret>` ;
+* une comparaison sécurisée du secret ;
+* le refus explicite de fonctionner sans `SOURCE_COLLECTION_SECRET` ;
+* une taille de lot configurable par `SOURCE_COLLECTION_BATCH_SIZE`, égale à 10 par défaut ;
+* des tests couvrant l’absence de secret, le secret invalide et le déclenchement autorisé ;
+* un intervalle de collecte de 15 minutes par défaut pour les sources.
+
+Aucun planificateur de production n’est encore configuré, car l’application n’est pas déployée et l’hébergeur sera choisi ultérieurement.
+
+Au moment du déploiement, il faudra :
+
+1. créer un secret de production distinct ;
+2. configurer `SOURCE_COLLECTION_SECRET` chez l’hébergeur ;
+3. appeler la route toutes les 15 minutes avec l’en-tête d’autorisation ;
+4. contrôler les réponses HTTP et mettre en place une alerte en cas d’échec.
+
+La prochaine priorité active est la fiabilisation des sources importantes qui ne produisent pas encore d’observations exploitables.
+
 ## Conclusion
 
 Andorra 360 n’est plus un simple prototype.
