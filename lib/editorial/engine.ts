@@ -35,6 +35,13 @@ export async function buildEditorialLayout(
       active: true,
       article: {
         ...PUBLIC_ARTICLE_FILTER,
+        ...(pageKey === "home"
+          ? {
+            category: {
+              not: "ILS_EN_PARLENT",
+            },
+          }
+          : {}),
       },
     },
     include: {
