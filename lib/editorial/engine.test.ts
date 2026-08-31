@@ -24,6 +24,25 @@ describe("buildEditorialLayout", () => {
           article: {
             published: true,
             editorialStatus: "PUBLISHED",
+            category: {
+              not: "ILS_EN_PARLENT",
+            },
+          },
+        }),
+      }),
+    );
+  });
+
+  it("réserve l’exclusion ILS_EN_PARLENT à la page d’accueil", async () => {
+    await buildEditorialLayout("category:POLITIQUE");
+
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          pageKey: "category:POLITIQUE",
+          article: {
+            published: true,
+            editorialStatus: "PUBLISHED",
           },
         }),
       }),
