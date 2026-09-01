@@ -11,6 +11,10 @@ import { revalidatePublicArticlePages } from "@/lib/public-revalidation";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
 import { recordEditorialEvent } from "@/lib/editorial-history";
 import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
+import {
+  getMissingPublishedTranslationLocales,
+  REQUIRED_TRANSLATION_LOCALES,
+} from "@/lib/article-engine/multilingualPublicationGuard";
 
 import {
   type ArticleDraft,
@@ -397,17 +401,47 @@ async function updateArticle(
 
   const shouldPublish =
     input.intent === "publish";
-   if (
-  shouldPublish &&
-  !canPublishEditorialStatus(
-    existingArticle.editorialStatus,
-  )
-) {
-  return {
-    success: false,
-    message:
-      "Cet article doit être relu et approuvé avant sa publication.",
-  };
+
+  if (
+    shouldPublish &&
+    !canPublishEditorialStatus(
+      existingArticle.editorialStatus,
+    )
+  ) {
+    return {
+      success: false,
+      message:
+        "Cet article doit être relu et approuvé avant sa publication.",
+    };
+  }
+
+  if (shouldPublish) {
+    const translations =
+      await prisma.articleTranslation.findMany({
+        where: {
+          articleId: draft.id,
+          locale: {
+            in: [...REQUIRED_TRANSLATION_LOCALES],
+          },
+        },
+        select: {
+          locale: true,
+          status: true,
+        },
+      });
+
+    const missingLocales =
+      getMissingPublishedTranslationLocales(
+        translations,
+      );
+
+    if (missingLocales.length > 0) {
+      return {
+        success: false,
+        message:
+          `Publie d’abord les traductions suivantes : ${missingLocales.join(", ")}.`,
+      };
+    }
   }
 
   const slug = await createUniqueSlug(
