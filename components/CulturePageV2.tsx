@@ -70,13 +70,13 @@ export default async function CulturePageV2() {
               <Link href={`/article/${mainArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
-  <MediaPreview
-    image={mainArticle.image}
-    videoUrl={mainArticle.videoUrl}
-    title={mainArticle.title}
-    mode="featured"
-  />
-</div>
+                    <MediaPreview
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
+                  </div>
 
                   <div className="p-6">
                     <h2 className="h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-4xl leading-9">
@@ -202,10 +202,7 @@ export default async function CulturePageV2() {
             {/* QUESTION À... */}
 
             {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${questionArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionImage ? (
                     <div className="relative h-48">
@@ -247,9 +244,7 @@ export default async function CulturePageV2() {
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className={
-                  index === rightCards.length - 1
-                    ? "block lg:flex-1"
-                    : "block"
+                  index === rightCards.length - 1 ? "block lg:flex-1" : "block"
                 }
               >
                 <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
@@ -287,7 +282,6 @@ export default async function CulturePageV2() {
                 </article>
               </Link>
             ))}
-
           </aside>
         </div>
       </section>
