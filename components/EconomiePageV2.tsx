@@ -19,6 +19,7 @@ export default async function EconomiePageV2() {
   const bottomCard = items[16];
   const secondBottomCard = items[17];
   const bonASavoir = items[18];
+  const bonASavoirBrief = items[19];
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -71,11 +72,11 @@ export default async function EconomiePageV2() {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <MediaPreview
-  image={mainArticle.image}
-  videoUrl={mainArticle.videoUrl}
-  title={mainArticle.title}
-  mode="featured"
-/>
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
                   </div>
 
                   <div className="p-6">
@@ -105,12 +106,12 @@ export default async function EconomiePageV2() {
                     href={`/article/${article.slug}`}
                     className="block"
                   >
-                    <article className="flex h-full flex-col justify-between rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="font-serif text-lg leading-snug">
+                    <article className="flex h-[150px] max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
+                      <h3 className="line-clamp-3 overflow-hidden font-serif text-lg leading-6">
                         {article.title}
                       </h3>
 
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      <p className="shrink-0 pt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                         Lire l’article →
                       </p>
                     </article>
@@ -137,7 +138,10 @@ export default async function EconomiePageV2() {
                   </Link>
                 )}
                 {secondMiddleCard && (
-                  <Link href={`/article/${secondMiddleCard.slug}`} className="block">
+                  <Link
+                    href={`/article/${secondMiddleCard.slug}`}
+                    className="block"
+                  >
                     <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
                       <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                         {secondMiddleCard.title}
@@ -161,10 +165,10 @@ export default async function EconomiePageV2() {
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-48 lg:h-auto lg:min-h-48 lg:flex-1">
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-64 shrink-0">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -174,12 +178,12 @@ export default async function EconomiePageV2() {
                         />
                       </div>
 
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                      <div className="flex h-[150px] flex-col p-5">
+                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {bottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
@@ -190,10 +194,10 @@ export default async function EconomiePageV2() {
                 {secondBottomCard && (
                   <Link
                     href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-48 lg:h-auto lg:min-h-48 lg:flex-1">
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-64 shrink-0">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
@@ -203,12 +207,12 @@ export default async function EconomiePageV2() {
                         />
                       </div>
 
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                      <div className="flex h-[150px] flex-col p-5">
+                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {secondBottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
@@ -222,55 +226,54 @@ export default async function EconomiePageV2() {
           {/* PARTIE DROITE : 2 COLONNES */}
 
           <aside className="space-y-6 lg:col-span-2">
-           {/* QUESTION À... */}
+            {/* QUESTION À... */}
 
-{questionArticle && (
-  <>
-    <a
-      href="https://www.andorracorporate.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="mb-3 block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
-    >
-      Visiter Andorra Corporate
-    </a>
+            {questionArticle && (
+              <>
+                <a
+                  href="https://www.andorracorporate.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-3 block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
+                >
+                  Visiter Andorra Corporate
+                </a>
 
-    <Link
-      href={`/article/${questionArticle.slug}`}
-      className="block"
-    >
-      <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-        <div className="relative h-64">
-          <SafeImage
-            src={questionArticle.image}
-            alt={questionArticle.title}
-            fill
-            sizes="(max-width: 1024px) 100vw, 33vw"
-            className="object-cover"
-          />
-        </div>
+                <Link
+                  href={`/article/${questionArticle.slug}`}
+                  className="block"
+                >
+                  <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <div className="relative h-64">
+                      <SafeImage
+                        src={questionArticle.image}
+                        alt={questionArticle.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
 
-        <div className="p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-            Question à…
-          </p>
+                    <div className="p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                        Question à…
+                      </p>
 
-          <h2 className="mt-3 font-serif text-2xl leading-snug">
-            {questionArticle.title}
-          </h2>
+                      <h2 className="mt-3 font-serif text-2xl leading-snug">
+                        {questionArticle.title}
+                      </h2>
 
-          <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
-            {questionArticle.description}
-          </p>
+                      <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400">
+                        {questionArticle.description}
+                      </p>
 
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-            Lire l’entretien →
-          </p>
-        </div>
-      </article>
-    </Link>
-  </>
-
+                      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’entretien →
+                      </p>
+                    </div>
+                  </article>
+                </Link>
+              </>
             )}
 
             {/* TROIS CARTES CLASSIQUES */}
@@ -310,28 +313,45 @@ export default async function EconomiePageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
+              <section className="overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900">
+                <Link
+                  href={`/article/${bonASavoir.slug}`}
+                  className="block p-6 transition hover:bg-zinc-800"
+                >
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                  <h2 className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 h-[4.5rem] max-h-[4.5rem] overflow-hidden leading-6 text-gray-400">
+                  <p className="mt-4 line-clamp-3 overflow-hidden leading-6 text-gray-400">
                     {bonASavoir.description}
                   </p>
 
                   <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                     Lire l’article →
                   </p>
-                </article>
-              </Link>
+                </Link>
+
+                {bonASavoirBrief && (
+                  <Link
+                    href={`/article/${bonASavoirBrief.slug}`}
+                    className="block border-t border-zinc-700 p-5 transition hover:bg-zinc-800"
+                  >
+                    <article className="flex h-[150px] flex-col justify-between overflow-hidden">
+                      <h3 className="line-clamp-3 overflow-hidden font-serif text-lg leading-6">
+                        {bonASavoirBrief.title}
+                      </h3>
+
+                      <p className="shrink-0 pt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
+                    </article>
+                  </Link>
+                )}
+              </section>
             )}
           </aside>
         </div>
