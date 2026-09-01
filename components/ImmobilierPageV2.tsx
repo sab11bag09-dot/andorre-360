@@ -6,7 +6,11 @@ import { getArticlesByCategory } from "@/lib/articles";
 
 export const dynamic = "force-dynamic";
 
-export default async function ImmobilierPageV2({ showMiddleCards = false }: { showMiddleCards?: boolean }) {
+export default async function ImmobilierPageV2({
+  showMiddleCards = false,
+}: {
+  showMiddleCards?: boolean;
+}) {
   const [currentItems, legacyItems] = await Promise.all([
     getArticlesByCategory("ILS_EN_PARLENT"),
     getArticlesByCategory("IMMOBILIER"),
@@ -82,11 +86,11 @@ export default async function ImmobilierPageV2({ showMiddleCards = false }: { sh
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <MediaPreview
-  image={mainArticle.image}
-  videoUrl={mainArticle.videoUrl}
-  title={mainArticle.title}
-  mode="featured"
-/>
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
                   </div>
 
                   <div className="p-6">
@@ -132,15 +136,27 @@ export default async function ImmobilierPageV2({ showMiddleCards = false }: { sh
 
             {showMiddleCards && (middleCard || secondMiddleCard) && (
               <div className="mt-10 grid gap-8 md:grid-cols-2">
-                {[middleCard, secondMiddleCard].filter(Boolean).map((article) => (
-                  <Link key={article.id} href={`/article/${article.slug}`} className="block">
-                    <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
-                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{article.title}</h2>
-                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{article.description}</p>
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
-                    </article>
-                  </Link>
-                ))}
+                {[middleCard, secondMiddleCard]
+                  .filter(Boolean)
+                  .map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/article/${article.slug}`}
+                      className="block"
+                    >
+                      <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
+                        <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                          {article.title}
+                        </h2>
+                        <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                          {article.description}
+                        </p>
+                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </article>
+                    </Link>
+                  ))}
               </div>
             )}
 
@@ -149,10 +165,7 @@ export default async function ImmobilierPageV2({ showMiddleCards = false }: { sh
             {(bottomCard || secondBottomCard) && (
               <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
                 {bottomCard && (
-                  <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block"
-                  >
+                  <Link href={`/article/${bottomCard.slug}`} className="block">
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
                         <SafeImage
@@ -223,21 +236,18 @@ export default async function ImmobilierPageV2({ showMiddleCards = false }: { sh
             {/* QUESTION À... */}
 
             {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${questionArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionImage ? (
-                  <div className="relative h-72">
-                    <SafeImage
-                      src={questionImage}
-                      alt={questionArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                    <div className="relative h-72">
+                      <SafeImage
+                        src={questionImage}
+                        alt={questionArticle.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                   ) : null}
 
                   <div className="p-4">
@@ -268,9 +278,7 @@ export default async function ImmobilierPageV2({ showMiddleCards = false }: { sh
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className={
-                  index === rightCards.length - 1
-                    ? "block lg:flex-1"
-                    : "block"
+                  index === rightCards.length - 1 ? "block lg:flex-1" : "block"
                 }
               >
                 <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
@@ -306,7 +314,6 @@ export default async function ImmobilierPageV2({ showMiddleCards = false }: { sh
                 </article>
               </Link>
             ))}
-
           </aside>
         </div>
       </section>
