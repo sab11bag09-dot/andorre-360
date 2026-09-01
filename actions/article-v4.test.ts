@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const {
   requireAdmin,
   findUnique,
+  translationFindMany,
   transaction,
   articleUpdate,
   mediaUsageDeleteMany,
@@ -18,6 +19,7 @@ const {
 } = vi.hoisted(() => ({
   requireAdmin: vi.fn(),
   findUnique: vi.fn(),
+  translationFindMany: vi.fn(),
   transaction: vi.fn(),
   articleUpdate: vi.fn(),
   mediaUsageDeleteMany: vi.fn(),
@@ -40,6 +42,9 @@ vi.mock("@/lib/public-revalidation", () => ({
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     article: { findUnique },
+    articleTranslation: {
+      findMany: translationFindMany,
+    },
     $transaction: transaction,
   },
 }));
@@ -81,6 +86,10 @@ function createDraft(): ArticleDraft {
 describe("durcissement de la sauvegarde principale", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+        translationFindMany.mockResolvedValue([
+      { locale: "CA", status: "PUBLISHED" },
+      { locale: "ES", status: "PUBLISHED" },
+    ]);
     findUnique.mockReset();
     requireAdmin.mockResolvedValue({
       id: "admin-1",
@@ -127,6 +136,38 @@ describe("durcissement de la sauvegarde principale", () => {
     expect(findUnique).not.toHaveBeenCalled();
     expect(transaction).not.toHaveBeenCalled();
     expect(revalidatePublicArticlePages).not.toHaveBeenCalled();
+  });
+    it("refuse la publication lorsqu’une traduction manque", async () => {
+    translationFindMany.mockResolvedValue([
+      { locale: "CA", status: "PUBLISHED" },
+    ]);
+
+    const result = await saveArticle({
+      mode: "update",
+      intent: "publish",
+      article: createDraft(),
+    });
+
+    expect(result).toEqual({
+      success: false,
+      message:
+        "Publie d’abord les traductions suivantes : ES.",
+    });
+
+    expect(translationFindMany).toHaveBeenCalledWith({
+      where: {
+        articleId: 7,
+        locale: {
+          in: ["CA", "ES"],
+        },
+      },
+      select: {
+        locale: true,
+        status: true,
+      },
+    });
+
+    expect(transaction).not.toHaveBeenCalled();
   });
 
   it.each([

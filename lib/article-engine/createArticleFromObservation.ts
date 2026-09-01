@@ -1,3 +1,4 @@
+import { assertMultilingualPublicationEnabled } from "../config/multilingualPublication";
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
@@ -5,6 +6,10 @@ import { OpenAiEditorialGenerator } from "./generators/OpenAiEditorialGenerator"
 import type { EditorialGenerator } from "./generators/EditorialGenerator";
 import { prepareAutoPublication } from "./autoPublicationOrchestration";
 import { generateArticleTranslations } from "./generateArticleTranslations";
+import {
+  assertRequiredTranslationsPublished,
+  REQUIRED_TRANSLATION_LOCALES,
+} from "./multilingualPublicationGuard";
 import { normalizeEditorialCategory } from "./normalizeEditorialCategory";
 import {
   recordSystemEditorialEvent,
@@ -178,6 +183,49 @@ export async function createArticleFromObservation(
   }
 
   if (autoPublication.decision.allowed) {
+    assertMultilingualPublicationEnabled();
+
+    const generatedTranslations =
+      await generateArticleTranslations(articleId, {
+        articleRepository: new PrismaArticleRepository(),
+        translationRepository: new PrismaArticleTranslationRepository(),
+        editorialGenerator:
+          aiGenerator ?? new DeterministicEditorialGenerator(),
+      });
+
+    await Promise.all(
+      generatedTranslations.translations
+        .filter(({ action }) => action !== "skipped")
+        .map(({ translationId }) =>
+          prisma.articleTranslation.update({
+            where: { id: translationId },
+            data: {
+              status: "PUBLISHED",
+              approvedAt: new Date(),
+              publishedAt: new Date(),
+            },
+          }),
+        ),
+    );
+
+    const publishedTranslations =
+      await prisma.articleTranslation.findMany({
+        where: {
+          articleId,
+          locale: {
+            in: [...REQUIRED_TRANSLATION_LOCALES],
+          },
+        },
+        select: {
+          locale: true,
+          status: true,
+        },
+      });
+
+    assertRequiredTranslationsPublished(
+      publishedTranslations,
+    );
+
     if (!options.regenerate) {
       if (!dependencies.articleRepository.publishDraft) {
         throw new Error(
@@ -186,34 +234,6 @@ export async function createArticleFromObservation(
       }
 
       await dependencies.articleRepository.publishDraft(articleId);
-    }
-
-    try {
-      const generatedTranslations = await generateArticleTranslations(articleId, {
-        articleRepository: new PrismaArticleRepository(),
-        translationRepository: new PrismaArticleTranslationRepository(),
-        editorialGenerator: aiGenerator ?? new DeterministicEditorialGenerator(),
-      });
-
-      await Promise.all(
-        generatedTranslations.translations
-          .filter(({ action }) => action !== "skipped")
-          .map(({ translationId }) =>
-            prisma.articleTranslation.update({
-              where: { id: translationId },
-              data: {
-                status: "PUBLISHED",
-                approvedAt: new Date(),
-                publishedAt: new Date(),
-              },
-            }),
-          ),
-      );
-    } catch (error) {
-      console.error(
-        "[AutoPublication] Traductions non générées",
-        { articleId, error },
-      );
     }
   }
 
