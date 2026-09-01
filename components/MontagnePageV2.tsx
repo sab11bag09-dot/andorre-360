@@ -67,11 +67,11 @@ export default async function MontagnePageV2() {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <MediaPreview
-  image={mainArticle.image}
-  videoUrl={mainArticle.videoUrl}
-  title={mainArticle.title}
-  mode="featured"
-/>
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
                   </div>
 
                   <div className="p-6">
@@ -146,21 +146,18 @@ export default async function MontagnePageV2() {
             {/* QUESTION À... */}
 
             {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${questionArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionImage ? (
-                  <div className="relative h-72">
-                    <SafeImage
-                      src={questionImage}
-                      alt={questionArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                    <div className="relative h-72">
+                      <SafeImage
+                        src={questionImage}
+                        alt={questionArticle.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                   ) : null}
 
                   <div className="p-4">
@@ -191,17 +188,17 @@ export default async function MontagnePageV2() {
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className={
-                  index === rightCards.length - 1
-                    ? "block lg:flex-1"
-                    : "block"
+                  index === rightCards.length - 1 ? "block lg:flex-1" : "block"
                 }
               >
                 <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                  <div className={`relative h-40 ${
-                    index === rightCards.length - 1
-                      ? "lg:h-auto lg:min-h-40 lg:flex-1"
-                      : ""
-                  }`}>
+                  <div
+                    className={`relative h-40 ${
+                      index === rightCards.length - 1
+                        ? "lg:h-auto lg:min-h-40 lg:flex-1"
+                        : ""
+                    }`}
+                  >
                     <SafeImage
                       src={article.image}
                       alt={article.title}
@@ -227,7 +224,6 @@ export default async function MontagnePageV2() {
                 </article>
               </Link>
             ))}
-
           </aside>
         </div>
       </section>
