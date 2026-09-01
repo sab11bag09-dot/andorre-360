@@ -3,30 +3,80 @@ import Link from "next/link";
 import MediaPreview from "@/components/article/MediaPreview";
 
 import { getArticlesByCategory } from "@/lib/articles";
+import { buildEditorialLayout } from "@/lib/editorial/engine";
+import PasDeLaCasaTraffic from "@/components/PasDeLaCasaTraffic";
 
 export const dynamic = "force-dynamic";
 
 export default async function LifestylePageV2() {
-  const [currentItems, legacyItems] = await Promise.all([
-    getArticlesByCategory("LOISIRS"),
-    getArticlesByCategory("LIFESTYLE"),
+  const [layout, mountainItems] = await Promise.all([
+    buildEditorialLayout("category:LOISIRS"),
+    getArticlesByCategory("MONTAGNE"),
   ]);
 
-  const items = [...currentItems, ...legacyItems].sort((a, b) => {
-    const aDate = a.publishedAt?.getTime() ?? a.createdAt.getTime();
-    const bDate = b.publishedAt?.getTime() ?? b.createdAt.getTime();
-    return bDate - aDate;
-  });
+  type LeisureArticle = Awaited<
+    ReturnType<typeof getArticlesByCategory>
+  >[number];
 
-  const featured = items[0];
-  const mainArticle = items[1];
-  const questionArticle = items[2];
-  const rightCards = items.slice(3, 6);
-  const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
-  const thirdBottomCard = items[15] ?? items[0];
-  const fourthBottomCard = items[16] ?? items[1];
+  const usedArticleIds = new Set<number>();
+
+  function takeArticle(
+    preferred?: LeisureArticle | null,
+  ): LeisureArticle | undefined {
+    if (preferred && !usedArticleIds.has(preferred.id)) {
+      usedArticleIds.add(preferred.id);
+      return preferred;
+    }
+
+    const fallback = mountainItems.find(
+      (article) => !usedArticleIds.has(article.id),
+    );
+
+    if (fallback) {
+      usedArticleIds.add(fallback.id);
+    }
+
+    return fallback;
+  }
+
+  function takeArticles(
+    preferred: LeisureArticle[],
+    count: number,
+  ): LeisureArticle[] {
+    const selected: LeisureArticle[] = [];
+
+    for (const article of preferred) {
+      if (selected.length >= count || usedArticleIds.has(article.id)) {
+        continue;
+      }
+
+      usedArticleIds.add(article.id);
+      selected.push(article);
+    }
+
+    while (selected.length < count) {
+      const fallback = takeArticle();
+
+      if (!fallback) {
+        break;
+      }
+
+      selected.push(fallback);
+    }
+
+    return selected;
+  }
+
+  const featured = takeArticle(layout.hero);
+  const mainArticle = takeArticle(layout.feature);
+  const questionArticle = takeArticle(layout.question);
+  const rightCards = takeArticles(layout.card, 3);
+  const briefs = takeArticles(layout.briefs, 6);
+  const bottomCard = takeArticle(layout.grandFormat);
+  const secondBottomCard = takeArticle();
+  const thirdBottomCard = takeArticle();
+  const fourthBottomCard = takeArticle();
+
   const questionImage = questionArticle?.image ?? featured?.image;
 
   return (
@@ -49,7 +99,8 @@ export default async function LifestylePageV2() {
 
             <div className="absolute bottom-10 left-8 max-w-3xl">
               <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category === "LIFESTYLE" || featured.category === "LOISIRS"
+                {featured.category === "LIFESTYLE" ||
+                featured.category === "LOISIRS"
                   ? "LOISIRS"
                   : featured.category}
               </p>
@@ -70,6 +121,7 @@ export default async function LifestylePageV2() {
         </Link>
       )}
 
+      <PasDeLaCasaTraffic />
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
         <div className="grid gap-8 lg:grid-cols-6">
           {/* PARTIE GAUCHE : 4 COLONNES */}
@@ -82,11 +134,11 @@ export default async function LifestylePageV2() {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <MediaPreview
-  image={mainArticle.image}
-  videoUrl={mainArticle.videoUrl}
-  title={mainArticle.title}
-  mode="featured"
-/>
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
                   </div>
 
                   <div className="p-6">
@@ -201,7 +253,10 @@ export default async function LifestylePageV2() {
                 )}
 
                 {thirdBottomCard && (
-                  <Link href={`/article/${thirdBottomCard.slug}`} className="block lg:h-full">
+                  <Link
+                    href={`/article/${thirdBottomCard.slug}`}
+                    className="block lg:h-full"
+                  >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
                         <SafeImage
@@ -228,7 +283,10 @@ export default async function LifestylePageV2() {
                 )}
 
                 {fourthBottomCard && (
-                  <Link href={`/article/${fourthBottomCard.slug}`} className="block lg:h-full">
+                  <Link
+                    href={`/article/${fourthBottomCard.slug}`}
+                    className="block lg:h-full"
+                  >
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-56">
                         <SafeImage
@@ -263,21 +321,18 @@ export default async function LifestylePageV2() {
             {/* QUESTION À... */}
 
             {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${questionArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   {questionImage ? (
-                  <div className="relative h-72">
-                    <SafeImage
-                      src={questionImage}
-                      alt={questionArticle.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover"
-                    />
-                  </div>
+                    <div className="relative h-72">
+                      <SafeImage
+                        src={questionImage}
+                        alt={questionArticle.title}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover"
+                      />
+                    </div>
                   ) : null}
 
                   <div className="p-4">
@@ -308,9 +363,7 @@ export default async function LifestylePageV2() {
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className={
-                  index === rightCards.length - 1
-                    ? "block lg:flex-1"
-                    : "block"
+                  index === rightCards.length - 1 ? "block lg:flex-1" : "block"
                 }
               >
                 <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
@@ -346,7 +399,6 @@ export default async function LifestylePageV2() {
                 </article>
               </Link>
             ))}
-
           </aside>
         </div>
       </section>
