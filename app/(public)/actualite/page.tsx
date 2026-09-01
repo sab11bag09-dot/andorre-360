@@ -9,26 +9,26 @@ export const dynamic = "force-dynamic";
 
 export default async function ActualitePage() {
   const [items, advertisements] = await Promise.all([
-  getArticlesByCategory("ACTUALITÉ"),
-  prisma.advertisement.findMany({
-    where: {
-      pageKey: "actualite",
-      active: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  }),
-]);
+    getArticlesByCategory("ACTUALITÉ"),
+    prisma.advertisement.findMany({
+      where: {
+        pageKey: "actualite",
+        active: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+  ]);
 
-const activeAdvertisement = advertisements.find((advertisement) => {
-  const now = new Date();
+  const activeAdvertisement = advertisements.find((advertisement) => {
+    const now = new Date();
 
-  return (
-    (!advertisement.startsAt || advertisement.startsAt <= now) &&
-    (!advertisement.endsAt || advertisement.endsAt >= now)
-  );
-});
+    return (
+      (!advertisement.startsAt || advertisement.startsAt <= now) &&
+      (!advertisement.endsAt || advertisement.endsAt >= now)
+    );
+  });
 
   const featured = items[0];
   const mainArticle = items[1];
@@ -46,13 +46,13 @@ const activeAdvertisement = advertisements.find((advertisement) => {
         <Link href={`/article/${featured.slug}`} className="block">
           <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
             <SafeImage
-  src={featured.image}
-  alt={featured.title}
-  fill
-  priority
-  sizes="100vw"
-  className="object-cover"
-/>
+              src={featured.image}
+              alt={featured.title}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
 
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
@@ -89,11 +89,11 @@ const activeAdvertisement = advertisements.find((advertisement) => {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <MediaPreview
-  image={mainArticle.image}
-  videoUrl={mainArticle.videoUrl}
-  title={mainArticle.title}
-  mode="featured"
-/>
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
                   </div>
 
                   <div className="p-6">
@@ -138,84 +138,81 @@ const activeAdvertisement = advertisements.find((advertisement) => {
             )}
 
             {activeAdvertisement?.format === "FOUR_COLUMNS" && (
-  <div className="mt-10 overflow-hidden rounded-xl border border-yellow-500">
-    <a
-      href={activeAdvertisement.targetUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block"
-    >
-      <div className="relative h-[480px]">
-        <SafeImage
-          src={activeAdvertisement.imagePath}
-          alt="Publicité"
-          fill
-          sizes="(max-width: 1024px) 100vw, 66vw"
-          className="object-cover"
-        />
-      </div>
+              <div className="mt-10 overflow-hidden rounded-xl border border-yellow-500">
+                <a
+                  href={activeAdvertisement.targetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <div className="relative h-[480px]">
+                    <SafeImage
+                      src={activeAdvertisement.imagePath}
+                      alt="Publicité"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 66vw"
+                      className="object-cover"
+                    />
+                  </div>
 
-      <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
-        Découvrir le site
-      </div>
-    </a>
-  </div>
-)}
-{activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" && (
-  <div className="mt-10 grid items-start gap-8 md:grid-cols-2">
-    <div className="overflow-hidden rounded-xl border border-yellow-500">
-      <a
-        href={activeAdvertisement.targetUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-      >
-        <div className="relative h-[480px]">
-          <SafeImage
-            src={activeAdvertisement.imagePath}
-            alt="Publicité"
-            fill
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-          />
-        </div>
+                  <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
+                    Découvrir le site
+                  </div>
+                </a>
+              </div>
+            )}
+            {activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" && (
+              <div className="mt-10 grid items-start gap-8 md:grid-cols-2">
+                <div className="overflow-hidden rounded-xl border border-yellow-500">
+                  <a
+                    href={activeAdvertisement.targetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <div className="relative h-[480px]">
+                      <SafeImage
+                        src={activeAdvertisement.imagePath}
+                        alt="Publicité"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover"
+                      />
+                    </div>
 
-        <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
-          Découvrir le site
-        </div>
-      </a>
-    </div>
+                    <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
+                      Découvrir le site
+                    </div>
+                  </a>
+                </div>
 
-    {bottomCard && (
-      <Link
-        href={`/article/${bottomCard.slug}`}
-        className="block"
-      >
-        <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-          <div className="relative h-[370px]">
-            <SafeImage
-              src={bottomCard.image}
-              alt={bottomCard.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-            />
-          </div>
+                {bottomCard && (
+                  <Link href={`/article/${bottomCard.slug}`} className="block">
+                    <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-[370px]">
+                        <SafeImage
+                          src={bottomCard.image}
+                          alt={bottomCard.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover"
+                        />
+                      </div>
 
-          <div className="p-5">
-            <h2 className="font-serif text-2xl">
-              {bottomCard.title}
-            </h2>
+                      <div className="p-5">
+                        <h2 className="font-serif text-2xl">
+                          {bottomCard.title}
+                        </h2>
 
-            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-              Lire l’article →
-            </p>
-          </div>
-        </article>
-      </Link>
-    )}
-  </div>
-)}
+                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                          Lire l’article →
+                        </p>
+                      </div>
+                    </article>
+                  </Link>
+                )}
+              </div>
+            )}
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {!activeAdvertisement && (bottomCard || secondBottomCard) && (
@@ -266,7 +263,7 @@ const activeAdvertisement = advertisements.find((advertisement) => {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                        <h2 className="line-clamp-2 overflow-hidden font-serif text-2xl leading-tight">
                           {secondBottomCard.title}
                         </h2>
 
@@ -285,13 +282,13 @@ const activeAdvertisement = advertisements.find((advertisement) => {
 
           <aside className="space-y-6 lg:col-span-2">
             <a
-  href="https://www.andorracorporate.com"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
->
-  Visiter Andorra Corporate
-</a>
+              href="https://www.andorracorporate.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
+            >
+              Visiter Andorra Corporate
+            </a>
             {rightCards.map((article, index) => (
               <Link
                 key={article.id}
@@ -301,11 +298,11 @@ const activeAdvertisement = advertisements.find((advertisement) => {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className={`relative ${index === 3 ? "h-48" : "h-40"}`}>
                     <MediaPreview
-  image={article.image}
-  videoUrl={article.videoUrl}
-  title={article.title}
-  mode={index === 0 ? "featured" : "thumbnail"}
-/>
+                      image={article.image}
+                      videoUrl={article.videoUrl}
+                      title={article.title}
+                      mode={index === 0 ? "featured" : "thumbnail"}
+                    />
                   </div>
 
                   <div className="p-4">
@@ -324,10 +321,7 @@ const activeAdvertisement = advertisements.find((advertisement) => {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${bonASavoir.slug}`} className="block">
                 <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
