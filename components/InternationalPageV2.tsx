@@ -17,7 +17,7 @@ export default async function InternationalPageV2() {
   const secondMiddleCard = items[15];
   const bottomCard = items[16];
   const secondBottomCard = items[17];
-  const bonASavoir = items[14];
+  const bonASavoir = items[18];
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -124,18 +124,33 @@ export default async function InternationalPageV2() {
                 {middleCard && (
                   <Link href={`/article/${middleCard.slug}`} className="block">
                     <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
-                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{middleCard.title}</h2>
-                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{middleCard.description}</p>
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        {middleCard.title}
+                      </h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                        {middleCard.description}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
                     </article>
                   </Link>
                 )}
                 {secondMiddleCard && (
-                  <Link href={`/article/${secondMiddleCard.slug}`} className="block">
+                  <Link
+                    href={`/article/${secondMiddleCard.slug}`}
+                    className="block"
+                  >
                     <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
-                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{secondMiddleCard.title}</h2>
-                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{secondMiddleCard.description}</p>
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        {secondMiddleCard.title}
+                      </h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                        {secondMiddleCard.description}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
                     </article>
                   </Link>
                 )}
@@ -147,10 +162,7 @@ export default async function InternationalPageV2() {
             {(bottomCard || secondBottomCard) && (
               <div className="mt-10 grid gap-8 md:grid-cols-2">
                 {bottomCard && (
-                  <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block"
-                  >
+                  <Link href={`/article/${bottomCard.slug}`} className="block">
                     <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                       <div className="relative h-64">
                         <SafeImage
@@ -221,10 +233,7 @@ export default async function InternationalPageV2() {
             {/* QUESTION À... */}
 
             {questionArticle && (
-              <Link
-                href={`/article/${questionArticle.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${questionArticle.slug}`} className="block">
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-40">
                     <SafeImage
@@ -264,9 +273,7 @@ export default async function InternationalPageV2() {
                 key={article.id}
                 href={`/article/${article.slug}`}
                 className={
-                  index === rightCards.length - 1
-                    ? "block lg:flex-1"
-                    : "block"
+                  index === rightCards.length - 1 ? "block lg:flex-1" : "block"
                 }
               >
                 <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
@@ -302,10 +309,7 @@ export default async function InternationalPageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${bonASavoir.slug}`} className="block">
                 <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
