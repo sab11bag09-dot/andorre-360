@@ -43,11 +43,11 @@ export default async function SociétéPageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 font-serif text-4xl md:text-5xl">
+              <h1 className="mt-4 line-clamp-2 max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl">
                 {featured.title}
               </h1>
 
-              <p className="mt-4 text-gray-300">
+              <p className="mt-4 line-clamp-2 h-12 max-h-12 overflow-hidden leading-6 text-gray-300">
                 {featured.description}
               </p>
 
@@ -71,17 +71,15 @@ export default async function SociétéPageV2() {
                 <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
                   <div className="relative h-[420px]">
                     <MediaPreview
-  image={mainArticle.image}
-  videoUrl={mainArticle.videoUrl}
-  title={mainArticle.title}
-  mode="featured"
-/>
+                      image={mainArticle.image}
+                      videoUrl={mainArticle.videoUrl}
+                      title={mainArticle.title}
+                      mode="featured"
+                    />
                   </div>
 
                   <div className="p-6">
-                    <h2 className="font-serif text-3xl">
-                      {mainArticle.title}
-                    </h2>
+                    <h2 className="font-serif text-3xl">{mainArticle.title}</h2>
 
                     <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-400 leading-6">
                       {mainArticle.description}
@@ -98,19 +96,19 @@ export default async function SociétéPageV2() {
             {/* SIX BRÈVES */}
 
             {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3 md:grid-rows-[repeat(2,150px)]">
+              <div className="mt-8 grid gap-4 md:grid-cols-3">
                 {briefs.map((article) => (
                   <Link
                     key={article.id}
                     href={`/article/${article.slug}`}
-                    className="block h-full"
+                    className="block"
                   >
                     <article className="flex h-[150px] max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="h-14 max-h-14 overflow-hidden font-serif text-lg leading-7">
+                      <h3 className="line-clamp-3 overflow-hidden font-serif text-lg leading-6">
                         {article.title}
                       </h3>
 
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                      <p className="shrink-0 pt-3 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                         Lire l’article →
                       </p>
                     </article>
@@ -124,18 +122,33 @@ export default async function SociétéPageV2() {
                 {middleCard && (
                   <Link href={`/article/${middleCard.slug}`} className="block">
                     <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
-                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{middleCard.title}</h2>
-                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{middleCard.description}</p>
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        {middleCard.title}
+                      </h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                        {middleCard.description}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
                     </article>
                   </Link>
                 )}
                 {secondMiddleCard && (
-                  <Link href={`/article/${secondMiddleCard.slug}`} className="block">
+                  <Link
+                    href={`/article/${secondMiddleCard.slug}`}
+                    className="block"
+                  >
                     <article className="h-[220px] max-h-[220px] overflow-hidden rounded-xl border border-gray-800 p-5 transition hover:border-yellow-500">
-                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">{secondMiddleCard.title}</h2>
-                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">{secondMiddleCard.description}</p>
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">Lire l’article →</p>
+                      <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        {secondMiddleCard.title}
+                      </h2>
+                      <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                        {secondMiddleCard.description}
+                      </p>
+                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’article →
+                      </p>
                     </article>
                   </Link>
                 )}
@@ -145,14 +158,14 @@ export default async function SociétéPageV2() {
             {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
 
             {(bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
+              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:mt-auto lg:flex-none lg:pt-10">
                 {bottomCard && (
                   <Link
                     href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-48 max-h-48">
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-48 shrink-0">
                         <SafeImage
                           src={bottomCard.image}
                           alt={bottomCard.title}
@@ -162,12 +175,12 @@ export default async function SociétéPageV2() {
                         />
                       </div>
 
-                      <div className="p-5">
-                        <h2 className="h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                      <div className="flex h-[132px] flex-col p-5">
+                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {bottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
@@ -178,10 +191,10 @@ export default async function SociétéPageV2() {
                 {secondBottomCard && (
                   <Link
                     href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
+                    className="block h-full"
                   >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-48 max-h-48">
+                    <article className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                      <div className="relative h-48 shrink-0">
                         <SafeImage
                           src={secondBottomCard.image}
                           alt={secondBottomCard.title}
@@ -191,12 +204,12 @@ export default async function SociétéPageV2() {
                         />
                       </div>
 
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
+                      <div className="flex h-[132px] flex-col p-5">
+                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
                           {secondBottomCard.title}
                         </h2>
 
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        <p className="mt-auto pt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
                           Lire l’article →
                         </p>
                       </div>
@@ -212,52 +225,51 @@ export default async function SociétéPageV2() {
           <aside className="space-y-6 lg:col-span-2">
             {/* QUESTION À... */}
 
-{questionArticle && (
-  <>
-    <a
-      href="https://www.andorrasignature.com"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="mb-3 block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
-    >
-      Visiter Andorra Signature
-    </a>
+            {questionArticle && (
+              <>
+                <a
+                  href="https://www.andorrasignature.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mb-3 block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
+                >
+                  Visiter Andorra Signature
+                </a>
 
-    <Link
-      href={`/article/${questionArticle.slug}`}
-      className="block"
-    >
-      <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-        <div className="relative h-40">
-          <MediaPreview
-            image={questionArticle.image}
-            videoUrl={questionArticle.videoUrl}
-            title={questionArticle.title}
-            mode="featured"
-          />
-        </div>
+                <Link
+                  href={`/article/${questionArticle.slug}`}
+                  className="block"
+                >
+                  <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
+                    <div className="relative h-40">
+                      <MediaPreview
+                        image={questionArticle.image}
+                        videoUrl={questionArticle.videoUrl}
+                        title={questionArticle.title}
+                        mode="featured"
+                      />
+                    </div>
 
-        <div className="p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-            Question à…
-          </p>
+                    <div className="p-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
+                        Question à…
+                      </p>
 
-          <h2 className="mt-3 h-[3.5rem] max-h-[3.5rem] line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
-            {questionArticle.title}
-          </h2>
+                      <h2 className="mt-3 h-[3.5rem] max-h-[3.5rem] line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
+                        {questionArticle.title}
+                      </h2>
 
-          <p className="mt-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400">
-            {questionArticle.description}
-          </p>
+                      <p className="mt-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400">
+                        {questionArticle.description}
+                      </p>
 
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-            Lire l’entretien →
-          </p>
-        </div>
-      </article>
-    </Link>
-  </>
-
+                      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                        Lire l’entretien →
+                      </p>
+                    </div>
+                  </article>
+                </Link>
+              </>
             )}
 
             {/* TROIS CARTES CLASSIQUES */}
@@ -295,20 +307,17 @@ export default async function SociétéPageV2() {
             {/* BON À SAVOIR */}
 
             {bonASavoir && (
-              <Link
-                href={`/article/${bonASavoir.slug}`}
-                className="block"
-              >
+              <Link href={`/article/${bonASavoir.slug}`} className="block">
                 <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                  <h2 className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
                     {bonASavoir.title}
                   </h2>
 
-                  <p className="mt-4 h-12 max-h-12 overflow-hidden leading-6 text-gray-400">
+                  <p className="mt-4 line-clamp-3 overflow-hidden leading-6 text-gray-400">
                     {bonASavoir.description}
                   </p>
 
