@@ -27,6 +27,7 @@ export type AutomatedHomeSimulationResult = {
   mode: "PROPOSAL_ONLY";
   generatedAt: Date;
   candidateCount: number;
+  candidateFacts: HomeCandidateFacts[];
   assessments: HomeCandidateAssessment[];
   composition: HomeCompositionResult;
 };
@@ -64,6 +65,7 @@ export async function simulateAutomatedHome(
       mode: "PROPOSAL_ONLY",
       generatedAt: options.generatedAt ?? new Date(),
       candidateCount: 0,
+      candidateFacts: [],
       assessments: [],
       composition: composeAutomatedHome([]),
     };
@@ -78,6 +80,7 @@ export async function simulateAutomatedHome(
     mode: "PROPOSAL_ONLY",
     generatedAt: options.generatedAt ?? new Date(),
     candidateCount: facts.length,
+    candidateFacts: facts,
     assessments,
     composition: composeAutomatedHome(candidates),
   };
