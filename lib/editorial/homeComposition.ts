@@ -61,12 +61,7 @@ const AUTOMATED_ZONE_ORDER: HomeVisibleZone[] = [
   "brief",
 ];
 
-const FALLBACK_ZONE_ORDER: HomeVisibleZone[] = [
-  "hero",
-  "feature",
-  "card",
-  "brief",
-];
+const FALLBACK_ZONE_ORDER: HomeVisibleZone[] = ["card", "brief"];
 
 const MAIN_ZONES = new Set<HomeVisibleZone>([
   "hero",

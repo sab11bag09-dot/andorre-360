@@ -272,7 +272,7 @@ describe("composeAutomatedHome", () => {
     );
   });
 
-  it("remplit chronologiquement les zones sans candidat au-dessus des seuils", () => {
+  it("réserve le secours chronologique aux cartes et aux brèves", () => {
     const result = composeAutomatedHome([
       makeCandidate(1, 50, {
         category: "ACTUALITÉ",
@@ -288,28 +288,30 @@ describe("composeAutomatedHome", () => {
       }),
     ]);
 
-    expect(result.placements).toContainEqual(
-      expect.objectContaining({
-        zone: "hero",
-        articleId: 2,
-        origin: "FALLBACK",
-      }),
-    );
+    expect(
+      result.placements.some(
+        ({ zone }) => zone === "hero" || zone === "feature",
+      ),
+    ).toBe(false);
 
-    expect(result.placements).toContainEqual(
-      expect.objectContaining({
-        zone: "feature",
-        articleId: 3,
-        origin: "FALLBACK",
-      }),
-    );
-
-    expect(result.placements).toContainEqual(
-      expect.objectContaining({
-        zone: "card",
-        articleId: 1,
-        origin: "FALLBACK",
-      }),
+    expect(result.placements).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          zone: "card",
+          articleId: 2,
+          origin: "FALLBACK",
+        }),
+        expect.objectContaining({
+          zone: "card",
+          articleId: 3,
+          origin: "FALLBACK",
+        }),
+        expect.objectContaining({
+          zone: "card",
+          articleId: 1,
+          origin: "FALLBACK",
+        }),
+      ]),
     );
 
     expect(result.placements.some(({ origin }) => origin === "AUTOMATED")).toBe(
