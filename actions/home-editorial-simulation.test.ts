@@ -162,6 +162,7 @@ describe("runHomeEditorialSimulation", () => {
           reasons: ["Sujet prioritaire."],
           exclusions: [],
           zone: "hero",
+          origin: "AUTOMATED",
         },
       ],
       excluded: [

@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import {
   runHomeEditorialSimulation,
   type HomeEditorialSimulationResult,
+  type HomeSimulationPlacementView,
 } from "@/actions/home-editorial-simulation";
 import { Button } from "@/components/admin/ui";
 import type { HomeCandidateExclusion } from "@/lib/editorial/homeAutomationPolicy";
@@ -16,6 +17,12 @@ const ZONE_LABELS: Record<HomeVisibleZone, string> = {
   "grand-format": "Grand format",
   card: "Carte éditoriale",
   brief: "Brève",
+};
+
+const ORIGIN_LABELS: Record<HomeSimulationPlacementView["origin"], string> = {
+  LOCKED: "Sélection humaine",
+  AUTOMATED: "Sélection IA",
+  FALLBACK: "Secours chronologique",
 };
 
 const EXCLUSION_LABELS: Record<HomeCandidateExclusion, string> = {
@@ -149,9 +156,23 @@ export default function HomeEditorialSimulationPanel() {
                       </span>
                     </div>
 
-                    <p className="mt-3 text-sm text-gray-500">
-                      {placement.category} · {placement.sourceName}
-                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <p className="text-sm text-gray-500">
+                        {placement.category} · {placement.sourceName}
+                      </p>
+
+                      <span
+                        className={
+                          placement.origin === "AUTOMATED"
+                            ? "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                            : placement.origin === "FALLBACK"
+                              ? "rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700"
+                              : "rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700"
+                        }
+                      >
+                        {ORIGIN_LABELS[placement.origin]}
+                      </span>
+                    </div>
 
                     <ul className="mt-4 space-y-1 text-sm leading-6 text-gray-700">
                       {placement.reasons.map((reason) => (

@@ -19,6 +19,7 @@ export type HomeSimulationCandidateView = {
 
 export type HomeSimulationPlacementView = HomeSimulationCandidateView & {
   zone: HomeVisibleZone;
+  origin: "LOCKED" | "AUTOMATED" | "FALLBACK";
 };
 
 export type HomeEditorialSimulationResult =
@@ -89,6 +90,7 @@ export async function runHomeEditorialSimulation(): Promise<HomeEditorialSimulat
     const placements = simulation.composition.placements.map((placement) => ({
       ...buildCandidateView(placement.articleId),
       zone: placement.zone,
+      origin: placement.origin,
     }));
 
     const placedArticleIds = new Set(

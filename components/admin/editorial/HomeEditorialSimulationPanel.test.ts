@@ -51,6 +51,14 @@ describe("interface de simulation éditoriale", () => {
     );
   });
 
+  it("distingue les sélections IA, humaines et de secours", () => {
+    expect(actionSource).toContain("origin: placement.origin");
+    expect(panelSource).toContain('LOCKED: "Sélection humaine"');
+    expect(panelSource).toContain('AUTOMATED: "Sélection IA"');
+    expect(panelSource).toContain('FALLBACK: "Secours chronologique"');
+    expect(panelSource).toContain("ORIGIN_LABELS[placement.origin]");
+  });
+
   it("expose une sous-page dédiée depuis la diffusion", () => {
     expect(simulationPageSource).toContain("<HomeEditorialSimulationPanel />");
     expect(diffusionPageSource).toContain('href="/admin/diffusion/simulation"');
