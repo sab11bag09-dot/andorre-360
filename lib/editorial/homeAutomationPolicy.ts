@@ -1,4 +1,8 @@
-export const HOME_AUTOMATION_POLICY_VERSION = "1.0";
+export const HOME_AUTOMATION_POLICY_VERSION = "1.1";
+
+export const HOME_GRAND_FORMAT_MINIMUM_SCORE = 60;
+
+export const HOME_STANDARD_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 
 export const HOME_ZONE_MINIMUM_SCORES = {
   hero: 85,

@@ -161,6 +161,26 @@ describe("simulateAutomatedHome", () => {
     ).rejects.toThrow("Aucune évaluation reçue pour l’article 2.");
   });
 
+  it("transmet la date de simulation au contrôle de fraîcheur", async () => {
+    const staleFacts = makeFacts(1);
+
+    staleFacts.publishedAt = new Date("2026-08-20T10:00:00.000Z");
+
+    const result = await simulateAutomatedHome(
+      {
+        generatedAt: new Date("2026-09-03T10:00:00.000Z"),
+      },
+      {
+        loadCandidateFacts: vi.fn(async () => [staleFacts]),
+        assessmentProvider: makeProvider(
+          vi.fn(async () => [makeAssessment(1)]),
+        ),
+      },
+    );
+
+    expect(result.composition.placements).toEqual([]);
+  });
+
   it("propage une panne de l’évaluateur sans produire de composition", async () => {
     const error = new Error("Évaluateur indisponible.");
 

@@ -219,6 +219,18 @@ describe("composeAutomatedHome", () => {
     );
   });
 
+  it("exige un score minimal de 60 pour le grand format", () => {
+    const result = composeAutomatedHome([
+      makeCandidate(1, 59, {
+        grandFormatEligible: true,
+      }),
+    ]);
+
+    expect(result.placements.some(({ zone }) => zone === "grand-format")).toBe(
+      false,
+    );
+  });
+
   it("écarte les candidats interdits même avec un score maximal", () => {
     const result = composeAutomatedHome([
       makeCandidate(1, 100, {
@@ -304,6 +316,46 @@ describe("composeAutomatedHome", () => {
       false,
     );
   });
+
+  it("écarte des zones standard un article publié depuis plus de sept jours", () => {
+    const result = composeAutomatedHome(
+      [
+        makeCandidate(1, 100, {
+          publishedAt: new Date("2026-08-20T10:00:00.000Z"),
+        }),
+      ],
+      [],
+      {
+        evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
+      },
+    );
+
+    expect(result.placements).toEqual([]);
+  });
+
+  it("conserve un grand format durable malgré son ancienneté", () => {
+    const result = composeAutomatedHome(
+      [
+        makeCandidate(1, 60, {
+          grandFormatEligible: true,
+          publishedAt: new Date("2026-08-01T10:00:00.000Z"),
+        }),
+      ],
+      [],
+      {
+        evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
+      },
+    );
+
+    expect(result.placements).toContainEqual(
+      expect.objectContaining({
+        zone: "grand-format",
+        articleId: 1,
+        origin: "AUTOMATED",
+      }),
+    );
+  });
+
   it("signale les emplacements restés vides", () => {
     const result = composeAutomatedHome([]);
 

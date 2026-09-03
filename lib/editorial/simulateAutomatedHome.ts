@@ -55,6 +55,7 @@ export async function simulateAutomatedHome(
   dependencies?: AutomatedHomeSimulationDependencies,
 ): Promise<AutomatedHomeSimulationResult> {
   const runtimeDependencies = dependencies ?? createDefaultDependencies();
+  const generatedAt = options.generatedAt ?? new Date();
 
   const facts = await runtimeDependencies.loadCandidateFacts(
     options.candidateLimit,
@@ -63,11 +64,13 @@ export async function simulateAutomatedHome(
   if (facts.length === 0) {
     return {
       mode: "PROPOSAL_ONLY",
-      generatedAt: options.generatedAt ?? new Date(),
+      generatedAt,
       candidateCount: 0,
       candidateFacts: [],
       assessments: [],
-      composition: composeAutomatedHome([]),
+      composition: composeAutomatedHome([], [], {
+        evaluatedAt: generatedAt,
+      }),
     };
   }
 
@@ -78,10 +81,12 @@ export async function simulateAutomatedHome(
 
   return {
     mode: "PROPOSAL_ONLY",
-    generatedAt: options.generatedAt ?? new Date(),
+    generatedAt,
     candidateCount: facts.length,
     candidateFacts: facts,
     assessments,
-    composition: composeAutomatedHome(candidates),
+    composition: composeAutomatedHome(candidates, [], {
+      evaluatedAt: generatedAt,
+    }),
   };
 }

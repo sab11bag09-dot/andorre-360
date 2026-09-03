@@ -1,5 +1,7 @@
 import {
   evaluateHomeAutomationCandidate,
+  HOME_GRAND_FORMAT_MINIMUM_SCORE,
+  HOME_STANDARD_MAX_AGE_MS,
   type HomeAutomationCandidate,
   type HomeAutomationZone,
   type HomeCandidateEvaluation,
@@ -40,6 +42,10 @@ export type HomeCompositionResult = {
   placements: HomeCompositionPlacement[];
   evaluations: HomeCandidateEvaluation[];
   unfilledSlots: Record<HomeVisibleZone, number>;
+};
+
+export type HomeCompositionOptions = {
+  evaluatedAt?: Date;
 };
 
 type EvaluatedCandidate = {
@@ -94,16 +100,38 @@ function compareFallbackCandidates(
   );
 }
 
+function isFreshForStandardZone(
+  candidate: EvaluatedCandidate,
+  evaluatedAt?: Date,
+): boolean {
+  if (!evaluatedAt) {
+    return true;
+  }
+
+  const ageMs =
+    evaluatedAt.getTime() - candidate.candidate.publishedAt.getTime();
+
+  return ageMs >= 0 && ageMs <= HOME_STANDARD_MAX_AGE_MS;
+}
+
 function isEligibleForZone(
   candidate: EvaluatedCandidate,
   zone: HomeVisibleZone,
+  evaluatedAt?: Date,
 ): boolean {
   if (!candidate.evaluation.eligible) {
     return false;
   }
 
   if (zone === "grand-format") {
-    return candidate.candidate.grandFormatEligible;
+    return (
+      candidate.candidate.grandFormatEligible &&
+      candidate.evaluation.score >= HOME_GRAND_FORMAT_MINIMUM_SCORE
+    );
+  }
+
+  if (!isFreshForStandardZone(candidate, evaluatedAt)) {
+    return false;
   }
 
   return candidate.evaluation.eligibleZones.includes(
@@ -114,6 +142,7 @@ function isEligibleForZone(
 export function composeAutomatedHome(
   candidates: HomeCompositionCandidate[],
   lockedPlacements: LockedHomePlacement[] = [],
+  options: HomeCompositionOptions = {},
 ): HomeCompositionResult {
   const evaluatedCandidates = candidates
     .map((candidate) => ({
@@ -196,7 +225,7 @@ export function composeAutomatedHome(
       return false;
     }
 
-    if (!isEligibleForZone(candidate, zone)) {
+    if (!isEligibleForZone(candidate, zone, options.evaluatedAt)) {
       return false;
     }
 
@@ -247,6 +276,10 @@ export function composeAutomatedHome(
     }
 
     if (!candidate.evaluation.eligible) {
+      return false;
+    }
+
+    if (!isFreshForStandardZone(candidate, options.evaluatedAt)) {
       return false;
     }
 
