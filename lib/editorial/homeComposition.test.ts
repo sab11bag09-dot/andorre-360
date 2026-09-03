@@ -82,7 +82,10 @@ describe("composeAutomatedHome", () => {
       [
         {
           zone: "hero",
-          candidate: lockedHero,
+          articleId: lockedHero.article.articleId,
+          sourceId: lockedHero.sourceId,
+          category: lockedHero.article.category,
+          score: 60,
         },
       ],
     );
@@ -152,9 +155,15 @@ describe("composeAutomatedHome", () => {
 
   it("refuse une même source pour le hero et le feature", () => {
     const result = composeAutomatedHome([
-      makeCandidate(1, 100, { sourceId: 10 }),
-      makeCandidate(2, 99, { sourceId: 10 }),
-      makeCandidate(3, 98, { sourceId: 20 }),
+      makeCandidate(1, 100, {
+        sourceId: 10,
+      }),
+      makeCandidate(2, 99, {
+        sourceId: 10,
+      }),
+      makeCandidate(3, 98, {
+        sourceId: 20,
+      }),
     ]);
 
     expect(result.placements).toContainEqual(
@@ -258,6 +267,7 @@ describe("composeAutomatedHome", () => {
     const older = makeCandidate(1, 90, {
       publishedAt: new Date("2026-09-01T10:00:00.000Z"),
     });
+
     const newer = makeCandidate(2, 90, {
       publishedAt: new Date("2026-09-01T12:00:00.000Z"),
     });

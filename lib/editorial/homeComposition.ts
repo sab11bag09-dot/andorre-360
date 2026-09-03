@@ -26,13 +26,16 @@ export type HomeCompositionCandidate = {
 
 export type LockedHomePlacement = {
   zone: HomeVisibleZone;
-  candidate: HomeCompositionCandidate;
+  articleId: number;
+  sourceId: number | null;
+  category: string;
+  score?: number;
 };
 
 export type HomeCompositionPlacement = {
   zone: HomeVisibleZone;
   articleId: number;
-  sourceId: number;
+  sourceId: number | null;
   category: string;
   score: number;
   origin: "LOCKED" | "AUTOMATED" | "FALLBACK";
@@ -51,6 +54,12 @@ export type HomeCompositionOptions = {
 type EvaluatedCandidate = {
   candidate: HomeCompositionCandidate;
   evaluation: HomeCandidateEvaluation;
+};
+
+type PlacementFacts = {
+  articleId: number;
+  sourceId: number | null;
+  category: string;
 };
 
 const AUTOMATED_ZONE_ORDER: HomeVisibleZone[] = [
@@ -134,6 +143,16 @@ function isEligibleForZone(
   );
 }
 
+function getPlacementFacts(
+  candidate: HomeCompositionCandidate,
+): PlacementFacts {
+  return {
+    articleId: candidate.article.articleId,
+    sourceId: candidate.sourceId,
+    category: candidate.article.category,
+  };
+}
+
 export function composeAutomatedHome(
   candidates: HomeCompositionCandidate[],
   lockedPlacements: LockedHomePlacement[] = [],
@@ -158,13 +177,13 @@ export function composeAutomatedHome(
 
   function registerPlacement(
     zone: HomeVisibleZone,
-    candidate: HomeCompositionCandidate,
+    candidate: PlacementFacts,
     score: number,
     origin: "LOCKED" | "AUTOMATED" | "FALLBACK",
   ): void {
-    if (usedArticleIds.has(candidate.article.articleId)) {
+    if (usedArticleIds.has(candidate.articleId)) {
       throw new Error(
-        `L’article ${candidate.article.articleId} occupe déjà un emplacement.`,
+        `L’article ${candidate.articleId} occupe déjà un emplacement.`,
       );
     }
 
@@ -175,39 +194,35 @@ export function composeAutomatedHome(
       throw new Error(`La zone ${zone} dépasse sa capacité de ${capacity}.`);
     }
 
-    usedArticleIds.add(candidate.article.articleId);
+    usedArticleIds.add(candidate.articleId);
     zoneCounts.set(zone, currentZoneCount + 1);
 
     if (MAIN_ZONES.has(zone)) {
       mainCategoryCounts.set(
-        candidate.article.category,
-        (mainCategoryCounts.get(candidate.article.category) ?? 0) + 1,
+        candidate.category,
+        (mainCategoryCounts.get(candidate.category) ?? 0) + 1,
       );
     }
 
-    if (LEADING_ZONES.has(zone)) {
+    if (LEADING_ZONES.has(zone) && candidate.sourceId !== null) {
       leadingSourceIds.add(candidate.sourceId);
     }
 
     placements.push({
       zone,
-      articleId: candidate.article.articleId,
+      articleId: candidate.articleId,
       sourceId: candidate.sourceId,
-      category: candidate.article.category,
+      category: candidate.category,
       score,
       origin,
     });
   }
 
   for (const lockedPlacement of lockedPlacements) {
-    const evaluation = evaluateHomeAutomationCandidate(
-      lockedPlacement.candidate.article,
-    );
-
     registerPlacement(
       lockedPlacement.zone,
-      lockedPlacement.candidate,
-      evaluation.score,
+      lockedPlacement,
+      lockedPlacement.score ?? 0,
       "LOCKED",
     );
   }
@@ -255,7 +270,7 @@ export function composeAutomatedHome(
 
       registerPlacement(
         zone,
-        candidate.candidate,
+        getPlacementFacts(candidate.candidate),
         candidate.evaluation.score,
         "AUTOMATED",
       );
@@ -309,7 +324,7 @@ export function composeAutomatedHome(
 
       registerPlacement(
         zone,
-        candidate.candidate,
+        getPlacementFacts(candidate.candidate),
         candidate.evaluation.score,
         "FALLBACK",
       );
