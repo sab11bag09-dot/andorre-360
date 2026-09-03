@@ -151,9 +151,11 @@ export default function HomeEditorialSimulationPanel() {
                         </h3>
                       </div>
 
-                      <span className="rounded-full bg-gray-950 px-3 py-1 text-sm font-semibold text-white">
-                        {placement.score}/100
-                      </span>
+                      {placement.origin !== "LOCKED" && (
+                        <span className="rounded-full bg-gray-950 px-3 py-1 text-sm font-semibold text-white">
+                          {placement.score}/100
+                        </span>
+                      )}
                     </div>
 
                     <div className="mt-3 flex flex-wrap items-center gap-2">

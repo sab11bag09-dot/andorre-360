@@ -64,4 +64,7 @@ describe("interface de simulation éditoriale", () => {
     expect(diffusionPageSource).toContain('href="/admin/diffusion/simulation"');
     expect(diffusionPageSource).toContain("Simuler l’accueil");
   });
+  it("n’affiche pas de score IA pour une sélection humaine verrouillée", () => {
+    expect(panelSource).toContain('placement.origin !== "LOCKED"');
+  });
 });
