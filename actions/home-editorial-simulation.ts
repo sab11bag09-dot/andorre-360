@@ -2,7 +2,10 @@
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import type { HomeCandidateExclusion } from "@/lib/editorial/homeAutomationPolicy";
-import type { HomeVisibleZone } from "@/lib/editorial/homeComposition";
+import type {
+  HomeCompositionPlacement,
+  HomeVisibleZone,
+} from "@/lib/editorial/homeComposition";
 import { simulateAutomatedHome } from "@/lib/editorial/simulateAutomatedHome";
 
 const HOME_SIMULATION_CANDIDATE_LIMIT = 30;
@@ -51,6 +54,13 @@ export async function runHomeEditorialSimulation(): Promise<HomeEditorialSimulat
       simulation.candidateFacts.map((facts) => [facts.articleId, facts]),
     );
 
+    const lockedByArticleId = new Map(
+      simulation.lockedPlacements.map((placement) => [
+        placement.articleId,
+        placement,
+      ]),
+    );
+
     const assessmentsByArticleId = new Map(
       simulation.assessments.map((assessment) => [
         assessment.articleId,
@@ -87,11 +97,40 @@ export async function runHomeEditorialSimulation(): Promise<HomeEditorialSimulat
       };
     }
 
-    const placements = simulation.composition.placements.map((placement) => ({
-      ...buildCandidateView(placement.articleId),
-      zone: placement.zone,
-      origin: placement.origin,
-    }));
+    function buildPlacementView(
+      placement: HomeCompositionPlacement,
+    ): HomeSimulationPlacementView {
+      if (placement.origin === "LOCKED") {
+        const lockedPlacement = lockedByArticleId.get(placement.articleId);
+
+        if (!lockedPlacement) {
+          throw new Error(
+            `Placement verrouillé introuvable pour l’article ${placement.articleId}.`,
+          );
+        }
+
+        return {
+          articleId: placement.articleId,
+          title: lockedPlacement.title,
+          category: lockedPlacement.category,
+          sourceName: lockedPlacement.sourceName,
+          score: placement.score,
+          reasons: ["Sélection humaine verrouillée."],
+          exclusions: [],
+          zone: placement.zone,
+          origin: placement.origin,
+        };
+      }
+
+      return {
+        ...buildCandidateView(placement.articleId),
+        zone: placement.zone,
+        origin: placement.origin,
+      };
+    }
+
+    const placements =
+      simulation.composition.placements.map(buildPlacementView);
 
     const placedArticleIds = new Set(
       placements.map(({ articleId }) => articleId),

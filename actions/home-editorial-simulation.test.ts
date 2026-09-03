@@ -71,6 +71,7 @@ function makeAssessment(articleId: number, reasons: string[]) {
 describe("runHomeEditorialSimulation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
     requireAdmin.mockResolvedValue({
       id: "admin-1",
       email: "admin@example.com",
@@ -95,6 +96,7 @@ describe("runHomeEditorialSimulation", () => {
         makeFacts(2, "Article exclu"),
         makeFacts(3, "Article non retenu"),
       ],
+      lockedPlacements: [],
       assessments: [
         makeAssessment(1, ["Sujet prioritaire."]),
         makeAssessment(2, ["Information périmée."]),
@@ -201,6 +203,76 @@ describe("runHomeEditorialSimulation", () => {
     });
   });
 
+  it("affiche un placement humain absent des candidats OpenAI", async () => {
+    simulateAutomatedHome.mockResolvedValue({
+      mode: "PROPOSAL_ONLY",
+      generatedAt,
+      candidateCount: 0,
+      candidateFacts: [],
+      lockedPlacements: [
+        {
+          publicationId: 10,
+          zone: "hero",
+          articleId: 42,
+          title: "Sélection humaine",
+          category: "POLITIQUE",
+          sourceId: null,
+          sourceName: "Rédaction",
+        },
+      ],
+      assessments: [],
+      composition: {
+        placements: [
+          {
+            zone: "hero",
+            articleId: 42,
+            sourceId: null,
+            category: "POLITIQUE",
+            score: 0,
+            origin: "LOCKED",
+          },
+        ],
+        evaluations: [],
+        unfilledSlots: {
+          hero: 0,
+          feature: 1,
+          "grand-format": 1,
+          card: 4,
+          brief: 4,
+        },
+      },
+    });
+
+    await expect(runHomeEditorialSimulation()).resolves.toEqual({
+      success: true,
+      mode: "PROPOSAL_ONLY",
+      generatedAt: "2026-09-02T12:00:00.000Z",
+      candidateCount: 0,
+      placements: [
+        {
+          articleId: 42,
+          title: "Sélection humaine",
+          category: "POLITIQUE",
+          sourceName: "Rédaction",
+          score: 0,
+          reasons: ["Sélection humaine verrouillée."],
+          exclusions: [],
+          zone: "hero",
+          origin: "LOCKED",
+        },
+      ],
+      excluded: [],
+      unselected: [],
+      unfilledSlots: {
+        hero: 0,
+        feature: 1,
+        "grand-format": 1,
+        card: 4,
+        brief: 4,
+      },
+    });
+  });
+
   it("retourne une erreur sûre sans divulguer le fournisseur", async () => {
     const consoleError = vi
       .spyOn(console, "error")
@@ -218,6 +290,7 @@ describe("runHomeEditorialSimulation", () => {
     });
 
     expect(consoleError).toHaveBeenCalled();
+
     consoleError.mockRestore();
   });
 });
