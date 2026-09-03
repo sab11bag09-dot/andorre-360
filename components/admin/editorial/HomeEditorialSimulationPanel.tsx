@@ -118,7 +118,7 @@ export default function HomeEditorialSimulationPanel() {
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-yellow-600">
                 Proposition
               </p>
-              <h2 className="mt-1 font-serif text-3xl text-gray-950">
+              <h2 className="mt-1 font-serif text-3xl text-white">
                 Composition simulée
               </h2>
             </div>
@@ -194,7 +194,7 @@ export default function HomeEditorialSimulationPanel() {
 
           {result.excluded.length > 0 && (
             <section>
-              <h2 className="font-serif text-2xl text-gray-950">
+              <h2 className="font-serif text-2xl text-white">
                 Candidats exclus
               </h2>
 
