@@ -34,30 +34,44 @@ const {
   revalidatePath: vi.fn(),
 }));
 
-vi.mock("@/lib/admin/requireAdmin", () => ({ requireAdmin }));
-vi.mock("next/cache", () => ({ revalidatePath }));
+vi.mock("@/lib/admin/requireAdmin", () => ({
+  requireAdmin,
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath,
+}));
+
 vi.mock("@/lib/public-revalidation", () => ({
   revalidatePublicArticlePages,
 }));
+
 vi.mock("@/lib/prisma", () => ({
   prisma: {
-    article: { findUnique },
+    article: {
+      findUnique,
+    },
     articleTranslation: {
       findMany: translationFindMany,
     },
     $transaction: transaction,
   },
 }));
+
 vi.mock("@/components/admin/article-v4/validation", () => ({
-  validateArticleDraft: vi.fn(() => ({ success: true, errors: [] })),
+  validateArticleDraft: vi.fn(() => ({
+    success: true,
+    errors: [],
+  })),
   getFirstValidationError: vi.fn(),
 }));
 
-import { saveArticle } from "./article-v4";
 import {
   EMPTY_ARTICLE_DRAFT,
   type ArticleDraft,
 } from "@/components/admin/article-v4/types";
+
+import { saveArticle } from "./article-v4";
 
 const existingArticle = {
   id: 7,
@@ -86,29 +100,45 @@ function createDraft(): ArticleDraft {
 describe("durcissement de la sauvegarde principale", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-        translationFindMany.mockResolvedValue([
-      { locale: "CA", status: "PUBLISHED" },
-      { locale: "ES", status: "PUBLISHED" },
+
+    translationFindMany.mockResolvedValue([
+      {
+        locale: "CA",
+        status: "PUBLISHED",
+      },
+      {
+        locale: "ES",
+        status: "PUBLISHED",
+      },
     ]);
+
     findUnique.mockReset();
+
     requireAdmin.mockResolvedValue({
       id: "admin-1",
       email: "admin@example.com",
     });
-    findUnique
-      .mockResolvedValueOnce(existingArticle)
-      .mockResolvedValueOnce({ id: 7 });
+
+    findUnique.mockResolvedValueOnce(existingArticle).mockResolvedValueOnce({
+      id: 7,
+    });
+
     mediaFindUnique.mockResolvedValue(null);
     publicationFindFirst.mockResolvedValue(null);
+
     transaction.mockImplementation(
       async (callback: (client: unknown) => unknown) =>
         callback({
-          article: { update: articleUpdate },
+          article: {
+            update: articleUpdate,
+          },
           mediaUsage: {
             deleteMany: mediaUsageDeleteMany,
             upsert: mediaUsageUpsert,
           },
-          media: { findUnique: mediaFindUnique },
+          media: {
+            findUnique: mediaFindUnique,
+          },
           publication: {
             findFirst: publicationFindFirst,
             update: publicationUpdate,
@@ -137,9 +167,13 @@ describe("durcissement de la sauvegarde principale", () => {
     expect(transaction).not.toHaveBeenCalled();
     expect(revalidatePublicArticlePages).not.toHaveBeenCalled();
   });
-    it("refuse la publication lorsqu’une traduction manque", async () => {
+
+  it("refuse la publication lorsqu’une traduction manque", async () => {
     translationFindMany.mockResolvedValue([
-      { locale: "CA", status: "PUBLISHED" },
+      {
+        locale: "CA",
+        status: "PUBLISHED",
+      },
     ]);
 
     const result = await saveArticle({
@@ -150,8 +184,7 @@ describe("durcissement de la sauvegarde principale", () => {
 
     expect(result).toEqual({
       success: false,
-      message:
-        "Publie d’abord les traductions suivantes : ES.",
+      message: "Publie d’abord les traductions suivantes : ES.",
     });
 
     expect(translationFindMany).toHaveBeenCalledWith({
@@ -192,17 +225,20 @@ describe("durcissement de la sauvegarde principale", () => {
       });
 
       expect(result).toEqual(
-        expect.objectContaining({ success: true, published }),
+        expect.objectContaining({
+          success: true,
+          published,
+        }),
       );
+
       expect(revalidatePublicArticlePages).toHaveBeenCalledWith({
         categories: ["POLITIQUE", "ACTUALITÉ"],
         slugs: ["nouveau-titre", "ancien-titre"],
       });
+
       expect(editorialEventCreate).toHaveBeenCalledWith({
         data: expect.objectContaining({
-          action: published
-            ? "ARTICLE_UPDATED"
-            : "ARTICLE_UNPUBLISHED",
+          action: published ? "ARTICLE_UPDATED" : "ARTICLE_UNPUBLISHED",
           articleId: 7,
           actorId: "admin-1",
           actorEmail: "admin@example.com",
@@ -213,12 +249,16 @@ describe("durcissement de la sauvegarde principale", () => {
 
   it("distingue une première publication d’une modification publiée", async () => {
     findUnique.mockReset();
+
     findUnique
       .mockResolvedValueOnce({
         ...existingArticle,
         editorialStatus: "APPROVED",
       })
-      .mockResolvedValueOnce({ id: 7 });
+      .mockResolvedValueOnce({
+        id: 7,
+      });
+
     articleUpdate.mockResolvedValue({
       id: 7,
       slug: "nouveau-titre",
@@ -239,6 +279,72 @@ describe("durcissement de la sauvegarde principale", () => {
         action: "ARTICLE_PUBLISHED",
         fromStatus: "APPROVED",
         toStatus: "PUBLISHED",
+      }),
+    });
+  });
+
+  it("crée une publication humaine verrouillée lors de la publication", async () => {
+    articleUpdate.mockResolvedValue({
+      id: 7,
+      slug: "nouveau-titre",
+      category: "POLITIQUE",
+      title: "Nouveau titre",
+      published: true,
+      editorialStatus: "PUBLISHED",
+    });
+
+    publicationFindFirst.mockResolvedValue(null);
+
+    await saveArticle({
+      mode: "update",
+      intent: "publish",
+      article: createDraft(),
+    });
+
+    expect(publicationCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        articleId: 7,
+        active: true,
+        origin: "MANUAL",
+        locked: true,
+        automationScore: null,
+        automationPolicyVersion: null,
+        automationRunId: null,
+      }),
+    });
+  });
+
+  it("réinitialise la provenance lors d’une mise à jour humaine", async () => {
+    articleUpdate.mockResolvedValue({
+      id: 7,
+      slug: "nouveau-titre",
+      category: "POLITIQUE",
+      title: "Nouveau titre",
+      published: true,
+      editorialStatus: "PUBLISHED",
+    });
+
+    publicationFindFirst.mockResolvedValue({
+      id: 11,
+    });
+
+    await saveArticle({
+      mode: "update",
+      intent: "publish",
+      article: createDraft(),
+    });
+
+    expect(publicationUpdate).toHaveBeenCalledWith({
+      where: {
+        id: 11,
+      },
+      data: expect.objectContaining({
+        active: true,
+        origin: "MANUAL",
+        locked: true,
+        automationScore: null,
+        automationPolicyVersion: null,
+        automationRunId: null,
       }),
     });
   });
