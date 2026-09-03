@@ -83,7 +83,7 @@ model Article {
   publishedAt     DateTime?
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
-  aiRewrittenAt DateTime?
+  aiRewrittenAt   DateTime?
   analytics       ArticleAnalytics[]
   publications    Publication[]
 
@@ -201,20 +201,37 @@ model Edition {
   publications Publication[]
 }
 
+enum PublicationOrigin {
+  MANUAL
+  AUTOMATED
+  FALLBACK
+}
+
 model Publication {
-  id        Int                    @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   articleId Int
   channel   String
-  pageKey   String                 @default("home")
+  pageKey   String @default("home")
   zone      String
-  priority  Int                    @default(0)
-  startsAt  DateTime?
-  endsAt    DateTime?
-  active    Boolean                @default(true)
-  createdAt DateTime               @default(now())
+  priority  Int    @default(0)
+
+  startsAt DateTime?
+  endsAt   DateTime?
+  active   Boolean   @default(true)
+
+  origin                  PublicationOrigin @default(MANUAL)
+  locked                  Boolean           @default(true)
+  automationScore         Int?
+  automationPolicyVersion String?
+  automationRunId         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
   editionId Int?
-  edition   Edition?               @relation(fields: [editionId], references: [id])
-  article   Article                @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  edition   Edition? @relation(fields: [editionId], references: [id])
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
   analytics PublicationAnalytics[]
 }
 
@@ -241,26 +258,26 @@ model PublicationAnalytics {
 }
 
 model Source {
-  id                   Int                      @id @default(autoincrement())
-  name                 String
-  description          String?
-  url                  String                   @unique
-  organizationType     SourceOrganizationType   @default(OTHER)
-  collectionMode       SourceCollectionMode     @default(RSS)
-  checkIntervalMinutes Int                      @default(15)
-  active               Boolean                  @default(true)
-  availabilityStatus   SourceAvailabilityStatus @default(UNKNOWN)
-  publicationMode      SourcePublicationMode    @default(MANUAL)
-  trustLevel           SourceTrustLevel         @default(HIGH)
-  category             String?
-  lastCheckedAt        DateTime?
-  lastSuccessAt        DateTime?
-  lastErrorAt          DateTime?
-  lastErrorMessage     String?
-  consecutiveEmptyCollections Int @default(0)
-  createdAt            DateTime                 @default(now())
-  updatedAt            DateTime                 @updatedAt
-  observations         Observation[]
+  id                          Int                      @id @default(autoincrement())
+  name                        String
+  description                 String?
+  url                         String                   @unique
+  organizationType            SourceOrganizationType   @default(OTHER)
+  collectionMode              SourceCollectionMode     @default(RSS)
+  checkIntervalMinutes        Int                      @default(15)
+  active                      Boolean                  @default(true)
+  availabilityStatus          SourceAvailabilityStatus @default(UNKNOWN)
+  publicationMode             SourcePublicationMode    @default(MANUAL)
+  trustLevel                  SourceTrustLevel         @default(HIGH)
+  category                    String?
+  lastCheckedAt               DateTime?
+  lastSuccessAt               DateTime?
+  lastErrorAt                 DateTime?
+  lastErrorMessage            String?
+  consecutiveEmptyCollections Int                      @default(0)
+  createdAt                   DateTime                 @default(now())
+  updatedAt                   DateTime                 @updatedAt
+  observations                Observation[]
 
   @@index([active])
   @@index([collectionMode])
@@ -408,22 +425,23 @@ enum ExternalVideoProvider {
   TIKTOK
   FACEBOOK
 }
+
 enum AdvertisementFormat {
   FOUR_COLUMNS
   TWO_COLUMNS_WITH_CARD
 }
 
 model Advertisement {
-  id          Int                  @id @default(autoincrement())
-  imagePath   String
-  targetUrl   String
-  format      AdvertisementFormat
-  pageKey     String               @default("actualite")
-  active      Boolean              @default(false)
-  startsAt    DateTime?
-  endsAt      DateTime?
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
+  id        Int                 @id @default(autoincrement())
+  imagePath String
+  targetUrl String
+  format    AdvertisementFormat
+  pageKey   String              @default("actualite")
+  active    Boolean             @default(false)
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
 
   @@index([pageKey, active, startsAt, endsAt])
 }
