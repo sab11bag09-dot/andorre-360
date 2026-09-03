@@ -12,6 +12,10 @@ import {
   loadHomeCandidateFacts,
   type HomeCandidateFacts,
 } from "./loadHomeCandidateFacts";
+import {
+  loadLockedHomePlacements,
+  type LockedHomePublication,
+} from "./loadLockedHomePlacements";
 
 export type AutomatedHomeSimulationOptions = {
   candidateLimit?: number;
@@ -20,6 +24,7 @@ export type AutomatedHomeSimulationOptions = {
 
 export type AutomatedHomeSimulationDependencies = {
   loadCandidateFacts(limit?: number): Promise<HomeCandidateFacts[]>;
+  loadLockedPlacements(evaluatedAt: Date): Promise<LockedHomePublication[]>;
   assessmentProvider: HomeCandidateAssessmentProvider;
 };
 
@@ -28,6 +33,7 @@ export type AutomatedHomeSimulationResult = {
   generatedAt: Date;
   candidateCount: number;
   candidateFacts: HomeCandidateFacts[];
+  lockedPlacements: LockedHomePublication[];
   assessments: HomeCandidateAssessment[];
   composition: HomeCompositionResult;
 };
@@ -43,6 +49,10 @@ function createDefaultDependencies(): AutomatedHomeSimulationDependencies {
 
   return {
     loadCandidateFacts: loadHomeCandidateFacts,
+    loadLockedPlacements: (evaluatedAt) =>
+      loadLockedHomePlacements({
+        evaluatedAt,
+      }),
     assessmentProvider: new OpenAiHomeCandidateAssessmentProvider({
       apiKey,
       model: process.env.OPENAI_HOME_EDITORIAL_MODEL,
@@ -57,9 +67,10 @@ export async function simulateAutomatedHome(
   const runtimeDependencies = dependencies ?? createDefaultDependencies();
   const generatedAt = options.generatedAt ?? new Date();
 
-  const facts = await runtimeDependencies.loadCandidateFacts(
-    options.candidateLimit,
-  );
+  const [facts, lockedPlacements] = await Promise.all([
+    runtimeDependencies.loadCandidateFacts(options.candidateLimit),
+    runtimeDependencies.loadLockedPlacements(generatedAt),
+  ]);
 
   if (facts.length === 0) {
     return {
@@ -67,8 +78,9 @@ export async function simulateAutomatedHome(
       generatedAt,
       candidateCount: 0,
       candidateFacts: [],
+      lockedPlacements,
       assessments: [],
-      composition: composeAutomatedHome([], [], {
+      composition: composeAutomatedHome([], lockedPlacements, {
         evaluatedAt: generatedAt,
       }),
     };
@@ -84,8 +96,9 @@ export async function simulateAutomatedHome(
     generatedAt,
     candidateCount: facts.length,
     candidateFacts: facts,
+    lockedPlacements,
     assessments,
-    composition: composeAutomatedHome(candidates, [], {
+    composition: composeAutomatedHome(candidates, lockedPlacements, {
       evaluatedAt: generatedAt,
     }),
   };

@@ -5,6 +5,7 @@ import type {
   HomeCandidateAssessmentProvider,
 } from "./homeCandidateAssessment";
 import type { HomeCandidateFacts } from "./loadHomeCandidateFacts";
+import type { LockedHomePublication } from "./loadLockedHomePlacements";
 import { simulateAutomatedHome } from "./simulateAutomatedHome";
 
 function makeFacts(articleId: number): HomeCandidateFacts {
@@ -62,16 +63,25 @@ function makeAssessment(articleId: number): HomeCandidateAssessment {
 function makeProvider(
   assess: HomeCandidateAssessmentProvider["assess"],
 ): HomeCandidateAssessmentProvider {
-  return { assess };
+  return {
+    assess,
+  };
+}
+
+function makeLockedLoader(placements: LockedHomePublication[] = []) {
+  return vi.fn(async () => placements);
 }
 
 describe("simulateAutomatedHome", () => {
   it("relie le chargement, l’évaluation et la composition", async () => {
     const facts = [makeFacts(1), makeFacts(2), makeFacts(3)];
     const loadCandidateFacts = vi.fn(async () => facts);
+    const loadLockedPlacements = makeLockedLoader();
+
     const assess = vi.fn(async (receivedFacts: HomeCandidateFacts[]) =>
       receivedFacts.map(({ articleId }) => makeAssessment(articleId)),
     );
+
     const generatedAt = new Date("2026-09-02T12:00:00.000Z");
 
     const result = await simulateAutomatedHome(
@@ -81,16 +91,20 @@ describe("simulateAutomatedHome", () => {
       },
       {
         loadCandidateFacts,
+        loadLockedPlacements,
         assessmentProvider: makeProvider(assess),
       },
     );
 
     expect(loadCandidateFacts).toHaveBeenCalledWith(30);
+    expect(loadLockedPlacements).toHaveBeenCalledWith(generatedAt);
     expect(assess).toHaveBeenCalledWith(facts);
     expect(result.mode).toBe("PROPOSAL_ONLY");
     expect(result.generatedAt).toEqual(generatedAt);
     expect(result.candidateCount).toBe(3);
+    expect(result.lockedPlacements).toEqual([]);
     expect(result.assessments).toHaveLength(3);
+
     expect(result.composition.placements[0]).toEqual(
       expect.objectContaining({
         zone: "hero",
@@ -109,14 +123,17 @@ describe("simulateAutomatedHome", () => {
       },
       {
         loadCandidateFacts: vi.fn(async () => []),
+        loadLockedPlacements: makeLockedLoader(),
         assessmentProvider: makeProvider(assess),
       },
     );
 
     expect(assess).not.toHaveBeenCalled();
     expect(result.candidateCount).toBe(0);
+    expect(result.lockedPlacements).toEqual([]);
     expect(result.assessments).toEqual([]);
     expect(result.composition.placements).toEqual([]);
+
     expect(result.composition.unfilledSlots).toEqual({
       hero: 1,
       feature: 1,
@@ -126,8 +143,50 @@ describe("simulateAutomatedHome", () => {
     });
   });
 
+  it("préserve un placement humain absent des candidats OpenAI", async () => {
+    const assess = vi.fn();
+
+    const lockedPlacement: LockedHomePublication = {
+      publicationId: 10,
+      zone: "hero",
+      articleId: 42,
+      title: "Sélection humaine",
+      category: "POLITIQUE",
+      sourceId: null,
+      sourceName: "Rédaction",
+    };
+
+    const result = await simulateAutomatedHome(
+      {
+        generatedAt: new Date("2026-09-03T10:00:00.000Z"),
+      },
+      {
+        loadCandidateFacts: vi.fn(async () => []),
+        loadLockedPlacements: makeLockedLoader([lockedPlacement]),
+        assessmentProvider: makeProvider(assess),
+      },
+    );
+
+    expect(assess).not.toHaveBeenCalled();
+    expect(result.lockedPlacements).toEqual([lockedPlacement]);
+
+    expect(result.composition.placements).toEqual([
+      {
+        zone: "hero",
+        articleId: 42,
+        sourceId: null,
+        category: "POLITIQUE",
+        score: 0,
+        origin: "LOCKED",
+      },
+    ]);
+
+    expect(result.composition.unfilledSlots.hero).toBe(0);
+  });
+
   it("conserve les motifs produits par l’évaluateur", async () => {
     const facts = [makeFacts(1)];
+
     const assessment = {
       ...makeAssessment(1),
       reasons: ["Impact national.", "Information récente."],
@@ -137,6 +196,7 @@ describe("simulateAutomatedHome", () => {
       {},
       {
         loadCandidateFacts: vi.fn(async () => facts),
+        loadLockedPlacements: makeLockedLoader(),
         assessmentProvider: makeProvider(vi.fn(async () => [assessment])),
       },
     );
@@ -153,6 +213,7 @@ describe("simulateAutomatedHome", () => {
         {},
         {
           loadCandidateFacts: vi.fn(async () => [makeFacts(1), makeFacts(2)]),
+          loadLockedPlacements: makeLockedLoader(),
           assessmentProvider: makeProvider(
             vi.fn(async () => [makeAssessment(1)]),
           ),
@@ -172,6 +233,7 @@ describe("simulateAutomatedHome", () => {
       },
       {
         loadCandidateFacts: vi.fn(async () => [staleFacts]),
+        loadLockedPlacements: makeLockedLoader(),
         assessmentProvider: makeProvider(
           vi.fn(async () => [makeAssessment(1)]),
         ),
@@ -189,6 +251,7 @@ describe("simulateAutomatedHome", () => {
         {},
         {
           loadCandidateFacts: vi.fn(async () => [makeFacts(1)]),
+          loadLockedPlacements: makeLockedLoader(),
           assessmentProvider: makeProvider(
             vi.fn(async () => {
               throw error;
