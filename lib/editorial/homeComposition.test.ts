@@ -260,6 +260,50 @@ describe("composeAutomatedHome", () => {
     );
   });
 
+  it("remplit chronologiquement les zones sans candidat au-dessus des seuils", () => {
+    const result = composeAutomatedHome([
+      makeCandidate(1, 50, {
+        category: "ACTUALITÉ",
+        publishedAt: new Date("2026-09-01T10:00:00.000Z"),
+      }),
+      makeCandidate(2, 51, {
+        category: "POLITIQUE",
+        publishedAt: new Date("2026-09-01T12:00:00.000Z"),
+      }),
+      makeCandidate(3, 52, {
+        category: "SOCIÉTÉ",
+        publishedAt: new Date("2026-09-01T11:00:00.000Z"),
+      }),
+    ]);
+
+    expect(result.placements).toContainEqual(
+      expect.objectContaining({
+        zone: "hero",
+        articleId: 2,
+        origin: "FALLBACK",
+      }),
+    );
+
+    expect(result.placements).toContainEqual(
+      expect.objectContaining({
+        zone: "feature",
+        articleId: 3,
+        origin: "FALLBACK",
+      }),
+    );
+
+    expect(result.placements).toContainEqual(
+      expect.objectContaining({
+        zone: "card",
+        articleId: 1,
+        origin: "FALLBACK",
+      }),
+    );
+
+    expect(result.placements.some(({ origin }) => origin === "AUTOMATED")).toBe(
+      false,
+    );
+  });
   it("signale les emplacements restés vides", () => {
     const result = composeAutomatedHome([]);
 

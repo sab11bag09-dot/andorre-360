@@ -33,7 +33,7 @@ export type HomeCompositionPlacement = {
   sourceId: number;
   category: string;
   score: number;
-  origin: "LOCKED" | "AUTOMATED";
+  origin: "LOCKED" | "AUTOMATED" | "FALLBACK";
 };
 
 export type HomeCompositionResult = {
@@ -55,6 +55,13 @@ const AUTOMATED_ZONE_ORDER: HomeVisibleZone[] = [
   "brief",
 ];
 
+const FALLBACK_ZONE_ORDER: HomeVisibleZone[] = [
+  "hero",
+  "feature",
+  "card",
+  "brief",
+];
+
 const MAIN_ZONES = new Set<HomeVisibleZone>([
   "hero",
   "feature",
@@ -70,6 +77,17 @@ function compareCandidates(
 ): number {
   return (
     right.evaluation.score - left.evaluation.score ||
+    right.candidate.publishedAt.getTime() -
+      left.candidate.publishedAt.getTime() ||
+    right.candidate.article.articleId - left.candidate.article.articleId
+  );
+}
+
+function compareFallbackCandidates(
+  left: EvaluatedCandidate,
+  right: EvaluatedCandidate,
+): number {
+  return (
     right.candidate.publishedAt.getTime() -
       left.candidate.publishedAt.getTime() ||
     right.candidate.article.articleId - left.candidate.article.articleId
@@ -104,6 +122,10 @@ export function composeAutomatedHome(
     }))
     .sort(compareCandidates);
 
+  const fallbackCandidates = [...evaluatedCandidates].sort(
+    compareFallbackCandidates,
+  );
+
   const placements: HomeCompositionPlacement[] = [];
   const usedArticleIds = new Set<number>();
   const mainCategoryCounts = new Map<string, number>();
@@ -114,7 +136,7 @@ export function composeAutomatedHome(
     zone: HomeVisibleZone,
     candidate: HomeCompositionCandidate,
     score: number,
-    origin: "LOCKED" | "AUTOMATED",
+    origin: "LOCKED" | "AUTOMATED" | "FALLBACK",
   ): void {
     if (usedArticleIds.has(candidate.article.articleId)) {
       throw new Error(
@@ -212,6 +234,56 @@ export function composeAutomatedHome(
         candidate.candidate,
         candidate.evaluation.score,
         "AUTOMATED",
+      );
+    }
+  }
+
+  function canPlaceAsFallback(
+    zone: HomeVisibleZone,
+    candidate: EvaluatedCandidate,
+  ): boolean {
+    if (usedArticleIds.has(candidate.candidate.article.articleId)) {
+      return false;
+    }
+
+    if (!candidate.evaluation.eligible) {
+      return false;
+    }
+
+    if (
+      MAIN_ZONES.has(zone) &&
+      (mainCategoryCounts.get(candidate.candidate.article.category) ?? 0) >= 2
+    ) {
+      return false;
+    }
+
+    if (
+      LEADING_ZONES.has(zone) &&
+      leadingSourceIds.has(candidate.candidate.sourceId)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  for (const zone of FALLBACK_ZONE_ORDER) {
+    const capacity = HOME_VISIBLE_ZONE_CAPACITIES[zone];
+
+    while ((zoneCounts.get(zone) ?? 0) < capacity) {
+      const candidate = fallbackCandidates.find((entry) =>
+        canPlaceAsFallback(zone, entry),
+      );
+
+      if (!candidate) {
+        break;
+      }
+
+      registerPlacement(
+        zone,
+        candidate.candidate,
+        candidate.evaluation.score,
+        "FALLBACK",
       );
     }
   }
