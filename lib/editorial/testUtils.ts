@@ -1,7 +1,4 @@
-import type {
-  Article,
-  Publication,
-} from "@/lib/generated/prisma/client";
+import type { Article, Publication } from "@/lib/generated/prisma/client";
 
 type PublicationWithArticle = Publication & {
   article: Article;
@@ -9,9 +6,7 @@ type PublicationWithArticle = Publication & {
 
 let nextArticleId = 1;
 
-export function makeArticle(
-  overrides: Partial<Article> = {}
-): Article {
+export function makeArticle(overrides: Partial<Article> = {}): Article {
   const id = nextArticleId++;
   const now = new Date("2026-07-29T10:00:00.000Z");
 
@@ -45,11 +40,10 @@ export function makeArticle(
 }
 
 export function makePublication(
-  overrides: Partial<PublicationWithArticle> = {}
+  overrides: Partial<PublicationWithArticle> = {},
 ): PublicationWithArticle {
   const now = new Date("2026-07-29T10:00:00.000Z");
   const article = makeArticle();
-  
 
   return {
     id: 1,
@@ -60,7 +54,13 @@ export function makePublication(
     active: true,
     startsAt: null,
     endsAt: null,
+    origin: "MANUAL",
+    locked: true,
+    automationScore: null,
+    automationPolicyVersion: null,
+    automationRunId: null,
     createdAt: now,
+    updatedAt: now,
     editionId: null,
     articleId: article.id,
     article,

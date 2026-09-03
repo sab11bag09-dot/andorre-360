@@ -17,10 +17,7 @@ type SubmissionIntent = "draft" | "publish";
    OUTILS
 ========================================================= */
 
-function getRequiredString(
-  formData: FormData,
-  field: string
-): string {
+function getRequiredString(formData: FormData, field: string): string {
   const value = formData.get(field);
 
   if (typeof value !== "string" || !value.trim()) {
@@ -30,10 +27,7 @@ function getRequiredString(
   return value.trim();
 }
 
-function getOptionalString(
-  formData: FormData,
-  field: string
-): string | null {
+function getOptionalString(formData: FormData, field: string): string | null {
   const value = formData.get(field);
 
   if (typeof value !== "string") {
@@ -45,10 +39,7 @@ function getOptionalString(
   return cleanedValue || null;
 }
 
-function getOptionalDate(
-  formData: FormData,
-  field: string
-): Date | null {
+function getOptionalDate(formData: FormData, field: string): Date | null {
   const value = getOptionalString(formData, field);
 
   if (!value) {
@@ -64,9 +55,7 @@ function getOptionalDate(
   return date;
 }
 
-function getSubmissionIntent(
-  formData: FormData
-): SubmissionIntent {
+function getSubmissionIntent(formData: FormData): SubmissionIntent {
   const value = formData.get("submissionIntent");
 
   return value === "draft" ? "draft" : "publish";
@@ -81,21 +70,17 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
-async function createUniqueSlug(
-  title: string
-): Promise<string> {
-  const baseSlug =
-    slugify(title) || `contenu-${Date.now()}`;
+async function createUniqueSlug(title: string): Promise<string> {
+  const baseSlug = slugify(title) || `contenu-${Date.now()}`;
 
-  const existingArticle =
-    await prisma.article.findUnique({
-      where: {
-        slug: baseSlug,
-      },
-      select: {
-        id: true,
-      },
-    });
+  const existingArticle = await prisma.article.findUnique({
+    where: {
+      slug: baseSlug,
+    },
+    select: {
+      id: true,
+    },
+  });
 
   if (!existingArticle) {
     return baseSlug;
@@ -120,284 +105,58 @@ function revalidatePublicPages(
    CRÉATION
 ========================================================= */
 
-export async function createArticle(
-  formData: FormData
-) {
+export async function createArticle(formData: FormData) {
   await requireAdmin();
 
-  const submissionIntent =
-    getSubmissionIntent(formData);
+  const submissionIntent = getSubmissionIntent(formData);
 
-  const shouldPublish =
-    submissionIntent === "publish";
+  const shouldPublish = submissionIntent === "publish";
 
-  const title = getRequiredString(
-    formData,
-    "title"
-  );
+  const title = getRequiredString(formData, "title");
 
-  const category = getRequiredString(
-    formData,
-    "category"
-  );
+  const category = getRequiredString(formData, "category");
 
-  const description = getRequiredString(
-    formData,
-    "description"
-  );
+  const description = getRequiredString(formData, "description");
 
-  const content = getRequiredString(
-    formData,
-    "content"
-  );
+  const content = getRequiredString(formData, "content");
 
-  const image = getRequiredString(
-    formData,
-    "image"
-  );
+  const image = getRequiredString(formData, "image");
 
-  const author = getRequiredString(
-    formData,
-    "author"
-  );
+  const author = getRequiredString(formData, "author");
 
-  const contentType =
-    getOptionalString(
-      formData,
-      "contentType"
-    ) ?? "article";
+  const contentType = getOptionalString(formData, "contentType") ?? "article";
 
-  const readingTime =
-    getOptionalString(
-      formData,
-      "readingTime"
-    ) ?? "1 min";
+  const readingTime = getOptionalString(formData, "readingTime") ?? "1 min";
 
-  const videoUrl =
-    getOptionalString(
-      formData,
-      "videoUrl"
-    );
+  const videoUrl = getOptionalString(formData, "videoUrl");
 
-  const videoDuration =
-    getOptionalString(
-      formData,
-      "videoDuration"
-    );
+  const videoDuration = getOptionalString(formData, "videoDuration");
 
-  const socialText =
-    getOptionalString(
-      formData,
-      "socialText"
-    );
+  const socialText = getOptionalString(formData, "socialText");
 
-  const featured =
-    formData.get("featured") === "on";
+  const featured = formData.get("featured") === "on";
 
-  const pageKey =
-    getOptionalString(
-      formData,
-      "pageKey"
-    ) ?? "home";
+  const pageKey = getOptionalString(formData, "pageKey") ?? "home";
 
-  const channel =
-    getOptionalString(
-      formData,
-      "channel"
-    ) ?? "site";
+  const channel = getOptionalString(formData, "channel") ?? "site";
 
-  const zone =
-    getOptionalString(
-      formData,
-      "zone"
-    ) ?? "standard";
+  const zone = getOptionalString(formData, "zone") ?? "standard";
 
-  const priorityValue =
-    getOptionalString(
-      formData,
-      "priority"
-    ) ?? "0";
+  const priorityValue = getOptionalString(formData, "priority") ?? "0";
 
-  const priority =
-    Number(priorityValue) || 0;
+  const priority = Number(priorityValue) || 0;
 
-  const startsAt =
-    getOptionalDate(
-      formData,
-      "startsAt"
-    );
+  const startsAt = getOptionalDate(formData, "startsAt");
 
-  const endsAt =
-    getOptionalDate(
-      formData,
-      "endsAt"
-    );
+  const endsAt = getOptionalDate(formData, "endsAt");
 
-  const slug =
-    await createUniqueSlug(title);
+  const slug = await createUniqueSlug(title);
 
-  const createdArticle =
-    await prisma.$transaction(
-      async (transaction) => {
-        const article =
-          await transaction.article.create({
-            data: {
-              title,
-              slug,
-              category,
-              description,
-              content,
-              image,
-              author,
-              readingTime,
-              contentType,
-              videoUrl,
-              videoDuration,
-              socialText,
-              featured,
-              published: shouldPublish,
-            },
-          });
-
-        if (shouldPublish) {
-          await transaction.publication.create({
-            data: {
-              articleId: article.id,
-              channel,
-              pageKey,
-              zone,
-              priority,
-              startsAt,
-              endsAt,
-              active: true,
-            },
-          });
-        }
-
-        return article;
-      }
-    );
-
-  revalidatePublicPages(
-    shouldPublish ? [createdArticle.slug] : [],
-    [createdArticle.category],
-  );
-
-  revalidatePath(
-    `/admin/articles/${createdArticle.id}`
-  );
-
-  if (shouldPublish) {
-    redirect(
-      `/article/${createdArticle.slug}`
-    );
-  }
-
-  redirect(
-    `/admin/articles/${createdArticle.id}`
-  );
-}
-
-/* =========================================================
-   MODIFICATION
-========================================================= */
-
-export async function updateArticle(
-  articleId: number,
-  formData: FormData
-) {
-  await requireAdmin();
-
-  const title = getRequiredString(
-    formData,
-    "title"
-  );
-
-  const category = getRequiredString(
-    formData,
-    "category"
-  );
-
-  const description =
-    getRequiredString(
-      formData,
-      "description"
-    );
-
-  const content =
-    getRequiredString(
-      formData,
-      "content"
-    );
-
-  const image =
-    getRequiredString(
-      formData,
-      "image"
-    );
-
-  const author =
-    getRequiredString(
-      formData,
-      "author"
-    );
-
-  const contentType =
-    getOptionalString(
-      formData,
-      "contentType"
-    ) ?? "article";
-
-  const readingTime =
-    getOptionalString(
-      formData,
-      "readingTime"
-    ) ?? "1 min";
-
-  const videoUrl =
-    getOptionalString(
-      formData,
-      "videoUrl"
-    );
-
-  const videoDuration =
-    getOptionalString(
-      formData,
-      "videoDuration"
-    );
-
-  const socialText =
-    getOptionalString(
-      formData,
-      "socialText"
-    );
-
-  const featured =
-    formData.get("featured") === "on";
-
-  const published =
-    formData.get("published") === "on";
-
-  const existingArticle =
-    await prisma.article.findUnique({
-      where: {
-        id: articleId,
-      },
-    });
-
-  if (!existingArticle) {
-    throw new Error(
-      "Article introuvable."
-    );
-  }
-
-  const updatedArticle =
-    await prisma.article.update({
-      where: {
-        id: articleId,
-      },
+  const createdArticle = await prisma.$transaction(async (transaction) => {
+    const article = await transaction.article.create({
       data: {
         title,
+        slug,
         category,
         description,
         content,
@@ -409,26 +168,120 @@ export async function updateArticle(
         videoDuration,
         socialText,
         featured,
-        published,
+        published: shouldPublish,
       },
     });
+
+    if (shouldPublish) {
+      await transaction.publication.create({
+        data: {
+          articleId: article.id,
+          channel,
+          pageKey,
+          zone,
+          priority,
+          startsAt,
+          endsAt,
+          active: true,
+          origin: "MANUAL",
+          locked: true,
+          automationScore: null,
+          automationPolicyVersion: null,
+          automationRunId: null,
+        },
+      });
+    }
+
+    return article;
+  });
+
+  revalidatePublicPages(shouldPublish ? [createdArticle.slug] : [], [
+    createdArticle.category,
+  ]);
+
+  revalidatePath(`/admin/articles/${createdArticle.id}`);
+
+  if (shouldPublish) {
+    redirect(`/article/${createdArticle.slug}`);
+  }
+
+  redirect(`/admin/articles/${createdArticle.id}`);
+}
+
+/* =========================================================
+   MODIFICATION
+========================================================= */
+
+export async function updateArticle(articleId: number, formData: FormData) {
+  await requireAdmin();
+
+  const title = getRequiredString(formData, "title");
+
+  const category = getRequiredString(formData, "category");
+
+  const description = getRequiredString(formData, "description");
+
+  const content = getRequiredString(formData, "content");
+
+  const image = getRequiredString(formData, "image");
+
+  const author = getRequiredString(formData, "author");
+
+  const contentType = getOptionalString(formData, "contentType") ?? "article";
+
+  const readingTime = getOptionalString(formData, "readingTime") ?? "1 min";
+
+  const videoUrl = getOptionalString(formData, "videoUrl");
+
+  const videoDuration = getOptionalString(formData, "videoDuration");
+
+  const socialText = getOptionalString(formData, "socialText");
+
+  const featured = formData.get("featured") === "on";
+
+  const published = formData.get("published") === "on";
+
+  const existingArticle = await prisma.article.findUnique({
+    where: {
+      id: articleId,
+    },
+  });
+
+  if (!existingArticle) {
+    throw new Error("Article introuvable.");
+  }
+
+  const updatedArticle = await prisma.article.update({
+    where: {
+      id: articleId,
+    },
+    data: {
+      title,
+      category,
+      description,
+      content,
+      image,
+      author,
+      readingTime,
+      contentType,
+      videoUrl,
+      videoDuration,
+      socialText,
+      featured,
+      published,
+    },
+  });
 
   revalidatePublicPages(
     [updatedArticle.slug, existingArticle.slug],
     [updatedArticle.category, existingArticle.category],
   );
 
-  revalidatePath(
-    `/admin/articles/${articleId}`
-  );
+  revalidatePath(`/admin/articles/${articleId}`);
 
-if (updatedArticle.published) {
-  redirect(
-    `/article/${updatedArticle.slug}`
-  );
-}
+  if (updatedArticle.published) {
+    redirect(`/article/${updatedArticle.slug}`);
+  }
 
-redirect(
-  `/admin/articles/${updatedArticle.id}`
-);
+  redirect(`/admin/articles/${updatedArticle.id}`);
 }
