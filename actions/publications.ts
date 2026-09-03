@@ -3,14 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
+import { getCascadeDestination } from "@/lib/editorial/cascade";
+import type { EditorialZone } from "@/lib/editorial/zones";
 import { recordEditorialEvent } from "@/lib/editorial-history";
 import { prisma } from "@/lib/prisma";
 import { isPublicArticle } from "@/lib/public-article";
 import { revalidateEditorialPublicPage } from "@/lib/public-revalidation";
-import {
-  getCascadeDestination,
-} from "@/lib/editorial/cascade";
-import type { EditorialZone } from "@/lib/editorial/zones";
 
 export type ReplacePublicationInput = {
   articleId: number;
@@ -28,6 +26,14 @@ export type ReplacePublicationResult = {
   movedArticles?: number;
 };
 
+const MANUAL_PUBLICATION_METADATA = {
+  origin: "MANUAL" as const,
+  locked: true,
+  automationScore: null,
+  automationPolicyVersion: null,
+  automationRunId: null,
+};
+
 function revalidateEditorialPages(pageKey: string) {
   revalidatePath("/admin");
   revalidatePath("/admin/editorial");
@@ -36,16 +42,13 @@ function revalidateEditorialPages(pageKey: string) {
 }
 
 async function movePublicationDown(
-  transaction: Parameters<
-    Parameters<typeof prisma.$transaction>[0]
-  >[0],
+  transaction: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
   publicationId: number,
   pageKey: string,
   channel: string,
-  currentZone: EditorialZone
+  currentZone: EditorialZone,
 ): Promise<number> {
-  const destinationZone =
-    getCascadeDestination(currentZone);
+  const destinationZone = getCascadeDestination(currentZone);
 
   if (!destinationZone) {
     await transaction.publication.update({
@@ -61,23 +64,22 @@ async function movePublicationDown(
     return 1;
   }
 
-  const destinationPublication =
-    await transaction.publication.findFirst({
-      where: {
-        pageKey,
-        channel,
-        zone: destinationZone,
-        active: true,
+  const destinationPublication = await transaction.publication.findFirst({
+    where: {
+      pageKey,
+      channel,
+      zone: destinationZone,
+      active: true,
+    },
+    orderBy: [
+      {
+        priority: "desc",
       },
-      orderBy: [
-        {
-          priority: "desc",
-        },
-        {
-          createdAt: "desc",
-        },
-      ],
-    });
+      {
+        createdAt: "desc",
+      },
+    ],
+  });
 
   let movedArticles = 0;
 
@@ -87,7 +89,7 @@ async function movePublicationDown(
       destinationPublication.id,
       pageKey,
       channel,
-      destinationZone
+      destinationZone,
     );
   }
 
@@ -101,6 +103,7 @@ async function movePublicationDown(
       startsAt: new Date(),
       endsAt: null,
       active: true,
+      ...MANUAL_PUBLICATION_METADATA,
     },
   });
 
@@ -108,17 +111,11 @@ async function movePublicationDown(
 }
 
 export async function replacePublication(
-  input: ReplacePublicationInput
+  input: ReplacePublicationInput,
 ): Promise<ReplacePublicationResult> {
   const admin = await requireAdmin();
 
-  const {
-    articleId,
-    pageKey,
-    zone,
-    channel = "site",
-    priority = 20,
-  } = input;
+  const { articleId, pageKey, zone, channel = "site", priority = 20 } = input;
 
   if (!Number.isInteger(articleId) || articleId <= 0) {
     return {
@@ -152,30 +149,33 @@ export async function replacePublication(
     };
   }
 
-  const result = await prisma.$transaction(
-    async (transaction) => {
-      const currentPublication =
-        await transaction.publication.findFirst({
-          where: {
-            pageKey,
-            channel,
-            zone,
-            active: true,
-          },
-          orderBy: [
-            {
-              priority: "desc",
-            },
-            {
-              createdAt: "desc",
-            },
-          ],
-        });
+  const result = await prisma.$transaction(async (transaction) => {
+    const currentPublication = await transaction.publication.findFirst({
+      where: {
+        pageKey,
+        channel,
+        zone,
+        active: true,
+      },
+      orderBy: [
+        {
+          priority: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
+    });
 
-      if (
-        currentPublication &&
-        currentPublication.articleId === articleId
-      ) {
+    if (currentPublication && currentPublication.articleId === articleId) {
+      const alreadyManualAndLocked =
+        currentPublication.origin === "MANUAL" &&
+        currentPublication.locked &&
+        currentPublication.automationScore === null &&
+        currentPublication.automationPolicyVersion === null &&
+        currentPublication.automationRunId === null;
+
+      if (alreadyManualAndLocked) {
         return {
           publication: currentPublication,
           previousArticleId: undefined,
@@ -184,56 +184,12 @@ export async function replacePublication(
         };
       }
 
-      let movedArticles = 0;
-
-      if (currentPublication) {
-        movedArticles += await movePublicationDown(
-          transaction,
-          currentPublication.id,
-          pageKey,
-          channel,
-          zone
-        );
-      }
-
-      const existingTargetPublication =
-        await transaction.publication.findFirst({
-          where: {
-            articleId,
-            pageKey,
-            channel,
-            zone,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-        });
-
-      const publication = existingTargetPublication
-        ? await transaction.publication.update({
-            where: {
-              id: existingTargetPublication.id,
-            },
-            data: {
-              active: true,
-              priority,
-              startsAt: new Date(),
-              endsAt: null,
-              zone,
-            },
-          })
-        : await transaction.publication.create({
-            data: {
-              articleId,
-              pageKey,
-              channel,
-              zone,
-              priority,
-              startsAt: new Date(),
-              endsAt: null,
-              active: true,
-            },
-          });
+      const publication = await transaction.publication.update({
+        where: {
+          id: currentPublication.id,
+        },
+        data: MANUAL_PUBLICATION_METADATA,
+      });
 
       await recordEditorialEvent(transaction, {
         action: "PUBLICATION_PLACED",
@@ -244,29 +200,110 @@ export async function replacePublication(
           zone,
           channel,
           priority,
-          previousArticleId:
-            currentPublication?.articleId ?? null,
-          movedArticles,
+          previousArticleId: null,
+          movedArticles: 0,
+          manualLockApplied: true,
         },
       });
 
       return {
         publication,
-        previousArticleId:
-          currentPublication?.articleId,
-        movedArticles,
+        previousArticleId: undefined,
+        movedArticles: 0,
         unchanged: false,
+        manualLockApplied: true,
       };
     }
-  );
+
+    let movedArticles = 0;
+
+    if (currentPublication) {
+      movedArticles += await movePublicationDown(
+        transaction,
+        currentPublication.id,
+        pageKey,
+        channel,
+        zone,
+      );
+    }
+
+    const existingTargetPublication = await transaction.publication.findFirst({
+      where: {
+        articleId,
+        pageKey,
+        channel,
+        zone,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const publication = existingTargetPublication
+      ? await transaction.publication.update({
+          where: {
+            id: existingTargetPublication.id,
+          },
+          data: {
+            active: true,
+            priority,
+            startsAt: new Date(),
+            endsAt: null,
+            zone,
+            ...MANUAL_PUBLICATION_METADATA,
+          },
+        })
+      : await transaction.publication.create({
+          data: {
+            articleId,
+            pageKey,
+            channel,
+            zone,
+            priority,
+            startsAt: new Date(),
+            endsAt: null,
+            active: true,
+            ...MANUAL_PUBLICATION_METADATA,
+          },
+        });
+
+    await recordEditorialEvent(transaction, {
+      action: "PUBLICATION_PLACED",
+      articleId,
+      actor: admin,
+      details: {
+        pageKey,
+        zone,
+        channel,
+        priority,
+        previousArticleId: currentPublication?.articleId ?? null,
+        movedArticles,
+      },
+    });
+
+    return {
+      publication,
+      previousArticleId: currentPublication?.articleId,
+      movedArticles,
+      unchanged: false,
+    };
+  });
 
   revalidateEditorialPages(pageKey);
+
+  if ("manualLockApplied" in result && result.manualLockApplied) {
+    return {
+      success: true,
+      message: "Sélection humaine verrouillée.",
+      publicationId: result.publication.id,
+      movedArticles: 0,
+    };
+  }
 
   if (result.unchanged) {
     return {
       success: true,
-      message:
-        "Cet article occupe déjà cet emplacement.",
+      message: "Cet article occupe déjà cet emplacement.",
       publicationId: result.publication.id,
       movedArticles: 0,
     };
