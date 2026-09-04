@@ -59,10 +59,12 @@ describe("loadLockedHomePlacements", () => {
     findMany.mockResolvedValue([]);
   });
 
-  it("charge uniquement les publications humaines visibles de l’accueil", async () => {
+  it("recherche les publications verrouillées ou manuelles de l’accueil", async () => {
     await loadLockedHomePlacements({
       evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
     });
+
+    expect(findMany).toHaveBeenCalledTimes(1);
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -70,7 +72,7 @@ describe("loadLockedHomePlacements", () => {
           pageKey: "home",
           channel: "site",
           active: true,
-          locked: true,
+          OR: [{ locked: true }, { origin: "MANUAL" }],
           zone: {
             in: ["hero", "feature", "grand-format", "card", "brief"],
           },
@@ -82,19 +84,46 @@ describe("loadLockedHomePlacements", () => {
             },
           }),
         }),
-        orderBy: [
-          {
-            priority: "desc",
-          },
-          {
-            createdAt: "desc",
-          },
-          {
-            id: "desc",
-          },
-        ],
+        orderBy: [{ priority: "desc" }, { createdAt: "desc" }, { id: "desc" }],
       }),
     );
+
+    expect(findMany.mock.calls[0][0].where).not.toHaveProperty("locked");
+  });
+
+  it("utilise le client transactionnel fourni sans consulter le client global", async () => {
+    const transactionFindMany = vi
+      .fn()
+      .mockResolvedValue([makePublication(42)]);
+
+    // Le double de test expose uniquement la méthode utilisée.
+    const transactionClient = {
+      publication: {
+        findMany: transactionFindMany,
+      },
+    } as unknown as NonNullable<Parameters<typeof loadLockedHomePlacements>[1]>;
+
+    const placements = await loadLockedHomePlacements(
+      {
+        evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
+      },
+      transactionClient,
+    );
+
+    expect(transactionFindMany).toHaveBeenCalledTimes(1);
+    expect(findMany).not.toHaveBeenCalled();
+
+    expect(placements).toEqual([
+      {
+        publicationId: 42,
+        zone: "hero",
+        articleId: 42,
+        title: "Article 42",
+        category: "ACTUALITÉ",
+        sourceId: 42,
+        sourceName: "Source 42",
+      },
+    ]);
   });
 
   it("ignore les publications futures ou terminées", async () => {
@@ -159,6 +188,7 @@ describe("loadLockedHomePlacements", () => {
 
     expect(placements.filter(({ zone }) => zone === "hero")).toHaveLength(1);
     expect(placements.filter(({ zone }) => zone === "card")).toHaveLength(4);
+
     expect(new Set(placements.map(({ articleId }) => articleId)).size).toBe(
       placements.length,
     );

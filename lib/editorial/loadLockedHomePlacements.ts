@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
+import type { Prisma } from "@/lib/generated/prisma/client";
 
 import {
   HOME_VISIBLE_ZONE_CAPACITIES,
@@ -42,15 +43,16 @@ function isVisibleAt(
 
 export async function loadLockedHomePlacements(
   options: LoadLockedHomePlacementsOptions = {},
+  client: Pick<Prisma.TransactionClient, "publication"> = prisma,
 ): Promise<LockedHomePublication[]> {
   const evaluatedAt = options.evaluatedAt ?? new Date();
 
-  const publications = await prisma.publication.findMany({
+  const publications = await client.publication.findMany({
     where: {
       pageKey: "home",
       channel: "site",
       active: true,
-      locked: true,
+      OR: [{ locked: true }, { origin: "MANUAL" }],
       zone: {
         in: HOME_VISIBLE_ZONES,
       },
