@@ -11,6 +11,10 @@ function makePlacement(
 ): LockedHomePublication {
   return {
     publicationId: 10,
+    priority: 20,
+    startsAt: null,
+    endsAt: null,
+    updatedAt: new Date("2026-09-03T08:00:00.000Z"),
     articleId: 42,
     zone: "hero",
     title: "Article humain",
@@ -29,6 +33,22 @@ describe("comparaison des sélections humaines", () => {
   it("accepte des sélections identiques", () => {
     expect(() =>
       assertLockedHomePlacementsUnchanged([makePlacement()], [makePlacement()]),
+    ).not.toThrow();
+  });
+
+  it("compare les dates par leur valeur et non par leur référence", () => {
+    const simulated = makePlacement({
+      startsAt: new Date("2026-09-03T07:00:00.000Z"),
+      endsAt: new Date("2026-09-04T07:00:00.000Z"),
+    });
+
+    const current = makePlacement({
+      startsAt: new Date("2026-09-03T07:00:00.000Z"),
+      endsAt: new Date("2026-09-04T07:00:00.000Z"),
+    });
+
+    expect(() =>
+      assertLockedHomePlacementsUnchanged([simulated], [current]),
     ).not.toThrow();
   });
 
@@ -70,11 +90,43 @@ describe("comparaison des sélections humaines", () => {
     { label: "catégorie", change: { category: "POLITIQUE" } },
     { label: "source", change: { sourceId: 99 } },
     { label: "source devenue inconnue", change: { sourceId: null } },
+    { label: "priorité", change: { priority: 30 } },
+    {
+      label: "début de programmation",
+      change: {
+        startsAt: new Date("2026-09-03T09:00:00.000Z"),
+      },
+    },
+    {
+      label: "fin de programmation",
+      change: {
+        endsAt: new Date("2026-09-04T09:00:00.000Z"),
+      },
+    },
+    {
+      label: "date de modification",
+      change: {
+        updatedAt: new Date("2026-09-03T09:00:00.000Z"),
+      },
+    },
   ])("refuse un changement de $label", ({ change }) => {
     expect(() =>
       assertLockedHomePlacementsUnchanged(
         [makePlacement()],
         [makePlacement(change)],
+      ),
+    ).toThrow(LockedHomePlacementsChangedError);
+  });
+
+  it("refuse la suppression d’une date de programmation", () => {
+    expect(() =>
+      assertLockedHomePlacementsUnchanged(
+        [
+          makePlacement({
+            startsAt: new Date("2026-09-03T07:00:00.000Z"),
+          }),
+        ],
+        [makePlacement({ startsAt: null })],
       ),
     ).toThrow(LockedHomePlacementsChangedError);
   });

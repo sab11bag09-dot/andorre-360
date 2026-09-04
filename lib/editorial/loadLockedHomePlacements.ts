@@ -1,6 +1,6 @@
+import type { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
-import type { Prisma } from "@/lib/generated/prisma/client";
 
 import {
   HOME_VISIBLE_ZONE_CAPACITIES,
@@ -13,6 +13,10 @@ const HOME_VISIBLE_ZONES = Object.keys(
 
 export type LockedHomePublication = {
   publicationId: number;
+  priority: number;
+  startsAt: Date | null;
+  endsAt: Date | null;
+  updatedAt: Date;
   zone: HomeVisibleZone;
   articleId: number;
   title: string;
@@ -66,8 +70,10 @@ export async function loadLockedHomePlacements(
     select: {
       id: true,
       zone: true,
+      priority: true,
       startsAt: true,
       endsAt: true,
+      updatedAt: true,
       article: {
         select: {
           id: true,
@@ -141,6 +147,10 @@ export async function loadLockedHomePlacements(
 
     placements.push({
       publicationId: publication.id,
+      priority: publication.priority,
+      startsAt: publication.startsAt,
+      endsAt: publication.endsAt,
+      updatedAt: publication.updatedAt,
       zone,
       articleId: publication.article.id,
       title: publication.article.title,

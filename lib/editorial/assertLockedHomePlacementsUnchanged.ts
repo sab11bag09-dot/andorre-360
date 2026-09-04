@@ -16,6 +16,10 @@ function placementSignature(placement: LockedHomePublication): string {
     placement.zone,
     placement.category,
     placement.sourceId,
+    placement.priority,
+    placement.startsAt?.getTime() ?? null,
+    placement.endsAt?.getTime() ?? null,
+    placement.updatedAt.getTime(),
   ]);
 }
 

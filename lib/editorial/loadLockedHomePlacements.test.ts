@@ -19,8 +19,10 @@ function makePublication(
   options: {
     zone?: string;
     articleId?: number;
+    priority?: number;
     startsAt?: Date | null;
     endsAt?: Date | null;
+    updatedAt?: Date;
     sourceId?: number | null;
   } = {},
 ) {
@@ -31,8 +33,10 @@ function makePublication(
   return {
     id,
     zone: options.zone ?? "hero",
+    priority: options.priority ?? 20,
     startsAt: options.startsAt ?? null,
     endsAt: options.endsAt ?? null,
+    updatedAt: options.updatedAt ?? new Date("2026-09-03T08:00:00.000Z"),
     article: {
       id: articleId,
       title: `Article ${articleId}`,
@@ -84,6 +88,14 @@ describe("loadLockedHomePlacements", () => {
             },
           }),
         }),
+        select: expect.objectContaining({
+          id: true,
+          zone: true,
+          priority: true,
+          startsAt: true,
+          endsAt: true,
+          updatedAt: true,
+        }),
         orderBy: [{ priority: "desc" }, { createdAt: "desc" }, { id: "desc" }],
       }),
     );
@@ -116,6 +128,10 @@ describe("loadLockedHomePlacements", () => {
     expect(placements).toEqual([
       {
         publicationId: 42,
+        priority: 20,
+        startsAt: null,
+        endsAt: null,
+        updatedAt: new Date("2026-09-03T08:00:00.000Z"),
         zone: "hero",
         articleId: 42,
         title: "Article 42",
@@ -124,6 +140,36 @@ describe("loadLockedHomePlacements", () => {
         sourceName: "Source 42",
       },
     ]);
+  });
+
+  it("conserve les priorités et dates nécessaires à la comparaison", async () => {
+    const startsAt = new Date("2026-09-03T07:00:00.000Z");
+    const endsAt = new Date("2026-09-04T07:00:00.000Z");
+    const updatedAt = new Date("2026-09-03T09:00:00.000Z");
+
+    findMany.mockResolvedValue([
+      makePublication(1, {
+        priority: 35,
+        startsAt,
+        endsAt,
+        updatedAt,
+      }),
+    ]);
+
+    const placements = await loadLockedHomePlacements({
+      evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
+    });
+
+    expect(placements).toHaveLength(1);
+    expect(placements[0]).toEqual(
+      expect.objectContaining({
+        publicationId: 1,
+        priority: 35,
+        startsAt,
+        endsAt,
+        updatedAt,
+      }),
+    );
   });
 
   it("ignore les publications futures ou terminées", async () => {
@@ -204,6 +250,10 @@ describe("loadLockedHomePlacements", () => {
     await expect(loadLockedHomePlacements()).resolves.toEqual([
       {
         publicationId: 1,
+        priority: 20,
+        startsAt: null,
+        endsAt: null,
+        updatedAt: new Date("2026-09-03T08:00:00.000Z"),
         zone: "hero",
         articleId: 1,
         title: "Article 1",
