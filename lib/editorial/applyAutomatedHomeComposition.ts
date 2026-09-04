@@ -49,3 +49,101 @@ export function evaluateHomeCompositionApplicationRuntime(
     reason: null,
   };
 }
+
+type HomeAutomationRunWriter = {
+  homeAutomationRun: {
+    create(input: {
+      data: {
+        id: string;
+        policyVersion: string;
+        status: "APPLYING";
+        snapshot: string;
+        actorId: string;
+        actorEmail: string;
+      };
+      select: {
+        id: true;
+      };
+    }): Promise<{ id: string }>;
+  };
+};
+
+export type ReserveHomeAutomationRunInput = {
+  runId: string;
+  policyVersion: string;
+  snapshot: string;
+  actor: {
+    id: string;
+    email: string;
+  };
+};
+
+export class HomeAutomationRunAlreadyExistsError extends Error {
+  constructor(runId: string) {
+    super(
+      `Le run ${runId} existe déjà. Aucune nouvelle application autorisée.`,
+    );
+    this.name = "HomeAutomationRunAlreadyExistsError";
+  }
+}
+
+function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "P2002"
+  );
+}
+
+/**
+ * À appeler exclusivement avec le client de la transaction d’application.
+ *
+ * La clé primaire de HomeAutomationRun garantit l’unicité du run.
+ * Toute erreur doit remonter hors de la transaction pour annuler ses écritures.
+ */
+export async function reserveHomeAutomationRun(
+  transaction: HomeAutomationRunWriter,
+  input: ReserveHomeAutomationRunInput,
+  runtime: HomeCompositionApplicationRuntime = readHomeCompositionApplicationRuntime(),
+): Promise<{ id: string }> {
+  const decision = evaluateHomeCompositionApplicationRuntime(runtime);
+
+  if (!decision.allowed) {
+    throw new Error(
+      decision.reason === "emergency_stop"
+        ? "Application bloquée : arrêt d’urgence actif."
+        : "Application de la composition désactivée.",
+    );
+  }
+
+  if (!input.runId.trim()) {
+    throw new Error("L’identifiant du run est obligatoire.");
+  }
+
+  if (!input.policyVersion.trim()) {
+    throw new Error("La version de politique est obligatoire.");
+  }
+
+  try {
+    return await transaction.homeAutomationRun.create({
+      data: {
+        id: input.runId,
+        policyVersion: input.policyVersion,
+        status: "APPLYING",
+        snapshot: input.snapshot,
+        actorId: input.actor.id,
+        actorEmail: input.actor.email,
+      },
+      select: {
+        id: true,
+      },
+    });
+  } catch (error) {
+    if (isUniqueConstraintError(error)) {
+      throw new HomeAutomationRunAlreadyExistsError(input.runId);
+    }
+
+    throw error;
+  }
+}
