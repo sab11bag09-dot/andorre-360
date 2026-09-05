@@ -74,6 +74,7 @@ export async function withHomeAutomationTransaction<
     const mutablePublications = await loadMutableHomePublications(transaction);
 
     const snapshot = JSON.stringify({
+      lockedPlacements: currentLockedPlacements,
       publications: mutablePublications,
     });
 

@@ -338,6 +338,17 @@ describe("application complète d’une composition préparée", () => {
     );
 
     expect(JSON.parse(run.snapshot)).toEqual({
+      lockedPlacements: [
+        expect.objectContaining({
+          publicationId: humanPublication.id,
+          articleId: humanArticleId,
+          zone: "hero",
+          priority: 20,
+          startsAt: null,
+          endsAt: null,
+          updatedAt: expect.any(String),
+        }),
+      ],
       publications: [
         expect.objectContaining({
           publicationId: previousAutomaticPublication.id,

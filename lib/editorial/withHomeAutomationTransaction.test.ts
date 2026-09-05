@@ -156,6 +156,7 @@ describe("transaction d’automatisation de l’accueil", () => {
         policyVersion: "1.1",
         status: "APPLYING",
         snapshot: JSON.stringify({
+          lockedPlacements: [makeLockedPlacement()],
           publications: [makeMutablePublication()],
         }),
         actorId: "admin-1",
