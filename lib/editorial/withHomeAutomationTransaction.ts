@@ -1,4 +1,4 @@
-import type { Prisma } from "@/lib/generated/prisma/client";
+import type { Prisma, PrismaClient } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -31,6 +31,7 @@ export type HomeAutomationTransactionWork = (
 export async function withHomeAutomationTransaction(
   input: HomeAutomationTransactionInput,
   work: HomeAutomationTransactionWork,
+  client: Pick<PrismaClient, "$transaction"> = prisma,
 ): Promise<Record<string, unknown>> {
   const runtime = readHomeCompositionApplicationRuntime();
   const decision = evaluateHomeCompositionApplicationRuntime(runtime);
@@ -43,7 +44,7 @@ export async function withHomeAutomationTransaction(
     );
   }
 
-  return prisma.$transaction(async (transaction) => {
+  return client.$transaction(async (transaction) => {
     const currentLockedPlacements = await loadLockedHomePlacements(
       { evaluatedAt: new Date() },
       transaction,
