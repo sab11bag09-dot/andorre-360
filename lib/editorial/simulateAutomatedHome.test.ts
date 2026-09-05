@@ -138,8 +138,8 @@ describe("simulateAutomatedHome", () => {
       hero: 1,
       feature: 1,
       "grand-format": 1,
-      card: 4,
-      brief: 4,
+      card: 5,
+      brief: 3,
     });
   });
 
@@ -148,6 +148,10 @@ describe("simulateAutomatedHome", () => {
 
     const lockedPlacement: LockedHomePublication = {
       publicationId: 10,
+      priority: 20,
+      startsAt: null,
+      endsAt: null,
+      updatedAt: new Date("2026-09-03T08:00:00.000Z"),
       zone: "hero",
       articleId: 42,
       title: "Sélection humaine",

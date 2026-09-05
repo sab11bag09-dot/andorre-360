@@ -6,7 +6,7 @@ import type { AdminIdentity } from "@/lib/admin/requireAdmin";
 
 type EditorialEventData = {
   action: EditorialEventAction;
-  articleId: number;
+  articleId?: number;
   translationId?: number;
   actorId?: string;
   actorEmail: string;
@@ -25,7 +25,7 @@ type EditorialEventDetails = Record<string, unknown>;
 
 export type RecordEditorialEventInput = {
   action: EditorialEventAction;
-  articleId: number;
+  articleId?: number;
   translationId?: number;
   actor: AdminIdentity;
   fromStatus?: EditorialStatus;
@@ -51,9 +51,7 @@ export async function recordEditorialEvent(
       actorEmail: input.actor.email,
       fromStatus: input.fromStatus,
       toStatus: input.toStatus,
-      details: input.details
-        ? JSON.stringify(input.details)
-        : undefined,
+      details: input.details ? JSON.stringify(input.details) : undefined,
     },
   });
 }
@@ -70,9 +68,7 @@ export async function recordSystemEditorialEvent(
       actorEmail: "system@andorre-360.local",
       fromStatus: input.fromStatus,
       toStatus: input.toStatus,
-      details: input.details
-        ? JSON.stringify(input.details)
-        : undefined,
+      details: input.details ? JSON.stringify(input.details) : undefined,
     },
   });
 }

@@ -2,11 +2,7 @@ import type { Prisma } from "@/lib/generated/prisma/client";
 import Link from "next/link";
 
 import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
-import {
-  Button,
-  EmptyState,
-  PageHeader,
-} from "@/components/admin/ui";
+import { Button, EmptyState, PageHeader } from "@/components/admin/ui";
 import {
   EDITORIAL_EVENT_ACTIONS,
   formatEditorialEventDate,
@@ -22,9 +18,7 @@ import { prisma } from "@/lib/prisma";
 const PAGE_SIZE = 25;
 
 type EditorialHistoryPageProps = {
-  searchParams?: Promise<
-    Record<string, string | string[] | undefined>
-  >;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export default async function EditorialHistoryPage({
@@ -33,9 +27,7 @@ export default async function EditorialHistoryPage({
   const filters = parseEditorialHistoryFilters(await searchParams);
   const where: Prisma.EditorialEventWhereInput = {
     ...(filters.articleId ? { articleId: filters.articleId } : {}),
-    ...(filters.actor
-      ? { actorEmail: { contains: filters.actor } }
-      : {}),
+    ...(filters.actor ? { actorEmail: { contains: filters.actor } } : {}),
     ...(filters.action ? { action: filters.action } : {}),
   };
 
@@ -44,10 +36,7 @@ export default async function EditorialHistoryPage({
   const currentPage = Math.min(filters.page, totalPages);
   const events = await prisma.editorialEvent.findMany({
     where,
-    orderBy: [
-      { createdAt: "desc" },
-      { id: "desc" },
-    ],
+    orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     skip: (currentPage - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
     select: {
@@ -139,15 +128,13 @@ export default async function EditorialHistoryPage({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
               Journal en lecture seule
             </p>
-            <h2
-              id="history-results-title"
-              className="mt-2 font-serif text-2xl"
-            >
+            <h2 id="history-results-title" className="mt-2 font-serif text-2xl">
               Actions enregistrées
             </h2>
           </div>
           <p className="text-sm text-zinc-500">
-            {totalEvents} action{totalEvents > 1 ? "s" : ""} · page {currentPage} sur {totalPages}
+            {totalEvents} action{totalEvents > 1 ? "s" : ""} · page{" "}
+            {currentPage} sur {totalPages}
           </p>
         </div>
 
@@ -164,8 +151,9 @@ export default async function EditorialHistoryPage({
         ) : (
           <ol className="space-y-3">
             {events.map((event) => {
-              const contextLabels =
-                getEditorialEventContextLabels(event.details);
+              const contextLabels = getEditorialEventContextLabels(
+                event.details,
+              );
 
               return (
                 <li
@@ -177,12 +165,18 @@ export default async function EditorialHistoryPage({
                       <p className="text-sm font-semibold text-white">
                         {getEditorialEventActionLabel(event.action)}
                       </p>
-                      <Link
-                        href={`/admin/articles/${event.article.id}`}
-                        className="mt-1 block truncate text-sm text-yellow-500 transition hover:text-yellow-400"
-                      >
-                        #{event.article.id} · {event.article.title}
-                      </Link>
+                      {event.article ? (
+                        <Link
+                          href={`/admin/articles/${event.article.id}`}
+                          className="mt-1 block truncate text-sm text-yellow-500 transition hover:text-yellow-400"
+                        >
+                          #{event.article.id} · {event.article.title}
+                        </Link>
+                      ) : (
+                        <p className="mt-1 text-sm text-zinc-400">
+                          Composition de l’accueil
+                        </p>
+                      )}
 
                       <div className="mt-3 flex flex-wrap items-center gap-2">
                         {event.translation && (

@@ -13,6 +13,8 @@ export const EDITORIAL_EVENT_ACTIONS = [
   "TRANSLATION_ARCHIVED",
   "FIL_INFO_UPDATED",
   "PUBLICATION_PLACED",
+  "HOME_COMPOSITION_APPLIED",
+  "HOME_COMPOSITION_ROLLED_BACK",
 ] as const satisfies readonly EditorialEventAction[];
 
 const ACTION_LABELS: Record<EditorialEventAction, string> = {
@@ -28,6 +30,8 @@ const ACTION_LABELS: Record<EditorialEventAction, string> = {
   TRANSLATION_ARCHIVED: "Traduction archivée",
   FIL_INFO_UPDATED: "Réglages du Fil info modifiés",
   PUBLICATION_PLACED: "Placement éditorial modifié",
+  HOME_COMPOSITION_APPLIED: "Composition de l’accueil appliquée",
+  HOME_COMPOSITION_ROLLED_BACK: "Composition de l’accueil annulée",
 };
 
 const LOCALE_LABELS: Record<string, string> = {
@@ -67,9 +71,7 @@ export function getEditorialEventActionLabel(
   return ACTION_LABELS[action];
 }
 
-export function getEditorialEventContextLabels(
-  value: string | null,
-): string[] {
+export function getEditorialEventContextLabels(value: string | null): string[] {
   const details = parseDetails(value);
   const labels: string[] = [];
 
@@ -78,26 +80,19 @@ export function getEditorialEventContextLabels(
   }
 
   if (typeof details.operation === "string") {
-    labels.push(
-      OPERATION_LABELS[details.operation] ?? details.operation,
-    );
+    labels.push(OPERATION_LABELS[details.operation] ?? details.operation);
   }
 
   if (typeof details.category === "string") {
     labels.push(`Catégorie : ${details.category}`);
   }
 
-  if (
-    typeof details.pageKey === "string" &&
-    typeof details.zone === "string"
-  ) {
+  if (typeof details.pageKey === "string" && typeof details.zone === "string") {
     labels.push(`${details.pageKey} · ${details.zone}`);
   }
 
   if (typeof details.visible === "boolean") {
-    labels.push(
-      details.visible ? "Visible dans le Fil" : "Retiré du Fil",
-    );
+    labels.push(details.visible ? "Visible dans le Fil" : "Retiré du Fil");
   }
 
   if (typeof details.pinned === "boolean") {

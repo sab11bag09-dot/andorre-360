@@ -19,8 +19,10 @@ function makePublication(
   options: {
     zone?: string;
     articleId?: number;
+    priority?: number;
     startsAt?: Date | null;
     endsAt?: Date | null;
+    updatedAt?: Date;
     sourceId?: number | null;
   } = {},
 ) {
@@ -31,8 +33,10 @@ function makePublication(
   return {
     id,
     zone: options.zone ?? "hero",
+    priority: options.priority ?? 20,
     startsAt: options.startsAt ?? null,
     endsAt: options.endsAt ?? null,
+    updatedAt: options.updatedAt ?? new Date("2026-09-03T08:00:00.000Z"),
     article: {
       id: articleId,
       title: `Article ${articleId}`,
@@ -59,10 +63,12 @@ describe("loadLockedHomePlacements", () => {
     findMany.mockResolvedValue([]);
   });
 
-  it("charge uniquement les publications humaines visibles de l’accueil", async () => {
+  it("recherche les publications verrouillées ou manuelles de l’accueil", async () => {
     await loadLockedHomePlacements({
       evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
     });
+
+    expect(findMany).toHaveBeenCalledTimes(1);
 
     expect(findMany).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -70,7 +76,7 @@ describe("loadLockedHomePlacements", () => {
           pageKey: "home",
           channel: "site",
           active: true,
-          locked: true,
+          OR: [{ locked: true }, { origin: "MANUAL" }],
           zone: {
             in: ["hero", "feature", "grand-format", "card", "brief"],
           },
@@ -82,17 +88,86 @@ describe("loadLockedHomePlacements", () => {
             },
           }),
         }),
-        orderBy: [
-          {
-            priority: "desc",
-          },
-          {
-            createdAt: "desc",
-          },
-          {
-            id: "desc",
-          },
-        ],
+        select: expect.objectContaining({
+          id: true,
+          zone: true,
+          priority: true,
+          startsAt: true,
+          endsAt: true,
+          updatedAt: true,
+        }),
+        orderBy: [{ priority: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+      }),
+    );
+
+    expect(findMany.mock.calls[0][0].where).not.toHaveProperty("locked");
+  });
+
+  it("utilise le client transactionnel fourni sans consulter le client global", async () => {
+    const transactionFindMany = vi
+      .fn()
+      .mockResolvedValue([makePublication(42)]);
+
+    // Le double de test expose uniquement la méthode utilisée.
+    const transactionClient = {
+      publication: {
+        findMany: transactionFindMany,
+      },
+    } as unknown as NonNullable<Parameters<typeof loadLockedHomePlacements>[1]>;
+
+    const placements = await loadLockedHomePlacements(
+      {
+        evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
+      },
+      transactionClient,
+    );
+
+    expect(transactionFindMany).toHaveBeenCalledTimes(1);
+    expect(findMany).not.toHaveBeenCalled();
+
+    expect(placements).toEqual([
+      {
+        publicationId: 42,
+        priority: 20,
+        startsAt: null,
+        endsAt: null,
+        updatedAt: new Date("2026-09-03T08:00:00.000Z"),
+        zone: "hero",
+        articleId: 42,
+        title: "Article 42",
+        category: "ACTUALITÉ",
+        sourceId: 42,
+        sourceName: "Source 42",
+      },
+    ]);
+  });
+
+  it("conserve les priorités et dates nécessaires à la comparaison", async () => {
+    const startsAt = new Date("2026-09-03T07:00:00.000Z");
+    const endsAt = new Date("2026-09-04T07:00:00.000Z");
+    const updatedAt = new Date("2026-09-03T09:00:00.000Z");
+
+    findMany.mockResolvedValue([
+      makePublication(1, {
+        priority: 35,
+        startsAt,
+        endsAt,
+        updatedAt,
+      }),
+    ]);
+
+    const placements = await loadLockedHomePlacements({
+      evaluatedAt: new Date("2026-09-03T10:00:00.000Z"),
+    });
+
+    expect(placements).toHaveLength(1);
+    expect(placements[0]).toEqual(
+      expect.objectContaining({
+        publicationId: 1,
+        priority: 35,
+        startsAt,
+        endsAt,
+        updatedAt,
       }),
     );
   });
@@ -154,11 +229,12 @@ describe("loadLockedHomePlacements", () => {
     const placements = await loadLockedHomePlacements();
 
     expect(placements.map(({ publicationId }) => publicationId)).toEqual([
-      1, 4, 5, 6, 7,
+      1, 4, 5, 6, 7, 8,
     ]);
 
     expect(placements.filter(({ zone }) => zone === "hero")).toHaveLength(1);
-    expect(placements.filter(({ zone }) => zone === "card")).toHaveLength(4);
+    expect(placements.filter(({ zone }) => zone === "card")).toHaveLength(5);
+
     expect(new Set(placements.map(({ articleId }) => articleId)).size).toBe(
       placements.length,
     );
@@ -174,6 +250,10 @@ describe("loadLockedHomePlacements", () => {
     await expect(loadLockedHomePlacements()).resolves.toEqual([
       {
         publicationId: 1,
+        priority: 20,
+        startsAt: null,
+        endsAt: null,
+        updatedAt: new Date("2026-09-03T08:00:00.000Z"),
         zone: "hero",
         articleId: 1,
         title: "Article 1",

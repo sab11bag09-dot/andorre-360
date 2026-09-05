@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  firstName       String
-  lastName        String
-  name            String?
-  email           String           @unique
-  emailVerified   DateTime?
-  passwordHash    String?
-  image           String?
-  role            UserRole         @default(EDITOR)
-  active          Boolean          @default(true)
-  lastLoginAt     DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  accounts        Account[]
-  sessions        Session[]
-  editorialEvents EditorialEvent[]
+  id                 String              @id @default(cuid())
+  firstName          String
+  lastName           String
+  name               String?
+  email              String              @unique
+  emailVerified      DateTime?
+  passwordHash       String?
+  image              String?
+  role               UserRole            @default(EDITOR)
+  active             Boolean             @default(true)
+  lastLoginAt        DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+  editorialEvents    EditorialEvent[]
+  homeAutomationRuns HomeAutomationRun[]
 }
 
 model Account {
@@ -131,12 +132,14 @@ enum EditorialEventAction {
   TRANSLATION_ARCHIVED
   FIL_INFO_UPDATED
   PUBLICATION_PLACED
+  HOME_COMPOSITION_APPLIED
+  HOME_COMPOSITION_ROLLED_BACK
 }
 
 model EditorialEvent {
   id            Int                  @id @default(autoincrement())
   action        EditorialEventAction
-  articleId     Int
+  articleId     Int?
   translationId Int?
   actorId       String?
   actorEmail    String
@@ -145,7 +148,7 @@ model EditorialEvent {
   details       String?
   createdAt     DateTime             @default(now())
 
-  article     Article             @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  article     Article?            @relation(fields: [articleId], references: [id], onDelete: Cascade)
   translation ArticleTranslation? @relation(fields: [translationId], references: [id], onDelete: SetNull)
   actor       User?               @relation(fields: [actorId], references: [id], onDelete: SetNull)
 
@@ -219,11 +222,12 @@ model Publication {
   endsAt   DateTime?
   active   Boolean   @default(true)
 
-  origin                  PublicationOrigin @default(MANUAL)
-  locked                  Boolean           @default(true)
+  origin                  PublicationOrigin  @default(MANUAL)
+  locked                  Boolean            @default(true)
   automationScore         Int?
   automationPolicyVersion String?
   automationRunId         String?
+  automationRun           HomeAutomationRun? @relation(fields: [automationRunId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -233,6 +237,31 @@ model Publication {
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
   analytics PublicationAnalytics[]
+}
+
+enum HomeAutomationRunStatus {
+  APPLYING
+  APPLIED
+  ROLLED_BACK
+}
+
+model HomeAutomationRun {
+  id            String                  @id
+  policyVersion String
+  status        HomeAutomationRunStatus @default(APPLYING)
+  snapshot      String
+  result        String?
+  actorId       String?
+  actorEmail    String
+  createdAt     DateTime                @default(now())
+  appliedAt     DateTime?
+  rolledBackAt  DateTime?
+
+  actor        User?         @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  publications Publication[]
+
+  @@index([status, createdAt])
+  @@index([actorId, createdAt])
 }
 
 model ArticleAnalytics {

@@ -143,8 +143,8 @@ describe("runHomeEditorialSimulation", () => {
           hero: 0,
           feature: 1,
           "grand-format": 1,
-          card: 4,
-          brief: 4,
+          card: 5,
+          brief: 3,
         },
       },
     });
@@ -193,8 +193,8 @@ describe("runHomeEditorialSimulation", () => {
         hero: 0,
         feature: 1,
         "grand-format": 1,
-        card: 4,
-        brief: 4,
+        card: 5,
+        brief: 3,
       },
     });
 
@@ -237,8 +237,8 @@ describe("runHomeEditorialSimulation", () => {
           hero: 0,
           feature: 1,
           "grand-format": 1,
-          card: 4,
-          brief: 4,
+          card: 5,
+          brief: 3,
         },
       },
     });
@@ -267,8 +267,8 @@ describe("runHomeEditorialSimulation", () => {
         hero: 0,
         feature: 1,
         "grand-format": 1,
-        card: 4,
-        brief: 4,
+        card: 5,
+        brief: 3,
       },
     });
   });

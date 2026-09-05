@@ -1,3 +1,4 @@
+import type { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_ARTICLE_FILTER } from "@/lib/public-article";
 
@@ -12,6 +13,10 @@ const HOME_VISIBLE_ZONES = Object.keys(
 
 export type LockedHomePublication = {
   publicationId: number;
+  priority: number;
+  startsAt: Date | null;
+  endsAt: Date | null;
+  updatedAt: Date;
   zone: HomeVisibleZone;
   articleId: number;
   title: string;
@@ -42,15 +47,16 @@ function isVisibleAt(
 
 export async function loadLockedHomePlacements(
   options: LoadLockedHomePlacementsOptions = {},
+  client: Pick<Prisma.TransactionClient, "publication"> = prisma,
 ): Promise<LockedHomePublication[]> {
   const evaluatedAt = options.evaluatedAt ?? new Date();
 
-  const publications = await prisma.publication.findMany({
+  const publications = await client.publication.findMany({
     where: {
       pageKey: "home",
       channel: "site",
       active: true,
-      locked: true,
+      OR: [{ locked: true }, { origin: "MANUAL" }],
       zone: {
         in: HOME_VISIBLE_ZONES,
       },
@@ -64,8 +70,10 @@ export async function loadLockedHomePlacements(
     select: {
       id: true,
       zone: true,
+      priority: true,
       startsAt: true,
       endsAt: true,
+      updatedAt: true,
       article: {
         select: {
           id: true,
@@ -139,6 +147,10 @@ export async function loadLockedHomePlacements(
 
     placements.push({
       publicationId: publication.id,
+      priority: publication.priority,
+      startsAt: publication.startsAt,
+      endsAt: publication.endsAt,
+      updatedAt: publication.updatedAt,
       zone,
       articleId: publication.article.id,
       title: publication.article.title,
