@@ -20,6 +20,7 @@ import { PrismaClient } from "@/lib/generated/prisma/client";
 import { applyPreparedHomeComposition } from "./applyPreparedHomeComposition";
 import type { HomeCompositionResult } from "./homeComposition";
 import { loadLockedHomePlacements } from "./loadLockedHomePlacements";
+import { rollbackAutomatedHomeComposition } from "./rollbackAutomatedHomeComposition";
 
 const databasePath = join(
   tmpdir(),
@@ -54,6 +55,7 @@ beforeAll(() => {
 
 beforeEach(async () => {
   vi.stubEnv("AI_HOME_COMPOSITION_APPLY_ENABLED", "true");
+  vi.stubEnv("AI_HOME_COMPOSITION_ROLLBACK_ENABLED", "true");
   vi.stubEnv("AI_HOME_COMPOSITION_EMERGENCY_STOP", "false");
   vi.stubEnv("AI_AUTO_PUBLICATION_EMERGENCY_STOP", "false");
 
@@ -391,5 +393,199 @@ describe("application complète d’une composition préparée", () => {
       appliedAt: run.appliedAt!.toISOString(),
       ...result,
     });
+  });
+
+  it("restaure réellement la composition précédente", async () => {
+    const humanArticleId = await createArticle("Choix humain conservé");
+    const previousArticleId = await createArticle(
+      "Publication automatique précédente",
+    );
+    const newArticleId = await createArticle(
+      "Nouvelle publication automatique",
+      "POLITIQUE",
+    );
+
+    const humanPublication = await client.publication.create({
+      data: {
+        articleId: humanArticleId,
+        pageKey: "home",
+        channel: "site",
+        zone: "hero",
+        priority: 20,
+        active: true,
+        origin: "MANUAL",
+        locked: true,
+      },
+    });
+
+    const previousPublication = await client.publication.create({
+      data: {
+        articleId: previousArticleId,
+        pageKey: "home",
+        channel: "site",
+        zone: "card",
+        priority: 10,
+        startsAt: null,
+        endsAt: null,
+        active: true,
+        origin: "AUTOMATED",
+        locked: false,
+        automationScore: 68,
+        automationPolicyVersion: "1.0",
+        automationRunId: null,
+      },
+    });
+
+    const lockedPlacements = await loadLockedHomePlacements({}, client);
+
+    const composition: HomeCompositionResult = {
+      placements: [
+        {
+          zone: "hero",
+          articleId: humanArticleId,
+          sourceId: null,
+          category: "ACTUALITÉ",
+          score: 0,
+          origin: "LOCKED",
+        },
+        {
+          zone: "card",
+          articleId: newArticleId,
+          sourceId: null,
+          category: "POLITIQUE",
+          score: 82,
+          origin: "AUTOMATED",
+        },
+      ],
+      evaluations: [],
+      unfilledSlots: {
+        hero: 0,
+        feature: 1,
+        "grand-format": 1,
+        card: 3,
+        brief: 4,
+      },
+    };
+
+    const application = await applyPreparedHomeComposition(
+      {
+        runId: "run-real-rollback",
+        policyVersion: "1.1",
+        actor: admin,
+        composition,
+        lockedPlacements,
+      },
+      client,
+    );
+
+    expect(application.createdPublicationIds).toHaveLength(1);
+
+    const rollback = await rollbackAutomatedHomeComposition(
+      {
+        runId: "run-real-rollback",
+        actor: admin,
+      },
+      client,
+    );
+
+    expect(rollback).toEqual({
+      runId: "run-real-rollback",
+      disabledPublicationIds: application.createdPublicationIds,
+      restoredPublicationIds: [previousPublication.id],
+      preservedLockedPublicationIds: [humanPublication.id],
+      rolledBackAt: expect.any(String),
+    });
+
+    await expect(
+      client.publication.findUnique({
+        where: {
+          id: humanPublication.id,
+        },
+        select: {
+          active: true,
+          origin: true,
+          locked: true,
+        },
+      }),
+    ).resolves.toEqual({
+      active: true,
+      origin: "MANUAL",
+      locked: true,
+    });
+
+    await expect(
+      client.publication.findUnique({
+        where: {
+          id: previousPublication.id,
+        },
+        select: {
+          active: true,
+          zone: true,
+          priority: true,
+          startsAt: true,
+          endsAt: true,
+          origin: true,
+          locked: true,
+          automationScore: true,
+          automationPolicyVersion: true,
+          automationRunId: true,
+        },
+      }),
+    ).resolves.toEqual({
+      active: true,
+      zone: "card",
+      priority: 10,
+      startsAt: null,
+      endsAt: null,
+      origin: "AUTOMATED",
+      locked: false,
+      automationScore: 68,
+      automationPolicyVersion: "1.0",
+      automationRunId: null,
+    });
+
+    await expect(
+      client.publication.findUnique({
+        where: {
+          id: application.createdPublicationIds[0],
+        },
+        select: {
+          active: true,
+          endsAt: true,
+          automationRunId: true,
+        },
+      }),
+    ).resolves.toEqual({
+      active: false,
+      endsAt: expect.any(Date),
+      automationRunId: "run-real-rollback",
+    });
+
+    await expect(
+      client.homeAutomationRun.findUnique({
+        where: {
+          id: "run-real-rollback",
+        },
+        select: {
+          status: true,
+          appliedAt: true,
+          rolledBackAt: true,
+        },
+      }),
+    ).resolves.toEqual({
+      status: "ROLLED_BACK",
+      appliedAt: expect.any(Date),
+      rolledBackAt: expect.any(Date),
+    });
+
+    await expect(
+      client.editorialEvent.count({
+        where: {
+          action: {
+            in: ["HOME_COMPOSITION_APPLIED", "HOME_COMPOSITION_ROLLED_BACK"],
+          },
+        },
+      }),
+    ).resolves.toBe(2);
   });
 });
