@@ -329,6 +329,21 @@ describe("composeAutomatedHome", () => {
     );
   });
 
+  it("complète les cinq cartes par secours même si une catégorie domine", () => {
+    const candidates = Array.from({ length: 5 }, (_, index) =>
+      makeCandidate(index + 1, 50, {
+        category: "POLITIQUE",
+      }),
+    );
+
+    const result = composeAutomatedHome(candidates);
+    const cards = result.placements.filter(({ zone }) => zone === "card");
+
+    expect(cards).toHaveLength(5);
+    expect(cards.every(({ origin }) => origin === "FALLBACK")).toBe(true);
+    expect(result.unfilledSlots.card).toBe(0);
+  });
+
   it("écarte des zones standard un article publié depuis plus de sept jours", () => {
     const result = composeAutomatedHome(
       [
