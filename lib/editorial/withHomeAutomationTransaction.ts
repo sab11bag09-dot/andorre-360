@@ -9,6 +9,7 @@ import {
   type ReserveHomeAutomationRunInput,
 } from "./applyAutomatedHomeComposition";
 import { assertLockedHomePlacementsUnchanged } from "./assertLockedHomePlacementsUnchanged";
+import { serializeHomeAutomationSnapshot } from "./homeAutomationSnapshot";
 import {
   loadLockedHomePlacements,
   type LockedHomePublication,
@@ -73,9 +74,9 @@ export async function withHomeAutomationTransaction<
 
     const mutablePublications = await loadMutableHomePublications(transaction);
 
-    const snapshot = JSON.stringify({
-      lockedPlacements: currentLockedPlacements,
-      publications: mutablePublications,
+    const snapshot = serializeHomeAutomationSnapshot({
+      lockedPlacements: [...currentLockedPlacements],
+      publications: [...mutablePublications],
     });
 
     await reserveHomeAutomationRun(
