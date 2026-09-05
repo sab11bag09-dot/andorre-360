@@ -1,32 +1,48 @@
 # État du chantier — automatisation éditoriale
 
-Dernière mise à jour : 3 septembre 2026
+Dernière mise à jour : 5 septembre 2026
 
 ## Branche
 
-`feat/automated-home-editorial`
+`feat/apply-automated-home`
 
-Destination prévue : `audit/studio-v4`.
+Branche de base : `audit/studio-v4`.
 
 ## Jalon terminé
 
-La simulation automatique de la page d’accueil est fonctionnelle.
+L’application manuelle et sécurisée d’une composition automatique de l’accueil est construite et testée.
 
-Elle peut :
+Le système peut :
 
 - charger jusqu’à 30 candidats ;
 - évaluer les articles avec OpenAI ;
-- appliquer les exclusions et les seuils déterministes ;
-- respecter la fraîcheur, la diversité et les capacités des zones ;
-- proposer des sélections IA ;
-- compléter uniquement les cartes et les brèves par secours chronologique ;
-- préserver les sélections humaines verrouillées.
+- appliquer les exclusions, seuils et règles déterministes ;
+- préserver les sélections humaines verrouillées ou d’origine `MANUAL` ;
+- recalculer une proposition au moment de son application ;
+- appliquer toute la composition dans une transaction Prisma unique ;
+- enregistrer les publications `AUTOMATED` et `FALLBACK` avec leur score, leur version de politique et leur identifiant de run ;
+- empêcher l’application répétée du même identifiant de run ;
+- enregistrer un événement éditorial global ;
+- restaurer la composition précédente grâce à un retour arrière transactionnel ;
+- bloquer toute écriture lorsque l’application est désactivée ou que l’arrêt d’urgence est actif.
 
-Elle ne modifie encore aucune publication réelle.
+La simulation reste consultative. Seule une confirmation explicite d’un administrateur déclenche l’application.
+
+Aucune tâche planifiée n’est activée.
+
+## Structure de la Une publique
+
+La composition automatique respecte maintenant la structure réellement affichée :
+
+- un hero ;
+- une mise en avant ;
+- un grand format ;
+- trois brèves dans « L’essentiel » ;
+- cinq cartes au total : une grande carte centrale et quatre articles dans « Sélection ».
 
 ## Protection des choix humains
 
-Les publications possèdent maintenant :
+Les publications possèdent :
 
 - une origine : `MANUAL`, `AUTOMATED` ou `FALLBACK` ;
 - un verrouillage ;
@@ -34,43 +50,84 @@ Les publications possèdent maintenant :
 - une version de politique ;
 - un identifiant de run.
 
-La migration a conservé les 171 publications existantes. Elles ont toutes été initialisées comme publications manuelles verrouillées.
+Les 171 publications historiques ont été conservées et initialisées comme publications manuelles verrouillées.
 
-Les actions humaines du Studio réinitialisent la provenance à `MANUAL`, verrouillent la publication et effacent les anciennes métadonnées automatiques.
+Les actions humaines du Studio réinitialisent la provenance à `MANUAL`, verrouillent la publication et effacent ses anciennes métadonnées automatiques.
 
-## Validation
+Au début d’une application ou d’un retour arrière, les choix humains sont relus dans la transaction. Toute modification humaine intervenue depuis la simulation provoque l’annulation complète de l’opération.
 
-La simulation réelle a produit :
+Une publication humaine ou verrouillée ne peut jamais être déplacée ni désactivée par l’automatisation.
 
-- 30 candidats évalués ;
-- 10 articles retenus ;
-- des choix humains correctement préservés ;
-- aucun score artificiel sur les choix humains ;
-- un grand format laissé vide faute de candidat admissible ;
-- aucune modification de la page publique.
+## Application et retour arrière
 
-Vérification globale :
+Chaque application :
 
-- 80 fichiers de tests passés ;
-- 452 tests passés ;
-- 0 erreur ESLint ;
+- utilise un identifiant de run unique ;
+- capture un snapshot des choix humains et des anciennes publications automatiques ;
+- remplace uniquement les publications automatiques non verrouillées ;
+- produit un événement `HOME_COMPOSITION_APPLIED` ;
+- termine le run avec le statut `APPLIED`.
+
+Chaque retour arrière :
+
+- désactive uniquement les publications créées par le run ;
+- restaure les anciennes publications automatiques du snapshot ;
+- conserve les placements humains ;
+- produit un événement `HOME_COMPOSITION_ROLLED_BACK` ;
+- termine le run avec le statut `ROLLED_BACK`.
+
+## Variables de sécurité
+
+L’application est désactivée par défaut.
+
+Variables utilisées :
+
+- `AI_HOME_COMPOSITION_APPLY_ENABLED=true` autorise l’application manuelle ;
+- `AI_HOME_COMPOSITION_ROLLBACK_ENABLED=true` autorise le retour arrière ;
+- `AI_HOME_COMPOSITION_EMERGENCY_STOP=true` bloque les écritures de composition ;
+- `AI_AUTO_PUBLICATION_EMERGENCY_STOP=true` bloque également les écritures de composition.
+
+Ces variables ne doivent pas être activées par défaut dans les fichiers d’environnement versionnés.
+
+## Validation réalisée
+
+Une application puis un retour arrière ont été testés visuellement le 5 septembre 2026 sur une copie isolée de la base SQLite.
+
+La vérification a confirmé :
+
+- la conservation des placements humains ;
+- l’enregistrement des origines, scores et identifiants de run ;
+- l’écriture de l’historique éditorial ;
+- le retour arrière de la composition ;
+- l’absence de modification de la base principale ;
+- trois brèves dans « L’essentiel » ;
+- une grande carte centrale ;
+- quatre articles dans « Sélection » ;
+- l’absence de déplacement indésirable de la publicité.
+
+Vérification globale finale :
+
+- 92 fichiers de tests passés ;
+- 540 tests passés ;
+- aucune erreur de test ;
+- aucune erreur ESLint ;
+- 11 avertissements ESLint préexistants ;
 - TypeScript validé ;
-- build Next.js réussi.
+- build Next.js réussi ;
+- `git diff --check` validé.
 
-## Suite du chantier
+## Travail restant
 
-L’application réelle d’une composition automatique reste à construire.
+Avant une utilisation sur la base principale :
 
-Elle devra inclure :
+- relire le diff final ;
+- pousser la branche ;
+- ouvrir et faire relire la pull request ;
+- appliquer la migration dans l’environnement cible ;
+- effectuer une première activation supervisée ;
+- vérifier immédiatement la Une, le Studio, l’historique et le retour arrière.
 
-- une transaction unique ;
-- un historique complet ;
-- un identifiant de run ;
-- un retour arrière ;
-- un arrêt d’urgence ;
-- une activation administrative supervisée.
-
-Aucun bouton d’application automatique ne doit être ajouté avant ces protections.
+Ne pas activer de tâche planifiée pendant cette phase.
 
 ## Consignes très précises pour reprendre dans un nouveau chat
 
@@ -231,23 +288,11 @@ Lorsqu’un humain sélectionne un article déjà placé automatiquement dans la
 
 Une simple désactivation conserve la provenance historique de la publication.
 
-### 5. Comportement actuellement visible dans la simulation
+### 5. Comportement actuellement validé
 
-Une simulation réelle a été exécutée le 3 septembre 2026.
+La simulation évalue une proposition sans modifier la base.
 
-Elle a produit :
-
-- 30 candidats évalués ;
-- 10 articles retenus.
-
-La simulation a correctement affiché :
-
-- une Une principale humaine ;
-- une grande carte humaine ;
-- une brève humaine ;
-- des sélections IA ;
-- des secours chronologiques ;
-- un grand format vide faute de candidat suffisamment bon.
+Lorsqu’un administrateur confirme l’application, le serveur recalcule la proposition. Il n’utilise pas aveuglément une composition envoyée par le navigateur.
 
 Les choix humains portent le badge :
 
@@ -263,201 +308,44 @@ Les secours portent le badge :
 
 Un choix humain non évalué par OpenAI n’affiche pas de faux score `0/100`.
 
-La simulation ne modifie aucune publication réelle.
+### 6. Règles de sécurité à conserver
 
-### 6. Ce qu’il ne faut surtout pas faire
+Ne jamais déplacer ou désactiver une publication verrouillée.
 
-Ne pas ajouter immédiatement un bouton « Appliquer la proposition ».
+Ne jamais déplacer ou désactiver une publication d’origine `MANUAL`.
 
-Ne pas écrire directement la composition simulée dans la base.
+Ne jamais appliquer une composition lorsque l’arrêt d’urgence est actif.
 
-Ne pas déplacer une publication verrouillée.
+Ne jamais faire confiance à une composition provenant directement du navigateur.
 
-Ne pas désactiver une publication verrouillée.
+Ne jamais effectuer une application ou un retour arrière hors d’une transaction Prisma.
 
-Ne pas supprimer les anciennes lignes de la table `Publication`.
+Ne jamais supprimer les anciennes publications pour simuler un remplacement.
 
-Ne pas nettoyer les doublons historiques sans un chantier séparé et validé.
+Ne jamais nettoyer les doublons historiques sans un chantier séparé et validé.
 
-Ne pas modifier les règles des pages publiques déjà restaurées.
+Ne jamais supprimer ou recréer une migration déjà appliquée.
 
-Ne pas utiliser `git reset --hard`.
-
-Ne pas utiliser `git checkout --` pour effacer des changements.
-
-Ne pas supprimer une migration déjà appliquée.
-
-Ne pas recréer la migration des métadonnées de publication.
-
-Ne pas considérer un score OpenAI comme une autorisation suffisante. Les exclusions déterministes restent prioritaires.
+Ne jamais considérer un score OpenAI comme une autorisation suffisante. Les exclusions déterministes restent prioritaires.
 
 ### 7. Prochaine phase exacte
 
-La prochaine phase consiste à construire un service capable d’appliquer une composition automatique de manière sûre.
+La prochaine phase consiste à préparer la pull request et la première activation supervisée.
 
-Ne pas commencer par l’interface.
+Ordre recommandé :
 
-Ne pas commencer par un bouton.
+1. vérifier que la branche est propre ;
+2. relire le diff complet depuis `audit/studio-v4` ;
+3. pousser `feat/apply-automated-home` ;
+4. ouvrir la pull request ;
+5. faire relire les migrations, les transactions et les protections humaines ;
+6. fusionner seulement après validation ;
+7. appliquer d’abord sur une copie récente de la base ;
+8. effectuer ensuite une activation manuelle surveillée sur la base principale.
 
-Commencer par un service métier isolé et testé.
+Aucune tâche périodique ne doit être ajoutée dans cette phase.
 
-Nom recommandé du nouveau fichier :
-
-`lib/editorial/applyAutomatedHomeComposition.ts`
-
-Nom recommandé du fichier de test :
-
-`lib/editorial/applyAutomatedHomeComposition.test.ts`
-
-### 8. Première étape de la prochaine phase
-
-Avant d’écrire le service, inspecter :
-
-- `prisma/schema.prisma`
-- `actions/publications.ts`
-- `lib/editorial/homeComposition.ts`
-- `lib/editorial/simulateAutomatedHome.ts`
-- `lib/editorial/loadLockedHomePlacements.ts`
-- `lib/editorial-history.ts`
-- `lib/public-revalidation.ts`
-
-Le service devra recevoir une composition déjà calculée. Il ne devra pas appeler OpenAI lui-même.
-
-### 9. Règles obligatoires du futur service d’application
-
-Toute l’application devra être effectuée dans une seule transaction Prisma.
-
-Au début de la transaction, le service devra relire les publications verrouillées depuis la base.
-
-Cette seconde lecture est obligatoire, car un humain peut avoir modifié la Une après la simulation.
-
-Si un placement humain a changé depuis la simulation, le service ne doit pas l’écraser.
-
-Le service doit refuser de déplacer ou de désactiver une publication ayant :
-
-- `locked = true`
-- ou `origin = MANUAL`
-
-Une publication choisie normalement par le moteur doit être enregistrée avec :
-
-- `origin = AUTOMATED`
-- `locked = false`
-- son score dans `automationScore`
-- la version de politique dans `automationPolicyVersion`
-- l’identifiant du run dans `automationRunId`
-
-Une publication ajoutée par secours chronologique doit être enregistrée avec :
-
-- `origin = FALLBACK`
-- `locked = false`
-- son score dans `automationScore`
-- la version de politique dans `automationPolicyVersion`
-- l’identifiant du run dans `automationRunId`
-
-Le service peut désactiver une ancienne publication uniquement si elle est automatique et non verrouillée.
-
-Il ne doit jamais désactiver une publication humaine.
-
-### 10. Identifiant de run
-
-Chaque application réelle doit posséder un identifiant unique de run.
-
-Le même identifiant doit être enregistré sur toutes les publications créées ou modifiées pendant l’application.
-
-Le service doit empêcher une seconde application accidentelle du même run.
-
-L’identifiant du run servira aussi au retour arrière et à l’historique.
-
-### 11. Historique obligatoire
-
-Chaque application réelle doit produire un événement éditorial.
-
-L’événement doit indiquer au minimum :
-
-- l’identifiant du run ;
-- la version de politique ;
-- la date ;
-- les articles placés ;
-- les zones utilisées ;
-- les scores ;
-- les origines ;
-- les anciennes publications désactivées ;
-- les placements humains conservés ;
-- l’administrateur ayant déclenché l’application.
-
-Aucune erreur secrète du fournisseur ne doit être affichée dans l’interface.
-
-### 12. Retour arrière obligatoire
-
-Avant d’exposer un bouton d’application, construire une stratégie de retour arrière.
-
-Le retour arrière doit pouvoir retrouver toutes les publications d’un run grâce à `automationRunId`.
-
-Il doit pouvoir :
-
-- désactiver les publications créées par le run ;
-- restaurer les anciennes publications automatiques remplacées ;
-- conserver tous les placements humains ;
-- produire un événement éditorial de retour arrière.
-
-Le retour arrière doit lui aussi être transactionnel.
-
-### 13. Arrêt d’urgence obligatoire
-
-Avant toute activation automatique périodique, vérifier l’arrêt d’urgence.
-
-Si l’arrêt d’urgence est actif :
-
-- aucune composition ne doit être appliquée ;
-- aucune publication ne doit être créée ;
-- aucune publication ne doit être déplacée ;
-- aucune publication ne doit être désactivée.
-
-La simulation consultative peut rester disponible.
-
-### 14. Tests à écrire avant toute application réelle
-
-Écrire les tests avant d’ajouter un bouton.
-
-Les tests doivent couvrir :
-
-1. une composition entièrement automatique ;
-2. une composition mélangeant choix humains et choix IA ;
-3. un hero humain verrouillé ;
-4. une carte humaine verrouillée ;
-5. une publication automatique remplacée ;
-6. une publication humaine qui ne doit pas être désactivée ;
-7. un changement humain intervenu après la simulation ;
-8. une erreur au milieu de la transaction ;
-9. une seconde application du même identifiant de run ;
-10. un retour arrière ;
-11. l’arrêt d’urgence ;
-12. une zone volontairement laissée vide.
-
-Après chaque petit changement, lancer seulement les tests ciblés.
-
-Ne lancer la vérification globale qu’à la fin.
-
-### 15. Première activation réelle
-
-La première application réelle devra être déclenchée manuellement par un administrateur.
-
-Elle devra être testée sur une copie de la base avant d’être utilisée sur la base principale.
-
-Après l’application, vérifier manuellement :
-
-- la page d’accueil publique ;
-- les zones du Studio ;
-- les publications verrouillées ;
-- les origines enregistrées ;
-- les scores enregistrés ;
-- l’identifiant du run ;
-- l’historique éditorial ;
-- l’absence de doublon visible.
-
-Ne pas activer de tâche planifiée pendant cette première phase.
-
-### 16. Contrôles de fin de chantier
+### 8. Contrôles de fin de chantier
 
 Lancer dans cet ordre :
 
@@ -468,13 +356,15 @@ Lancer dans cet ordre :
 - `git diff --check`
 - `git status -sb`
 
-Résultat obtenu le 3 septembre 2026 :
+Dernier résultat obtenu le 5 septembre 2026 :
 
-- 80 fichiers de tests passés ;
-- 452 tests passés ;
+- 92 fichiers de tests passés ;
+- 540 tests passés ;
 - aucune erreur de test ;
 - aucune erreur ESLint ;
 - 11 avertissements ESLint préexistants ;
 - TypeScript validé ;
 - build Next.js réussi ;
-- simulation réelle réussie.
+- application réelle réussie sur une copie de la base ;
+- retour arrière réel réussi sur cette copie ;
+- base principale non modifiée.
