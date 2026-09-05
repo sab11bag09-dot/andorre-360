@@ -68,11 +68,15 @@ function makeMutablePublication(): MutableHomePublicationSnapshot {
 describe("transaction d’automatisation de l’accueil", () => {
   const create = vi.fn();
   const update = vi.fn();
+  const editorialEventCreate = vi.fn();
 
   const client = {
     homeAutomationRun: {
       create,
       update,
+    },
+    editorialEvent: {
+      create: editorialEventCreate,
     },
   } as unknown as Prisma.TransactionClient;
 
@@ -105,6 +109,10 @@ describe("transaction d’automatisation de l’accueil", () => {
 
     update.mockResolvedValue({
       id: "run-123",
+    });
+
+    editorialEventCreate.mockResolvedValue({
+      id: 1,
     });
 
     transaction.mockImplementation(
@@ -165,6 +173,31 @@ describe("transaction d’automatisation de l’accueil", () => {
       expect.any(Date),
     );
 
+    expect(editorialEventCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        action: "HOME_COMPOSITION_APPLIED",
+        articleId: undefined,
+        actorId: "admin-1",
+        actorEmail: "admin@example.com",
+        details: expect.any(String),
+      }),
+    });
+
+    const eventDetails = JSON.parse(
+      editorialEventCreate.mock.calls[0][0].data.details,
+    );
+
+    expect(eventDetails).toEqual({
+      runId: "run-123",
+      policyVersion: "1.1",
+      appliedAt: expect.any(String),
+      ...result,
+    });
+
+    expect(new Date(eventDetails.appliedAt).toISOString()).toBe(
+      eventDetails.appliedAt,
+    );
+
     expect(update).toHaveBeenCalledWith({
       where: {
         id: "run-123",
@@ -197,6 +230,10 @@ describe("transaction d’automatisation de l’accueil", () => {
     );
 
     expect(work.mock.invocationCallOrder[0]).toBeLessThan(
+      editorialEventCreate.mock.invocationCallOrder[0],
+    );
+
+    expect(editorialEventCreate.mock.invocationCallOrder[0]).toBeLessThan(
       update.mock.invocationCallOrder[0],
     );
   });

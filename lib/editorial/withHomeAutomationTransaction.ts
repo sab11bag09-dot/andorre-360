@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from "@/lib/generated/prisma/client";
+import { recordEditorialEvent } from "@/lib/editorial-history";
 import { prisma } from "@/lib/prisma";
 
 import {
@@ -93,6 +94,17 @@ export async function withHomeAutomationTransaction<
       mutablePublications,
       appliedAt,
     );
+
+    await recordEditorialEvent(transaction, {
+      action: "HOME_COMPOSITION_APPLIED",
+      actor: input.actor,
+      details: {
+        runId: input.runId,
+        policyVersion: input.policyVersion,
+        appliedAt: appliedAt.toISOString(),
+        ...result,
+      },
+    });
 
     await transaction.homeAutomationRun.update({
       where: {
