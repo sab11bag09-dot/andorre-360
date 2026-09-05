@@ -229,11 +229,11 @@ describe("loadLockedHomePlacements", () => {
     const placements = await loadLockedHomePlacements();
 
     expect(placements.map(({ publicationId }) => publicationId)).toEqual([
-      1, 4, 5, 6, 7,
+      1, 4, 5, 6, 7, 8,
     ]);
 
     expect(placements.filter(({ zone }) => zone === "hero")).toHaveLength(1);
-    expect(placements.filter(({ zone }) => zone === "card")).toHaveLength(4);
+    expect(placements.filter(({ zone }) => zone === "card")).toHaveLength(5);
 
     expect(new Set(placements.map(({ articleId }) => articleId)).size).toBe(
       placements.length,

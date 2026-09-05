@@ -416,7 +416,7 @@ describe("écriture d’une composition automatique de l’accueil", () => {
   });
 
   it("refuse le dépassement de capacité d’une zone", async () => {
-    const placements = Array.from({ length: 5 }, (_, index) =>
+    const placements = Array.from({ length: 6 }, (_, index) =>
       makePlacement({
         zone: "card",
         articleId: index + 1,
@@ -432,7 +432,7 @@ describe("écriture d’une composition automatique de l’accueil", () => {
         mutablePublications: [],
         placements,
       }),
-    ).rejects.toThrow("La zone card dépasse sa capacité de 4.");
+    ).rejects.toThrow("La zone card dépasse sa capacité de 5.");
 
     expect(articleFindMany).not.toHaveBeenCalled();
     expect(publicationUpdateMany).not.toHaveBeenCalled();

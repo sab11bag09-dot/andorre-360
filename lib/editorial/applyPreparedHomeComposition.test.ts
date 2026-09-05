@@ -88,7 +88,7 @@ function makeComposition(): HomeCompositionResult {
       feature: 1,
       "grand-format": 1,
       card: 3,
-      brief: 4,
+      brief: 3,
     },
   };
 }

@@ -205,7 +205,7 @@ describe("application complète d’une composition préparée", () => {
         feature: 0,
         "grand-format": 1,
         card: 3,
-        brief: 4,
+        brief: 3,
       },
     };
 
@@ -463,7 +463,7 @@ describe("application complète d’une composition préparée", () => {
         feature: 1,
         "grand-format": 1,
         card: 3,
-        brief: 4,
+        brief: 3,
       },
     };
 

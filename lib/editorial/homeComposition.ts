@@ -11,8 +11,8 @@ export const HOME_VISIBLE_ZONE_CAPACITIES = {
   hero: 1,
   feature: 1,
   "grand-format": 1,
-  card: 4,
-  brief: 4,
+  card: 5,
+  brief: 3,
 } as const;
 
 export type HomeVisibleZone = keyof typeof HOME_VISIBLE_ZONE_CAPACITIES;

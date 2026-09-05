@@ -260,7 +260,7 @@ export default async function HomePageEditorial() {
                 </div>
 
                 <div className="flex-1 divide-y divide-gray-800">
-                  {briefs.slice(0, 4).map((article) => (
+                  {briefs.slice(0, 3).map((article) => (
                     <Link
                       key={article.id}
                       href={`/article/${article.slug}`}
