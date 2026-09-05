@@ -24,11 +24,14 @@ export type HomeAutomationTransactionInput = Omit<
   simulatedLockedPlacements: readonly LockedHomePublication[];
 };
 
-export type HomeAutomationTransactionWork = (
+export type HomeAutomationTransactionWork<
+  Result extends Record<string, unknown> = Record<string, unknown>,
+> = (
   transaction: Prisma.TransactionClient,
   currentLockedPlacements: readonly LockedHomePublication[],
   mutablePublications: readonly MutableHomePublicationSnapshot[],
-) => Promise<Record<string, unknown>>;
+  appliedAt: Date,
+) => Promise<Result>;
 
 /**
  * Module interne au serveur, sans action publique.
@@ -36,11 +39,13 @@ export type HomeAutomationTransactionWork = (
  * Le travail fourni doit utiliser exclusivement le client transactionnel.
  * Il ne doit effectuer aucun appel externe ni invalidation de cache.
  */
-export async function withHomeAutomationTransaction(
+export async function withHomeAutomationTransaction<
+  Result extends Record<string, unknown>,
+>(
   input: HomeAutomationTransactionInput,
-  work: HomeAutomationTransactionWork,
+  work: HomeAutomationTransactionWork<Result>,
   client: Pick<PrismaClient, "$transaction"> = prisma,
-): Promise<Record<string, unknown>> {
+): Promise<Result> {
   const runtime = readHomeCompositionApplicationRuntime();
   const decision = evaluateHomeCompositionApplicationRuntime(runtime);
 
@@ -52,9 +57,11 @@ export async function withHomeAutomationTransaction(
     );
   }
 
+  const appliedAt = new Date();
+
   return client.$transaction(async (transaction) => {
     const currentLockedPlacements = await loadLockedHomePlacements(
-      { evaluatedAt: new Date() },
+      { evaluatedAt: appliedAt },
       transaction,
     );
 
@@ -84,6 +91,7 @@ export async function withHomeAutomationTransaction(
       transaction,
       currentLockedPlacements,
       mutablePublications,
+      appliedAt,
     );
 
     await transaction.homeAutomationRun.update({
@@ -92,7 +100,7 @@ export async function withHomeAutomationTransaction(
       },
       data: {
         status: "APPLIED",
-        appliedAt: new Date(),
+        appliedAt,
         result: JSON.stringify(result),
       },
     });

@@ -162,6 +162,7 @@ describe("transaction d’automatisation de l’accueil", () => {
       client,
       [makeLockedPlacement()],
       [makeMutablePublication()],
+      expect.any(Date),
     );
 
     expect(update).toHaveBeenCalledWith({
