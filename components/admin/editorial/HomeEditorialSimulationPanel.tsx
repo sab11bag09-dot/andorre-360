@@ -3,6 +3,12 @@
 import { useState, useTransition } from "react";
 
 import {
+  applyCurrentHomeEditorialProposal,
+  rollbackHomeEditorialRun,
+  type ApplyHomeEditorialProposalResult,
+  type RollbackHomeEditorialRunResult,
+} from "@/actions/home-editorial-application";
+import {
   runHomeEditorialSimulation,
   type HomeEditorialSimulationResult,
   type HomeSimulationPlacementView,
@@ -46,19 +52,84 @@ function formatGeneratedAt(value: string): string {
   }).format(new Date(value));
 }
 
-export default function HomeEditorialSimulationPanel() {
+export type HomeEditorialSimulationPanelProps = {
+  applicationEnabled: boolean;
+  rollbackEnabled: boolean;
+};
+
+export default function HomeEditorialSimulationPanel({
+  applicationEnabled,
+  rollbackEnabled,
+}: HomeEditorialSimulationPanelProps) {
   const [result, setResult] = useState<HomeEditorialSimulationResult | null>(
     null,
   );
+  const [applicationResult, setApplicationResult] =
+    useState<ApplyHomeEditorialProposalResult | null>(null);
+  const [rollbackResult, setRollbackResult] =
+    useState<RollbackHomeEditorialRunResult | null>(null);
+  const [lastAppliedRunId, setLastAppliedRunId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function runSimulation() {
     setResult(null);
+    setApplicationResult(null);
+    setRollbackResult(null);
+    setLastAppliedRunId(null);
 
     startTransition(async () => {
       const nextResult = await runHomeEditorialSimulation();
 
       setResult(nextResult);
+    });
+  }
+
+  function applyProposal() {
+    const confirmed = window.confirm(
+      "La proposition sera recalculée côté serveur avant d’être appliquée. Continuer ?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setApplicationResult(null);
+    setRollbackResult(null);
+
+    startTransition(async () => {
+      const nextResult = await applyCurrentHomeEditorialProposal();
+
+      setApplicationResult(nextResult);
+
+      if (nextResult.success) {
+        setLastAppliedRunId(nextResult.runId);
+      }
+    });
+  }
+
+  function rollbackLastRun() {
+    if (!lastAppliedRunId) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Restaurer la composition présente avant ce run ?",
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setRollbackResult(null);
+
+    startTransition(async () => {
+      const nextResult = await rollbackHomeEditorialRun(lastAppliedRunId);
+
+      setRollbackResult(nextResult);
+
+      if (nextResult.success) {
+        setLastAppliedRunId(null);
+      }
     });
   }
 
@@ -283,9 +354,96 @@ export default function HomeEditorialSimulationPanel() {
             </details>
           )}
 
+          <section className="rounded-xl border border-yellow-200 bg-yellow-50 p-5">
+            <h2 className="font-semibold text-gray-950">
+              Application manuelle
+            </h2>
+
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-700">
+              Par sécurité, le serveur recalcule la proposition au moment de
+              l’application. Il protège les choix humains et enregistre un run
+              permettant le retour arrière.
+            </p>
+
+            {applicationEnabled ? (
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  onClick={applyProposal}
+                  disabled={isPending}
+                >
+                  {isPending
+                    ? "Opération en cours…"
+                    : "Recalculer et appliquer la proposition"}
+                </Button>
+              </div>
+            ) : (
+              <p className="mt-4 text-sm font-semibold text-amber-800">
+                L’application réelle est désactivée par le garde-fou serveur.
+              </p>
+            )}
+
+            {applicationResult && !applicationResult.success && (
+              <p
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+                role="alert"
+              >
+                {applicationResult.message}
+              </p>
+            )}
+
+            {applicationResult?.success && (
+              <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                <p className="font-semibold">
+                  Composition appliquée avec succès.
+                </p>
+                <p className="mt-1 break-all">
+                  Identifiant du run : {applicationResult.runId}
+                </p>
+
+                {rollbackEnabled && lastAppliedRunId && (
+                  <div className="mt-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={rollbackLastRun}
+                      disabled={isPending}
+                    >
+                      Annuler ce run
+                    </Button>
+                  </div>
+                )}
+
+                {!rollbackEnabled && (
+                  <p className="mt-2 font-semibold">
+                    Le retour arrière est désactivé par le garde-fou serveur.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {rollbackResult && !rollbackResult.success && (
+              <p
+                className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+                role="alert"
+              >
+                {rollbackResult.message}
+              </p>
+            )}
+
+            {rollbackResult?.success && (
+              <p
+                className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-900"
+                role="status"
+              >
+                La composition précédente a été restaurée.
+              </p>
+            )}
+          </section>
+
           <p className="rounded-xl border border-gray-200 bg-gray-50 px-5 py-4 text-sm font-semibold text-gray-700">
-            Proposition uniquement — aucun placement n’a été créé, déplacé ou
-            désactivé.
+            Cette simulation reste une proposition tant que l’application
+            manuelle n’a pas été confirmée.
           </p>
         </>
       )}
