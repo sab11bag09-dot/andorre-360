@@ -114,7 +114,6 @@ function makeInput(runId: string) {
   return {
     runId,
     policyVersion: "1.1",
-    snapshot: JSON.stringify({ publications: [] }),
     actor: admin,
     simulatedLockedPlacements: [],
   };

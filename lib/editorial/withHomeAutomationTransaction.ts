@@ -12,14 +12,22 @@ import {
   loadLockedHomePlacements,
   type LockedHomePublication,
 } from "./loadLockedHomePlacements";
+import {
+  loadMutableHomePublications,
+  type MutableHomePublicationSnapshot,
+} from "./loadMutableHomePublications";
 
-export type HomeAutomationTransactionInput = ReserveHomeAutomationRunInput & {
+export type HomeAutomationTransactionInput = Omit<
+  ReserveHomeAutomationRunInput,
+  "snapshot"
+> & {
   simulatedLockedPlacements: readonly LockedHomePublication[];
 };
 
 export type HomeAutomationTransactionWork = (
   transaction: Prisma.TransactionClient,
   currentLockedPlacements: readonly LockedHomePublication[],
+  mutablePublications: readonly MutableHomePublicationSnapshot[],
 ) => Promise<Record<string, unknown>>;
 
 /**
@@ -55,13 +63,28 @@ export async function withHomeAutomationTransaction(
       currentLockedPlacements,
     );
 
+    const mutablePublications = await loadMutableHomePublications(transaction);
+
+    const snapshot = JSON.stringify({
+      publications: mutablePublications,
+    });
+
     await reserveHomeAutomationRun(
       transaction,
-      input,
-      readHomeCompositionApplicationRuntime(),
+      {
+        runId: input.runId,
+        policyVersion: input.policyVersion,
+        snapshot,
+        actor: input.actor,
+      },
+      runtime,
     );
 
-    const result = await work(transaction, currentLockedPlacements);
+    const result = await work(
+      transaction,
+      currentLockedPlacements,
+      mutablePublications,
+    );
 
     await transaction.homeAutomationRun.update({
       where: {
