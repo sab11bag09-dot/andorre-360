@@ -34,28 +34,27 @@ describe("interface de simulation éditoriale", () => {
     expect(panelSource).toContain("Cette simulation reste une proposition");
   });
 
-  it("ne transmet aucune composition du navigateur à l’application", () => {
-    expect(panelSource).toContain("await applyCurrentHomeEditorialProposal()");
+  it("transmet uniquement le jeton signé de la proposition examinée", () => {
+    expect(panelSource).toContain("result.applicationToken");
     expect(panelSource).not.toContain(
-      "applyCurrentHomeEditorialProposal(result",
+      "applyCurrentHomeEditorialProposal(result.placements",
     );
 
+    expect(applicationActionSource).toContain("readHomeEditorialProposalToken");
+    expect(applicationActionSource).not.toContain("simulateAutomatedHome");
     expect(applicationActionSource).toContain(
-      "const simulation = await simulateAutomatedHome",
+      "composition: proposal.composition",
     );
     expect(applicationActionSource).toContain(
-      "composition: simulation.composition",
-    );
-    expect(applicationActionSource).toContain(
-      "lockedPlacements: simulation.lockedPlacements",
+      "lockedPlacements: proposal.lockedPlacements",
     );
   });
 
   it("demande une confirmation explicite avant l’application", () => {
     expect(panelSource).toContain(
-      'window.confirm(\n      "La proposition sera recalculée côté serveur',
+      "Appliquer exactement la proposition affichée ?",
     );
-    expect(panelSource).toContain("Recalculer et appliquer la proposition");
+    expect(panelSource).toContain("Appliquer la proposition affichée");
   });
 
   it("respecte le garde-fou serveur d’application", () => {

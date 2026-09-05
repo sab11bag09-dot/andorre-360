@@ -1,7 +1,11 @@
 "use server";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
-import type { HomeCandidateExclusion } from "@/lib/editorial/homeAutomationPolicy";
+import {
+  HOME_AUTOMATION_POLICY_VERSION,
+  type HomeCandidateExclusion,
+} from "@/lib/editorial/homeAutomationPolicy";
+import { createHomeEditorialProposalToken } from "@/lib/editorial/homeEditorialProposalToken";
 import type {
   HomeCompositionPlacement,
   HomeVisibleZone,
@@ -30,6 +34,7 @@ export type HomeEditorialSimulationResult =
       success: true;
       mode: "PROPOSAL_ONLY";
       generatedAt: string;
+      applicationToken: string;
       candidateCount: number;
       placements: HomeSimulationPlacementView[];
       excluded: HomeSimulationCandidateView[];
@@ -43,7 +48,7 @@ export type HomeEditorialSimulationResult =
     };
 
 export async function runHomeEditorialSimulation(): Promise<HomeEditorialSimulationResult> {
-  await requireAdmin();
+  const admin = await requireAdmin();
 
   try {
     const simulation = await simulateAutomatedHome({
@@ -147,10 +152,19 @@ export async function runHomeEditorialSimulation(): Promise<HomeEditorialSimulat
       )
       .map((evaluation) => buildCandidateView(evaluation.articleId));
 
+    const applicationToken = createHomeEditorialProposalToken({
+      actorId: admin.id,
+      generatedAt: simulation.generatedAt,
+      policyVersion: HOME_AUTOMATION_POLICY_VERSION,
+      composition: simulation.composition,
+      lockedPlacements: simulation.lockedPlacements,
+    });
+
     return {
       success: true,
       mode: simulation.mode,
       generatedAt: simulation.generatedAt.toISOString(),
+      applicationToken,
       candidateCount: simulation.candidateCount,
       placements,
       excluded,

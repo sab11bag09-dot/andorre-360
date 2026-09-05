@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const {
   randomUUID,
   requireAdmin,
-  simulateAutomatedHome,
+  readHomeEditorialProposalToken,
   applyPreparedHomeComposition,
   rollbackAutomatedHomeComposition,
   revalidatePath,
@@ -11,7 +11,7 @@ const {
 } = vi.hoisted(() => ({
   randomUUID: vi.fn(),
   requireAdmin: vi.fn(),
-  simulateAutomatedHome: vi.fn(),
+  readHomeEditorialProposalToken: vi.fn(),
   applyPreparedHomeComposition: vi.fn(),
   rollbackAutomatedHomeComposition: vi.fn(),
   revalidatePath: vi.fn(),
@@ -30,8 +30,8 @@ vi.mock("@/lib/admin/requireAdmin", () => ({
   requireAdmin,
 }));
 
-vi.mock("@/lib/editorial/simulateAutomatedHome", () => ({
-  simulateAutomatedHome,
+vi.mock("@/lib/editorial/homeEditorialProposalToken", () => ({
+  readHomeEditorialProposalToken,
 }));
 
 vi.mock("@/lib/editorial/applyPreparedHomeComposition", () => ({
@@ -81,14 +81,11 @@ describe("actions d’application éditoriale de l’accueil", () => {
     requireAdmin.mockResolvedValue(admin);
     randomUUID.mockReturnValue("run-server-123");
 
-    simulateAutomatedHome.mockResolvedValue({
-      mode: "PROPOSAL_ONLY",
+    readHomeEditorialProposalToken.mockReturnValue({
       generatedAt,
-      candidateCount: 0,
-      candidateFacts: [],
-      lockedPlacements,
-      assessments: [],
+      policyVersion: "1.1",
       composition,
+      lockedPlacements,
     });
 
     applyPreparedHomeComposition.mockResolvedValue({
@@ -110,16 +107,18 @@ describe("actions d’application éditoriale de l’accueil", () => {
   it("exige un administrateur avant de simuler une application", async () => {
     requireAdmin.mockRejectedValue(new Error("Accès refusé"));
 
-    await expect(applyCurrentHomeEditorialProposal()).rejects.toThrow(
-      "Accès refusé",
-    );
+    await expect(
+      applyCurrentHomeEditorialProposal("signed-proposal"),
+    ).rejects.toThrow("Accès refusé");
 
-    expect(simulateAutomatedHome).not.toHaveBeenCalled();
+    expect(readHomeEditorialProposalToken).not.toHaveBeenCalled();
     expect(applyPreparedHomeComposition).not.toHaveBeenCalled();
   });
 
-  it("recalcule puis applique la composition uniquement côté serveur", async () => {
-    await expect(applyCurrentHomeEditorialProposal()).resolves.toEqual({
+  it("applique exactement la proposition signée sans nouveau calcul", async () => {
+    await expect(
+      applyCurrentHomeEditorialProposal("signed-proposal"),
+    ).resolves.toEqual({
       success: true,
       runId: "run-server-123",
       generatedAt: "2026-09-05T09:00:00.000Z",
@@ -128,9 +127,10 @@ describe("actions d’application éditoriale de l’accueil", () => {
       preservedLockedPublicationIds: [10],
     });
 
-    expect(simulateAutomatedHome).toHaveBeenCalledWith({
-      candidateLimit: 30,
-    });
+    expect(readHomeEditorialProposalToken).toHaveBeenCalledWith(
+      "signed-proposal",
+      "admin-1",
+    );
 
     expect(applyPreparedHomeComposition).toHaveBeenCalledWith({
       runId: "run-server-123",
@@ -141,8 +141,29 @@ describe("actions d’application éditoriale de l’accueil", () => {
     });
   });
 
+  it("refuse une proposition issue d’une ancienne politique", async () => {
+    readHomeEditorialProposalToken.mockReturnValue({
+      generatedAt,
+      policyVersion: "ancienne-version",
+      composition,
+      lockedPlacements,
+    });
+
+    await expect(
+      applyCurrentHomeEditorialProposal("signed-proposal"),
+    ).resolves.toEqual({
+      success: false,
+      code: "APPLICATION_FAILED",
+      message:
+        "La composition n’a pas pu être appliquée. Aucun placement n’a été modifié.",
+    });
+
+    expect(applyPreparedHomeComposition).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
+  });
+
   it("revalide les pages uniquement après une application réussie", async () => {
-    await applyCurrentHomeEditorialProposal();
+    await applyCurrentHomeEditorialProposal("signed-proposal");
 
     expect(revalidatePath.mock.calls).toEqual([
       ["/admin"],
@@ -164,7 +185,9 @@ describe("actions d’application éditoriale de l’accueil", () => {
       new Error("Erreur interne secrète"),
     );
 
-    await expect(applyCurrentHomeEditorialProposal()).resolves.toEqual({
+    await expect(
+      applyCurrentHomeEditorialProposal("signed-proposal"),
+    ).resolves.toEqual({
       success: false,
       code: "APPLICATION_FAILED",
       message:

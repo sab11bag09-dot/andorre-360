@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { requireAdmin, simulateAutomatedHome } = vi.hoisted(() => ({
+const {
+  requireAdmin,
+  simulateAutomatedHome,
+  createHomeEditorialProposalToken,
+} = vi.hoisted(() => ({
   requireAdmin: vi.fn(),
   simulateAutomatedHome: vi.fn(),
+  createHomeEditorialProposalToken: vi.fn(),
 }));
 
 vi.mock("@/lib/admin/requireAdmin", () => ({
@@ -11,6 +16,10 @@ vi.mock("@/lib/admin/requireAdmin", () => ({
 
 vi.mock("@/lib/editorial/simulateAutomatedHome", () => ({
   simulateAutomatedHome,
+}));
+
+vi.mock("@/lib/editorial/homeEditorialProposalToken", () => ({
+  createHomeEditorialProposalToken,
 }));
 
 import { runHomeEditorialSimulation } from "./home-editorial-simulation";
@@ -76,6 +85,8 @@ describe("runHomeEditorialSimulation", () => {
       id: "admin-1",
       email: "admin@example.com",
     });
+
+    createHomeEditorialProposalToken.mockReturnValue("signed-proposal");
   });
 
   it("exige un administrateur avant de lancer la simulation", async () => {
@@ -153,6 +164,7 @@ describe("runHomeEditorialSimulation", () => {
       success: true,
       mode: "PROPOSAL_ONLY",
       generatedAt: "2026-09-02T12:00:00.000Z",
+      applicationToken: "signed-proposal",
       candidateCount: 3,
       placements: [
         {
@@ -201,6 +213,14 @@ describe("runHomeEditorialSimulation", () => {
     expect(simulateAutomatedHome).toHaveBeenCalledWith({
       candidateLimit: 30,
     });
+
+    expect(createHomeEditorialProposalToken).toHaveBeenCalledWith({
+      actorId: "admin-1",
+      generatedAt,
+      policyVersion: "1.1",
+      composition: expect.any(Object),
+      lockedPlacements: [],
+    });
   });
 
   it("affiche un placement humain absent des candidats OpenAI", async () => {
@@ -247,6 +267,7 @@ describe("runHomeEditorialSimulation", () => {
       success: true,
       mode: "PROPOSAL_ONLY",
       generatedAt: "2026-09-02T12:00:00.000Z",
+      applicationToken: "signed-proposal",
       candidateCount: 0,
       placements: [
         {

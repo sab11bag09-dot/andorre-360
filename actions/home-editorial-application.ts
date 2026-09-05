@@ -8,10 +8,8 @@ import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { applyPreparedHomeComposition } from "@/lib/editorial/applyPreparedHomeComposition";
 import { HOME_AUTOMATION_POLICY_VERSION } from "@/lib/editorial/homeAutomationPolicy";
 import { rollbackAutomatedHomeComposition } from "@/lib/editorial/rollbackAutomatedHomeComposition";
-import { simulateAutomatedHome } from "@/lib/editorial/simulateAutomatedHome";
+import { readHomeEditorialProposalToken } from "@/lib/editorial/homeEditorialProposalToken";
 import { revalidateEditorialPublicPage } from "@/lib/public-revalidation";
-
-const HOME_APPLICATION_CANDIDATE_LIMIT = 30;
 
 export type ApplyHomeEditorialProposalResult =
   | {
@@ -52,22 +50,26 @@ function revalidateHomeEditorialPages(): void {
   revalidateEditorialPublicPage("home");
 }
 
-export async function applyCurrentHomeEditorialProposal(): Promise<ApplyHomeEditorialProposalResult> {
+export async function applyCurrentHomeEditorialProposal(
+  applicationToken: string,
+): Promise<ApplyHomeEditorialProposalResult> {
   const admin = await requireAdmin();
 
   try {
-    const simulation = await simulateAutomatedHome({
-      candidateLimit: HOME_APPLICATION_CANDIDATE_LIMIT,
-    });
+    const proposal = readHomeEditorialProposalToken(applicationToken, admin.id);
+
+    if (proposal.policyVersion !== HOME_AUTOMATION_POLICY_VERSION) {
+      throw new Error("La politique éditoriale a changé depuis la simulation.");
+    }
 
     const runId = randomUUID();
 
     const application = await applyPreparedHomeComposition({
       runId,
-      policyVersion: HOME_AUTOMATION_POLICY_VERSION,
+      policyVersion: proposal.policyVersion,
       actor: admin,
-      composition: simulation.composition,
-      lockedPlacements: simulation.lockedPlacements,
+      composition: proposal.composition,
+      lockedPlacements: proposal.lockedPlacements,
     });
 
     revalidateHomeEditorialPages();
@@ -75,7 +77,7 @@ export async function applyCurrentHomeEditorialProposal(): Promise<ApplyHomeEdit
     return {
       success: true,
       runId,
-      generatedAt: simulation.generatedAt.toISOString(),
+      generatedAt: proposal.generatedAt.toISOString(),
       createdPublicationIds: application.createdPublicationIds,
       disabledPublicationIds: application.disabledPublicationIds,
       preservedLockedPublicationIds: application.preservedLockedPublicationIds,
