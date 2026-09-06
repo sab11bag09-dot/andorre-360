@@ -294,13 +294,6 @@ export function composeAutomatedHome(
     }
 
     if (
-      MAIN_ZONES.has(zone) &&
-      (mainCategoryCounts.get(candidate.candidate.article.category) ?? 0) >= 2
-    ) {
-      return false;
-    }
-
-    if (
       LEADING_ZONES.has(zone) &&
       leadingSourceIds.has(candidate.candidate.sourceId)
     ) {

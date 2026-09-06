@@ -85,8 +85,12 @@ export default function HomeEditorialSimulationPanel({
   }
 
   function applyProposal() {
+    if (!result?.success) {
+      return;
+    }
+
     const confirmed = window.confirm(
-      "La proposition sera recalculée côté serveur avant d’être appliquée. Continuer ?",
+      "Appliquer exactement la proposition affichée ? Les choix humains seront vérifiés une nouvelle fois.",
     );
 
     if (!confirmed) {
@@ -97,7 +101,9 @@ export default function HomeEditorialSimulationPanel({
     setRollbackResult(null);
 
     startTransition(async () => {
-      const nextResult = await applyCurrentHomeEditorialProposal();
+      const nextResult = await applyCurrentHomeEditorialProposal(
+        result.applicationToken,
+      );
 
       setApplicationResult(nextResult);
 
@@ -360,8 +366,8 @@ export default function HomeEditorialSimulationPanel({
             </h2>
 
             <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-700">
-              Par sécurité, le serveur recalcule la proposition au moment de
-              l’application. Il protège les choix humains et enregistre un run
+              Le serveur appliquera exactement la proposition affichée. Il
+              vérifiera encore les choix humains et enregistrera un run
               permettant le retour arrière.
             </p>
 
@@ -374,7 +380,7 @@ export default function HomeEditorialSimulationPanel({
                 >
                   {isPending
                     ? "Opération en cours…"
-                    : "Recalculer et appliquer la proposition"}
+                    : "Appliquer la proposition affichée"}
                 </Button>
               </div>
             ) : (
