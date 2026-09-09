@@ -12,8 +12,11 @@ export async function createArticleFromObservationAction(
 ) {
   await requireAdmin();
 
-  const { articleId } =
-    await createArticleFromObservation(observationId);
+  const { articleId } = await createArticleFromObservation(
+    observationId,
+    undefined,
+    { allowAutoPublication: false },
+  );
 
   revalidatePath("/admin/observations");
   revalidatePath("/admin/articles");
@@ -29,7 +32,7 @@ export async function regenerateArticleFromObservationAction(
   const { articleId } = await createArticleFromObservation(
     observationId,
     undefined,
-    { regenerate: true },
+    { regenerate: true, allowAutoPublication: false },
   );
 
   revalidatePath("/admin/observations");
@@ -57,7 +60,11 @@ export async function deleteAiDraftFromObservationAction(
       select: { id: true, published: true, editorialStatus: true },
     });
 
-    if (!article || article.published || article.editorialStatus !== "AI_DRAFT") {
+    if (
+      !article ||
+      article.published ||
+      article.editorialStatus !== "AI_DRAFT"
+    ) {
       throw new Error("Seuls les brouillons IA peuvent être supprimés.");
     }
 

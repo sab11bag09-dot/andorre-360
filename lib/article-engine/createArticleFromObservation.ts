@@ -33,13 +33,9 @@ export interface CreateArticleFromObservationDependencies {
     ArticleRepository,
     "createDraft" | "updateDraft" | "publishDraft"
   >;
-  editorialGenerator: Pick<
-    EditorialGenerator,
-    "prepareArticle"
-  >;
+  editorialGenerator: Pick<EditorialGenerator, "prepareArticle">;
   editorialEventWriter?: EditorialEventWriter;
 }
-
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
   observationRepository: new PrismaObservationRepository(),
@@ -51,7 +47,10 @@ const defaultDependencies: CreateArticleFromObservationDependencies = {
 export async function createArticleFromObservation(
   observationId: number,
   dependencies = defaultDependencies,
-  options: { regenerate?: boolean } = {},
+  options: {
+    regenerate?: boolean;
+    allowAutoPublication?: boolean;
+  } = {},
 ): Promise<CreateArticleFromObservationResult> {
   if (!Number.isInteger(observationId) || observationId <= 0) {
     throw new Error("Identifiant d’observation invalide.");
@@ -64,7 +63,11 @@ export async function createArticleFromObservation(
     throw new Error("Observation introuvable.");
   }
 
-  if (observation.processed && observation.articleId !== null && !options.regenerate) {
+  if (
+    observation.processed &&
+    observation.articleId !== null &&
+    !options.regenerate
+  ) {
     return { articleId: observation.articleId };
   }
 
@@ -86,23 +89,22 @@ export async function createArticleFromObservation(
 
   const aiGenerator = usesProductionPipeline
     ? (() => {
-      const apiKey = process.env.OPENAI_API_KEY?.trim();
+        const apiKey = process.env.OPENAI_API_KEY?.trim();
 
-      if (!apiKey) {
-        throw new Error(
-          "OPENAI_API_KEY est obligatoire pour préparer un article.",
-        );
-      }
+        if (!apiKey) {
+          throw new Error(
+            "OPENAI_API_KEY est obligatoire pour préparer un article.",
+          );
+        }
 
-      return new OpenAiEditorialGenerator({
-        apiKey,
-        model: process.env.OPENAI_TRANSLATION_MODEL,
-      });
-    })()
+        return new OpenAiEditorialGenerator({
+          apiKey,
+          model: process.env.OPENAI_TRANSLATION_MODEL,
+        });
+      })()
     : null;
 
-  const editorialGenerator =
-    aiGenerator ?? dependencies.editorialGenerator;
+  const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
   let draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
@@ -126,10 +128,9 @@ export async function createArticleFromObservation(
     };
   }
 
-  const sourceEditorialCategory =
-    normalizeEditorialCategory(
-      observation.source.category,
-    );
+  const sourceEditorialCategory = normalizeEditorialCategory(
+    observation.source.category,
+  );
 
   const editorialDraft = {
     ...draft,
@@ -151,10 +152,14 @@ export async function createArticleFromObservation(
         data: editorialDraft,
       });
     } else {
-      await dependencies.articleRepository.updateDraft(articleId, editorialDraft);
+      await dependencies.articleRepository.updateDraft(
+        articleId,
+        editorialDraft,
+      );
     }
   } else {
-    articleId = await dependencies.articleRepository.createDraft(editorialDraft);
+    articleId =
+      await dependencies.articleRepository.createDraft(editorialDraft);
   }
 
   const autoPublication = prepareAutoPublication({
@@ -166,32 +171,34 @@ export async function createArticleFromObservation(
     trustLevel: observation.source.trustLevel,
     title: draft.title,
     content: draft.content,
+    runtimeConfig: options.allowAutoPublication
+      ? undefined
+      : {
+          enabled: false,
+          emergencyStop: false,
+          sourceIds: [],
+        },
   });
 
   if (dependencies.editorialEventWriter) {
-    await recordSystemEditorialEvent(
-      dependencies.editorialEventWriter,
-      {
-        action: "ARTICLE_CREATED",
-        articleId,
-        details: {
-          eventType: "auto_publication_evaluated",
-          ...autoPublication.audit,
-        },
+    await recordSystemEditorialEvent(dependencies.editorialEventWriter, {
+      action: "ARTICLE_CREATED",
+      articleId,
+      details: {
+        eventType: "auto_publication_evaluated",
+        ...autoPublication.audit,
       },
-    );
+    });
   }
 
   if (autoPublication.decision.allowed) {
     assertMultilingualPublicationEnabled();
 
-    const generatedTranslations =
-      await generateArticleTranslations(articleId, {
-        articleRepository: new PrismaArticleRepository(),
-        translationRepository: new PrismaArticleTranslationRepository(),
-        editorialGenerator:
-          aiGenerator ?? new DeterministicEditorialGenerator(),
-      });
+    const generatedTranslations = await generateArticleTranslations(articleId, {
+      articleRepository: new PrismaArticleRepository(),
+      translationRepository: new PrismaArticleTranslationRepository(),
+      editorialGenerator: aiGenerator ?? new DeterministicEditorialGenerator(),
+    });
 
     await Promise.all(
       generatedTranslations.translations
@@ -208,23 +215,20 @@ export async function createArticleFromObservation(
         ),
     );
 
-    const publishedTranslations =
-      await prisma.articleTranslation.findMany({
-        where: {
-          articleId,
-          locale: {
-            in: [...REQUIRED_TRANSLATION_LOCALES],
-          },
+    const publishedTranslations = await prisma.articleTranslation.findMany({
+      where: {
+        articleId,
+        locale: {
+          in: [...REQUIRED_TRANSLATION_LOCALES],
         },
-        select: {
-          locale: true,
-          status: true,
-        },
-      });
+      },
+      select: {
+        locale: true,
+        status: true,
+      },
+    });
 
-    assertRequiredTranslationsPublished(
-      publishedTranslations,
-    );
+    assertRequiredTranslationsPublished(publishedTranslations);
 
     if (!options.regenerate) {
       if (!dependencies.articleRepository.publishDraft) {
