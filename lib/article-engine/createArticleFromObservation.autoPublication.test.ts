@@ -1,23 +1,13 @@
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ObservationWithSource } from "../source-engine/repositories/ObservationRepository";
 
-const {
-  generateArticleTranslations,
-  translationFindMany,
-  translationUpdate,
-} = vi.hoisted(() => ({
-  generateArticleTranslations: vi.fn(),
-  translationFindMany: vi.fn(),
-  translationUpdate: vi.fn(),
-}));
+const { generateArticleTranslations, translationFindMany, translationUpdate } =
+  vi.hoisted(() => ({
+    generateArticleTranslations: vi.fn(),
+    translationFindMany: vi.fn(),
+    translationUpdate: vi.fn(),
+  }));
 
 vi.mock("./generateArticleTranslations", () => ({
   generateArticleTranslations,
@@ -41,14 +31,10 @@ import {
 } from "./createArticleFromObservation";
 
 const originalEnvironment = {
-  enabled:
-    process.env.AI_AUTO_PUBLICATION_ENABLED,
-  emergencyStop:
-    process.env.AI_AUTO_PUBLICATION_EMERGENCY_STOP,
-  sourceIds:
-    process.env.AI_AUTO_PUBLICATION_SOURCE_IDS,
-  multilingual:
-    process.env.MULTILINGUAL_PUBLICATION_ENABLED,
+  enabled: process.env.AI_AUTO_PUBLICATION_ENABLED,
+  emergencyStop: process.env.AI_AUTO_PUBLICATION_EMERGENCY_STOP,
+  sourceIds: process.env.AI_AUTO_PUBLICATION_SOURCE_IDS,
+  multilingual: process.env.MULTILINGUAL_PUBLICATION_ENABLED,
 };
 
 function restoreEnvironment(
@@ -67,20 +53,15 @@ function makeObservation(): ObservationWithSource {
     id: 9,
     sourceId: 5,
     articleId: null,
-    title:
-      "Une actualité suffisamment descriptive",
-    url:
-      "https://source.example/article",
+    title: "Une actualité suffisamment descriptive",
+    url: "https://source.example/article",
     publishedAt: null,
     content: "x".repeat(300),
     processed: false,
     processedAt: null,
-    collectedAt:
-      new Date("2026-09-01T00:00:00Z"),
-    createdAt:
-      new Date("2026-09-01T00:00:00Z"),
-    updatedAt:
-      new Date("2026-09-01T00:00:00Z"),
+    collectedAt: new Date("2026-09-01T00:00:00Z"),
+    createdAt: new Date("2026-09-01T00:00:00Z"),
+    updatedAt: new Date("2026-09-01T00:00:00Z"),
     source: {
       id: 5,
       name: "Source officielle",
@@ -94,39 +75,27 @@ function makeObservation(): ObservationWithSource {
 
 function makeDependencies() {
   const observation = makeObservation();
-  const markProcessed =
-    vi.fn(async () => undefined);
-  const publishDraft =
-    vi.fn(async () => undefined);
+  const markProcessed = vi.fn(async () => undefined);
+  const publishDraft = vi.fn(async () => undefined);
 
   const dependencies: CreateArticleFromObservationDependencies = {
     observationRepository: {
-      findById: vi.fn(
-        async () => observation,
-      ),
+      findById: vi.fn(async () => observation),
       markProcessed,
     },
     articleRepository: {
-      createDraft: vi.fn(
-        async () => 42,
-      ),
-      updateDraft: vi.fn(
-        async () => undefined,
-      ),
+      createDraft: vi.fn(async () => 42),
+      updateDraft: vi.fn(async () => undefined),
       publishDraft,
     },
     editorialGenerator: {
-      prepareArticle: vi.fn(
-        async () => ({
-          title:
-            "Une actualité suffisamment descriptive",
-          description:
-            "Description suffisamment descriptive.",
-          content: "x".repeat(300),
-          category: "SOCIÉTÉ",
-          author: "Source officielle",
-        }),
-      ),
+      prepareArticle: vi.fn(async () => ({
+        title: "Une actualité suffisamment descriptive",
+        description: "Description suffisamment descriptive.",
+        content: "x".repeat(300),
+        category: "SOCIÉTÉ",
+        author: "Source officielle",
+      })),
     },
   };
 
@@ -141,14 +110,10 @@ describe("publication automatique multilingue", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    process.env.AI_AUTO_PUBLICATION_ENABLED =
-      "true";
-    process.env.AI_AUTO_PUBLICATION_EMERGENCY_STOP =
-      "false";
-    process.env.AI_AUTO_PUBLICATION_SOURCE_IDS =
-      "5";
-    process.env.MULTILINGUAL_PUBLICATION_ENABLED =
-      "true";
+    process.env.AI_AUTO_PUBLICATION_ENABLED = "true";
+    process.env.AI_AUTO_PUBLICATION_EMERGENCY_STOP = "false";
+    process.env.AI_AUTO_PUBLICATION_SOURCE_IDS = "5";
+    process.env.MULTILINGUAL_PUBLICATION_ENABLED = "true";
 
     generateArticleTranslations.mockResolvedValue({
       articleId: 42,
@@ -199,73 +164,58 @@ describe("publication automatique multilingue", () => {
   });
 
   it("publie le français après les traductions CA et ES", async () => {
-    const {
-      dependencies,
-      markProcessed,
-      publishDraft,
-    } = makeDependencies();
+    const { dependencies, markProcessed, publishDraft } = makeDependencies();
 
-    await createArticleFromObservation(
-      9,
-      dependencies,
-    );
+    await createArticleFromObservation(9, dependencies, {
+      allowAutoPublication: true,
+    });
 
-    expect(
-      generateArticleTranslations,
-    ).toHaveBeenCalledWith(
+    expect(generateArticleTranslations).toHaveBeenCalledWith(
       42,
       expect.any(Object),
     );
 
-    expect(translationUpdate).toHaveBeenCalledTimes(
-      2,
-    );
+    expect(translationUpdate).toHaveBeenCalledTimes(2);
 
-    expect(
-      translationFindMany.mock.invocationCallOrder[0],
-    ).toBeLessThan(
+    expect(translationFindMany.mock.invocationCallOrder[0]).toBeLessThan(
       publishDraft.mock.invocationCallOrder[0],
     );
 
-    expect(publishDraft).toHaveBeenCalledWith(
-      42,
-    );
-    expect(markProcessed).toHaveBeenCalledWith(
-      9,
-      42,
-    );
+    expect(publishDraft).toHaveBeenCalledWith(42);
+    expect(markProcessed).toHaveBeenCalledWith(9, 42);
+  });
+
+  it("conserve un brouillon par défaut même si l’automatisme est activé", async () => {
+    const { dependencies, markProcessed, publishDraft } = makeDependencies();
+
+    await createArticleFromObservation(9, dependencies);
+
+    expect(generateArticleTranslations).not.toHaveBeenCalled();
+    expect(translationUpdate).not.toHaveBeenCalled();
+    expect(translationFindMany).not.toHaveBeenCalled();
+    expect(publishDraft).not.toHaveBeenCalled();
+    expect(markProcessed).toHaveBeenCalledWith(9, 42);
   });
 
   it("ne publie pas le français si la traduction échoue", async () => {
-    const {
-      dependencies,
-      markProcessed,
-      publishDraft,
-    } = makeDependencies();
+    const { dependencies, markProcessed, publishDraft } = makeDependencies();
 
     generateArticleTranslations.mockRejectedValue(
       new Error("Traduction indisponible"),
     );
 
     await expect(
-      createArticleFromObservation(
-        9,
-        dependencies,
-      ),
-    ).rejects.toThrow(
-      "Traduction indisponible",
-    );
+      createArticleFromObservation(9, dependencies, {
+        allowAutoPublication: true,
+      }),
+    ).rejects.toThrow("Traduction indisponible");
 
     expect(publishDraft).not.toHaveBeenCalled();
     expect(markProcessed).not.toHaveBeenCalled();
   });
 
   it("ne publie pas le français si une langue reste absente", async () => {
-    const {
-      dependencies,
-      markProcessed,
-      publishDraft,
-    } = makeDependencies();
+    const { dependencies, markProcessed, publishDraft } = makeDependencies();
 
     translationFindMany.mockResolvedValue([
       {
@@ -275,10 +225,9 @@ describe("publication automatique multilingue", () => {
     ]);
 
     await expect(
-      createArticleFromObservation(
-        9,
-        dependencies,
-      ),
+      createArticleFromObservation(9, dependencies, {
+        allowAutoPublication: true,
+      }),
     ).rejects.toThrow(
       "Les traductions suivantes doivent être publiées avant l’article : ES.",
     );
