@@ -7,6 +7,7 @@ import type {
   ObservationInput,
 } from "./Collector";
 import { siteRules } from "./siteRules";
+import { normalizeObservationPublishedAt } from "../observationDate";
 import { FetchHtmlClient } from "../html/FetchHtmlClient";
 import type { HtmlClient } from "../html/HtmlClient";
 
@@ -83,18 +84,47 @@ function parseCatalanDate(value: string): Date | null {
     : date;
 }
 
-function parseGenericDate(value: string): Date | null {
-  const catalanDate = parseCatalanDate(value);
+function parseDayFirstNumericDate(
+  value: string,
+): Date | null {
+  const match = normalizeText(value).match(
+    /(?:^|\D)(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\D|$)/,
+  );
 
-  if (catalanDate) {
-    return catalanDate;
+  if (!match) {
+    return null;
   }
 
-  const parsedDate = new Date(value);
+  const [, dayValue, monthValue, yearValue] = match;
+  const day = Number(dayValue);
+  const month = Number(monthValue);
+  const year = Number(yearValue);
+  const date = new Date(Date.UTC(year, month - 1, day));
 
-  return Number.isNaN(parsedDate.getTime())
-    ? null
-    : parsedDate;
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    return null;
+  }
+
+  return date;
+}
+
+function parseGenericDate(value: string): Date | null {
+  const parsedDate =
+    parseCatalanDate(value) ??
+    parseDayFirstNumericDate(value) ??
+    (() => {
+      const genericDate = new Date(value);
+
+      return Number.isNaN(genericDate.getTime())
+        ? null
+        : genericDate;
+    })();
+
+  return normalizeObservationPublishedAt(parsedDate);
 }
 
 async function mapWithConcurrency<T, R>(

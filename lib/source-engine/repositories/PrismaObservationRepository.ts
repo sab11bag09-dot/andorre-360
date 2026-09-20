@@ -4,6 +4,8 @@ import {
 } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
+import { normalizeObservationPublishedAt } from "../observationDate";
+
 import type { ObservationInput } from "../collectors/Collector";
 import type {
   ObservationRepository,
@@ -70,13 +72,18 @@ export class PrismaObservationRepository
     let created = 0;
 
     for (const observation of observations) {
+      const publishedAt =
+        normalizeObservationPublishedAt(
+          observation.publishedAt,
+        );
+
       try {
         await prisma.observation.create({
           data: {
             sourceId,
             title: observation.title,
             url: observation.url,
-            publishedAt: observation.publishedAt,
+            publishedAt,
             content: observation.content,
           },
         });
@@ -97,7 +104,7 @@ export class PrismaObservationRepository
             },
             data: {
               title: observation.title,
-              publishedAt: observation.publishedAt,
+              publishedAt,
               content: observation.content,
             },
           });
