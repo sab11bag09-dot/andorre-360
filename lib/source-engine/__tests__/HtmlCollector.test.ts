@@ -228,6 +228,58 @@ describe("HtmlCollector", () => {
     ]);
   });
 
+  it("interprète les dates Altaveu au format jour/mois/année", async () => {
+    const source = {
+      ...createSource(),
+      name: "Altaveu",
+      url: "https://www.altaveu.com",
+    };
+    const articleUrl =
+      "https://www.altaveu.com/actualitat/societat/article-date_123_102.html";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <a href="${articleUrl}">Article daté</a>
+      `,
+      [articleUrl]: `
+        <time datetime="12/08/2026">12/08/2026</time>
+        <div class="c-mainarticle__body">
+          <p>Premier paragraphe complet de l'article publié par Altaveu.</p>
+          <p>Second paragraphe qui confirme la bonne extraction du contenu.</p>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(
+      observations[0]?.publishedAt?.toISOString(),
+    ).toBe("2026-08-12T00:00:00.000Z");
+  });
+
+  it("écarte une date de publication manifestement future", async () => {
+    const source = createSource();
+    const articleUrl = "https://example.com/article-futur";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <h2><a href="${articleUrl}">Article futur</a></h2>
+      `,
+      [articleUrl]: `
+        <time datetime="2999-01-01T00:00:00.000Z">
+          1 janvier 2999
+        </time>
+        <div class="article-content">
+          <p>Contenu éditorial suffisamment long pour tester le rejet d'une date future.</p>
+        </div>
+      `,
+    });
+    const collector = new HtmlCollector(htmlClient);
+
+    const observations = await collector.collect(source);
+
+    expect(observations[0]?.publishedAt).toBeNull();
+  });
+
   it("écarte les articles sans contenu de Diari d'Andorra", async () => {
     const source = {
       ...createSource(),
