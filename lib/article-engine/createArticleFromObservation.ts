@@ -33,7 +33,10 @@ export interface CreateArticleFromObservationDependencies {
     ArticleRepository,
     "createDraft" | "updateDraft" | "publishDraft"
   >;
-  editorialGenerator: Pick<EditorialGenerator, "prepareArticle">;
+  editorialGenerator: Pick<
+    EditorialGenerator,
+    "prepareArticle" | "auditMetadata"
+  >;
   editorialEventWriter?: EditorialEventWriter;
 }
 
@@ -105,28 +108,16 @@ export async function createArticleFromObservation(
     : null;
 
   const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
-  let draft = await editorialGenerator.prepareArticle({
+  const generatedAt = new Date();
+
+  const draft = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
+    sourcePublishedAt: observation.publishedAt,
+    generatedAt,
     sourceName: observation.source.name,
     sourceCategory: observation.source.category,
   });
-
-  if (aiGenerator !== null) {
-    const french = await aiGenerator.translateArticle({
-      locale: "FR",
-      title: draft.title,
-      description: draft.description,
-      content: draft.content,
-    });
-
-    draft = {
-      ...draft,
-      title: french.title,
-      description: french.description,
-      content: french.content,
-    };
-  }
 
   const sourceEditorialCategory = normalizeEditorialCategory(
     observation.source.category,
@@ -135,7 +126,7 @@ export async function createArticleFromObservation(
   const editorialDraft = {
     ...draft,
     image: "/images/global/hero.jpg",
-    aiRewrittenAt: new Date(),
+    aiRewrittenAt: generatedAt,
     category:
       sourceEditorialCategory === "ILS_EN_PARLENT"
         ? "ILS_EN_PARLENT"
@@ -171,6 +162,7 @@ export async function createArticleFromObservation(
     trustLevel: observation.source.trustLevel,
     title: draft.title,
     content: draft.content,
+    generator: editorialGenerator.auditMetadata,
     runtimeConfig: options.allowAutoPublication
       ? undefined
       : {

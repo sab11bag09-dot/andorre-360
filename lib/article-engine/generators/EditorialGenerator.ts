@@ -1,6 +1,8 @@
 export interface PrepareArticleInput {
   originalTitle: string;
   originalContent: string;
+  sourcePublishedAt: Date | null;
+  generatedAt: Date;
   sourceName: string;
   sourceCategory: string | null;
 }
@@ -29,7 +31,15 @@ export interface PreparedTranslation {
   content: string;
 }
 
+export interface EditorialGeneratorAuditMetadata {
+  provider: string;
+  model?: string;
+  promptVersion?: string;
+}
+
 export interface EditorialGenerator {
+  readonly auditMetadata?: EditorialGeneratorAuditMetadata;
+
   prepareArticle(
     input: PrepareArticleInput,
   ): Promise<PreparedArticle>;

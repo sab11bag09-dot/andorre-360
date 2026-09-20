@@ -12,6 +12,10 @@ describe("DeterministicEditorialGenerator", () => {
         originalTitle: "  Titre collecté  ",
         originalContent:
           "  Premier paragraphe collecté.  ",
+        sourcePublishedAt: null,
+        generatedAt: new Date(
+          "2026-09-20T12:00:00.000Z",
+        ),
         sourceName: "Source test",
         sourceCategory: "  Société  ",
       });
@@ -37,6 +41,10 @@ describe("DeterministicEditorialGenerator", () => {
       await generator.prepareArticle({
         originalTitle: "Titre",
         originalContent: content,
+        sourcePublishedAt: null,
+        generatedAt: new Date(
+          "2026-09-20T12:00:00.000Z",
+        ),
         sourceName: "Source test",
         sourceCategory: null,
       });
