@@ -9,6 +9,10 @@ import type {
 export class DeterministicEditorialGenerator
   implements EditorialGenerator
 {
+  readonly auditMetadata = {
+    provider: "deterministic",
+  } as const;
+
   async prepareArticle(
     input: PrepareArticleInput,
   ): Promise<PreparedArticle> {

@@ -136,22 +136,32 @@ describe("OpenAiEditorialGenerator", () => {
     ).rejects.toThrow("La traduction OpenAI a échoué : délai dépassé");
   });
 
-  it("prépare un article français avec la réponse structurée", async () => {
+  it("prépare un article français avec son contexte temporel et sa traçabilité", async () => {
+    const client = makeClient(
+      JSON.stringify({
+        title: "Titre français",
+        description: "Description française",
+        content: "Contenu français",
+      }),
+    );
     const generator = new OpenAiEditorialGenerator({
       apiKey: "test-key",
-      client: makeClient(
-        JSON.stringify({
-          title: "Titre français",
-          description: "Description française",
-          content: "Contenu français",
-        }),
-      ),
+      model: "test-model",
+      client,
     });
+    const sourcePublishedAt = new Date(
+      "2026-09-02T00:00:00.000Z",
+    );
+    const generatedAt = new Date(
+      "2026-09-20T12:00:00.000Z",
+    );
 
     await expect(
       generator.prepareArticle({
         originalTitle: " Titre français ",
         originalContent: " Contenu français ",
+        sourcePublishedAt,
+        generatedAt,
         sourceName: "Source",
         sourceCategory: "Actualité",
       }),
@@ -159,6 +169,31 @@ describe("OpenAiEditorialGenerator", () => {
       title: "Titre français",
       description: "Description française",
       content: "Contenu français",
+    });
+
+    expect(client.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: "test-model",
+        instructions: expect.stringContaining(
+          "date absolue",
+        ),
+        input: JSON.stringify({
+          title: " Titre français ",
+          content: " Contenu français ",
+          sourceName: "Source",
+          sourceCategory: "Actualité",
+          sourcePublishedAt:
+            "2026-09-02T00:00:00.000Z",
+          generatedAt:
+            "2026-09-20T12:00:00.000Z",
+        }),
+      }),
+    );
+
+    expect(generator.auditMetadata).toEqual({
+      provider: "openai",
+      model: "test-model",
+      promptVersion: "editorial-rewrite-v2",
     });
   });
 

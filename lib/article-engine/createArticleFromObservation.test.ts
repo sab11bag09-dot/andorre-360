@@ -158,6 +158,7 @@ describe("createArticleFromObservation", () => {
       createDraft,
       updateDraft,
       markProcessed,
+      prepareArticle,
     } = makeDependencies(observation);
 
     const result = await createArticleFromObservation(
@@ -167,6 +168,15 @@ describe("createArticleFromObservation", () => {
 
     expect(result.articleId).toBe(42);
     expect(updateDraft).not.toHaveBeenCalled();
+
+    expect(prepareArticle).toHaveBeenCalledWith({
+      originalTitle: observation.title,
+      originalContent: "Premier paragraphe.",
+      sourcePublishedAt: null,
+      generatedAt: expect.any(Date),
+      sourceName: observation.source.name,
+      sourceCategory: observation.source.category,
+    });
 
     expect(createDraft).toHaveBeenCalledWith({
       title: "Titre test",

@@ -11,6 +11,9 @@ import type {
 const DEFAULT_MODEL = "gpt-5.6-terra";
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+export const OPENAI_EDITORIAL_PROMPT_VERSION =
+  "editorial-rewrite-v2";
+
 interface TranslationResponse {
   title: string;
   description: string;
@@ -100,6 +103,12 @@ function parseTranslationResponse(output: string): TranslationResponse {
 }
 
 export class OpenAiEditorialGenerator implements EditorialGenerator {
+  readonly auditMetadata: {
+    provider: string;
+    model: string;
+    promptVersion: string;
+  };
+
   private readonly model: string;
   private readonly client: StructuredResponseClient;
   constructor(options: OpenAiEditorialGeneratorOptions) {
@@ -108,6 +117,11 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
     }
 
     this.model = options.model?.trim() || DEFAULT_MODEL;
+    this.auditMetadata = {
+      provider: "openai",
+      model: this.model,
+      promptVersion: OPENAI_EDITORIAL_PROMPT_VERSION,
+    };
     this.client =
       options.client ??
       new OpenAiResponsesClient(
@@ -123,15 +137,27 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       output = await this.client.create({
         model: this.model,
         instructions: [
-          "Réécris cet article en français dans un style journalistique clair et factuel adapté à Andorre.",
-          "Crée un titre informatif et original, un chapô synthétique et un article réécrit.",
+          "Rédige en français un article journalistique original, clair et factuel adapté à ANDORRE 360.",
+          "Ne produis pas une traduction littérale et ne reproduis pas la structure des phrases de la source.",
+          "Crée un titre informatif, un chapô synthétique et un article entièrement rédigé.",
           "Conserve strictement les faits, noms propres, chiffres, dates, citations et liens présents dans la source.",
-          "N’invente aucune information et ne mentionne pas le processus de réécriture.",
+          "Utilise la date de publication de la source et la date de génération fournies comme contexte temporel.",
+          "Remplace les expressions relatives comme aujourd’hui, hier, demain ou ce matin par une date absolue lorsqu’elle peut être déterminée.",
+          "Si une référence temporelle ne peut pas être déterminée avec certitude, reformule-la sans inventer de date.",
+          "Corrige les défauts évidents d’extraction, d’espacement, de ponctuation et de typographie sans modifier le sens.",
+          "Applique les conventions typographiques françaises aux nombres, pourcentages et montants.",
+          "Développe un acronyme lors de sa première occurrence uniquement si sa signification figure dans la source.",
+          "N’invente aucune information, n’ajoute aucune connaissance extérieure et ne mentionne pas le processus de réécriture.",
           "Retourne uniquement les trois champs demandés.",
         ].join(" "),
         input: JSON.stringify({
           title: input.originalTitle,
           content: input.originalContent,
+          sourceName: input.sourceName,
+          sourceCategory: input.sourceCategory,
+          sourcePublishedAt:
+            input.sourcePublishedAt?.toISOString() ?? null,
+          generatedAt: input.generatedAt.toISOString(),
         }),
         schema: translationSchema,
       });
