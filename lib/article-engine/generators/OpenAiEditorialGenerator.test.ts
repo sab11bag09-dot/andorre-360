@@ -178,8 +178,8 @@ describe("OpenAiEditorialGenerator", () => {
           "date absolue",
         ),
         input: JSON.stringify({
-          title: " Titre français ",
-          content: " Contenu français ",
+          title: "Titre français",
+          content: "Contenu français",
           sourceName: "Source",
           sourceCategory: "Actualité",
           sourcePublishedAt:
@@ -193,8 +193,121 @@ describe("OpenAiEditorialGenerator", () => {
     expect(generator.auditMetadata).toEqual({
       provider: "openai",
       model: "test-model",
-      promptVersion: "editorial-rewrite-v2",
+      promptVersion: "editorial-rewrite-v3",
     });
+  });
+
+  it("nettoie les collisions de mots avant et après la génération", async () => {
+    const client = makeClient(
+      JSON.stringify({
+        title: "Titre propre",
+        description:
+          "Le Comú d’Encampreversera 2 euros par inscription.",
+        content:
+          "Le parcoursdans la montagne protège lesanimaux avec lemême guide.",
+      }),
+    );
+    const generator = new OpenAiEditorialGenerator({
+      apiKey: "test-key",
+      client,
+    });
+
+    await expect(
+      generator.prepareArticle({
+        originalTitle: "Titre source",
+        originalContent:
+          "Le parcoursdans la montagne protège lesanimaux avec lemême guide.",
+        sourcePublishedAt: new Date(
+          "2026-09-04T00:00:00.000Z",
+        ),
+        generatedAt: new Date(
+          "2026-09-20T12:00:00.000Z",
+        ),
+        sourceName: "Encamp",
+        sourceCategory: "Actualité",
+      }),
+    ).resolves.toMatchObject({
+      description:
+        "Le Comú d’Encamp reversera 2 euros par inscription.",
+      content:
+        "Le parcours dans la montagne protège les animaux avec le même guide.",
+    });
+
+    expect(client.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input: expect.stringContaining(
+          "Le parcours dans la montagne protège les animaux avec le même guide.",
+        ),
+      }),
+    );
+  });
+
+  it("interdit le Markdown dans un article préparé", async () => {
+    const generator = new OpenAiEditorialGenerator({
+      apiKey: "test-key",
+      client: makeClient(
+        JSON.stringify({
+          title: "Titre",
+          description: "Description",
+          content:
+            "Consultez [le site](https://example.com).",
+        }),
+      ),
+    });
+
+    await expect(
+      generator.prepareArticle({
+        originalTitle: "Titre",
+        originalContent: "Contenu source.",
+        sourcePublishedAt: new Date(
+          "2026-09-04T00:00:00.000Z",
+        ),
+        generatedAt: new Date(
+          "2026-09-20T12:00:00.000Z",
+        ),
+        sourceName: "Source",
+        sourceCategory: "Actualité",
+      }),
+    ).rejects.toThrow("Markdown interdit");
+  });
+
+  it("exige les années, le texte brut et les quantités exactes", async () => {
+    const client = makeClient(
+      JSON.stringify({
+        title: "Titre",
+        description: "Description",
+        content: "Contenu",
+      }),
+    );
+    const generator = new OpenAiEditorialGenerator({
+      apiKey: "test-key",
+      client,
+    });
+
+    await generator.prepareArticle({
+      originalTitle: "Titre",
+      originalContent: "Contenu source.",
+      sourcePublishedAt: new Date(
+        "2026-09-04T00:00:00.000Z",
+      ),
+      generatedAt: new Date(
+        "2026-09-20T12:00:00.000Z",
+      ),
+      sourceName: "Source",
+      sourceCategory: "Actualité",
+    });
+
+    const request = vi.mocked(client.create).mock.calls[0]?.[0];
+
+    expect(request?.instructions).toContain(
+      "jour, le mois et l’année",
+    );
+    expect(request?.instructions).toContain(
+      "aucun balisage Markdown ou HTML",
+    );
+    expect(request?.instructions).toContain(
+      "quantités exactes",
+    );
   });
 
   it("refuse une clé vide", () => {

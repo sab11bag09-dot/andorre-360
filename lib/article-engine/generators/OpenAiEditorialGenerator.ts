@@ -12,7 +12,7 @@ const DEFAULT_MODEL = "gpt-5.6-terra";
 const DEFAULT_TIMEOUT_MS = 30_000;
 
 export const OPENAI_EDITORIAL_PROMPT_VERSION =
-  "editorial-rewrite-v2";
+  "editorial-rewrite-v3";
 
 interface TranslationResponse {
   title: string;
@@ -76,6 +76,58 @@ const translationSchema = {
   additionalProperties: false,
 } as const;
 
+const KNOWN_EXTRACTION_COLLISIONS = [
+  [/\bparcoursdans\b/giu, "parcours dans"],
+  [/\blesanimaux\b/giu, "les animaux"],
+  [/\bdesanimaux\b/giu, "des animaux"],
+  [/\blemême\b/giu, "le même"],
+  [/\bEncampreversera\b/gu, "Encamp reversera"],
+] as const;
+
+function normalizeEditorialText(value: string): string {
+  let normalized = value
+    .replace(/\r\n?/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/([.!?;:])(?=\p{Lu})/gu, "$1 ");
+
+  for (
+    const [collision, replacement] of
+    KNOWN_EXTRACTION_COLLISIONS
+  ) {
+    normalized = normalized.replace(
+      collision,
+      replacement,
+    );
+  }
+
+  return normalized
+    .replace(/ +\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function containsMarkdown(value: string): boolean {
+  return (
+    /\[[^\]]+\]\([^)]+\)/.test(value) ||
+    /(^|\n)\s{0,3}#{1,6}\s/.test(value) ||
+    /(^|\n)\s{0,3}[-*+]\s/.test(value)
+  );
+}
+
+function assertPlainEditorialOutput(
+  response: TranslationResponse,
+): void {
+  if (
+    containsMarkdown(response.title) ||
+    containsMarkdown(response.description) ||
+    containsMarkdown(response.content)
+  ) {
+    throw new Error(
+      "Le fournisseur éditorial a renvoyé du Markdown interdit.",
+    );
+  }
+}
+
 function parseTranslationResponse(output: string): TranslationResponse {
   let value: unknown;
 
@@ -99,7 +151,11 @@ function parseTranslationResponse(output: string): TranslationResponse {
     throw new Error("Le fournisseur de traduction a renvoyé des champs incomplets.");
   }
 
-  return { title, description, content };
+  return {
+    title: normalizeEditorialText(title),
+    description: normalizeEditorialText(description),
+    content: normalizeEditorialText(content),
+  };
 }
 
 export class OpenAiEditorialGenerator implements EditorialGenerator {
@@ -142,17 +198,24 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
           "Crée un titre informatif, un chapô synthétique et un article entièrement rédigé.",
           "Conserve strictement les faits, noms propres, chiffres, dates, citations et liens présents dans la source.",
           "Utilise la date de publication de la source et la date de génération fournies comme contexte temporel.",
-          "Remplace les expressions relatives comme aujourd’hui, hier, demain ou ce matin par une date absolue lorsqu’elle peut être déterminée.",
+          "Remplace les expressions relatives comme aujourd’hui, hier, demain, ce matin, cette année ou enguany par une date absolue lorsqu’elle peut être déterminée.",
+          "Toute date événementielle déterminable doit comporter le jour, le mois et l’année, y compris dans le titre, le chapô et le corps.",
           "Si une référence temporelle ne peut pas être déterminée avec certitude, reformule-la sans inventer de date.",
           "Corrige les défauts évidents d’extraction, d’espacement, de ponctuation et de typographie sans modifier le sens.",
+          "N’utilise aucun balisage Markdown ou HTML : rends uniquement du texte brut, en conservant les URL sous leur forme brute.",
+          "Dans le chapô, conserve les quantités exactes fournies par la source et évite toute formulation vague lorsqu’un chiffre précis est disponible.",
           "Applique les conventions typographiques françaises aux nombres, pourcentages et montants.",
           "Développe un acronyme lors de sa première occurrence uniquement si sa signification figure dans la source.",
           "N’invente aucune information, n’ajoute aucune connaissance extérieure et ne mentionne pas le processus de réécriture.",
           "Retourne uniquement les trois champs demandés.",
         ].join(" "),
         input: JSON.stringify({
-          title: input.originalTitle,
-          content: input.originalContent,
+          title: normalizeEditorialText(
+            input.originalTitle,
+          ),
+          content: normalizeEditorialText(
+            input.originalContent,
+          ),
           sourceName: input.sourceName,
           sourceCategory: input.sourceCategory,
           sourcePublishedAt:
@@ -167,6 +230,8 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
     }
 
     const rewritten = parseTranslationResponse(output);
+
+    assertPlainEditorialOutput(rewritten);
 
     return {
       title: rewritten.title,
