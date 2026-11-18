@@ -599,6 +599,42 @@ Il devra au minimum :
 - gérer les erreurs source par source sans arrêter tout le lot ;
 - prévoir des reprises et des délais entre les tentatives.
 
+#### Avancement du lot C (18 novembre 2026)
+
+Les lots A (#125) et B (#126, #127) sont fusionnés.
+
+Premier sous-lot livré : la sélection déterministe, en lecture seule, dans `lib/article-orchestrator/` :
+
+- `selectObservationsForArticles` : fonction pure qui retient ou écarte chaque observation avec des motifs explicites (déjà traitée, source non autorisée, inactive, hors mode `AUTO`, confiance inférieure à `HIGH`, URL non HTTPS ou hors de l’origine de la source, date absente, invalide ou future, hors fenêtre de fraîcheur de 48 h, titre ou contenu trop courts, doublon d’une observation traitée ou retenue, limite de 5 par exécution) ;
+- `planArticleOrchestration` : charge les observations collectées sur les 7 derniers jours (1 000 au maximum), applique la sélection et indique si une exécution réelle resterait bloquée (arrêt d’urgence, publication automatique désactivée, aucune source autorisée).
+
+Ce sous-lot ne crée aucun article, n’appelle pas OpenAI et n’écrit rien en base.
+
+Limite connue : l’anti-doublon compare les titres normalisés et les URL, uniquement avec les observations des 7 derniers jours.
+
+Deuxième sous-lot livré : l’exécution (`executeArticleOrchestration`), écrite et testée sans aucun appel OpenAI (les tests utilisent un faux générateur) :
+
+- nouvelle variable `AI_ARTICLE_ORCHESTRATOR_ENABLED`, désactivée par défaut, exigée en plus de `AI_AUTO_PUBLICATION_ENABLED=true`, de l’arrêt d’urgence inactif et d’une source autorisée ;
+- exécutions tracées dans `ArticleOrchestrationRun` : statut, politique, plan, résultat, y compris les exécutions bloquées ;
+- verrou unique en base : une seule exécution à la fois ;
+- réservation durable de chaque observation dans `ArticleOrchestrationItem` avant la génération : une observation ne déclenche jamais deux générations, même après relance ;
+- une erreur reste limitée à son observation, n’est jamais relancée automatiquement et n’occupe plus la limite du lot ;
+- arrêt d’urgence relu avant chaque observation ; délai d’une seconde entre deux générations ;
+- appel de `createArticleFromObservation` avec `allowAutoPublication: true`, qui réévalue ses propres règles avant toute publication.
+
+Migration `20261118210000_add_article_orchestration_runs` : écrite mais **pas encore appliquée** à `./dev.db`. L’appliquer avec sauvegarde préalable, selon la procédure du guide d’activation supervisée.
+
+Comportements volontairement prudents :
+
+- après un arrêt brutal, le verrou reste posé et les observations réservées restent `CLAIMED` : un humain doit contrôler les brouillons éventuellement créés, puis lever le verrou ;
+- une observation en échec (`FAILED`) n’est plus jamais reprise automatiquement : une génération partielle pourrait sinon créer un second brouillon.
+
+Reste à faire :
+
+- un point de déclenchement : écran du Studio ou route interne protégée ;
+- un premier essai supervisé réel (lot D), qui appellera OpenAI : moins de 1 € estimé pour 5 articles ;
+- la levée contrôlée d’un verrou après incident.
+
 ### Lot D — Multiplier les essais supervisés
 
 Avant l’autonomie complète :
