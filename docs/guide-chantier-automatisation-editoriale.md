@@ -599,6 +599,26 @@ Il devra au minimum :
 - gérer les erreurs source par source sans arrêter tout le lot ;
 - prévoir des reprises et des délais entre les tentatives.
 
+#### Avancement du lot C (18 novembre 2026)
+
+Les lots A (#125) et B (#126, #127) sont fusionnés.
+
+Premier sous-lot livré : la sélection déterministe, en lecture seule, dans `lib/article-orchestrator/` :
+
+- `selectObservationsForArticles` : fonction pure qui retient ou écarte chaque observation avec des motifs explicites (déjà traitée, source non autorisée, inactive, hors mode `AUTO`, confiance inférieure à `HIGH`, URL non HTTPS ou hors de l’origine de la source, date absente, invalide ou future, hors fenêtre de fraîcheur de 48 h, titre ou contenu trop courts, doublon d’une observation traitée ou retenue, limite de 5 par exécution) ;
+- `planArticleOrchestration` : charge les observations collectées sur les 7 derniers jours (1 000 au maximum), applique la sélection et indique si une exécution réelle resterait bloquée (arrêt d’urgence, publication automatique désactivée, aucune source autorisée).
+
+Ce sous-lot ne crée aucun article, n’appelle pas OpenAI et n’écrit rien en base.
+
+Limite connue : l’anti-doublon compare les titres normalisés et les URL, uniquement avec les observations des 7 derniers jours.
+
+Reste à faire, après décision explicite car chaque exécution appelle OpenAI et engage donc un coût :
+
+- l’exécution idempotente qui appelle `createArticleFromObservation` avec `allowAutoPublication: true` ;
+- l’isolement des erreurs source par source, les reprises et les délais ;
+- l’audit de chaque décision d’orchestration ;
+- un éventuel écran d’aperçu du plan dans le Studio.
+
 ### Lot D — Multiplier les essais supervisés
 
 Avant l’autonomie complète :
