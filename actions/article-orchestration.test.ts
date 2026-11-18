@@ -88,7 +88,9 @@ describe("previewArticleOrchestration", () => {
       already_processed: 1,
       published_at_in_future: 1,
     });
-    expect(result.blockedReasons).toEqual(["feature_disabled", "orchestrator_disabled"]);
+    // Mode brouillons par défaut : la publication automatique n’est pas exigée.
+    expect(result.mode).toBe("DRAFTS_ONLY");
+    expect(result.blockedReasons).toEqual(["orchestrator_disabled"]);
     expect(executeArticleOrchestration).not.toHaveBeenCalled();
   });
 
@@ -130,6 +132,7 @@ describe("launchArticleOrchestration", () => {
   it("passes the administrator and the reviewed selection to the server-side execution", async () => {
     executeArticleOrchestration.mockResolvedValue({
       status: "COMPLETED",
+      mode: "DRAFTS_ONLY",
       runId: "run-1",
       blockedReasons: [],
       items: [
@@ -146,6 +149,7 @@ describe("launchArticleOrchestration", () => {
     });
     expect(result).toEqual({
       success: true,
+      mode: "DRAFTS_ONLY",
       runId: "run-1",
       items: [
         { observationId: 1, title: "Titre 1", status: "CREATED", articleId: 42, errorMessage: null },
@@ -185,5 +189,26 @@ describe("launchArticleOrchestration", () => {
 
     expect(result).toMatchObject({ success: false, code: "LAUNCH_FAILED" });
     expect(JSON.stringify(result)).not.toContain("secret");
+  });
+});
+
+describe("previewArticleOrchestration — mode publication", () => {
+  it("requires auto-publication only when the publish mode is requested", async () => {
+    vi.stubEnv("AI_ARTICLE_ORCHESTRATOR_ENABLED", "true");
+    vi.stubEnv("AI_ARTICLE_ORCHESTRATOR_PUBLISH", "true");
+    planArticleOrchestration.mockResolvedValue({
+      generatedAt: new Date("2026-11-18T12:00:00.000Z"),
+      loadedObservationCount: 0,
+      policy: { maxSelected: 5 },
+      selectedObservationIds: [],
+      executionBlockedReasons: ["feature_disabled"],
+      decisions: [],
+    });
+
+    const result = await previewArticleOrchestration();
+
+    if (!result.success) throw new Error(result.message);
+    expect(result.mode).toBe("PUBLISH");
+    expect(result.blockedReasons).toEqual(["feature_disabled"]);
   });
 });

@@ -646,9 +646,11 @@ Constats de cette collecte, non corrigés à ce stade :
 
 Vérification du 18 novembre 2026 sur une copie migrée de `./dev.db` : aperçu calculé sans erreur, 0 observation retenue, car la dernière collecte date du 8 septembre 2026. Un essai réel demandera donc d’abord une collecte récente.
 
+Mode brouillons (18 novembre 2026) : la configuration locale autorisait déjà une cinquantaine de sources et la publication multilingue. Activer l’orchestrateur aurait donc publié directement les articles et leurs traductions, sans relecture. L’orchestrateur ne crée désormais que des **brouillons** par défaut, avec `allowAutoPublication: false`, sans publication ni traduction ; dans ce mode, `AI_AUTO_PUBLICATION_ENABLED` n’est pas exigé. La publication exige `AI_ARTICLE_ORCHESTRATOR_PUBLISH=true` en plus de `AI_AUTO_PUBLICATION_ENABLED=true`. Le mode est affiché dans le Studio et enregistré dans chaque run. L’arrêt d’urgence et la liste des sources autorisées s’appliquent dans les deux modes.
+
 Reste à faire :
 
-- appliquer les deux migrations à `./dev.db` après sauvegarde ;
+- appliquer les deux migrations à `./dev.db` après sauvegarde : fait le 18 novembre 2026 ;
 - lancer une collecte, puis un premier essai supervisé réel (lot D), qui appellera OpenAI : moins de 1 € estimé pour 5 articles ;
 - la levée contrôlée d’un verrou après incident.
 

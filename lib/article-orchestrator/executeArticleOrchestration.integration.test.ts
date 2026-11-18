@@ -311,6 +311,83 @@ describe("executeArticleOrchestration", () => {
     expect(createArticle).toHaveBeenCalledTimes(2);
   });
 
+  describe("modes brouillons et publication", () => {
+    it("generates drafts only by default, without requiring auto-publication", async () => {
+      delete env.AI_AUTO_PUBLICATION_ENABLED;
+      const createArticle = vi.fn<
+        (observationId: number, options: { allowAutoPublication: boolean }) => Promise<{ articleId: number }>
+      >(async () => ({ articleId: 1 }));
+
+      const result = await executeArticleOrchestration(client, {
+        now: NOW,
+        env,
+        policy: MULTI_SOURCE_POLICY,
+        createArticle,
+        sleep: async () => {},
+      });
+
+      expect(result.status).toBe("COMPLETED");
+      expect(result.mode).toBe("DRAFTS_ONLY");
+      expect(createArticle).toHaveBeenCalledTimes(2);
+      for (const [, options] of createArticle.mock.calls) {
+        expect(options).toEqual({ allowAutoPublication: false });
+      }
+    });
+
+    it("keeps honouring the emergency stop in drafts mode", async () => {
+      delete env.AI_AUTO_PUBLICATION_ENABLED;
+      env.AI_AUTO_PUBLICATION_EMERGENCY_STOP = "true";
+      const createArticle = fakeCreateArticle();
+
+      const result = await run(createArticle);
+
+      expect(result.status).toBe("BLOCKED");
+      expect(result.blockedReasons).toEqual(["emergency_stop"]);
+      expect(createArticle).not.toHaveBeenCalled();
+    });
+
+    it("requires auto-publication to be enabled before publishing", async () => {
+      env.AI_ARTICLE_ORCHESTRATOR_PUBLISH = "true";
+      delete env.AI_AUTO_PUBLICATION_ENABLED;
+      const createArticle = fakeCreateArticle();
+
+      const result = await run(createArticle);
+
+      expect(result.status).toBe("BLOCKED");
+      expect(result.mode).toBe("PUBLISH");
+      expect(result.blockedReasons).toEqual(["feature_disabled"]);
+      expect(createArticle).not.toHaveBeenCalled();
+    });
+
+    it("asks for auto-publication only in publish mode", async () => {
+      env.AI_ARTICLE_ORCHESTRATOR_PUBLISH = "true";
+      const createArticle = vi.fn<
+        (observationId: number, options: { allowAutoPublication: boolean }) => Promise<{ articleId: number }>
+      >(async () => ({ articleId: 1 }));
+
+      const result = await executeArticleOrchestration(client, {
+        now: NOW,
+        env,
+        policy: MULTI_SOURCE_POLICY,
+        createArticle,
+        sleep: async () => {},
+      });
+
+      expect(result.mode).toBe("PUBLISH");
+      expect(createArticle.mock.calls[0][1]).toEqual({ allowAutoPublication: true });
+    });
+
+    it("records the mode in the run", async () => {
+      const result = await run(fakeCreateArticle());
+
+      if (result.status !== "COMPLETED") throw new Error(result.status);
+      const stored = await client.articleOrchestrationRun.findUniqueOrThrow({
+        where: { id: result.runId },
+      });
+      expect(JSON.parse(stored.result ?? "{}").mode).toBe("DRAFTS_ONLY");
+    });
+  });
+
   it("waits between two generations", async () => {
     const sleep = vi.fn(async () => {});
 
@@ -325,5 +402,24 @@ describe("executeArticleOrchestration", () => {
 
     expect(sleep).toHaveBeenCalledTimes(1);
     expect(sleep).toHaveBeenCalledWith(2_000);
+  });
+});
+
+describe("createArticleAutonomously", () => {
+  it("forwards the drafts-only choice to the article engine", async () => {
+    const createArticleFromObservation = vi.fn(async () => ({ articleId: 3 }));
+    vi.doMock("../article-engine/createArticleFromObservation", () => ({
+      createArticleFromObservation,
+    }));
+    const { createArticleAutonomously } = await import("./executeArticleOrchestration");
+
+    await createArticleAutonomously(12, { allowAutoPublication: false });
+    await createArticleAutonomously(13, { allowAutoPublication: true });
+
+    expect(createArticleFromObservation.mock.calls).toEqual([
+      [12, undefined, { allowAutoPublication: false }],
+      [13, undefined, { allowAutoPublication: true }],
+    ]);
+    vi.doUnmock("../article-engine/createArticleFromObservation");
   });
 });
