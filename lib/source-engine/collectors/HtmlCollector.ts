@@ -112,10 +112,142 @@ function parseDayFirstNumericDate(
   return date;
 }
 
+const LONG_MONTHS: Record<string, number> = {
+  // Catalan
+  gener: 0, febrer: 1, març: 2, abril: 3, maig: 4, juny: 5,
+  juliol: 6, agost: 7, setembre: 8, octubre: 9, novembre: 10, desembre: 11,
+  // Français
+  janvier: 0, février: 1, mars: 2, avril: 3, mai: 4, juin: 5,
+  juillet: 6, août: 7, septembre: 8, octobre: 9, décembre: 11,
+  // Español
+  enero: 0, febrero: 1, marzo: 2, mayo: 4, junio: 5, julio: 6,
+  agosto: 7, septiembre: 8, noviembre: 10, diciembre: 11,
+};
+
+/** « 16 de novembre 2026 », « 17 novembre 2026 », « 3 d’agost de 2026 »… */
+function parseLongWrittenDate(value: string): Date | null {
+  const match = normalizeText(value)
+    .toLowerCase()
+    .match(
+      /(?:^|[^\d])(\d{1,2})\s+(?:de\s+|d['’]\s*)?([a-zà-ÿç]+)\s+(?:de\s+)?(\d{4})(?:\D|$)/,
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  const [, dayValue, monthValue, yearValue] = match;
+  const month = LONG_MONTHS[monthValue];
+
+  if (month === undefined) {
+    return null;
+  }
+
+  return validUtcDate(Number(yearValue), month, Number(dayValue));
+}
+
+function validUtcDate(year: number, month: number, day: number): Date | null {
+  const date = new Date(Date.UTC(year, month, day));
+
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month &&
+    date.getUTCDate() === day
+    ? date
+    : null;
+}
+
+/** Date année/mois/jour présente dans le chemin de l’adresse, en dernier recours. */
+function parseDateFromUrl(value: string): Date | null {
+  try {
+    const match = new URL(value).pathname.match(
+      /\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/,
+    );
+
+    if (!match) {
+      return null;
+    }
+
+    const [, year, month, day] = match;
+
+    return normalizeObservationPublishedAt(
+      validUtcDate(Number(year), Number(month) - 1, Number(day)),
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Dates de publication déclarées par la page selon les conventions
+ * standard (Open Graph, schema.org). Les dates de modification ne sont
+ * jamais retenues.
+ */
+function declaredPublicationDates($: cheerio.CheerioAPI): string[] {
+  const values: string[] = [];
+  const push = (value: string | undefined) => {
+    const trimmed = value?.trim();
+    if (trimmed) values.push(trimmed);
+  };
+
+  push($('meta[property="article:published_time"]').first().attr("content"));
+  push($('meta[name="article:published_time"]').first().attr("content"));
+  push($('meta[itemprop="datePublished"]').first().attr("content"));
+  push($("[itemprop=datePublished][datetime]").first().attr("datetime"));
+
+  $('script[type="application/ld+json"]').each((_, script) => {
+    const text = $(script).text();
+
+    try {
+      collectJsonLdDatePublished(JSON.parse(text), values, 0);
+    } catch {
+      // JSON-LD mal formé : seule la clé datePublished est recherchée.
+      const match = text.match(/"datePublished"\s*:\s*"([^"]{4,64})"/);
+      if (match) values.push(match[1]);
+    }
+  });
+
+  return values;
+}
+
+function collectJsonLdDatePublished(
+  node: unknown,
+  values: string[],
+  depth: number,
+): void {
+  if (depth > 5 || node === null || typeof node !== "object") {
+    return;
+  }
+
+  if (Array.isArray(node)) {
+    for (const item of node) collectJsonLdDatePublished(item, values, depth + 1);
+    return;
+  }
+
+  const record = node as Record<string, unknown>;
+
+  if (typeof record.datePublished === "string" && record.datePublished.trim()) {
+    values.push(record.datePublished.trim());
+  }
+
+  if (record["@graph"]) {
+    collectJsonLdDatePublished(record["@graph"], values, depth + 1);
+  }
+}
+
+function firstValidDate(candidates: string[]): Date | null {
+  for (const candidate of candidates) {
+    const date = parseGenericDate(candidate);
+    if (date) return date;
+  }
+
+  return null;
+}
+
 function parseGenericDate(value: string): Date | null {
   const parsedDate =
     parseCatalanDate(value) ??
     parseDayFirstNumericDate(value) ??
+    parseLongWrittenDate(value) ??
     (() => {
       const genericDate = new Date(value);
 
@@ -262,19 +394,21 @@ export class HtmlCollector implements Collector {
         }
       }
 
-      const dateText =
-        $("time").first().attr("datetime") ??
+      // Priorité aux dates déclarées par l’article : une balise time de
+      // la page peut afficher la date du jour (en-tête, agenda…).
+      const publishedAt = firstValidDate([
+        ...declaredPublicationDates($),
+        $("time").first().attr("datetime") ?? "",
         $(
           "time, .date, .field--name-created, .published-date",
         )
           .first()
-          .text();
+          .text(),
+      ]);
 
       return {
         content,
-        publishedAt: dateText
-          ? parseGenericDate(dateText)
-          : null,
+        publishedAt,
       };
     } catch (error) {
       console.error(
@@ -388,7 +522,8 @@ export class HtmlCollector implements Collector {
           url: link.url,
           publishedAt:
             article.publishedAt ??
-            link.publishedAt,
+            link.publishedAt ??
+            parseDateFromUrl(link.url),
           content: article.content,
         };
       },

@@ -640,7 +640,7 @@ Limite par source (18 novembre 2026) : une collecte supervisée des 41 sources a
 
 Constats de cette collecte, non corrigés à ce stade :
 
-- 278 observations sur 443 n’ont pas de date et sont donc écartées : la lecture des dates doit être améliorée pour plusieurs sources ;
+- 278 observations sur 443 n’avaient pas de date et étaient donc écartées. Correctif du même jour : le collecteur HTML lit d’abord les dates de publication standard déclarées par l’article (`article:published_time`, `itemprop=datePublished`, JSON-LD `datePublished`, y compris dans un `@graph` ou un JSON-LD mal formé), puis les balises `time`, puis une date année/mois/jour présente dans l’adresse. Il comprend aussi les dates écrites en toutes lettres en catalan, français et espagnol. Les dates de modification ne sont jamais utilisées. Collecte à blanc après correctif : 331 observations datées sur 493 (67 %, contre 37 % avant). Restent sans date, faute de signal standard : RTVA, Consell General, Ordino, Sant Julià, Escaldes-Engordany, CCIS, AFA, ARI, CASS, Mobilitat, Agenda, FAE et PS. Il leur faudra des règles propres à chaque site. Les observations déjà enregistrées sans date ne sont pas mises à jour : une nouvelle collecte ignore les adresses déjà connues ;
 - Andorra Business et le Comú d’Encamp refusent la collecte (HTTP 403) ;
 - certaines observations retenues sont des pages faibles (par exemple un simple nom de personne en titre) : à examiner pendant les essais supervisés.
 
