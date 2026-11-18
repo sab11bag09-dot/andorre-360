@@ -1,6 +1,6 @@
 # ANDORRE 360 — Guide du chantier d’automatisation éditoriale
 
-**Dernière mise à jour : 9 septembre 2026**  
+**Dernière mise à jour : 18 novembre 2026**\
 **État du projet : chantier de développement local — aucune mise en production**
 
 ## 1. À quoi sert ce document ?
@@ -668,6 +668,44 @@ Avant l’autonomie complète :
 - contrôler la base après chaque opération ;
 - documenter les anomalies récurrentes.
 
+#### Premier essai supervisé de l’orchestrateur (18 novembre 2026)
+
+Préparation :
+
+- base `./dev.db` migrée, puis sauvegardée juste avant l’essai (`dev.before-first-trial-20261118-225554.db`, ignorée par Git) ;
+- collecte des 41 sources actives et redatage des observations récentes ;
+- réglages temporaires : `AI_ARTICLE_ORCHESTRATOR_ENABLED=true`, `AI_AUTO_PUBLICATION_EMERGENCY_STOP=false` ; `AI_AUTO_PUBLICATION_ENABLED=false` et `AI_ARTICLE_ORCHESTRATOR_PUBLISH` absent, donc **mode brouillons**.
+
+Déroulement : aperçu relu puis lancement depuis `/admin/diffusion/orchestrateur` par un administrateur. Le run `a486c867-ff90-46e5-b36b-5253d8e1861f`, en mode `DRAFTS_ONLY`, a duré environ une minute.
+
+Résultat :
+
+| Article | Source | Titre rédigé |
+|---|---|---|
+| 494 | La Veu Lliure | Saint-Marin prépare un plan de réponse face au risque de cyberattaque |
+| 495 | Diari d’Andorra | Jaume Bartumeu reçoit la Creu dels Set Braços, la plus haute distinction d’Andorre |
+| 496 | Bondia | Le diocèse d’Urgell ouvre une procédure canonique contre le prêtre accusé de viol |
+| 497 | Concordia | Concòrdia propose de porter à trente ans le loyer abordable des logements aidés |
+| 498 | FC Andorra | Diego Alende appelle l’Andorra à « franchir un cap » face à Leganés le 20 novembre 2026 |
+
+Contrôles après l’essai :
+
+- 5 articles créés sur 5, aucun échec ; run `COMPLETED`, verrou libéré ;
+- les 5 articles sont au statut `AI_DRAFT`, avec `published = false` ;
+- aucune traduction et aucune publication sur l’accueil ;
+- les 5 observations sont marquées traitées et liées à leur article ;
+- 5 événements `ARTICLE_CREATED`, avec une publication automatique refusée (`feature_disabled`) ;
+- intégrité SQLite `ok`, aucune erreur de clé étrangère.
+
+Constats :
+
+- les 5 brouillons utilisent tous l’image générique `/images/global/hero.jpg` : le choix d’une image pertinente, prévu au lot B, reste à faire ;
+- la fidélité aux sources et la qualité rédactionnelle restent à juger à la relecture humaine, en particulier pour l’article 496, au sujet sensible ;
+- les sources retenues sont surtout des médias : la question juridique de la réécriture d’articles de presse (section 14) reste ouverte ;
+- le coût exact se lit dans le tableau de bord OpenAI : 5 appels de rédaction, sans traduction.
+
+Après l’essai, remettre `AI_ARTICLE_ORCHESTRATOR_ENABLED=false` et `AI_AUTO_PUBLICATION_EMERGENCY_STOP=true`.
+
 ### Lot E — Automatiser l’ensemble de la chaîne
 
 Quand les lots précédents seront suffisamment fiables :
@@ -884,19 +922,18 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 
 ## 18. État exact au moment d’archiver ce guide
 
+État au 18 novembre 2026 :
+
 - branche de référence : `audit/studio-v4` ;
-- dernier correctif fusionné : pull request #123 ;
-- commit : `0590c6d63c6f3007707a5d919f7dccd5003c522b` ;
-- publication automatique des articles : désactivée localement ;
-- arrêt d’urgence de cette publication : activé ;
-- application et retour arrière de la composition de l’accueil : disponibles en mode supervisé ;
-- collecte par lot : testée avec succès sur dix sources ;
-- article test 492 : conservé en brouillon non publié ;
-- dates futures Altaveu : anomalie connue et non corrigée ;
-- qualité de génération : amélioration nécessaire ;
-- simulation de l’accueil du 8 septembre : non appliquée ;
+- dernières pull requests fusionnées : #125 à #133 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons) ;
+- orchestrateur des articles : livré, mode brouillons par défaut, désactivé hors des essais ;
+- publication automatique des articles : désactivée localement, arrêt d’urgence activé ;
+- premier essai supervisé : 5 brouillons créés, aucune publication (voir lot D) ;
+- dates : 67 % des observations datées à la collecte ; 13 sources sans signal standard ;
+- 4 observations Altaveu du 13 août restent datées au 7 décembre 2026 : données antérieures au correctif #125, sans effet sur l’orchestrateur ;
+- images des brouillons : image générique, amélioration nécessaire ;
 - production : non déployée ;
-- prochaine priorité : correction et blocage des dates futures.
+- prochaines priorités : relecture des brouillons de l’essai, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés.
 
 ---
 
