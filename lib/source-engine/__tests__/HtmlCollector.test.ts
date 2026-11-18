@@ -605,3 +605,110 @@ describe("HtmlCollector", () => {
     ]);
   });
 });
+
+describe("HtmlCollector — dates de publication standard", () => {
+  const BODY = `
+    <div class="article-content">
+      <p>Contenu éditorial suffisamment long pour vérifier la lecture de la date de publication.</p>
+    </div>
+  `;
+
+  async function collectDate(articleHtml: string, articleUrl = "https://example.com/article") {
+    const source = createSource();
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `<h2><a href="${articleUrl}">Article de test</a></h2>`,
+      [articleUrl]: articleHtml,
+    });
+    const observations = await new HtmlCollector(htmlClient).collect(source);
+    return observations[0]?.publishedAt?.toISOString() ?? null;
+  }
+
+  it("lit la balise article:published_time", async () => {
+    await expect(
+      collectDate(`
+        <head><meta property="article:published_time" content="2026-11-17T21:27:47+01:00"></head>
+        ${BODY}
+      `),
+    ).resolves.toBe("2026-11-17T20:27:47.000Z");
+  });
+
+  it("lit datePublished dans le JSON-LD, y compris dans un @graph", async () => {
+    await expect(
+      collectDate(`
+        <script type="application/ld+json">
+          {"@context":"https://schema.org","@graph":[
+            {"@type":"WebPage","dateModified":"2026-11-18T10:00:00+00:00"},
+            {"@type":"NewsArticle","datePublished":"2026-11-15T21:21:27+02:00"}
+          ]}
+        </script>
+        ${BODY}
+      `),
+    ).resolves.toBe("2026-11-15T19:21:27.000Z");
+  });
+
+  it("préfère la date déclarée de l’article à une balise time de la page", async () => {
+    await expect(
+      collectDate(`
+        <header><time datetime="2026-11-18T08:00:00Z">Aujourd’hui</time></header>
+        <meta property="article:published_time" content="2026-11-10T09:00:00Z">
+        ${BODY}
+      `),
+    ).resolves.toBe("2026-11-10T09:00:00.000Z");
+  });
+
+  it("n’utilise jamais une date de modification comme date de publication", async () => {
+    await expect(
+      collectDate(`
+        <meta property="article:modified_time" content="2026-11-17T10:00:00Z">
+        <meta property="og:updated_time" content="2026-11-17T10:00:00Z">
+        <script type="application/ld+json">{"@type":"Article","dateModified":"2026-11-17T10:00:00Z"}</script>
+        ${BODY}
+      `),
+    ).resolves.toBeNull();
+  });
+
+  it("comprend une date catalane écrite en toutes lettres", async () => {
+    await expect(
+      collectDate(`
+        <script type="application/ld+json">{"@type":"NewsArticle","datePublished":"16 de novembre 2026"}</script>
+        ${BODY}
+      `),
+    ).resolves.toBe("2026-11-16T00:00:00.000Z");
+  });
+
+  it("lit une date année/mois/jour présente dans l’adresse de l’article", async () => {
+    await expect(
+      collectDate(BODY, "https://example.com/noticies/2026/11/09/8394/la-policia"),
+    ).resolves.toBe("2026-11-09T00:00:00.000Z");
+  });
+
+  it("ignore une date de métadonnées future et se rabat sur le signal suivant", async () => {
+    await expect(
+      collectDate(`
+        <meta property="article:published_time" content="2999-01-01T00:00:00Z">
+        <time datetime="2026-11-12T08:00:00Z">12 novembre</time>
+        ${BODY}
+      `),
+    ).resolves.toBe("2026-11-12T08:00:00.000Z");
+  });
+
+  it("retrouve datePublished dans un JSON-LD mal formé", async () => {
+    await expect(
+      collectDate(`
+        <script type="application/ld+json">
+          {"@type":"NewsArticle","datePublished":"2026-11-16T07:00:00.0000000+00:00","dateModified":"2026-11-17T08:00:00Z"} }
+        </script>
+        ${BODY}
+      `),
+    ).resolves.toBe("2026-11-16T07:00:00.000Z");
+  });
+
+  it("ne transforme pas un JSON-LD invalide en erreur de collecte", async () => {
+    await expect(
+      collectDate(`
+        <script type="application/ld+json">{ ceci n'est pas du JSON</script>
+        ${BODY}
+      `),
+    ).resolves.toBeNull();
+  });
+});
