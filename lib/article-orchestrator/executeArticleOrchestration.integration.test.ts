@@ -11,6 +11,10 @@ import { PrismaClient } from "@/lib/generated/prisma/client";
 import { executeArticleOrchestration } from "./executeArticleOrchestration";
 import { DEFAULT_ARTICLE_ORCHESTRATION_POLICY } from "./selectObservationsForArticles";
 
+// Ces scénarios placent volontairement plusieurs observations d’une même
+// source dans le lot : la limite par source est testée séparément.
+const MULTI_SOURCE_POLICY = { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxPerSource: 5 };
+
 const databasePath = join(
   tmpdir(),
   `andorre-360-article-orchestrator-run-${process.pid}-${crypto.randomUUID()}.db`,
@@ -104,6 +108,7 @@ function fakeCreateArticle() {
 function run(createArticle: (observationId: number) => Promise<{ articleId: number }>) {
   return executeArticleOrchestration(client, {
     now: NOW,
+    policy: MULTI_SOURCE_POLICY,
     env,
     createArticle,
     sleep: async () => {},
@@ -206,7 +211,7 @@ describe("executeArticleOrchestration", () => {
       if (observationId === observationIds[0]) throw new Error("échec");
       return { articleId: 901 };
     });
-    const policy = { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxSelected: 1 };
+    const policy = { ...MULTI_SOURCE_POLICY, maxSelected: 1 };
     const runWithPolicy = () =>
       executeArticleOrchestration(client, {
         now: NOW,
@@ -257,6 +262,7 @@ describe("executeArticleOrchestration", () => {
   it("records the administrator who launched the run", async () => {
     const result = await executeArticleOrchestration(client, {
       now: NOW,
+      policy: MULTI_SOURCE_POLICY,
       env,
       createArticle: fakeCreateArticle(),
       sleep: async () => {},
@@ -276,6 +282,7 @@ describe("executeArticleOrchestration", () => {
 
     const result = await executeArticleOrchestration(client, {
       now: NOW,
+      policy: MULTI_SOURCE_POLICY,
       env,
       createArticle,
       sleep: async () => {},
@@ -293,6 +300,7 @@ describe("executeArticleOrchestration", () => {
 
     const result = await executeArticleOrchestration(client, {
       now: NOW,
+      policy: MULTI_SOURCE_POLICY,
       env,
       createArticle,
       sleep: async () => {},
@@ -308,6 +316,7 @@ describe("executeArticleOrchestration", () => {
 
     await executeArticleOrchestration(client, {
       now: NOW,
+      policy: MULTI_SOURCE_POLICY,
       env,
       createArticle: fakeCreateArticle(),
       sleep,

@@ -21,6 +21,7 @@ export default function ArticleOrchestrationPage() {
       <section className="py-8">
         <ArticleOrchestrationPanel
           maxSelected={DEFAULT_ARTICLE_ORCHESTRATION_POLICY.maxSelected}
+          maxPerSource={DEFAULT_ARTICLE_ORCHESTRATION_POLICY.maxPerSource}
           freshnessWindowHours={
             DEFAULT_ARTICLE_ORCHESTRATION_POLICY.freshnessWindowHours
           }
