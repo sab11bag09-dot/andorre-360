@@ -43,6 +43,13 @@ const BLOCK_LABELS: Record<ArticleOrchestrationExecutionBlockReason, string> = {
   no_allowlisted_source: "Aucune source autorisée (AI_AUTO_PUBLICATION_SOURCE_IDS)",
 };
 
+const MODE_DESCRIPTIONS: Record<"DRAFTS_ONLY" | "PUBLISH", string> = {
+  DRAFTS_ONLY:
+    "Mode brouillons : chaque article est rédigé en français et reste en brouillon dans le Studio. Rien n’est publié ni traduit.",
+  PUBLISH:
+    "Mode publication : un article peut être traduit et publié automatiquement si ses règles de publication l’autorisent.",
+};
+
 const ITEM_STATUS_LABELS: Record<ArticleOrchestrationLaunchItemView["status"], string> = {
   CREATED: "Article créé",
   FAILED: "Échec",
@@ -98,10 +105,15 @@ export default function ArticleOrchestrationPanel({
     if (!preview?.success || preview.selected.length === 0) return;
 
     const count = preview.selected.length;
+    const plural = count > 1 ? "s" : "";
     const confirmed = window.confirm(
-      `Générer ${count} article${count > 1 ? "s" : ""} avec OpenAI ? ` +
-        "Chaque article consomme des crédits OpenAI (moins de 0,20 $ estimé par article). " +
-        "Le serveur recalculera la sélection et refusera si elle a changé.",
+      preview.mode === "PUBLISH"
+        ? `Générer, traduire et éventuellement publier ${count} article${plural} avec OpenAI ? ` +
+            "Chaque article consomme des crédits OpenAI (moins de 0,20 $ estimé par article). " +
+            "Le serveur recalculera la sélection et refusera si elle a changé."
+        : `Rédiger ${count} brouillon${plural} avec OpenAI ? Rien ne sera publié. ` +
+            "Chaque brouillon consomme des crédits OpenAI (environ 0,05 $ estimé par brouillon). " +
+            "Le serveur recalculera la sélection et refusera si elle a changé.",
     );
     if (!confirmed) return;
 
@@ -242,6 +254,10 @@ export default function ArticleOrchestrationPanel({
           <section className="rounded-xl border border-yellow-200 bg-yellow-50 p-5">
             <h2 className="font-semibold text-gray-950">Lancement manuel</h2>
 
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-gray-900">
+              {MODE_DESCRIPTIONS[preview.mode]}
+            </p>
+
             <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-700">
               Le lancement appelle OpenAI pour chaque observation retenue et
               engage donc un coût. Le serveur recalcule la sélection et refuse
@@ -270,7 +286,9 @@ export default function ArticleOrchestrationPanel({
                 >
                   {isPending
                     ? "Génération en cours…"
-                    : `Générer ${preview.selected.length} article${preview.selected.length > 1 ? "s" : ""}`}
+                    : preview.mode === "PUBLISH"
+                      ? `Générer ${preview.selected.length} article${preview.selected.length > 1 ? "s" : ""}`
+                      : `Rédiger ${preview.selected.length} brouillon${preview.selected.length > 1 ? "s" : ""}`}
                 </Button>
               </div>
             )}
@@ -290,6 +308,11 @@ export default function ArticleOrchestrationPanel({
       {launch?.success && (
         <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-sm text-emerald-950">
           <h2 className="font-semibold">Exécution terminée</h2>
+          {launch.mode === "DRAFTS_ONLY" && (
+            <p className="mt-1 font-semibold">
+              Mode brouillons : aucun article n’a été publié. Relisez-les dans le Studio.
+            </p>
+          )}
           <p className="mt-1 break-all">Identifiant du run : {launch.runId}</p>
 
           <ul className="mt-4 space-y-2">

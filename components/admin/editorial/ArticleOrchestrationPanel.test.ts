@@ -56,3 +56,11 @@ describe("panneau de l’orchestrateur d’articles", () => {
     expect(isWebUrl("")).toBe(false);
   });
 });
+
+describe("panneau de l’orchestrateur — modes", () => {
+  it("announces the drafts-only mode and its cost before launching", () => {
+    expect(panelSource).toContain("Mode brouillons");
+    expect(panelSource).toContain("Rien ne sera publié");
+    expect(panelSource).toContain('preview.mode === "PUBLISH"');
+  });
+});

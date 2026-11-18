@@ -4,9 +4,11 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
 import {
+  articleOrchestrationBlockers,
   executeArticleOrchestration,
-  isArticleOrchestratorEnabled,
+  readArticleOrchestrationMode,
   type ArticleOrchestrationExecutionBlockReason,
+  type ArticleOrchestrationMode,
 } from "@/lib/article-orchestrator/executeArticleOrchestration";
 import { planArticleOrchestration } from "@/lib/article-orchestrator/planArticleOrchestration";
 import {
@@ -37,6 +39,7 @@ export type ArticleOrchestrationObservationView = {
 export type ArticleOrchestrationPreviewResult =
   | {
       success: true;
+      mode: ArticleOrchestrationMode;
       generatedAt: string;
       loadedObservationCount: number;
       maxSelected: number;
@@ -60,6 +63,7 @@ export type ArticleOrchestrationLaunchItemView = {
 export type ArticleOrchestrationLaunchResult =
   | {
       success: true;
+      mode: ArticleOrchestrationMode;
       runId: string;
       items: ArticleOrchestrationLaunchItemView[];
     }
@@ -99,14 +103,6 @@ async function loadObservationLabels(ids: number[]) {
       },
     ]),
   );
-}
-
-function blockedReasonsFor(
-  planReasons: ArticleOrchestrationExecutionBlockReason[],
-): ArticleOrchestrationExecutionBlockReason[] {
-  return isArticleOrchestratorEnabled(process.env)
-    ? planReasons
-    : [...planReasons, "orchestrator_disabled"];
 }
 
 export async function previewArticleOrchestration(): Promise<ArticleOrchestrationPreviewResult> {
@@ -153,6 +149,7 @@ export async function previewArticleOrchestration(): Promise<ArticleOrchestratio
 
     return {
       success: true,
+      mode: readArticleOrchestrationMode(process.env),
       generatedAt: plan.generatedAt.toISOString(),
       loadedObservationCount: plan.loadedObservationCount,
       maxSelected: plan.policy.maxSelected,
@@ -161,7 +158,10 @@ export async function previewArticleOrchestration(): Promise<ArticleOrchestratio
       routineSkippedCount: routine.length,
       skippedByReason,
       detailedSkipped: informative.map(({ observationId }) => toView(observationId)),
-      blockedReasons: blockedReasonsFor(plan.executionBlockedReasons),
+      blockedReasons: articleOrchestrationBlockers(
+        process.env,
+        plan.executionBlockedReasons,
+      ),
     };
   } catch {
     return {
@@ -233,6 +233,7 @@ export async function launchArticleOrchestration(
 
     return {
       success: true,
+      mode: result.mode,
       runId: result.runId,
       items: result.items.map((item) => ({
         observationId: item.observationId,

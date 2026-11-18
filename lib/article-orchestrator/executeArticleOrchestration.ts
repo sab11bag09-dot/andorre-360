@@ -13,10 +13,17 @@ import {
 /**
  * Exécution de l’orchestrateur autonome des articles.
  *
+ * Deux modes :
+ * - brouillons seulement (par défaut) : les articles restent en brouillon,
+ *   sans publication ni traduction ; la publication automatique n’a pas à
+ *   être activée ;
+ * - publication (`AI_ARTICLE_ORCHESTRATOR_PUBLISH=true`) : la création
+ *   d’article peut publier, si `AI_AUTO_PUBLICATION_ENABLED=true` et si
+ *   ses propres règles l’autorisent.
+ *
  * Garanties :
- * - rien n’est généré sans `AI_ARTICLE_ORCHESTRATOR_ENABLED=true`, en plus
- *   des protections de la publication automatique (activation, arrêt
- *   d’urgence, liste des sources autorisées) ;
+ * - rien n’est généré sans `AI_ARTICLE_ORCHESTRATOR_ENABLED=true`, sans
+ *   source autorisée ou pendant l’arrêt d’urgence, quel que soit le mode ;
  * - une seule exécution à la fois (verrou unique en base) ;
  * - chaque observation est réservée durablement avant toute génération :
  *   elle ne peut jamais déclencher deux générations, même après relance ;
@@ -35,6 +42,32 @@ export type ArticleOrchestrationExecutionBlockReason =
   | ArticleOrchestrationBlockReason
   | "orchestrator_disabled";
 
+export type ArticleOrchestrationMode = "DRAFTS_ONLY" | "PUBLISH";
+
+export function readArticleOrchestrationMode(
+  env: Record<string, string | undefined>,
+): ArticleOrchestrationMode {
+  return env.AI_ARTICLE_ORCHESTRATOR_PUBLISH === "true" ? "PUBLISH" : "DRAFTS_ONLY";
+}
+
+/**
+ * Garde-fous fermés pour un mode donné. L’activation de la publication
+ * automatique n’est exigée qu’en mode publication.
+ */
+export function articleOrchestrationBlockers(
+  env: Record<string, string | undefined>,
+  planReasons: ArticleOrchestrationBlockReason[],
+): ArticleOrchestrationExecutionBlockReason[] {
+  const mode = readArticleOrchestrationMode(env);
+  const reasons: ArticleOrchestrationExecutionBlockReason[] = planReasons.filter(
+    (reason) => mode === "PUBLISH" || reason !== "feature_disabled",
+  );
+
+  if (!isArticleOrchestratorEnabled(env)) reasons.push("orchestrator_disabled");
+
+  return reasons;
+}
+
 export type ArticleOrchestrationItemOutcome =
   | { observationId: number; status: "CREATED"; articleId: number }
   | { observationId: number; status: "FAILED"; errorMessage: string }
@@ -44,14 +77,22 @@ export type ArticleOrchestrationItemOutcome =
 export type ArticleOrchestrationExecutionResult =
   | {
       status: "BLOCKED";
+      mode: ArticleOrchestrationMode;
       runId: string;
       blockedReasons: ArticleOrchestrationExecutionBlockReason[];
       items: [];
     }
-  | { status: "ALREADY_RUNNING"; runId: null; blockedReasons: []; items: [] }
+  | {
+      status: "ALREADY_RUNNING";
+      mode: ArticleOrchestrationMode;
+      runId: null;
+      blockedReasons: [];
+      items: [];
+    }
   | {
       /** La sélection diffère de l’aperçu examiné : rien n’est généré. */
       status: "PLAN_CHANGED";
+      mode: ArticleOrchestrationMode;
       runId: null;
       blockedReasons: [];
       items: [];
@@ -59,6 +100,7 @@ export type ArticleOrchestrationExecutionResult =
     }
   | {
       status: "COMPLETED";
+      mode: ArticleOrchestrationMode;
       runId: string;
       blockedReasons: [];
       items: ArticleOrchestrationItemOutcome[];
@@ -73,7 +115,10 @@ export type ExecuteArticleOrchestrationOptions = {
   now?: Date;
   env?: Record<string, string | undefined>;
   policy?: ArticleOrchestrationPolicy;
-  createArticle?: (observationId: number) => Promise<{ articleId: number }>;
+  createArticle?: (
+    observationId: number,
+    options: { allowAutoPublication: boolean },
+  ) => Promise<{ articleId: number }>;
   sleep?: (ms: number) => Promise<void>;
   delayBetweenArticlesMs?: number;
   /** Administrateur à l’origine du lancement, enregistré dans le run. */
@@ -101,6 +146,7 @@ export async function executeArticleOrchestration(
   const createArticle = options.createArticle ?? createArticleAutonomously;
   const sleep = options.sleep ?? defaultSleep;
   const delayMs = Math.max(0, options.delayBetweenArticlesMs ?? 1_000);
+  const mode = readArticleOrchestrationMode(env);
 
   const plan = await planArticleOrchestration(client, {
     now,
@@ -114,6 +160,7 @@ export async function executeArticleOrchestration(
   ) {
     return {
       status: "PLAN_CHANGED",
+      mode,
       runId: null,
       blockedReasons: [],
       items: [],
@@ -121,12 +168,10 @@ export async function executeArticleOrchestration(
     };
   }
 
-  const blockedReasons: ArticleOrchestrationExecutionBlockReason[] = [
-    ...plan.executionBlockedReasons,
-  ];
-  if (!isArticleOrchestratorEnabled(env)) {
-    blockedReasons.push("orchestrator_disabled");
-  }
+  const blockedReasons = articleOrchestrationBlockers(
+    env,
+    plan.executionBlockedReasons,
+  );
 
   const runId = crypto.randomUUID();
   const serializedPlan = JSON.stringify({
@@ -143,13 +188,13 @@ export async function executeArticleOrchestration(
         status: "BLOCKED",
         policy: JSON.stringify(policy),
         plan: serializedPlan,
-        result: JSON.stringify({ blockedReasons }),
+        result: JSON.stringify({ mode, blockedReasons }),
         actorId: options.actor?.id,
         actorEmail: options.actor?.email,
         finishedAt: new Date(),
       },
     });
-    return { status: "BLOCKED", runId, blockedReasons, items: [] };
+    return { status: "BLOCKED", mode, runId, blockedReasons, items: [] };
   }
 
   try {
@@ -166,7 +211,13 @@ export async function executeArticleOrchestration(
     });
   } catch (error) {
     if (isUniqueConstraintError(error)) {
-      return { status: "ALREADY_RUNNING", runId: null, blockedReasons: [], items: [] };
+      return {
+        status: "ALREADY_RUNNING",
+        mode,
+        runId: null,
+        blockedReasons: [],
+        items: [],
+      };
     }
     throw error;
   }
@@ -177,7 +228,7 @@ export async function executeArticleOrchestration(
     let generations = 0;
 
     for (const observationId of plan.selectedObservationIds) {
-      if (!isStillAllowed(env)) {
+      if (!isStillAllowed(env, mode)) {
         items.push({ observationId, status: "STOPPED" });
         continue;
       }
@@ -198,7 +249,9 @@ export async function executeArticleOrchestration(
       generations += 1;
 
       try {
-        const { articleId } = await createArticle(observationId);
+        const { articleId } = await createArticle(observationId, {
+          allowAutoPublication: mode === "PUBLISH",
+        });
         await client.articleOrchestrationItem.update({
           where: { observationId },
           data: { status: "CREATED", articleId },
@@ -220,7 +273,7 @@ export async function executeArticleOrchestration(
         status: "FAILED",
         activeLock: null,
         finishedAt: new Date(),
-        result: JSON.stringify({ items, error: normalizeError(error) }),
+        result: JSON.stringify({ mode, items, error: normalizeError(error) }),
       },
     });
     throw error;
@@ -232,11 +285,11 @@ export async function executeArticleOrchestration(
       status: "COMPLETED",
       activeLock: null,
       finishedAt: new Date(),
-      result: JSON.stringify({ items }),
+      result: JSON.stringify({ mode, items }),
     },
   });
 
-  return { status: "COMPLETED", runId, blockedReasons: [], items };
+  return { status: "COMPLETED", mode, runId, blockedReasons: [], items };
 }
 
 function sameIds(left: number[], right: number[]): boolean {
@@ -246,23 +299,31 @@ function sameIds(left: number[], right: number[]): boolean {
   return sortedLeft.every((id, index) => id === sortedRight[index]);
 }
 
-function isStillAllowed(env: Record<string, string | undefined>): boolean {
+/** Relu avant chaque observation : le mode reste celui du début du run. */
+function isStillAllowed(
+  env: Record<string, string | undefined>,
+  mode: ArticleOrchestrationMode,
+): boolean {
   const runtime = readAutoPublicationRuntimeConfig(env);
   return (
-    isArticleOrchestratorEnabled(env) && runtime.enabled && !runtime.emergencyStop
+    isArticleOrchestratorEnabled(env) &&
+    !runtime.emergencyStop &&
+    (mode === "DRAFTS_ONLY" || runtime.enabled)
   );
 }
 
-async function createArticleAutonomously(
+export async function createArticleAutonomously(
   observationId: number,
+  options: { allowAutoPublication: boolean },
 ): Promise<{ articleId: number }> {
   const { createArticleFromObservation } = await import(
     "../article-engine/createArticleFromObservation"
   );
-  // L’orchestrateur se déclare explicitement : la création réévalue
-  // ensuite ses propres règles avant toute publication.
+  // En mode publication, l’orchestrateur se déclare explicitement et la
+  // création réévalue ses propres règles. En mode brouillons, la
+  // publication automatique est refusée par construction.
   return createArticleFromObservation(observationId, undefined, {
-    allowAutoPublication: true,
+    allowAutoPublication: options.allowAutoPublication,
   });
 }
 
