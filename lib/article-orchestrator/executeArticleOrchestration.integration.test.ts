@@ -254,6 +254,55 @@ describe("executeArticleOrchestration", () => {
     expect(await client.articleOrchestrationItem.count()).toBe(1);
   });
 
+  it("records the administrator who launched the run", async () => {
+    const result = await executeArticleOrchestration(client, {
+      now: NOW,
+      env,
+      createArticle: fakeCreateArticle(),
+      sleep: async () => {},
+      actor: { id: "admin-1", email: "admin@example.com" },
+    });
+
+    if (result.status !== "COMPLETED") throw new Error(result.status);
+    expect(
+      await client.articleOrchestrationRun.findUniqueOrThrow({
+        where: { id: result.runId },
+      }),
+    ).toMatchObject({ actorId: "admin-1", actorEmail: "admin@example.com" });
+  });
+
+  it("refuses to generate when the selection differs from the reviewed preview", async () => {
+    const createArticle = fakeCreateArticle();
+
+    const result = await executeArticleOrchestration(client, {
+      now: NOW,
+      env,
+      createArticle,
+      sleep: async () => {},
+      expectedSelectedObservationIds: [observationIds[0]],
+    });
+
+    expect(result.status).toBe("PLAN_CHANGED");
+    expect(createArticle).not.toHaveBeenCalled();
+    expect(await client.articleOrchestrationRun.count()).toBe(0);
+    expect(await client.articleOrchestrationItem.count()).toBe(0);
+  });
+
+  it("generates when the selection matches the reviewed preview, in any order", async () => {
+    const createArticle = fakeCreateArticle();
+
+    const result = await executeArticleOrchestration(client, {
+      now: NOW,
+      env,
+      createArticle,
+      sleep: async () => {},
+      expectedSelectedObservationIds: [...observationIds].reverse(),
+    });
+
+    expect(result.status).toBe("COMPLETED");
+    expect(createArticle).toHaveBeenCalledTimes(2);
+  });
+
   it("waits between two generations", async () => {
     const sleep = vi.fn(async () => {});
 

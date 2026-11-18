@@ -50,6 +50,14 @@ export type ArticleOrchestrationExecutionResult =
     }
   | { status: "ALREADY_RUNNING"; runId: null; blockedReasons: []; items: [] }
   | {
+      /** La sélection diffère de l’aperçu examiné : rien n’est généré. */
+      status: "PLAN_CHANGED";
+      runId: null;
+      blockedReasons: [];
+      items: [];
+      selectedObservationIds: number[];
+    }
+  | {
       status: "COMPLETED";
       runId: string;
       blockedReasons: [];
@@ -68,6 +76,13 @@ export type ExecuteArticleOrchestrationOptions = {
   createArticle?: (observationId: number) => Promise<{ articleId: number }>;
   sleep?: (ms: number) => Promise<void>;
   delayBetweenArticlesMs?: number;
+  /** Administrateur à l’origine du lancement, enregistré dans le run. */
+  actor?: { id: string; email: string };
+  /**
+   * Sélection affichée dans l’aperçu examiné. Si elle est fournie et
+   * diffère de la sélection recalculée, aucune génération n’a lieu.
+   */
+  expectedSelectedObservationIds?: number[];
 };
 
 export function isArticleOrchestratorEnabled(
@@ -93,6 +108,19 @@ export async function executeArticleOrchestration(
     runtimeConfig: readAutoPublicationRuntimeConfig(env),
   });
 
+  if (
+    options.expectedSelectedObservationIds &&
+    !sameIds(options.expectedSelectedObservationIds, plan.selectedObservationIds)
+  ) {
+    return {
+      status: "PLAN_CHANGED",
+      runId: null,
+      blockedReasons: [],
+      items: [],
+      selectedObservationIds: plan.selectedObservationIds,
+    };
+  }
+
   const blockedReasons: ArticleOrchestrationExecutionBlockReason[] = [
     ...plan.executionBlockedReasons,
   ];
@@ -116,6 +144,8 @@ export async function executeArticleOrchestration(
         policy: JSON.stringify(policy),
         plan: serializedPlan,
         result: JSON.stringify({ blockedReasons }),
+        actorId: options.actor?.id,
+        actorEmail: options.actor?.email,
         finishedAt: new Date(),
       },
     });
@@ -130,6 +160,8 @@ export async function executeArticleOrchestration(
         activeLock: ACTIVE_LOCK,
         policy: JSON.stringify(policy),
         plan: serializedPlan,
+        actorId: options.actor?.id,
+        actorEmail: options.actor?.email,
       },
     });
   } catch (error) {
@@ -205,6 +237,13 @@ export async function executeArticleOrchestration(
   });
 
   return { status: "COMPLETED", runId, blockedReasons: [], items };
+}
+
+function sameIds(left: number[], right: number[]): boolean {
+  if (left.length !== right.length) return false;
+  const sortedLeft = [...left].sort((a, b) => a - b);
+  const sortedRight = [...right].sort((a, b) => a - b);
+  return sortedLeft.every((id, index) => id === sortedRight[index]);
 }
 
 function isStillAllowed(env: Record<string, string | undefined>): boolean {

@@ -107,6 +107,10 @@ export default async function DiffusionPage() {
               Simuler l’accueil
             </Button>
 
+            <Button href="/admin/diffusion/orchestrateur" variant="outline">
+              Orchestrateur d’articles
+            </Button>
+
             <Button href="/admin/articles/nouveau">Nouveau contenu</Button>
           </>
         }
