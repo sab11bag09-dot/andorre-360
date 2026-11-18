@@ -157,7 +157,7 @@ function validUtcDate(year: number, month: number, day: number): Date | null {
 }
 
 /** Date année/mois/jour présente dans le chemin de l’adresse, en dernier recours. */
-function parseDateFromUrl(value: string): Date | null {
+export function parseDateFromUrl(value: string): Date | null {
   try {
     const match = new URL(value).pathname.match(
       /\/(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\/|$)/,
@@ -241,6 +241,26 @@ function firstValidDate(candidates: string[]): Date | null {
   }
 
   return null;
+}
+
+/**
+ * Date de publication lue sur la page d’un article, dans l’ordre :
+ * dates déclarées par l’article, puis balises time et classes de date.
+ */
+export function extractArticlePagePublishedAt(
+  $: cheerio.CheerioAPI,
+): Date | null {
+  // Priorité aux dates déclarées par l’article : une balise time de
+  // la page peut afficher la date du jour (en-tête, agenda…).
+  return firstValidDate([
+    ...declaredPublicationDates($),
+    $("time").first().attr("datetime") ?? "",
+    $(
+      "time, .date, .field--name-created, .published-date",
+    )
+      .first()
+      .text(),
+  ]);
 }
 
 function parseGenericDate(value: string): Date | null {
@@ -394,17 +414,7 @@ export class HtmlCollector implements Collector {
         }
       }
 
-      // Priorité aux dates déclarées par l’article : une balise time de
-      // la page peut afficher la date du jour (en-tête, agenda…).
-      const publishedAt = firstValidDate([
-        ...declaredPublicationDates($),
-        $("time").first().attr("datetime") ?? "",
-        $(
-          "time, .date, .field--name-created, .published-date",
-        )
-          .first()
-          .text(),
-      ]);
+      const publishedAt = extractArticlePagePublishedAt($);
 
       return {
         content,
