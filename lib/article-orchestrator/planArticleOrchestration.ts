@@ -37,7 +37,7 @@ export type ArticleOrchestrationPlan = ObservationSelectionResult & {
 };
 
 export async function planArticleOrchestration(
-  client: Pick<PrismaClient, "observation">,
+  client: Pick<PrismaClient, "observation" | "articleOrchestrationItem">,
   options: {
     now?: Date;
     policy?: ArticleOrchestrationPolicy;
@@ -79,9 +79,15 @@ export async function planArticleOrchestration(
     },
   });
 
+  const attemptedItems = await client.articleOrchestrationItem.findMany({
+    where: { observationId: { in: observations.map(({ id }) => id) } },
+    select: { observationId: true },
+  });
+
   const selection = selectObservationsForArticles({
     observations,
     allowlistedSourceIds: runtimeConfig.sourceIds,
+    attemptedObservationIds: attemptedItems.map(({ observationId }) => observationId),
     now,
     policy,
   });

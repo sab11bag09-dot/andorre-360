@@ -271,3 +271,19 @@ describe("selectObservationsForArticles", () => {
     ).toThrow();
   });
 });
+
+describe("selectObservationsForArticles — observations déjà tentées", () => {
+  it("never reselects an observation already attempted by the orchestrator", () => {
+    const result = selectObservationsForArticles({
+      observations: [makeObservation()],
+      allowlistedSourceIds: [10],
+      attemptedObservationIds: [1],
+      now: NOW,
+    });
+
+    expect(result.selectedObservationIds).toEqual([]);
+    expect(result.decisions[0].reasons).toEqual([
+      "already_attempted_by_orchestrator",
+    ]);
+  });
+});

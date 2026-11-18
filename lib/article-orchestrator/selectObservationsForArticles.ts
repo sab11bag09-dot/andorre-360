@@ -56,6 +56,7 @@ export const DEFAULT_ARTICLE_ORCHESTRATION_POLICY: ArticleOrchestrationPolicy =
 export type ObservationSelectionReason =
   | "already_processed"
   | "already_linked_to_article"
+  | "already_attempted_by_orchestrator"
   | "source_inactive"
   | "source_not_allowlisted"
   | "source_auto_mode_not_enabled"
@@ -93,6 +94,8 @@ const TRUSTED_LEVELS: ReadonlySet<SourceTrustLevel> = new Set([
 export function selectObservationsForArticles(input: {
   observations: OrchestrationObservation[];
   allowlistedSourceIds: number[];
+  /** Observations déjà réservées par une exécution précédente, réussie ou non. */
+  attemptedObservationIds?: number[];
   now: Date;
   policy?: ArticleOrchestrationPolicy;
 }): ObservationSelectionResult {
@@ -104,6 +107,7 @@ export function selectObservationsForArticles(input: {
   }
 
   const allowlist = new Set(input.allowlistedSourceIds);
+  const attempted = new Set(input.attemptedObservationIds ?? []);
   const ordered = [...input.observations].sort(compareObservations);
 
   // Les observations déjà traitées servent de référence anti-doublon.
@@ -125,6 +129,10 @@ export function selectObservationsForArticles(input: {
       input.now,
       policy,
     );
+    // Une observation déjà tentée ne doit jamais occuper la limite du lot.
+    if (attempted.has(observation.id)) {
+      reasons.unshift("already_attempted_by_orchestrator");
+    }
 
     if (reasons.length === 0) {
       const keys = duplicateKeys(observation);

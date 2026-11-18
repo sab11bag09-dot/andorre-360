@@ -264,6 +264,56 @@ model HomeAutomationRun {
   @@index([actorId, createdAt])
 }
 
+enum ArticleOrchestrationRunStatus {
+  RUNNING
+  COMPLETED
+  BLOCKED
+  FAILED
+}
+
+/// Exécution de l’orchestrateur autonome des articles.
+/// `activeLock` vaut "active" tant que l’exécution tourne : l’index unique
+/// empêche deux exécutions simultanées. Après un arrêt brutal, le verrou
+/// reste posé et doit être levé par un humain après contrôle.
+model ArticleOrchestrationRun {
+  id         String                        @id
+  status     ArticleOrchestrationRunStatus @default(RUNNING)
+  activeLock String?                       @unique
+  policy     String
+  plan       String
+  result     String?
+  startedAt  DateTime                      @default(now())
+  finishedAt DateTime?
+
+  items ArticleOrchestrationItem[]
+
+  @@index([status, startedAt])
+}
+
+enum ArticleOrchestrationItemStatus {
+  CLAIMED
+  CREATED
+  FAILED
+}
+
+/// Réservation définitive d’une observation par l’orchestrateur.
+/// L’index unique sur `observationId` garantit qu’une observation ne
+/// déclenche jamais deux générations automatiques, même après relance.
+model ArticleOrchestrationItem {
+  id            Int                            @id @default(autoincrement())
+  runId         String
+  observationId Int                            @unique
+  status        ArticleOrchestrationItemStatus @default(CLAIMED)
+  articleId     Int?
+  errorMessage  String?
+  createdAt     DateTime                       @default(now())
+  updatedAt     DateTime                       @updatedAt
+
+  run ArticleOrchestrationRun @relation(fields: [runId], references: [id], onDelete: Restrict)
+
+  @@index([runId])
+}
+
 model ArticleAnalytics {
   id               Int      @id @default(autoincrement())
   articleId        Int
