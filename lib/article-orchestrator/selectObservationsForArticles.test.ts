@@ -247,7 +247,7 @@ describe("selectObservationsForArticles", () => {
       }),
     );
 
-    const policy = { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxSelected: 2 };
+    const policy = { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxSelected: 2, maxPerSource: 5 };
     const first = select(observations, [10], policy);
     const second = select([...observations].reverse(), [10], policy);
 
@@ -285,5 +285,60 @@ describe("selectObservationsForArticles — observations déjà tentées", () =>
     expect(result.decisions[0].reasons).toEqual([
       "already_attempted_by_orchestrator",
     ]);
+  });
+});
+
+describe("selectObservationsForArticles — diversité des sources", () => {
+  function fromSource(id: number, sourceId: number, host: string, hours: number) {
+    return makeObservation({
+      id,
+      title: `Information numéro ${id} de la source ${sourceId}`,
+      url: `https://${host}/${id}`,
+      publishedAt: hoursAgo(hours),
+      source: {
+        id: sourceId,
+        url: `https://${host}/`,
+        active: true,
+        publicationMode: "AUTO",
+        trustLevel: "HIGH",
+      },
+    });
+  }
+
+  it("does not let one prolific source fill the whole batch", () => {
+    const observations = [
+      fromSource(1, 6, "www.diariandorra.ad", 1),
+      fromSource(2, 6, "www.diariandorra.ad", 2),
+      fromSource(3, 6, "www.diariandorra.ad", 3),
+      fromSource(4, 3, "www.govern.ad", 4),
+      fromSource(5, 16, "www.policia.ad", 5),
+    ];
+
+    const result = selectObservationsForArticles({
+      observations,
+      allowlistedSourceIds: [3, 6, 16],
+      now: NOW,
+      policy: { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxSelected: 3, maxPerSource: 1 },
+    });
+
+    expect(result.selectedObservationIds).toEqual([1, 4, 5]);
+    expect(result.decisions.find((d) => d.observationId === 2)?.reasons).toEqual([
+      "source_limit_reached",
+    ]);
+  });
+
+  it("limits each source to one article per run by default", () => {
+    expect(DEFAULT_ARTICLE_ORCHESTRATION_POLICY.maxPerSource).toBe(1);
+  });
+
+  it("rejects an invalid per-source limit", () => {
+    expect(() =>
+      selectObservationsForArticles({
+        observations: [],
+        allowlistedSourceIds: [],
+        now: NOW,
+        policy: { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxPerSource: 0 },
+      }),
+    ).toThrow();
   });
 });

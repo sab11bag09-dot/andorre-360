@@ -39,6 +39,11 @@ export type ArticleOrchestrationPolicy = {
   freshnessWindowHours: number;
   /** Nombre maximal d’observations retenues par exécution. */
   maxSelected: number;
+  /**
+   * Nombre maximal d’observations retenues pour une même source par
+   * exécution, afin qu’une source très productive n’occupe pas tout le lot.
+   */
+  maxPerSource: number;
   /** Longueur minimale du contenu collecté, alignée sur la publication automatique. */
   minContentLength: number;
   /** Longueur minimale du titre d’origine. */
@@ -49,6 +54,7 @@ export const DEFAULT_ARTICLE_ORCHESTRATION_POLICY: ArticleOrchestrationPolicy =
   Object.freeze({
     freshnessWindowHours: 48,
     maxSelected: 5,
+    maxPerSource: 1,
     minContentLength: 280,
     minTitleLength: 12,
   });
@@ -71,6 +77,7 @@ export type ObservationSelectionReason =
   | "content_too_short"
   | "duplicate_of_processed_observation"
   | "duplicate_of_selected_observation"
+  | "source_limit_reached"
   | "batch_limit_reached";
 
 export type ObservationSelectionDecision = {
@@ -120,6 +127,7 @@ export function selectObservationsForArticles(input: {
 
   const selectedKeys = new Set<string>();
   const selectedObservationIds: number[] = [];
+  const selectedPerSource = new Map<number, number>();
   const decisionsById = new Map<number, ObservationSelectionDecision>();
 
   for (const observation of ordered) {
@@ -141,11 +149,20 @@ export function selectObservationsForArticles(input: {
         reasons.push("duplicate_of_processed_observation");
       } else if (keys.some((key) => selectedKeys.has(key))) {
         reasons.push("duplicate_of_selected_observation");
+      } else if (
+        (selectedPerSource.get(observation.source.id) ?? 0) >=
+        policy.maxPerSource
+      ) {
+        reasons.push("source_limit_reached");
       } else if (selectedObservationIds.length >= policy.maxSelected) {
         reasons.push("batch_limit_reached");
       } else {
         for (const key of keys) selectedKeys.add(key);
         selectedObservationIds.push(observation.id);
+        selectedPerSource.set(
+          observation.source.id,
+          (selectedPerSource.get(observation.source.id) ?? 0) + 1,
+        );
       }
     }
 
@@ -285,6 +302,8 @@ function assertValidPolicy(policy: ArticleOrchestrationPolicy): void {
     !positive(policy.freshnessWindowHours) ||
     !Number.isInteger(policy.maxSelected) ||
     policy.maxSelected <= 0 ||
+    !Number.isInteger(policy.maxPerSource) ||
+    policy.maxPerSource <= 0 ||
     !Number.isInteger(policy.minContentLength) ||
     policy.minContentLength < 0 ||
     !Number.isInteger(policy.minTitleLength) ||

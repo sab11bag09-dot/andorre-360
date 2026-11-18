@@ -32,6 +32,7 @@ const REASON_LABELS: Record<ObservationSelectionReason, string> = {
   content_too_short: "Contenu trop court",
   duplicate_of_processed_observation: "Doublon d’une information traitée",
   duplicate_of_selected_observation: "Doublon d’une information retenue",
+  source_limit_reached: "Limite par source atteinte",
   batch_limit_reached: "Limite du lot atteinte",
 };
 
@@ -69,11 +70,13 @@ function formatDate(value: string | null): string {
 
 export type ArticleOrchestrationPanelProps = {
   maxSelected: number;
+  maxPerSource: number;
   freshnessWindowHours: number;
 };
 
 export default function ArticleOrchestrationPanel({
   maxSelected,
+  maxPerSource,
   freshnessWindowHours,
 }: ArticleOrchestrationPanelProps) {
   const [preview, setPreview] =
@@ -131,8 +134,9 @@ export default function ArticleOrchestrationPanel({
           L’aperçu applique les règles déterministes de l’orchestrateur aux
           observations des 7 derniers jours : sources autorisées et fiables,
           dates valides, fraîcheur de {freshnessWindowHours} h, contenu
-          suffisant, absence de doublon, {maxSelected} articles au maximum. Il
-          n’appelle pas OpenAI et ne modifie rien.
+          suffisant, absence de doublon, {maxPerSource} article
+          {maxPerSource > 1 ? "s" : ""} au maximum par source et{" "}
+          {maxSelected} au total. Il n’appelle pas OpenAI et ne modifie rien.
         </p>
 
         <div className="mt-5">

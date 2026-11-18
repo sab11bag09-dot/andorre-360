@@ -636,6 +636,14 @@ Troisième sous-lot livré : l’écran du Studio `/admin/diffusion/orchestrateu
 - le serveur recalcule la sélection et refuse (`PLAN_CHANGED`) si elle diffère de l’aperçu examiné ;
 - l’administrateur qui lance l’exécution est enregistré dans le run (migration `20261118223000_add_article_orchestration_run_actor`, pas encore appliquée à `./dev.db`).
 
+Limite par source (18 novembre 2026) : une collecte supervisée des 41 sources actives a produit 443 observations. Sans limite, l’aperçu retenait 5 articles, tous du Diari d’Andorra, la source la plus productive. La politique limite désormais chaque source à 1 article par exécution (`maxPerSource`, motif « Limite par source atteinte »). Avec toutes les sources `AUTO` supposées autorisées, l’aperçu retient alors 4 articles issus de 4 sources différentes.
+
+Constats de cette collecte, non corrigés à ce stade :
+
+- 278 observations sur 443 n’ont pas de date et sont donc écartées : la lecture des dates doit être améliorée pour plusieurs sources ;
+- Andorra Business et le Comú d’Encamp refusent la collecte (HTTP 403) ;
+- certaines observations retenues sont des pages faibles (par exemple un simple nom de personne en titre) : à examiner pendant les essais supervisés.
+
 Vérification du 18 novembre 2026 sur une copie migrée de `./dev.db` : aperçu calculé sans erreur, 0 observation retenue, car la dernière collecte date du 8 septembre 2026. Un essai réel demandera donc d’abord une collecte récente.
 
 Reste à faire :
