@@ -282,6 +282,8 @@ model ArticleOrchestrationRun {
   policy     String
   plan       String
   result     String?
+  actorId    String?
+  actorEmail String?
   startedAt  DateTime                      @default(now())
   finishedAt DateTime?
 

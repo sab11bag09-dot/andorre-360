@@ -629,10 +629,19 @@ Comportements volontairement prudents :
 - après un arrêt brutal, le verrou reste posé et les observations réservées restent `CLAIMED` : un humain doit contrôler les brouillons éventuellement créés, puis lever le verrou ;
 - une observation en échec (`FAILED`) n’est plus jamais reprise automatiquement : une génération partielle pourrait sinon créer un second brouillon.
 
+Troisième sous-lot livré : l’écran du Studio `/admin/diffusion/orchestrateur`, accessible depuis la page Diffusion :
+
+- « Calculer l’aperçu » : liste des observations retenues et des motifs de refus, sans appel OpenAI ni écriture ;
+- « Générer N articles » : affiché seulement si tous les garde-fous serveur sont ouverts, après une confirmation qui rappelle le coût OpenAI ;
+- le serveur recalcule la sélection et refuse (`PLAN_CHANGED`) si elle diffère de l’aperçu examiné ;
+- l’administrateur qui lance l’exécution est enregistré dans le run (migration `20261118223000_add_article_orchestration_run_actor`, pas encore appliquée à `./dev.db`).
+
+Vérification du 18 novembre 2026 sur une copie migrée de `./dev.db` : aperçu calculé sans erreur, 0 observation retenue, car la dernière collecte date du 8 septembre 2026. Un essai réel demandera donc d’abord une collecte récente.
+
 Reste à faire :
 
-- un point de déclenchement : écran du Studio ou route interne protégée ;
-- un premier essai supervisé réel (lot D), qui appellera OpenAI : moins de 1 € estimé pour 5 articles ;
+- appliquer les deux migrations à `./dev.db` après sauvegarde ;
+- lancer une collecte, puis un premier essai supervisé réel (lot D), qui appellera OpenAI : moins de 1 € estimé pour 5 articles ;
 - la levée contrôlée d’un verrou après incident.
 
 ### Lot D — Multiplier les essais supervisés
