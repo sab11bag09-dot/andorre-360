@@ -742,7 +742,17 @@ Le générateur déterministe, qui recopie la source, est désormais bloqué par
 
 Limite : cette comparaison repère la reprise de formulations dans la même langue, pas une traduction fidèle d’une source catalane ou espagnole. La rédaction à partir des faits traite ce cas en amont. Les seuils sont un premier réglage, à confronter aux prochains essais supervisés. Mesure à blanc, en lecture seule, sur les 5 brouillons du premier essai (articles 494 à 498, rédigés avec l’ancienne consigne en un seul appel) : de 0 à 2 % de passages communs, au plus 8 mots consécutifs, donc aucun blocage. Ces sources étant en catalan et les articles en français, ce résultat illustre aussi la limite ci-dessus. Comme le lot précédent, ce contrôle réduit le risque juridique sans le trancher.
 
-Prochain lot prévu : la priorité aux sources institutionnelles dans la sélection de l’orchestrateur.
+#### Priorité aux sources institutionnelles (19 novembre 2026)
+
+La sélection de l’orchestrateur (`selectObservationsForArticles`) classe désormais les observations admissibles selon le type d’organisation de leur source (`organizationType`), avant de remplir le lot :
+
+1. **institutionnelles** : `GOVERNMENT`, `COMMUNE`, `POLICE`, `EMERGENCY_SERVICE`, `WEATHER_SERVICE` ;
+2. **ordinaires** : clubs, fédérations, entreprises, associations, `OTHER` et sources non classées ;
+3. **médias** : `MEDIA`.
+
+Au sein d’une même priorité, l’information la plus récente passe d’abord, comme avant. Les règles d’admissibilité, la limite d’un article par source et la limite du lot sont inchangées : un média n’est retenu que s’il reste de la place après les autres sources. Chaque décision indique la priorité de sa source (`sourcePriority`), enregistrée avec le plan de chaque run.
+
+Point d’attention : cette priorité ne vaut que si les sources sont bien classées. Au 19 novembre 2026, seules 4 sources actives sont classées `MEDIA` ; plusieurs médias (RTVA, Diari d’Andorra, Bondia, Andorra Business, Altaveu) sont encore classés `OTHER` et passent donc avant les médias correctement classés. Leur reclassement est une écriture dans `./dev.db`, à faire avec sauvegarde préalable.
 
 ### Lot E — Automatiser l’ensemble de la chaîne
 
@@ -973,6 +983,7 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - production : non déployée ;
 - rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), pas encore essayée sur de vrais appels OpenAI ;
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
+- sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; reclassement des médias encore classés `OTHER` à faire ;
 - prochaines priorités : relecture des brouillons de l’essai, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés.
 
 ---

@@ -1,4 +1,5 @@
 import type {
+  SourceOrganizationType,
   SourcePublicationMode,
   SourceTrustLevel,
 } from "@/lib/generated/prisma/client";
@@ -15,6 +16,12 @@ import { normalizeObservationPublishedAt } from "../source-engine/observationDat
  *
  * Une sélection n’est pas une autorisation de publication : la création
  * d’article réévalue ensuite ses propres règles de publication automatique.
+ *
+ * Les sources institutionnelles (Govern, comuns, Policia, services de
+ * secours et météo) passent en premier, puis les autres sources, puis les
+ * médias : une information institutionnelle publique présente moins de
+ * risque juridique qu’une reprise d’article de presse. Au sein d’une même
+ * priorité, l’information la plus récente passe d’abord.
  */
 
 export type OrchestrationObservation = {
@@ -31,8 +38,36 @@ export type OrchestrationObservation = {
     active: boolean;
     publicationMode: SourcePublicationMode;
     trustLevel: SourceTrustLevel;
+    /** Type d’organisation ; une source non classée est traitée comme ordinaire. */
+    organizationType?: SourceOrganizationType;
   };
 };
+
+export type SourcePriority = "institutional" | "standard" | "media";
+
+const INSTITUTIONAL_TYPES: ReadonlySet<SourceOrganizationType> = new Set([
+  "GOVERNMENT",
+  "COMMUNE",
+  "POLICE",
+  "EMERGENCY_SERVICE",
+  "WEATHER_SERVICE",
+]);
+
+const PRIORITY_RANK: Record<SourcePriority, number> = {
+  institutional: 0,
+  standard: 1,
+  media: 2,
+};
+
+export function sourcePriorityOf(
+  organizationType: SourceOrganizationType | undefined,
+): SourcePriority {
+  if (organizationType && INSTITUTIONAL_TYPES.has(organizationType)) {
+    return "institutional";
+  }
+  if (organizationType === "MEDIA") return "media";
+  return "standard";
+}
 
 export type ArticleOrchestrationPolicy = {
   /** Âge maximal d’une observation, mesuré depuis sa date de publication. */
@@ -83,6 +118,7 @@ export type ObservationSelectionReason =
 export type ObservationSelectionDecision = {
   observationId: number;
   sourceId: number;
+  sourcePriority: SourcePriority;
   status: "selected" | "skipped";
   reasons: ObservationSelectionReason[];
 };
@@ -169,6 +205,7 @@ export function selectObservationsForArticles(input: {
     decisionsById.set(observation.id, {
       observationId: observation.id,
       sourceId: observation.source.id,
+      sourcePriority: sourcePriorityOf(observation.source.organizationType),
       status: reasons.length === 0 ? "selected" : "skipped",
       reasons,
     });
@@ -249,6 +286,12 @@ function compareObservations(
   left: OrchestrationObservation,
   right: OrchestrationObservation,
 ): number {
+  const leftRank = PRIORITY_RANK[sourcePriorityOf(left.source.organizationType)];
+  const rightRank =
+    PRIORITY_RANK[sourcePriorityOf(right.source.organizationType)];
+
+  if (leftRank !== rightRank) return leftRank - rightRank;
+
   const leftTime = validTime(left.publishedAt);
   const rightTime = validTime(right.publishedAt);
 
