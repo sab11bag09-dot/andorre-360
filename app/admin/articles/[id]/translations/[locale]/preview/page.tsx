@@ -1,3 +1,4 @@
+import { loadArticleSourceCredits } from "@/lib/article-engine/articleSourceCredits";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -66,6 +67,7 @@ export default async function TranslationPreviewPage({
   }
 
   const contentLanguage = locale === "CA" ? "ca" : "es";
+  const sourceCredits = await loadArticleSourceCredits(articleId);
 
   return (
     <>
@@ -93,6 +95,7 @@ export default async function TranslationPreviewPage({
           videoUrl: translation.article.videoUrl,
           publishedAt:
             translation.publishedAt ?? translation.updatedAt,
+          sourceCredits,
         }}
         dateLocale={locale === "CA" ? "ca-ES" : "es-ES"}
         contentLanguage={contentLanguage}

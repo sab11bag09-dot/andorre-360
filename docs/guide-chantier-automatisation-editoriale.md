@@ -874,6 +874,17 @@ Plusieurs sources portent désormais le même nom (les deux flux du Diari d’An
 
 Les articles existants gardent la signature qu’ils avaient ; ce renommage prépare le crédit public de la source (« D’après … »).
 
+#### Crédit public de la source (19 novembre 2026)
+
+La page publique d’un article tiré d’une source indique désormais cette source sous la signature : « Source : Govern d’Andorra » en français, « Font: » en catalan, « Fuente: » en espagnol, au pluriel s’il y en a plusieurs (`lib/article-engine/articleSourceCredits.ts`).
+
+- les sources sont lues à partir des observations rattachées à l’article ; chacune n’est créditée qu’une fois, dans l’ordre des observations ;
+- le nom renvoie vers l’article d’origine, dans un nouvel onglet ; un lien qui n’est pas une adresse web (`http` ou `https`) est retiré, le nom reste affiché ;
+- un article sans observation rattachée (article écrit à la main) n’affiche aucun crédit ;
+- le crédit apparaît sur la page française, les pages traduites et l’aperçu administrateur des traductions.
+
+Vérifié dans le navigateur, sur un serveur de développement branché sur une copie de `./dev.db` (l’ouverture d’un article enregistre une vue) : l’article 491 affiche « Source : Govern d’Andorra » avec le lien vers le communiqué d’origine, et sa traduction catalane « Font: Govern d’Andorra ». L’article 491 reste signé « gouvernement d’andorre » : les articles existants n’ont pas été re-signés.
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :

@@ -1,5 +1,9 @@
 import ArticleRenderer from "@/components/article/ArticleRenderer";
 import SafeImage from "@/components/SafeImage";
+import {
+  type ArticleSourceCredit,
+  sourceCreditLabel,
+} from "@/lib/article-engine/articleSourceCredits";
 
 export interface PublicArticleViewData {
   title: string;
@@ -12,6 +16,8 @@ export interface PublicArticleViewData {
   videoUrl: string | null;
   publishedAt: Date;
   languageVariants?: Array<{ locale: string; label: string; href: string }>;
+  /** Sources dont l’article est tiré, créditées sous la signature. */
+  sourceCredits?: ArticleSourceCredit[];
 }
 
 type Props = {
@@ -206,6 +212,29 @@ export default function PublicArticleView({
         <div className="mt-12 border-t border-gray-800 pt-6">
           <p className="text-gray-400">Article signé</p>
           <p className="mt-2 text-xl text-yellow-500">{article.author}</p>
+          {article.sourceCredits && article.sourceCredits.length > 0 && (
+            <p className="mt-4 text-gray-400">
+              {sourceCreditLabel(contentLanguage, article.sourceCredits.length)}
+              {contentLanguage === "fr" ? "\u00a0: " : ": "}
+              {article.sourceCredits.map((credit, index) => (
+                <span key={`${index}-${credit.name}`}>
+                  {index > 0 && ", "}
+                  {credit.url ? (
+                    <a
+                      href={credit.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-yellow-500"
+                    >
+                      {credit.name}
+                    </a>
+                  ) : (
+                    credit.name
+                  )}
+                </span>
+              ))}
+            </p>
+          )}
         </div>
       </article>
     </main>
