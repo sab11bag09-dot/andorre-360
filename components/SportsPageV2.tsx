@@ -43,7 +43,7 @@ export default async function SportsPageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 line-clamp-2 max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl">
+              <h1 className="mt-4 line-clamp-4 overflow-hidden font-serif text-[1.75rem] leading-[1.15] md:line-clamp-3 md:text-5xl">
                 {featured.title}
               </h1>
 
@@ -79,7 +79,7 @@ export default async function SportsPageV2() {
                   </div>
 
                   <div className="flex min-h-0 flex-1 flex-col justify-between p-6">
-                    <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
+                    <h2 className="line-clamp-4 font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:text-4xl">
                       {mainArticle.title}
                     </h2>
 
@@ -106,7 +106,7 @@ export default async function SportsPageV2() {
                     className="block"
                   >
                     <article className="flex h-full flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-3 font-serif text-lg leading-snug">
+                      <h3 className="line-clamp-4 font-serif text-lg leading-snug">
                         {article.title}
                       </h3>
 
@@ -141,7 +141,7 @@ export default async function SportsPageV2() {
                       </div>
 
                       <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                        <h2 className="line-clamp-3 font-serif text-xl leading-[1.15] xl:text-2xl">
                           {article.title}
                         </h2>
                         <p className="mt-3 line-clamp-2 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
@@ -183,7 +183,7 @@ export default async function SportsPageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                    <h2 className="mt-3 line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl">
                       {questionArticle.title}
                     </h2>
 
@@ -254,7 +254,7 @@ export default async function SportsPageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
+                  <h2 className="mt-4 line-clamp-4 overflow-hidden font-serif text-xl leading-7 xl:line-clamp-3 xl:text-2xl">
                     {bonASavoir.title}
                   </h2>
 

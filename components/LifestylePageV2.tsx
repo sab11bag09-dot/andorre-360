@@ -236,7 +236,7 @@ export default async function LifestylePageV2() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                        <h2 className="line-clamp-3 font-serif text-xl leading-[1.15] xl:text-2xl">
                           {secondBottomCard.title}
                         </h2>
 
@@ -268,7 +268,7 @@ export default async function LifestylePageV2() {
                         />
                       </div>
                       <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                        <h2 className="line-clamp-3 font-serif text-xl leading-[1.15] xl:text-2xl">
                           {thirdBottomCard.title}
                         </h2>
                         <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
@@ -298,7 +298,7 @@ export default async function LifestylePageV2() {
                         />
                       </div>
                       <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                        <h2 className="line-clamp-3 font-serif text-xl leading-[1.15] xl:text-2xl">
                           {fourthBottomCard.title}
                         </h2>
                         <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">

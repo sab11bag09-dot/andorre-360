@@ -938,6 +938,19 @@ Vérifié dans le navigateur, sur une copie de `./dev.db`, avec cinq vrais titre
 
 Limites : seule la page d’accueil a été mesurée et adaptée ; les pages de rubrique (Politique, Culture, Lifestyle…) gardent leurs coupures en 2 ou 3 lignes. Un titre écrit à la main de plus de 70 caractères peut encore être coupé.
 
+#### Affichage des titres sur les pages de rubrique (19 novembre 2026)
+
+Même mesure que pour la page d’accueil, sur les pages de rubrique (Actualité, Culture, Économie, Ils en parlent, Loisirs, Montagne, Politique, Société, Sports), avec les mêmes cinq titres de 69 à 70 caractères, à 375, 768, 1 024, 1 280 et 1 440 px : avant les changements, la plupart des emplacements coupaient le titre (par exemple 11 sur 11 en Politique et en Société dès 1 024 px, 13 sur 17 en Sports).
+
+Les emplacements se ramenaient à quelques familles, corrigées de la même façon dans chaque composant (41 emplacements) :
+
+- cartes en 24 px sur 2 lignes, parfois de hauteur fixe : 20 px jusqu’à 1 280 px, 24 px au-delà, sur 3 lignes ; la hauteur fixe des cartes passe de 2 à 3 lignes pour garder l’alignement ;
+- cartes en 18 px : une ligne de plus (3 ou 4) ;
+- grandes unes de rubrique en 36 ou 48 px : 28 px en mobile, 4 lignes en mobile et 3 au-delà ; la hauteur maximale qui coupait la une est retirée ;
+- grandes cartes du haut de page (Actualité, Économie, Politique, Société, Sports) : 4 lignes jusqu’à 1 280 px, 3 au-delà.
+
+Après les changements : aucun emplacement ne coupe un titre de 70 caractères, sur aucune rubrique ni aucune largeur, sans défilement horizontal. Les pages International et Fil info n’ont pas d’emplacement de titre coupé. Mesures faites dans le navigateur, sur une copie de `./dev.db`. Les tests de mise en page (`*.layout.test.ts`), qui vérifient les classes de chaque emplacement, ont été mis à jour avec les nouvelles limites.
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :
