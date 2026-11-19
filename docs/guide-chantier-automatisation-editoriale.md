@@ -859,6 +859,21 @@ Non traité dans ce lot :
 - la page publique n’affiche pas encore la source dont l’article est tiré ; un crédit « D’après … » demandera des noms de sources propres, les noms actuels étant bruts (casse, fautes de frappe) ;
 - les communiqués politiques (catégorie « Ils en parlent ») sont eux aussi signés par la rédaction ; leur présentation, qui doit indiquer clairement de qui vient la prise de position, reste à décider.
 
+#### Noms officiels des sources (19 novembre 2026)
+
+Les noms des sources étaient bruts : casse irrégulière (« gouvernement d’andorre », « FORCES ÉLECTRIQUES »), fautes de frappe (« Fésération de ski »), noms de test (« altaveu test 2 ») ou traductions approximatives. Avec l’accord de l’utilisateur, 53 sources ont été renommées dans `./dev.db` avec leur nom officiel, tel que l’organisation se nomme elle-même, le plus souvent en catalan : il reste juste quelle que soit la langue de l’article.
+
+Exemples : « Govern d’Andorra », « Consell General », « Comú de Sant Julià de Lòria », « Altaveu », « Federació Andorrana d’Esquí », « FEDA », « Partit Socialdemòcrata ». Dix noms étaient déjà corrects et n’ont pas changé (Bondia, Andorra Ara, Policia d’Andorra, Andorra Business, France 24, BBC, FC Andorra, Grandvalira, Pal Arinsal, Andorra Endavant).
+
+- sauvegarde préalable : `dev.before-source-names-20261119-212238.db`, intégrité vérifiée ;
+- écriture en une transaction, validée seulement si les 53 noms attendus étaient en place ;
+- vérification après coup : intégrité « ok », 53 noms modifiés, aucune autre colonne des sources modifiée, aucune observation ni aucun article ajouté ou supprimé ;
+- aucun code ne dépend du nom d’une source : il sert à l’affichage dans l’administration et au contexte donné aux générateurs.
+
+Plusieurs sources portent désormais le même nom (les deux flux du Diari d’Andorra, les deux pages météo, musées et expositions, Visit Andorra) ; elles se distinguent par leur adresse. Noms à confirmer : « Departament de Mobilitat », « Acció », « BC MoraBanc Andorra », « Agenda.ad ».
+
+Les articles existants gardent la signature qu’ils avaient ; ce renommage prépare le crédit public de la source (« D’après … »).
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :
