@@ -4,6 +4,7 @@ import {
   getPublicArticleSeoVersions,
 } from "@/lib/article-engine/articleSeo";
 import { recordArticleView } from "@/lib/analytics";
+import { loadArticleSourceCredits } from "@/lib/article-engine/articleSourceCredits";
 import { getArticleBySlug } from "@/lib/articles";
 import { getPublicArticleDate } from "@/lib/public-article";
 import type { Metadata } from "next";
@@ -54,6 +55,8 @@ export default async function ArticlePage({
 
   await recordArticleView(article.id);
 
+  const sourceCredits = await loadArticleSourceCredits(article.id);
+
   const variants = await prisma.articleTranslation.findMany({
     where: { articleId: article.id, status: "PUBLISHED" },
     select: { locale: true, slug: true },
@@ -75,6 +78,7 @@ export default async function ArticlePage({
         ...article,
         publishedAt: getPublicArticleDate(article),
         languageVariants,
+        sourceCredits,
       }}
       dateLocale="fr-FR"
       contentLanguage="fr"

@@ -8,6 +8,7 @@ import {
   getPublicArticleSeoVersions,
 } from "@/lib/article-engine/articleSeo";
 import { recordArticleView } from "@/lib/analytics";
+import { loadArticleSourceCredits } from "@/lib/article-engine/articleSourceCredits";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -70,9 +71,11 @@ export default async function TranslatedArticlePage({
 
   await recordArticleView(translation.articleId);
 
+  const sourceCredits = await loadArticleSourceCredits(translation.articleId);
+
   return (
     <PublicArticleView
-      article={translation}
+      article={{ ...translation, sourceCredits }}
       dateLocale={locale === "ca" ? "ca-ES" : "es-ES"}
       contentLanguage={locale}
     />
