@@ -242,4 +242,45 @@ describe("createArticleFromObservation", () => {
       }),
     );
   });
+
+  it("garde la liste de faits hors de l’article et la consigne dans l’audit", async () => {
+    const observation = makeObservation();
+    const { dependencies, createDraft, prepareArticle } =
+      makeDependencies(observation);
+    const eventCreate = vi.fn(async () => undefined);
+    const factSheet = [
+      "Le Comú de Canillo a ouvert les inscriptions le 3 septembre 2026.",
+    ];
+
+    prepareArticle.mockResolvedValue({
+      title: "Titre test",
+      description: "Premier paragraphe.",
+      content: "Premier paragraphe.",
+      category: "SOCIÉTÉ",
+      author: "Source test",
+      factSheet,
+    } as Awaited<ReturnType<typeof prepareArticle>>);
+
+    await createArticleFromObservation(observation.id, {
+      ...dependencies,
+      editorialEventWriter: {
+        editorialEvent: { create: eventCreate },
+      } as unknown as NonNullable<
+        CreateArticleFromObservationDependencies["editorialEventWriter"]
+      >,
+    });
+
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.not.objectContaining({ factSheet: expect.anything() }),
+    );
+
+    const [[event]] = eventCreate.mock.calls as unknown as [
+      [{ data: { details: string } }],
+    ];
+
+    expect(JSON.parse(event.data.details)).toMatchObject({
+      eventType: "auto_publication_evaluated",
+      factSheet,
+    });
+  });
 });

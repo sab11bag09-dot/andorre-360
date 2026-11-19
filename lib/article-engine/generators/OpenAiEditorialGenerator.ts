@@ -11,8 +11,24 @@ import type {
 const DEFAULT_MODEL = "gpt-5.6-terra";
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+/**
+ * Rédaction en deux temps : un premier appel extrait une liste de faits de
+ * la source, sans citations ni témoignages ; un second appel rédige l’article
+ * à partir de cette liste seulement, sans jamais voir le texte source.
+ *
+ * Cette méthode éloigne le texte produit de la formulation de la source.
+ * Elle ne tranche pas la question juridique de la reprise d’articles de
+ * presse : un avis juridique reste nécessaire avant toute mise en ligne.
+ */
 export const OPENAI_EDITORIAL_PROMPT_VERSION =
-  "editorial-rewrite-v3";
+  "editorial-facts-v1";
+
+/** Nombre maximal de faits retenus pour un article. */
+export const MAX_FACTS = 40;
+/** Longueur maximale d’un fait, pour éviter la reprise de paragraphes entiers. */
+export const MAX_FACT_LENGTH = 400;
+/** Au-delà de ce nombre de mots, un passage entre guillemets est une citation. */
+export const MAX_QUOTED_WORDS = 4;
 
 interface TranslationResponse {
   title: string;
@@ -24,6 +40,7 @@ interface StructuredResponseRequest {
   model: string;
   instructions: string;
   input: string;
+  schemaName: string;
   schema: Record<string, unknown>;
 }
 
@@ -54,7 +71,7 @@ class OpenAiResponsesClient implements StructuredResponseClient {
       text: {
         format: {
           type: "json_schema",
-          name: "article_translation",
+          name: request.schemaName,
           strict: true,
           schema: request.schema,
         },
@@ -75,6 +92,29 @@ const translationSchema = {
   required: ["title", "description", "content"],
   additionalProperties: false,
 } as const;
+
+const factSheetSchema = {
+  type: "object",
+  properties: {
+    facts: {
+      type: "array",
+      items: { type: "string" },
+    },
+  },
+  required: ["facts"],
+  additionalProperties: false,
+} as const;
+
+const QUOTED_PASSAGE = /[«“„"]\s*([^«»“”„"]+?)\s*[»”"]/gu;
+
+/** Indique si le texte contient un passage entre guillemets trop long. */
+export function containsLongQuotation(value: string): boolean {
+  for (const match of value.matchAll(QUOTED_PASSAGE)) {
+    const words = match[1]?.trim().split(/\s+/u).filter(Boolean) ?? [];
+    if (words.length > MAX_QUOTED_WORDS) return true;
+  }
+  return false;
+}
 
 const KNOWN_EXTRACTION_COLLISIONS = [
   [/\bparcoursdans\b/giu, "parcours dans"],
@@ -124,6 +164,76 @@ function assertPlainEditorialOutput(
   ) {
     throw new Error(
       "Le fournisseur éditorial a renvoyé du Markdown interdit.",
+    );
+  }
+}
+
+function parseFactSheetResponse(output: string): string[] {
+  let value: unknown;
+
+  try {
+    value = JSON.parse(output);
+  } catch {
+    throw new Error(
+      "Le fournisseur éditorial a renvoyé une liste de faits invalide.",
+    );
+  }
+
+  const rawFacts =
+    value && typeof value === "object" && !Array.isArray(value)
+      ? (value as Record<string, unknown>).facts
+      : undefined;
+
+  if (!Array.isArray(rawFacts)) {
+    throw new Error(
+      "Le fournisseur éditorial a renvoyé une liste de faits invalide.",
+    );
+  }
+
+  const facts = [
+    ...new Set(
+      rawFacts
+        .filter((fact): fact is string => typeof fact === "string")
+        .map((fact) => normalizeEditorialText(fact))
+        .filter(Boolean),
+    ),
+  ];
+
+  if (facts.length === 0) {
+    throw new Error(
+      "L’extraction n’a produit aucun fait exploitable.",
+    );
+  }
+
+  if (facts.length > MAX_FACTS) {
+    throw new Error(
+      `L’extraction a produit plus de ${MAX_FACTS} faits.`,
+    );
+  }
+
+  if (facts.some((fact) => fact.length > MAX_FACT_LENGTH)) {
+    throw new Error(
+      `Un fait extrait dépasse ${MAX_FACT_LENGTH} caractères.`,
+    );
+  }
+
+  if (facts.some(containsLongQuotation)) {
+    throw new Error(
+      "La liste de faits contient une citation directe interdite.",
+    );
+  }
+
+  return facts;
+}
+
+function assertNoLongQuotation(response: TranslationResponse): void {
+  if (
+    containsLongQuotation(response.title) ||
+    containsLongQuotation(response.description) ||
+    containsLongQuotation(response.content)
+  ) {
+    throw new Error(
+      "L’article rédigé contient une citation directe interdite.",
     );
   }
 }
@@ -187,6 +297,15 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
   }
 
   async prepareArticle(input: PrepareArticleInput): Promise<PreparedArticle> {
+    const sourcePublishedAt =
+      input.sourcePublishedAt?.toISOString() ?? null;
+    const generatedAt = input.generatedAt.toISOString();
+
+    const factSheet = await this.extractFacts(input, {
+      sourcePublishedAt,
+      generatedAt,
+    });
+
     let output: string;
 
     try {
@@ -194,44 +313,41 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
         model: this.model,
         instructions: [
           "Rédige en français un article journalistique original, clair et factuel adapté à ANDORRE 360.",
-          "Ne produis pas une traduction littérale et ne reproduis pas la structure des phrases de la source.",
-          "Crée un titre informatif, un chapô synthétique et un article entièrement rédigé.",
-          "Conserve strictement les faits, noms propres, chiffres, dates, citations et liens présents dans la source.",
+          "Rédige uniquement à partir de la liste de faits fournie : tu n’as pas accès au texte d’origine et tu ne dois pas chercher à le reconstituer.",
+          "N’ajoute aucun fait absent de la liste, n’invente aucune information et n’ajoute aucune connaissance extérieure.",
+          "N’insère aucune citation entre guillemets et ne prête à personne des paroles qui ne figurent pas dans la liste.",
+          "Indique une fois, de façon naturelle, l’origine de l’information à partir du nom de la source fourni.",
+          "Crée un titre informatif, un chapô synthétique et un article entièrement rédigé, organisé selon ton propre plan.",
           "Utilise la date de publication de la source et la date de génération fournies comme contexte temporel.",
-          "Remplace les expressions relatives comme aujourd’hui, hier, demain, ce matin, cette année ou enguany par une date absolue lorsqu’elle peut être déterminée.",
+          "Remplace toute expression relative comme aujourd’hui, hier ou demain par une date absolue lorsqu’elle peut être déterminée.",
           "Toute date événementielle déterminable doit comporter le jour, le mois et l’année, y compris dans le titre, le chapô et le corps.",
           "Si une référence temporelle ne peut pas être déterminée avec certitude, reformule-la sans inventer de date.",
-          "Corrige les défauts évidents d’extraction, d’espacement, de ponctuation et de typographie sans modifier le sens.",
           "N’utilise aucun balisage Markdown ou HTML : rends uniquement du texte brut, en conservant les URL sous leur forme brute.",
-          "Dans le chapô, conserve les quantités exactes fournies par la source et évite toute formulation vague lorsqu’un chiffre précis est disponible.",
+          "Dans le chapô, conserve les quantités exactes fournies par les faits et évite toute formulation vague lorsqu’un chiffre précis est disponible.",
           "Applique les conventions typographiques françaises aux nombres, pourcentages et montants.",
-          "Développe un acronyme lors de sa première occurrence uniquement si sa signification figure dans la source.",
-          "N’invente aucune information, n’ajoute aucune connaissance extérieure et ne mentionne pas le processus de réécriture.",
+          "Développe un acronyme lors de sa première occurrence uniquement si sa signification figure dans les faits.",
+          "Ne mentionne pas le processus de rédaction.",
           "Retourne uniquement les trois champs demandés.",
         ].join(" "),
         input: JSON.stringify({
-          title: normalizeEditorialText(
-            input.originalTitle,
-          ),
-          content: normalizeEditorialText(
-            input.originalContent,
-          ),
+          facts: factSheet,
           sourceName: input.sourceName,
           sourceCategory: input.sourceCategory,
-          sourcePublishedAt:
-            input.sourcePublishedAt?.toISOString() ?? null,
-          generatedAt: input.generatedAt.toISOString(),
+          sourcePublishedAt,
+          generatedAt,
         }),
+        schemaName: "article_from_facts",
         schema: translationSchema,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "erreur inconnue";
-      throw new Error(`La réécriture OpenAI a échoué : ${message}`);
+      throw new Error(`La rédaction OpenAI a échoué : ${message}`);
     }
 
     const rewritten = parseTranslationResponse(output);
 
     assertPlainEditorialOutput(rewritten);
+    assertNoLongQuotation(rewritten);
 
     return {
       title: rewritten.title,
@@ -239,7 +355,47 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       content: rewritten.content,
       category: input.sourceCategory?.trim() || "Général",
       author: input.sourceName,
+      factSheet,
     };
+  }
+
+  private async extractFacts(
+    input: PrepareArticleInput,
+    context: { sourcePublishedAt: string | null; generatedAt: string },
+  ): Promise<string[]> {
+    let output: string;
+
+    try {
+      output = await this.client.create({
+        model: this.model,
+        instructions: [
+          "Extrais de cet article la liste des faits vérifiables, en français : qui, quoi, où, quand, combien.",
+          "Rédige chaque fait sous la forme d’une phrase courte, neutre et autonome, avec tes propres mots, sans reprendre la formulation de la source.",
+          "Conserve exactement les noms propres, fonctions, lieux, chiffres, montants et dates.",
+          "Remplace les dates relatives par une date absolue lorsqu’elle peut être déterminée grâce aux dates fournies.",
+          "Ne retiens aucune citation, même courte, et aucun témoignage : une prise de position officielle peut seulement être résumée en un fait neutre et attribué, sans guillemets.",
+          "Écris les noms d’événements, d’œuvres ou de programmes sans guillemets.",
+          "N’inclus ni opinion, ni commentaire, ni anecdote, ni description de style, et n’ajoute aucune information absente de la source.",
+          "Ignore les menus, mentions légales, liens de partage et autres éléments étrangers à l’article.",
+          "N’utilise aucun balisage Markdown ou HTML.",
+          "Retourne uniquement le champ facts.",
+        ].join(" "),
+        input: JSON.stringify({
+          title: normalizeEditorialText(input.originalTitle),
+          content: normalizeEditorialText(input.originalContent),
+          sourceName: input.sourceName,
+          sourcePublishedAt: context.sourcePublishedAt,
+          generatedAt: context.generatedAt,
+        }),
+        schemaName: "article_fact_sheet",
+        schema: factSheetSchema,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "erreur inconnue";
+      throw new Error(`L’extraction des faits OpenAI a échoué : ${message}`);
+    }
+
+    return parseFactSheetResponse(output);
   }
 
   async translateArticle(
@@ -269,6 +425,7 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
           description: input.description,
           content: input.content,
         }),
+        schemaName: "article_translation",
         schema: translationSchema,
       });
     } catch (error) {

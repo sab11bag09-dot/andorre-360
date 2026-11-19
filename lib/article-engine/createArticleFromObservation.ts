@@ -110,7 +110,7 @@ export async function createArticleFromObservation(
   const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
   const generatedAt = new Date();
 
-  const draft = await editorialGenerator.prepareArticle({
+  const { factSheet, ...draft } = await editorialGenerator.prepareArticle({
     originalTitle: observation.title,
     originalContent: content,
     sourcePublishedAt: observation.publishedAt,
@@ -179,6 +179,7 @@ export async function createArticleFromObservation(
       details: {
         eventType: "auto_publication_evaluated",
         ...autoPublication.audit,
+        ...(factSheet ? { factSheet } : {}),
       },
     });
   }
