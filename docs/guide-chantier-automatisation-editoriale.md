@@ -885,6 +885,24 @@ La page publique d’un article tiré d’une source indique désormais cette so
 
 Vérifié dans le navigateur, sur un serveur de développement branché sur une copie de `./dev.db` (l’ouverture d’un article enregistre une vue) : l’article 491 affiche « Source : Govern d’Andorra » avec le lien vers le communiqué d’origine, et sa traduction catalane « Font: Govern d’Andorra ». L’article 491 reste signé « gouvernement d’andorre » : les articles existants n’ont pas été re-signés.
 
+#### Re-signature des brouillons et état des articles déjà publiés (19 novembre 2026)
+
+Avec l’accord de l’utilisateur, les 12 brouillons IA non publiés 492 à 503 ont été re-signés « Rédaction ANDORRE 360 » dans `./dev.db`, comme le système les signerait aujourd’hui.
+
+- sauvegarde préalable : `dev.before-draft-resign-20261119-220219.db`, intégrité vérifiée ;
+- écriture en une transaction, validée seulement si les 12 signatures étaient en place ;
+- vérification après coup : intégrité « ok », 12 signatures modifiées, aucune hors de 492 à 503, aucun titre, contenu ou statut modifié, aucun article ajouté ou supprimé.
+
+Les autres articles signés du nom de leur source n’ont pas été re-signés, volontairement :
+
+- les 17 articles IA publiés 471 à 491 ont été réécrits avec l’ancienne consigne, jugée trop proche d’une traduction ; d’après le contrôle de ressemblance, le 473 reprend plus de la moitié de sa source et les 472 et 481 en sont proches ;
+- 148 articles plus anciens, rattachés à une observation mais créés sans IA, sont des traductions littérales ou des copies du texte de la source (par exemple l’article 276, traduction du Govern, ou l’article 440, paraphrase d’une dépêche de France 24) ; 16 sont classés comme copies par le contrôle de ressemblance, qui ne repère pas les traductions ;
+- pour ces articles, la signature au nom de la source est au moins exacte : les signer par la rédaction reviendrait à s’attribuer un texte qui n’est pas le sien.
+
+Point d’attention juridique : 164 articles publiés sont rattachés à une source, dont 62 à des médias (BBC, France 24, Diari d’Andorra, Andorra Business, Altaveu…). Leur maintien en ligne, ou leur dépublication, est à soumettre à l’avis d’avocat déjà prévu ; aucune décision n’a été prise.
+
+Les signatures humaines (« Sa.BA », « Salah »), sur des articles sans source, n’ont pas été modifiées.
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :
