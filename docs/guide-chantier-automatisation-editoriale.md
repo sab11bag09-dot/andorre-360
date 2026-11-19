@@ -1203,7 +1203,7 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 État au 19 novembre 2026 :
 
 - branche de référence : `audit/studio-v4` ;
-- dernières pull requests fusionnées : #125 à #137 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons, premier essai, rédaction à partir des faits, contrôle de ressemblance, priorité institutionnelle) ;
+- dernières pull requests fusionnées : #125 à #152 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons, essais supervisés, rédaction à partir des faits, contrôle de ressemblance, priorité institutionnelle, anti-doublon par sujet, signature et crédit des sources, longueur et affichage des titres) ;
 - orchestrateur des articles : livré, mode brouillons par défaut, désactivé hors des essais ;
 - publication automatique des articles : désactivée localement, arrêt d’urgence activé ;
 - essais supervisés : le 18 novembre 2026, 5 brouillons (articles 494 à 498) ; le 19 novembre 2026, 5 brouillons rédigés à partir des faits (articles 499 à 503) ; aucune publication (voir lot D) ;
@@ -1215,8 +1215,61 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
 - sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; sources reclassées dans `./dev.db` le 19 novembre 2026 ;
 - anti-doublon par sujet : titres rapprochés par mots significatifs communs et, entre sources différentes, par racines communes ; pas de traduction entre langues ;
-- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, rapprochement des titres traduits (le cas des navettes du FC Andorra), choix d’images pertinentes, puis d’autres essais supervisés ;
+- signature : articles rédigés automatiquement signés « Rédaction ANDORRE 360 », source créditée sur la page publique avec un lien ; sources renommées avec leur nom officiel ;
+- titres : 70 caractères au plus en français, catalan et espagnol ; page d’accueil et pages de rubrique adaptées pour les afficher en entier ;
+- articles déjà présents dans `./dev.db` : données de chantier, à effacer lors de la mise en production ;
+- prochaines priorités : voir « Revue d’ensemble et priorités » ci-dessous ;
 - question juridique de la reprise d’articles de presse : réduite par les trois derniers lots, mais non tranchée ; un avis d’avocat reste nécessaire avant toute mise en ligne.
+
+### Revue d’ensemble et priorités (19 novembre 2026)
+
+Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du plus important au moins important.
+
+#### Juridique
+
+- C’est la plus grande incertitude, et tout le reste en dépend : consulter l’avocat dès maintenant plutôt qu’à la fin, avec trois questions précises (reprise de communiqués institutionnels, réécriture à partir des faits d’un article de presse, crédit de la source avec un lien).
+- En attendant l’avis : limiter la rédaction automatique aux sources institutionnelles (Govern, comuns, Policia, CASS…), dont les communiqués sont faits pour être repris et qui sont les plus fiables.
+- Angle mort : le contrôle de ressemblance compare des mots ; les sources étant surtout en catalan et les articles en français, il ne repère pas une traduction fidèle. La rédaction à partir des faits limite ce risque, mais rien ne le mesure. Piste : comparer après avoir retraduit l’article vers la langue de la source.
+
+#### Qualité éditoriale
+
+- Chaque changement de consigne est jugé sur 5 brouillons et à l’œil : constituer un jeu de référence d’une vingtaine d’observations variées, relu une fois par l’utilisateur, sur lequel comparer chaque nouvelle version de consigne.
+- Aucun contrôle automatique ne vérifie que les chiffres, noms et dates de l’article figurent dans la liste de faits : contrôle simple, qui attraperait les inventions.
+- La relecture humaine des brouillons 494 à 503 reste à faire : c’est le meilleur retour disponible, et il est gratuit.
+- Valeur ajoutée : réécrire l’information des autres apporte peu au lecteur ; ANDORRE 360 se distinguerait en croisant plusieurs sources sur un même sujet (l’anti-doublon sait déjà les regrouper), en ajoutant du contexte et en suivant les données locales (IPC, CASS…).
+
+#### Produit
+
+- Images : tous les brouillons ont la même image générique, point faible le plus visible en une.
+- « Ils en parlent » : des communiqués politiques signés par la rédaction risquent de passer pour des prises de position du journal ; prévoir une présentation claire (« Communiqué de… ») et un équilibre entre partis.
+- Langue : site d’abord en français dans un pays de langue officielle catalane ; choix à assumer consciemment selon le public visé.
+
+#### Technique
+
+- 10 composants de rubrique recopient les mêmes cartes (41 corrections identiques dans 9 fichiers pour les titres) : quelques composants de carte partagés.
+- Les tests de mise en page vérifient des chaînes de classes CSS, ce qui est fragile : les remplacer par un test automatique qui mesure les titres coupés dans un navigateur.
+- Nettoyage : `HomePageEditorial.fusion.tsx`, `HomePageEditorial.apres-fusion.tsx`, 11 avertissements de lint, sauvegardes `dev.before-*.db` qui s’accumulent à la racine.
+- Configuration des sources dans la base, règles par site dans le code : un fichier de définition des sources, versionné, rendrait tout reproductible.
+- Collecte : 948 observations sans date, 2 sources en erreur 403 (Andorra Business, Encamp), aucune alerte quand une source tombe.
+
+#### Exploitation et sécurité
+
+- Les interrupteurs `AI_*` se modifient en éditant `.env` à la main, ce qui est risqué (le jour de l’essai l’a montré) : une page d’administration ou un petit script.
+- Aucun suivi du coût par article (2 à 4 appels OpenAI) ni plafond de dépense.
+- Mise en production non préparée : hébergement, choix de la base (SQLite ou base serveur), sauvegardes automatiques, effacement des articles de chantier.
+
+#### Méthode de travail
+
+- Le guide dépasse 1 000 lignes et mélange journal, décisions et état actuel : le découper en une page « état actuel » lisible en 2 minutes, un journal des décisions et une procédure pour les manipulations sensibles (essai, sauvegarde, `.env`).
+- Une PR de documentation séparée après chaque écriture en base demande beaucoup de validations : regrouper la documentation avec le changement, ou par fin de journée.
+
+#### Priorités retenues, dans l’ordre
+
+1. Avis d’avocat maintenant ; en attendant, rédaction automatique limitée aux sources institutionnelles.
+2. Relecture humaine des brouillons 494 à 503, puis jeu de référence.
+3. Contrôle automatique de fidélité : chiffres, noms et dates de l’article présents dans la liste de faits.
+4. Images.
+5. Préparation de la mise en production : interrupteurs sans `.env`, coûts, hébergement, sauvegardes.
 
 ---
 
