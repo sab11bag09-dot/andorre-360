@@ -761,6 +761,53 @@ Cette priorité ne vaut que si les sources sont bien classées. Reclassement app
 
 Contrôles après l’écriture : intégrité SQLite `ok`, aucune erreur de clé étrangère. Sources actives après reclassement : 19 institutionnelles (10 `GOVERNMENT`, 7 `COMMUNE`, 1 `POLICE`, 1 `EMERGENCY_SERVICE`), 13 ordinaires (9 `OTHER`, 2 `SPORTS_CLUB`, 2 `SPORTS_FEDERATION`) et 9 `MEDIA`. Les partis, stations de ski, COA, OMS et agenda restent classés `OTHER`. Ce reclassement ne concerne que la base locale : il faudra le reproduire sur la future base de production.
 
+#### Deuxième essai supervisé : rédaction à partir des faits (19 novembre 2026)
+
+Objectif : essayer pour la première fois, sur de vrais appels OpenAI, la rédaction en deux temps (#135), le contrôle de ressemblance (#136) et la priorité institutionnelle (#137).
+
+Préparation :
+
+- sauvegarde de `./dev.db` juste avant l’essai (`dev.before-second-trial-20261119-131403.db`, ignorée par Git, intégrité `ok`) ;
+- collecte des 41 sources actives : 39 réussies, 90 nouvelles observations ; Andorra Business et le Comú d’Encamp refusent toujours la collecte (HTTP 403) ; le redatage n’a daté aucune des 158 observations sans date ;
+- intégrité `ok` après la collecte ; aucune nouvelle date future (seules restent les 4 observations Altaveu du 13 août) ;
+- réglages temporaires, modifiés par l’utilisateur : `AI_ARTICLE_ORCHESTRATOR_ENABLED=true`, `AI_AUTO_PUBLICATION_EMERGENCY_STOP=false` ; `AI_AUTO_PUBLICATION_ENABLED=false` et `AI_ARTICLE_ORCHESTRATOR_PUBLISH` absent, donc **mode brouillons**.
+
+Constat pendant la préparation : un aperçu calculé avant la collecte retenait une observation du Govern sur la Creu dels Set Braços de Jaume Bartumeu, déjà traitée à partir du Diari (article 495). L’anti-doublon, qui compare les titres et les adresses, ne repère pas un même sujet traité par deux sources. Après la collecte, cette observation a été remplacée par une information plus récente.
+
+Déroulement : aperçu relu puis lancement depuis `/admin/diffusion/orchestrateur` par un administrateur. Le run `476a1b68-20e5-4d08-9fd9-87549ca637cd`, en mode `DRAFTS_ONLY`, a duré environ une minute et demie.
+
+Résultat :
+
+| Article | Source | Faits | Passages de 5 mots communs | Plus long passage commun | Titre rédigé |
+|---|---|---|---|---|---|
+| 499 | Mairie d’Andorre (`COMMUNE`) | 18 | 3,4 % | 8 mots | Andorre-la-Vieille installe le 11e Consell d’Infants pour l’année scolaire 2026-2027 |
+| 500 | Govern (`GOVERNMENT`) | 18 | 1,5 % | 6 mots | Le 20 novembre 2026, quatre navettes gratuites pour le match FC Andorra-CD Leganés à Encamp |
+| 501 | FC Andorra (`SPORTS_CLUB`) | 7 | 0 % | 2 mots | Football : l’Andorra veut renouer avec la victoire face à Leganés |
+| 502 | OMS Europe (`OTHER`) | 16 | 0 % | 2 mots | Résistance aux antibiotiques : 21 pays sur 43 signalent une forte résistance de Klebsiella pneumoniae |
+| 503 | Concòrdia (`OTHER`) | 10 | 1,8 % | 7 mots | Après le vol de NIA à la CASS, Concòrdia réclame un audit indépendant |
+
+Contrôles après l’essai :
+
+- 5 articles créés sur 5, aucun échec ; run `COMPLETED`, verrou libéré ;
+- aucun média retenu : 2 sources institutionnelles, puis 3 sources ordinaires ;
+- les 5 articles sont au statut `AI_DRAFT`, avec `published = false` ; aucune traduction et aucune publication sur l’accueil ;
+- les 5 observations sont marquées traitées et liées à leur article ;
+- 5 événements `ARTICLE_CREATED` avec la version `editorial-facts-v1`, la liste de faits (`factSheet`), la mesure de ressemblance (`sourceSimilarity`) et une publication automatique refusée (`feature_disabled`) ;
+- aucun passage entre guillemets dans les titres, chapôs et corps ; l’interview de l’article 501 ne conserve que des propos résumés et attribués ;
+- ressemblance très en dessous des seuils (au plus 3,4 % et 8 mots), aucun blocage ;
+- intégrité SQLite `ok`, aucune erreur de clé étrangère ;
+- `.env` remis ensuite à `AI_ARTICLE_ORCHESTRATOR_ENABLED=false` et `AI_AUTO_PUBLICATION_EMERGENCY_STOP=true`.
+
+Constats à traiter :
+
+- fidélité aux sources à vérifier en relecture humaine, en comparant chaque article à sa liste de faits puis à la source (par exemple le lieu indiqué dans le titre de l’article 500) ;
+- articles plus secs sans citations ; l’article 501 ne compte que 852 caractères ;
+- les 5 brouillons utilisent toujours l’image générique `/images/global/hero.jpg` ;
+- le champ auteur reprend le nom brut de la source (par exemple « gouvernement d’andorre ») ;
+- l’anti-doublon ne repère pas un même sujet traité par deux sources différentes.
+
+Coût : 10 appels OpenAI (5 extractions, 5 rédactions), sans traduction ; le montant exact se lit dans le tableau de bord OpenAI.
+
 ### Lot E — Automatiser l’ensemble de la chaîne
 
 Quand les lots précédents seront suffisamment fiables :
@@ -983,15 +1030,15 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - dernières pull requests fusionnées : #125 à #137 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons, premier essai, rédaction à partir des faits, contrôle de ressemblance, priorité institutionnelle) ;
 - orchestrateur des articles : livré, mode brouillons par défaut, désactivé hors des essais ;
 - publication automatique des articles : désactivée localement, arrêt d’urgence activé ;
-- premier essai supervisé : 5 brouillons créés, aucune publication (voir lot D) ;
+- essais supervisés : le 18 novembre 2026, 5 brouillons (articles 494 à 498) ; le 19 novembre 2026, 5 brouillons rédigés à partir des faits (articles 499 à 503) ; aucune publication (voir lot D) ;
 - dates : 67 % des observations datées à la collecte ; 13 sources sans signal standard ;
 - 4 observations Altaveu du 13 août restent datées au 7 décembre 2026 : données antérieures au correctif #125, sans effet sur l’orchestrateur ;
 - images des brouillons : image générique, amélioration nécessaire ;
 - production : non déployée ;
-- rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), pas encore essayée sur de vrais appels OpenAI ;
+- rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), essayée avec succès le 19 novembre 2026 ;
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
 - sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; sources reclassées dans `./dev.db` le 19 novembre 2026 ;
-- prochaines priorités : relecture des brouillons de l’essai, essai supervisé de la rédaction à partir des faits (avec l’accord explicite de l’utilisateur, deux appels OpenAI par article), choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés ;
+- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, anti-doublon par sujet entre sources différentes, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés ;
 - question juridique de la reprise d’articles de presse : réduite par les trois derniers lots, mais non tranchée ; un avis d’avocat reste nécessaire avant toute mise en ligne.
 
 ---
