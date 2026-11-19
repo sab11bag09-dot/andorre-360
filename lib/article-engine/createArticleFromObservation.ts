@@ -12,6 +12,11 @@ import {
 } from "./multilingualPublicationGuard";
 import { normalizeEditorialCategory } from "./normalizeEditorialCategory";
 import {
+  describeSourceSimilarity,
+  evaluateSourceSimilarity,
+  measureSourceSimilarity,
+} from "./sourceSimilarity";
+import {
   recordSystemEditorialEvent,
   type EditorialEventWriter,
 } from "../editorial-history";
@@ -119,6 +124,20 @@ export async function createArticleFromObservation(
     sourceCategory: observation.source.category,
   });
 
+  // Contrôle de ressemblance : un article trop proche de sa source n’est
+  // jamais enregistré, ni comme nouveau brouillon ni en remplacement.
+  const similarity = measureSourceSimilarity(
+    { title: observation.title, content },
+    draft,
+  );
+  const similarityEvaluation = evaluateSourceSimilarity(similarity);
+
+  if (similarityEvaluation.blocked) {
+    throw new Error(
+      `Article bloqué : trop proche du texte source (${describeSourceSimilarity(similarity)}).`,
+    );
+  }
+
   const sourceEditorialCategory = normalizeEditorialCategory(
     observation.source.category,
   );
@@ -179,6 +198,10 @@ export async function createArticleFromObservation(
       details: {
         eventType: "auto_publication_evaluated",
         ...autoPublication.audit,
+        sourceSimilarity: {
+          ...similarity,
+          blocked: false,
+        },
         ...(factSheet ? { factSheet } : {}),
       },
     });
