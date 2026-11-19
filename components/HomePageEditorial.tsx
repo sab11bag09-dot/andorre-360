@@ -182,7 +182,7 @@ export default async function HomePageEditorial() {
               À la Une · {hero.category}
             </p>
 
-            <h1 className="line-clamp-2 max-w-5xl font-serif text-4xl leading-[1.05] md:text-6xl lg:text-7xl">
+            <h1 className="line-clamp-4 max-w-5xl font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:text-5xl lg:text-6xl">
               {hero.title}
             </h1>
 
@@ -200,10 +200,10 @@ export default async function HomePageEditorial() {
       {/* CORPS ÉDITORIAL : 4 COLONNES + 2 COLONNES */}
 
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-10 md:py-14">
-        <div className="grid items-start gap-10 lg:grid-cols-6">
+        <div className="grid items-start gap-10 xl:grid-cols-6">
           {/* PARTIE GAUCHE */}
 
-          <div className="flex flex-col space-y-10 lg:col-span-4">
+          <div className="flex flex-col space-y-10 xl:col-span-4">
             {/* GRANDE CARTE */}
 
             {feature && (
@@ -214,7 +214,7 @@ export default async function HomePageEditorial() {
                       Grande carte · {feature.category}
                     </p>
 
-                    <h2 className="mt-4 line-clamp-2 max-w-4xl font-serif text-4xl leading-tight md:text-5xl">
+                    <h2 className="mt-4 line-clamp-4 max-w-4xl font-serif text-[1.75rem] leading-tight md:line-clamp-3 md:text-5xl">
                       {feature.title}
                     </h2>
                   </div>
@@ -246,10 +246,10 @@ export default async function HomePageEditorial() {
 
             {/* BRÈVES + GRAND FORMAT */}
 
-            <div className="grid gap-8 md:grid-cols-4">
+            <div className="grid gap-8 lg:grid-cols-4">
               {/* BRÈVES */}
 
-              <section className="flex md:col-span-1 md:min-h-[440px] md:flex-col">
+              <section className="flex lg:col-span-1 lg:min-h-[440px] lg:flex-col">
                 <div className="mb-5 border-b border-yellow-500 pb-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                     L’essentiel
@@ -267,7 +267,7 @@ export default async function HomePageEditorial() {
                         {article.category}
                       </p>
 
-                      <h3 className="mt-2 line-clamp-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+                      <h3 className="mt-2 line-clamp-4 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
                         {article.title}
                       </h3>
 
@@ -284,16 +284,16 @@ export default async function HomePageEditorial() {
               {grandFormat && (
                 <Link
                   href={`/article/${grandFormat.slug}`}
-                  className="group block md:col-span-3"
+                  className="group block lg:col-span-3"
                 >
-                  <article className="h-[520px] overflow-hidden border-l border-gray-800 pl-0 md:pl-7">
+                  <article className="h-[520px] overflow-hidden border-l border-gray-800 pl-0 lg:pl-7">
                     <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
                       Grand Format · {grandFormat.category}
                     </p>
 
                     {/* Titre sur toute la largeur des trois colonnes */}
 
-                    <h2 className="mt-4 line-clamp-2 max-w-4xl font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
+                    <h2 className="mt-4 line-clamp-3 max-w-4xl font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
                       {grandFormat.title}
                     </h2>
 
@@ -342,7 +342,7 @@ export default async function HomePageEditorial() {
 
           {/* COLONNE ÉDITORIALE DROITE */}
 
-          <aside className="space-y-9 lg:col-span-2 lg:flex lg:flex-col lg:gap-9 lg:space-y-0 lg:border-l lg:border-gray-800 lg:pl-8">
+          <aside className="space-y-9 xl:col-span-2 xl:flex xl:flex-col xl:gap-9 xl:space-y-0 xl:border-l xl:border-gray-800 xl:pl-8">
             {/* ÉDITO */}
 
             <section className="h-[620px] overflow-hidden border-b border-gray-800 pb-8">
@@ -369,7 +369,7 @@ export default async function HomePageEditorial() {
                     La voix de la rédaction
                   </p>
 
-                  <h3 className="mt-3 line-clamp-2 font-serif text-3xl leading-snug transition group-hover:text-yellow-500">
+                  <h3 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug transition group-hover:text-yellow-500">
                     {editorial.title}
                   </h3>
 
@@ -449,7 +449,7 @@ export default async function HomePageEditorial() {
                           </p>
                         </div>
 
-                        <h3 className="mt-3 line-clamp-3 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+                        <h3 className="mt-3 line-clamp-4 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
                           {article.title}
                         </h3>
 
@@ -485,7 +485,7 @@ export default async function HomePageEditorial() {
                           {article.category}
                         </p>
 
-                        <h3 className="mt-1 line-clamp-2 font-serif leading-snug transition group-hover:text-yellow-500">
+                        <h3 className="mt-1 line-clamp-3 font-serif leading-snug transition group-hover:text-yellow-500">
                           {article.title}
                         </h3>
 

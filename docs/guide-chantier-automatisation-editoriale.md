@@ -924,6 +924,20 @@ Limites :
 - la grande une en mobile (28 caractères) et l’emplacement de 39 caractères restent trop étroits pour un titre de presse : c’est l’affichage qu’il faut adapter (taille du texte ou nombre de lignes), pas la longueur des titres ;
 - les titres existants et ceux écrits à la main ne sont pas concernés.
 
+#### Affichage des titres sur la page d’accueil (19 novembre 2026)
+
+Après la limite de 70 caractères, la page d’accueil (`components/HomePageEditorial.tsx`) a été adaptée pour qu’un titre de cette longueur ne soit coupé nulle part :
+
+- grande une et titre principal : texte un peu plus petit en mobile (28 px), jusqu’à 4 lignes en mobile et 3 au-delà ; interligne de la une relevé à 1,1 pour ne plus rogner le bas des lettres ;
+- « L’essentiel » et les petites cartes : 4 lignes au lieu de 3 ; liste du bas de colonne : 3 lignes au lieu de 2 ; grand format : 3 lignes au lieu de 2 ;
+- « La voix de la rédaction » : 24 px au lieu de 30, sur 3 lignes ;
+- la colonne « L’essentiel » ne passe à côté du grand format qu’à partir de 1 024 px (elle ne faisait que 148 px de large sur tablette) ;
+- la page ne se divise en partie principale et colonne latérale qu’à partir de 1 280 px (entre 1 024 et 1 280 px, plusieurs colonnes ne faisaient que 130 px).
+
+Vérifié dans le navigateur, sur une copie de `./dev.db`, avec cinq vrais titres de 69 à 70 caractères, à 375, 768, 1 024, 1 280 et 1 440 px de large : aucun des 14 emplacements de titre ne coupe le titre, sans défilement horizontal. Avant ces changements, en bureau, 12 titres réels sur 14 étaient coupés.
+
+Limites : seule la page d’accueil a été mesurée et adaptée ; les pages de rubrique (Politique, Culture, Lifestyle…) gardent leurs coupures en 2 ou 3 lignes. Un titre écrit à la main de plus de 70 caractères peut encore être coupé.
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :
