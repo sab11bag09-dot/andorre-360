@@ -136,178 +136,309 @@ describe("OpenAiEditorialGenerator", () => {
     ).rejects.toThrow("La traduction OpenAI a échoué : délai dépassé");
   });
 
-  it("prépare un article français avec son contexte temporel et sa traçabilité", async () => {
-    const client = makeClient(
-      JSON.stringify({
-        title: "Titre français",
-        description: "Description française",
-        content: "Contenu français",
-      }),
-    );
-    const generator = new OpenAiEditorialGenerator({
-      apiKey: "test-key",
-      model: "test-model",
-      client,
-    });
-    const sourcePublishedAt = new Date(
-      "2026-09-02T00:00:00.000Z",
-    );
-    const generatedAt = new Date(
-      "2026-09-20T12:00:00.000Z",
-    );
+  describe("rédaction en deux temps à partir des faits", () => {
+    const SOURCE_TITLE = "El Govern aprova el pla d’habitatge";
+    const SOURCE_SENTENCE =
+      "Segons el ministre, «aquest pla canviarà la vida de moltes famílies andorranes», va dir ahir.";
+    const sourcePublishedAt = new Date("2026-09-02T00:00:00.000Z");
+    const generatedAt = new Date("2026-09-20T12:00:00.000Z");
 
-    await expect(
-      generator.prepareArticle({
-        originalTitle: " Titre français ",
-        originalContent: " Contenu français ",
+    const FACTS = [
+      "Le gouvernement d’Andorre a approuvé un plan logement le 1er septembre 2026.",
+      "Le plan prévoit 120 logements à loyer abordable.",
+    ];
+
+    const ARTICLE = {
+      title: "Le gouvernement approuve un plan de 120 logements abordables",
+      description:
+        "Le plan, approuvé le 1er septembre 2026, prévoit 120 logements à loyer abordable.",
+      content:
+        "Le gouvernement d’Andorre a approuvé le 1er septembre 2026 un plan logement qui prévoit 120 logements à loyer abordable.",
+    };
+
+    function makeTwoStepClient(
+      facts: unknown = { facts: FACTS },
+      article: unknown = ARTICLE,
+    ): StructuredResponseClient {
+      return {
+        create: vi
+          .fn()
+          .mockResolvedValueOnce(
+            typeof facts === "string" ? facts : JSON.stringify(facts),
+          )
+          .mockResolvedValueOnce(
+            typeof article === "string" ? article : JSON.stringify(article),
+          ),
+      };
+    }
+
+    function prepare(
+      generator: OpenAiEditorialGenerator,
+      overrides: Partial<{
+        originalTitle: string;
+        originalContent: string;
+      }> = {},
+    ) {
+      return generator.prepareArticle({
+        originalTitle: ` ${SOURCE_TITLE} `,
+        originalContent: ` ${SOURCE_SENTENCE} `,
         sourcePublishedAt,
         generatedAt,
-        sourceName: "Source",
+        sourceName: "Govern d’Andorra",
         sourceCategory: "Actualité",
-      }),
-    ).resolves.toMatchObject({
-      title: "Titre français",
-      description: "Description française",
-      content: "Contenu français",
-    });
+        ...overrides,
+      });
+    }
 
-    expect(client.create).toHaveBeenCalledWith(
-      expect.objectContaining({
+    function requests(client: StructuredResponseClient) {
+      return vi.mocked(client.create).mock.calls.map(([request]) => request);
+    }
+
+    it("extrait d’abord les faits de la source, puis rédige à partir des faits seulement", async () => {
+      const client = makeTwoStepClient();
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
         model: "test-model",
-        instructions: expect.stringContaining(
-          "date absolue",
-        ),
-        input: JSON.stringify({
-          title: "Titre français",
-          content: "Contenu français",
-          sourceName: "Source",
-          sourceCategory: "Actualité",
-          sourcePublishedAt:
-            "2026-09-02T00:00:00.000Z",
-          generatedAt:
-            "2026-09-20T12:00:00.000Z",
-        }),
-      }),
-    );
+        client,
+      });
 
-    expect(generator.auditMetadata).toEqual({
-      provider: "openai",
-      model: "test-model",
-      promptVersion: "editorial-rewrite-v3",
-    });
-  });
+      await expect(prepare(generator)).resolves.toEqual({
+        ...ARTICLE,
+        category: "Actualité",
+        author: "Govern d’Andorra",
+        factSheet: FACTS,
+      });
 
-  it("nettoie les collisions de mots avant et après la génération", async () => {
-    const client = makeClient(
-      JSON.stringify({
-        title: "Titre propre",
-        description:
-          "Le Comú d’Encampreversera 2 euros par inscription.",
-        content:
-          "Le parcoursdans la montagne protège lesanimaux avec lemême guide.",
-      }),
-    );
-    const generator = new OpenAiEditorialGenerator({
-      apiKey: "test-key",
-      client,
-    });
+      const [extraction, drafting] = requests(client);
 
-    await expect(
-      generator.prepareArticle({
-        originalTitle: "Titre source",
-        originalContent:
-          "Le parcoursdans la montagne protège lesanimaux avec lemême guide.",
-        sourcePublishedAt: new Date(
-          "2026-09-04T00:00:00.000Z",
-        ),
-        generatedAt: new Date(
-          "2026-09-20T12:00:00.000Z",
-        ),
-        sourceName: "Encamp",
+      expect(client.create).toHaveBeenCalledTimes(2);
+      expect(extraction?.model).toBe("test-model");
+      expect(extraction?.schemaName).toBe("article_fact_sheet");
+      expect(JSON.parse(extraction?.input ?? "{}")).toEqual({
+        title: SOURCE_TITLE,
+        content: SOURCE_SENTENCE,
+        sourceName: "Govern d’Andorra",
+        sourcePublishedAt: "2026-09-02T00:00:00.000Z",
+        generatedAt: "2026-09-20T12:00:00.000Z",
+      });
+      expect(extraction?.instructions).toContain("aucune citation");
+      expect(extraction?.instructions).toContain("aucun témoignage");
+
+      expect(drafting?.model).toBe("test-model");
+      expect(drafting?.schemaName).toBe("article_from_facts");
+      expect(JSON.parse(drafting?.input ?? "{}")).toEqual({
+        facts: FACTS,
+        sourceName: "Govern d’Andorra",
         sourceCategory: "Actualité",
-      }),
-    ).resolves.toMatchObject({
-      description:
-        "Le Comú d’Encamp reversera 2 euros par inscription.",
-      content:
-        "Le parcours dans la montagne protège les animaux avec le même guide.",
+        sourcePublishedAt: "2026-09-02T00:00:00.000Z",
+        generatedAt: "2026-09-20T12:00:00.000Z",
+      });
     });
 
-    expect(client.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        input: expect.stringContaining(
-          "Le parcours dans la montagne protège les animaux avec le même guide.",
-        ),
-      }),
-    );
-  });
+    it("ne transmet jamais le texte source à l’étape de rédaction", async () => {
+      const client = makeTwoStepClient();
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
 
-  it("interdit le Markdown dans un article préparé", async () => {
-    const generator = new OpenAiEditorialGenerator({
-      apiKey: "test-key",
-      client: makeClient(
-        JSON.stringify({
-          title: "Titre",
-          description: "Description",
+      await prepare(generator);
+
+      const drafting = requests(client)[1];
+
+      expect(drafting?.input).not.toContain("Govern aprova");
+      expect(drafting?.input).not.toContain("canviarà la vida");
+      expect(drafting?.instructions).not.toContain("citations");
+      expect(drafting?.instructions).toContain("uniquement à partir de la liste de faits");
+    });
+
+    it("trace la nouvelle méthode de rédaction dans l’audit", () => {
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        model: "test-model",
+        client: makeTwoStepClient(),
+      });
+
+      expect(generator.auditMetadata).toEqual({
+        provider: "openai",
+        model: "test-model",
+        promptVersion: "editorial-facts-v1",
+      });
+    });
+
+    it("conserve les contraintes de dates, de texte brut et de quantités à la rédaction", async () => {
+      const client = makeTwoStepClient();
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
+
+      await prepare(generator);
+
+      const drafting = requests(client)[1];
+
+      expect(drafting?.instructions).toContain("date absolue");
+      expect(drafting?.instructions).toContain("jour, le mois et l’année");
+      expect(drafting?.instructions).toContain("aucun balisage Markdown ou HTML");
+      expect(drafting?.instructions).toContain("quantités exactes");
+    });
+
+    it("nettoie les collisions de mots avant l’extraction et dans l’article rédigé", async () => {
+      const client = makeTwoStepClient(
+        { facts: FACTS },
+        {
+          title: "Titre propre",
+          description: "Le Comú d’Encampreversera 2 euros par inscription.",
           content:
-            "Consultez [le site](https://example.com).",
+            "Le parcoursdans la montagne protège lesanimaux avec lemême guide.",
+        },
+      );
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
+
+      await expect(
+        prepare(generator, {
+          originalContent:
+            "Le parcoursdans la montagne protège lesanimaux avec lemême guide.",
         }),
-      ),
+      ).resolves.toMatchObject({
+        description: "Le Comú d’Encamp reversera 2 euros par inscription.",
+        content:
+          "Le parcours dans la montagne protège les animaux avec le même guide.",
+      });
+
+      expect(requests(client)[0]?.input).toContain(
+        "Le parcours dans la montagne protège les animaux avec le même guide.",
+      );
     });
 
-    await expect(
-      generator.prepareArticle({
-        originalTitle: "Titre",
-        originalContent: "Contenu source.",
-        sourcePublishedAt: new Date(
-          "2026-09-04T00:00:00.000Z",
+    it("refuse une liste de faits vide sans lancer la rédaction", async () => {
+      const client = makeTwoStepClient({ facts: [" ", ""] });
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
+
+      await expect(prepare(generator)).rejects.toThrow(
+        "aucun fait exploitable",
+      );
+      expect(client.create).toHaveBeenCalledTimes(1);
+    });
+
+    it("refuse une liste de faits qui reprend une citation longue de la source", async () => {
+      const client = makeTwoStepClient({
+        facts: [
+          "Le ministre a déclaré : « ce plan changera la vie de nombreuses familles andorranes ».",
+        ],
+      });
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
+
+      await expect(prepare(generator)).rejects.toThrow("citation");
+      expect(client.create).toHaveBeenCalledTimes(1);
+    });
+
+    it("accepte un nom court entre guillemets dans un fait", async () => {
+      const facts = [
+        "Le festival « Andorra Ski Fest » aura lieu le 4 décembre 2026.",
+      ];
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client: makeTwoStepClient({ facts }),
+      });
+
+      await expect(prepare(generator)).resolves.toMatchObject({
+        factSheet: facts,
+      });
+    });
+
+    it("refuse un article rédigé qui contient une citation longue", async () => {
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client: makeTwoStepClient(
+          { facts: FACTS },
+          {
+            ...ARTICLE,
+            content:
+              "Le ministre a assuré que “ce plan changera la vie de nombreuses familles”.",
+          },
         ),
-        generatedAt: new Date(
-          "2026-09-20T12:00:00.000Z",
+      });
+
+      await expect(prepare(generator)).rejects.toThrow("citation");
+    });
+
+    it("interdit le Markdown dans l’article rédigé", async () => {
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client: makeTwoStepClient(
+          { facts: FACTS },
+          {
+            ...ARTICLE,
+            content: "Consultez [le site](https://example.com).",
+          },
         ),
-        sourceName: "Source",
-        sourceCategory: "Actualité",
-      }),
-    ).rejects.toThrow("Markdown interdit");
-  });
+      });
 
-  it("exige les années, le texte brut et les quantités exactes", async () => {
-    const client = makeClient(
-      JSON.stringify({
-        title: "Titre",
-        description: "Description",
-        content: "Contenu",
-      }),
-    );
-    const generator = new OpenAiEditorialGenerator({
-      apiKey: "test-key",
-      client,
+      await expect(prepare(generator)).rejects.toThrow("Markdown interdit");
     });
 
-    await generator.prepareArticle({
-      originalTitle: "Titre",
-      originalContent: "Contenu source.",
-      sourcePublishedAt: new Date(
-        "2026-09-04T00:00:00.000Z",
-      ),
-      generatedAt: new Date(
-        "2026-09-20T12:00:00.000Z",
-      ),
-      sourceName: "Source",
-      sourceCategory: "Actualité",
+    it("signale lisiblement une erreur pendant l’extraction des faits", async () => {
+      const client: StructuredResponseClient = {
+        create: vi.fn().mockRejectedValue(new Error("délai dépassé")),
+      };
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
+
+      await expect(prepare(generator)).rejects.toThrow(
+        "L’extraction des faits OpenAI a échoué : délai dépassé",
+      );
     });
 
-    const request = vi.mocked(client.create).mock.calls[0]?.[0];
+    it("signale lisiblement une erreur pendant la rédaction", async () => {
+      const client: StructuredResponseClient = {
+        create: vi
+          .fn()
+          .mockResolvedValueOnce(JSON.stringify({ facts: FACTS }))
+          .mockRejectedValueOnce(new Error("quota atteint")),
+      };
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
 
-    expect(request?.instructions).toContain(
-      "jour, le mois et l’année",
-    );
-    expect(request?.instructions).toContain(
-      "aucun balisage Markdown ou HTML",
-    );
-    expect(request?.instructions).toContain(
-      "quantités exactes",
-    );
+      await expect(prepare(generator)).rejects.toThrow(
+        "La rédaction OpenAI a échoué : quota atteint",
+      );
+    });
+
+    it("refuse un fait trop long, signe d’un paragraphe repris tel quel", async () => {
+      const client = makeTwoStepClient({ facts: ["mot ".repeat(120)] });
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client,
+      });
+
+      await expect(prepare(generator)).rejects.toThrow("dépasse 400 caractères");
+      expect(client.create).toHaveBeenCalledTimes(1);
+    });
+
+    it("rejette une liste de faits mal formée", async () => {
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        client: makeTwoStepClient("pas du JSON"),
+      });
+
+      await expect(prepare(generator)).rejects.toThrow(
+        "liste de faits invalide",
+      );
+    });
   });
 
   it("refuse une clé vide", () => {

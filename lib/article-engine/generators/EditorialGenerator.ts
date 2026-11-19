@@ -13,6 +13,12 @@ export interface PreparedArticle {
   content: string;
   category: string;
   author: string;
+  /**
+   * Liste de faits dont l’article a été rédigé, lorsque le générateur
+   * travaille en deux temps. Elle est consignée dans l’audit, jamais
+   * enregistrée dans l’article.
+   */
+  factSheet?: string[];
 }
 
 export type TranslationLocale = "FR" | "CA" | "ES";

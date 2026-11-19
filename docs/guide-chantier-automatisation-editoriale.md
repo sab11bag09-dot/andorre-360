@@ -706,6 +706,29 @@ Constats :
 
 Après l’essai, remettre `AI_ARTICLE_ORCHESTRATOR_ENABLED=false` et `AI_AUTO_PUBLICATION_EMERGENCY_STOP=true`.
 
+#### Rédaction à partir des faits (19 novembre 2026)
+
+Les sources retenues lors du premier essai sont surtout des médias. Pour réduire le risque juridique de la réécriture d’articles de presse, la génération OpenAI travaille désormais en deux temps (`OpenAiEditorialGenerator`, version de consigne `editorial-facts-v1`) :
+
+1. **extraction** : un premier appel lit la source et rend une liste de faits courts et neutres (qui, quoi, où, quand, combien), sans citation ni témoignage ; une prise de position officielle n’y figure que résumée et attribuée, sans guillemets ;
+2. **rédaction** : un second appel rédige le titre, le chapô et l’article à partir de cette liste seulement. Il ne reçoit ni le titre ni le texte d’origine.
+
+Contrôles automatiques, qui font échouer la génération de l’observation concernée sans créer de brouillon :
+
+- liste de faits vide, mal formée, de plus de 40 faits, ou contenant un fait de plus de 400 caractères (signe d’un paragraphe repris tel quel) ;
+- passage de plus de 4 mots entre guillemets dans un fait ou dans l’article rédigé ; un nom court entre guillemets reste accepté ;
+- Markdown dans l’article rédigé, comme auparavant.
+
+La liste de faits n’est jamais enregistrée dans l’article : elle est consignée dans l’événement `ARTICLE_CREATED` (champ `factSheet`), pour permettre au relecteur de comparer l’article aux faits.
+
+Conséquences :
+
+- chaque article coûte désormais deux appels OpenAI au lieu d’un ;
+- les citations des personnes interrogées disparaissent des articles : c’est voulu, mais les articles seront plus secs ;
+- les tests utilisent un faux client ; la méthode n’a pas encore été essayée sur de vrais appels.
+
+Ce changement éloigne le texte produit de la formulation de la source, mais **ne tranche pas la question juridique** : il ne remplace pas un avis d’avocat, qui reste nécessaire avant toute mise en ligne. Prochains lots prévus : un contrôle automatique de ressemblance entre l’article et la source, puis la priorité aux sources institutionnelles dans la sélection de l’orchestrateur.
+
 ### Lot E — Automatiser l’ensemble de la chaîne
 
 Quand les lots précédents seront suffisamment fiables :
@@ -933,6 +956,7 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - 4 observations Altaveu du 13 août restent datées au 7 décembre 2026 : données antérieures au correctif #125, sans effet sur l’orchestrateur ;
 - images des brouillons : image générique, amélioration nécessaire ;
 - production : non déployée ;
+- rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), pas encore essayée sur de vrais appels OpenAI ;
 - prochaines priorités : relecture des brouillons de l’essai, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés.
 
 ---
