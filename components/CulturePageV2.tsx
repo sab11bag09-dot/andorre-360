@@ -177,7 +177,7 @@ export default async function CulturePageV2() {
                       ) : null}
 
                       <div className="p-5">
-                        <h2 className="line-clamp-2 font-serif text-2xl leading-[1.1]">
+                        <h2 className="line-clamp-3 font-serif text-xl leading-[1.15] xl:text-2xl">
                           {secondBottomCard.title}
                         </h2>
 
@@ -267,7 +267,7 @@ export default async function CulturePageV2() {
                   ) : null}
 
                   <div className="p-4">
-                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 

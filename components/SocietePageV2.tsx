@@ -43,7 +43,7 @@ export default async function SociétéPageV2() {
                 {featured.category}
               </p>
 
-              <h1 className="mt-4 line-clamp-2 max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl">
+              <h1 className="mt-4 line-clamp-4 overflow-hidden font-serif text-[1.75rem] leading-[1.15] md:line-clamp-3 md:text-5xl">
                 {featured.title}
               </h1>
 
@@ -104,7 +104,7 @@ export default async function SociétéPageV2() {
                     className="block"
                   >
                     <article className="flex h-[150px] max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-3 overflow-hidden font-serif text-lg leading-6">
+                      <h3 className="line-clamp-4 overflow-hidden font-serif text-lg leading-6">
                         {article.title}
                       </h3>
 
@@ -176,7 +176,7 @@ export default async function SociétéPageV2() {
                       </div>
 
                       <div className="flex h-[132px] flex-col p-5">
-                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        <h2 className="line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl">
                           {bottomCard.title}
                         </h2>
 
@@ -205,7 +205,7 @@ export default async function SociétéPageV2() {
                       </div>
 
                       <div className="flex h-[132px] flex-col p-5">
-                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        <h2 className="line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl">
                           {secondBottomCard.title}
                         </h2>
 
@@ -255,7 +255,7 @@ export default async function SociétéPageV2() {
                         Question à…
                       </p>
 
-                      <h2 className="mt-3 h-[3.5rem] max-h-[3.5rem] line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
+                      <h2 className="mt-3 h-[5.25rem] max-h-[5.25rem] line-clamp-3 overflow-hidden font-serif text-xl leading-7 xl:text-2xl">
                         {questionArticle.title}
                       </h2>
 
@@ -313,7 +313,7 @@ export default async function SociétéPageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
+                  <h2 className="mt-4 line-clamp-4 overflow-hidden font-serif text-xl leading-7 xl:line-clamp-3 xl:text-2xl">
                     {bonASavoir.title}
                   </h2>
 

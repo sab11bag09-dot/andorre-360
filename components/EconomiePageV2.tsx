@@ -107,7 +107,7 @@ export default async function EconomiePageV2() {
                     className="block"
                   >
                     <article className="flex h-[150px] max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="line-clamp-3 overflow-hidden font-serif text-lg leading-6">
+                      <h3 className="line-clamp-4 overflow-hidden font-serif text-lg leading-6">
                         {article.title}
                       </h3>
 
@@ -179,7 +179,7 @@ export default async function EconomiePageV2() {
                       </div>
 
                       <div className="flex h-[150px] flex-col p-5">
-                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        <h2 className="line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl">
                           {bottomCard.title}
                         </h2>
 
@@ -208,7 +208,7 @@ export default async function EconomiePageV2() {
                       </div>
 
                       <div className="flex h-[150px] flex-col p-5">
-                        <h2 className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7">
+                        <h2 className="line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl">
                           {secondBottomCard.title}
                         </h2>
 
@@ -322,7 +322,7 @@ export default async function EconomiePageV2() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7">
+                  <h2 className="mt-4 line-clamp-4 overflow-hidden font-serif text-xl leading-7 xl:line-clamp-3 xl:text-2xl">
                     {bonASavoir.title}
                   </h2>
 
@@ -341,7 +341,7 @@ export default async function EconomiePageV2() {
                     className="block border-t border-zinc-700 p-5 transition hover:bg-zinc-800"
                   >
                     <article className="flex h-[150px] flex-col justify-between overflow-hidden">
-                      <h3 className="line-clamp-3 overflow-hidden font-serif text-lg leading-6">
+                      <h3 className="line-clamp-4 overflow-hidden font-serif text-lg leading-6">
                         {bonASavoirBrief.title}
                       </h3>
 

@@ -67,20 +67,20 @@ describe("mise en page Ils en parlent", () => {
     expect(componentSource).toContain("videoUrl={mainArticle.videoUrl}");
     expect(componentSource).toContain('className="relative h-[420px]"');
     expect(componentSource).toContain(
-      'className="line-clamp-2 font-serif text-4xl leading-[1.05]"',
+      'className="line-clamp-4 font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:text-4xl"',
     );
     expect(componentSource).toContain(
       'className="mt-4 line-clamp-2 text-gray-400"',
     );
   });
 
-  it("conserve six brèves limitées à trois lignes", () => {
+  it("conserve six brèves limitées à quatre lignes", () => {
     expect(componentSource).toContain("{/* SIX BRÈVES */}");
     expect(componentSource).toContain(
       'className="mt-8 grid gap-4 md:grid-cols-3"',
     );
     expect(componentSource).toContain(
-      'className="line-clamp-3 font-serif text-lg leading-snug"',
+      'className="line-clamp-4 font-serif text-lg leading-snug"',
     );
   });
 
@@ -109,7 +109,7 @@ describe("mise en page Ils en parlent", () => {
     expect(componentSource).toContain("{/* QUESTION À... */}");
     expect(componentSource).toContain('className="relative h-72"');
     expect(componentSource).toContain(
-      'className="mt-3 line-clamp-3 font-serif text-2xl leading-snug"',
+      'className="mt-3 line-clamp-3 font-serif text-xl leading-snug xl:text-2xl"',
     );
     expect(componentSource).toContain("{/* TROIS CARTES CLASSIQUES */}");
     expect(componentSource).toContain("rightCards.map((article, index) =>");

@@ -93,7 +93,7 @@ describe("mise en page Actualité", () => {
     );
     expect(
       countOccurrences(
-        'className="line-clamp-2 overflow-hidden font-serif text-2xl leading-tight"',
+        'className="line-clamp-3 overflow-hidden font-serif text-xl leading-tight xl:text-2xl"',
       ),
     ).toBe(2);
     expect(source).toContain("{bottomCard.title}");
@@ -111,7 +111,7 @@ describe("mise en page Actualité", () => {
   it("conserve le bloc Bon à savoir", () => {
     expect(source).toContain("{/* BON À SAVOIR */}");
     expect(source).toContain(
-      'className="mt-4 line-clamp-2 font-serif text-2xl leading-snug"',
+      'className="mt-4 line-clamp-4 font-serif text-xl leading-snug xl:line-clamp-3 xl:text-2xl"',
     );
     expect(source).toContain(
       'className="mt-4 line-clamp-5 leading-relaxed text-gray-400"',

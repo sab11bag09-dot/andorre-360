@@ -14,7 +14,7 @@ function countOccurrences(value: string): number {
 describe("mise en page Politique", () => {
   it("limite le titre et le chapô du hero", () => {
     expect(source).toContain(
-      'className="mt-4 line-clamp-2 max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl"',
+      'className="mt-4 line-clamp-4 overflow-hidden font-serif text-[1.75rem] leading-[1.15] md:line-clamp-3 md:text-5xl"',
     );
 
     expect(source).toContain(
@@ -22,7 +22,7 @@ describe("mise en page Politique", () => {
     );
   });
 
-  it("conserve six brèves uniformes avec trois lignes maximum", () => {
+  it("conserve six brèves uniformes avec quatre lignes maximum", () => {
     expect(source).toContain("{/* SIX BRÈVES */}");
 
     expect(source).toContain(
@@ -30,7 +30,7 @@ describe("mise en page Politique", () => {
     );
 
     expect(source).toContain(
-      'className="line-clamp-3 overflow-hidden font-serif text-lg leading-6"',
+      'className="line-clamp-4 overflow-hidden font-serif text-lg leading-6"',
     );
   });
 
@@ -45,7 +45,7 @@ describe("mise en page Politique", () => {
 
     expect(
       countOccurrences(
-        'className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7"',
+        'className="line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl"',
       ),
     ).toBe(2);
   });
@@ -59,11 +59,11 @@ describe("mise en page Politique", () => {
 
   it("limite Question à et Bon à savoir", () => {
     expect(source).toContain(
-      'className="mt-3 line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7"',
+      'className="mt-3 line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl"',
     );
 
     expect(source).toContain(
-      'className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7"',
+      'className="mt-4 line-clamp-4 overflow-hidden font-serif text-xl leading-7 xl:line-clamp-3 xl:text-2xl"',
     );
 
     expect(source).toContain(

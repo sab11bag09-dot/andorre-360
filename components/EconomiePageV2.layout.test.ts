@@ -12,13 +12,13 @@ function countOccurrences(value: string): number {
 }
 
 describe("mise en page Économie", () => {
-  it("conserve les brèves uniformes avec trois lignes maximum", () => {
+  it("conserve les brèves uniformes avec quatre lignes maximum", () => {
     expect(source).toContain("{/* SIX BRÈVES */}");
     expect(source).toContain(
       'className="flex h-[150px] max-h-[150px] flex-col justify-between overflow-hidden',
     );
     expect(source).toContain(
-      'className="line-clamp-3 overflow-hidden font-serif text-lg leading-6"',
+      'className="line-clamp-4 overflow-hidden font-serif text-lg leading-6"',
     );
     expect(source).toContain("Lire l’article →");
   });
@@ -32,7 +32,7 @@ describe("mise en page Économie", () => {
 
     expect(
       countOccurrences(
-        'className="line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7"',
+        'className="line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl"',
       ),
     ).toBe(2);
   });

@@ -75,7 +75,7 @@ export default async function MontagnePageV2() {
                   </div>
 
                   <div className="p-6">
-                    <h2 className="line-clamp-2 font-serif text-4xl leading-[1.05]">
+                    <h2 className="line-clamp-4 font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:text-4xl">
                       {mainArticle.title}
                     </h2>
 
@@ -118,7 +118,7 @@ export default async function MontagnePageV2() {
                         <div>
                           <h3
                             className={`line-clamp-3 font-serif leading-snug ${
-                              index < 2 ? "text-2xl" : "text-xl"
+                              index < 2 ? "text-xl xl:text-2xl" : "text-xl"
                             }`}
                           >
                             {article.title}
@@ -165,7 +165,7 @@ export default async function MontagnePageV2() {
                       Question à…
                     </p>
 
-                    <h2 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug">
+                    <h2 className="mt-3 line-clamp-3 font-serif text-xl leading-snug xl:text-2xl">
                       {questionArticle.title}
                     </h2>
 
@@ -209,7 +209,7 @@ export default async function MontagnePageV2() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="line-clamp-2 font-serif text-lg leading-snug">
+                    <h3 className="line-clamp-3 font-serif text-lg leading-snug">
                       {article.title}
                     </h3>
 

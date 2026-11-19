@@ -234,7 +234,7 @@ export default async function ActualitePage() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="line-clamp-2 overflow-hidden font-serif text-2xl leading-tight">
+                        <h2 className="line-clamp-3 overflow-hidden font-serif text-xl leading-tight xl:text-2xl">
                           {bottomCard.title}
                         </h2>
 
@@ -263,7 +263,7 @@ export default async function ActualitePage() {
                       </div>
 
                       <div className="p-5">
-                        <h2 className="line-clamp-2 overflow-hidden font-serif text-2xl leading-tight">
+                        <h2 className="line-clamp-3 overflow-hidden font-serif text-xl leading-tight xl:text-2xl">
                           {secondBottomCard.title}
                         </h2>
 
@@ -327,7 +327,7 @@ export default async function ActualitePage() {
                     Bon à savoir
                   </p>
 
-                  <h2 className="mt-4 line-clamp-2 font-serif text-2xl leading-snug">
+                  <h2 className="mt-4 line-clamp-4 font-serif text-xl leading-snug xl:line-clamp-3 xl:text-2xl">
                     {bonASavoir.title}
                   </h2>
 

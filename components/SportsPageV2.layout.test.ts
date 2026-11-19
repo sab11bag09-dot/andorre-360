@@ -20,7 +20,7 @@ describe("mise en page Sports", () => {
 
   it("limite le titre et le chapô du hero", () => {
     expect(source).toContain(
-      'className="mt-4 line-clamp-2 max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl"',
+      'className="mt-4 line-clamp-4 overflow-hidden font-serif text-[1.75rem] leading-[1.15] md:line-clamp-3 md:text-5xl"',
     );
     expect(source).toContain(
       'className="mt-4 line-clamp-2 h-12 max-h-12 overflow-hidden leading-6 text-gray-300"',
@@ -31,7 +31,7 @@ describe("mise en page Sports", () => {
     expect(source).toContain("{/* SIX BRÈVES */}");
     expect(source).toContain("md:auto-rows-[150px] md:grid-cols-3");
     expect(source).toContain(
-      'className="line-clamp-3 font-serif text-lg leading-snug"',
+      'className="line-clamp-4 font-serif text-lg leading-snug"',
     );
   });
 
@@ -47,7 +47,7 @@ describe("mise en page Sports", () => {
 
   it("limite Question à et les cartes droites", () => {
     expect(source).toContain(
-      'className="mt-3 line-clamp-2 h-14 max-h-14 overflow-hidden font-serif text-2xl leading-7"',
+      'className="mt-3 line-clamp-3 h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-xl leading-7 xl:text-2xl"',
     );
     expect(source).toContain(
       'className="mt-3 line-clamp-3 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-sm leading-6 text-gray-400"',
@@ -59,7 +59,7 @@ describe("mise en page Sports", () => {
 
   it("limite le bloc Bon à savoir", () => {
     expect(source).toContain(
-      'className="mt-4 line-clamp-2 overflow-hidden font-serif text-2xl leading-7"',
+      'className="mt-4 line-clamp-4 overflow-hidden font-serif text-xl leading-7 xl:line-clamp-3 xl:text-2xl"',
     );
     expect(source).toContain(
       'className="mt-4 line-clamp-3 overflow-hidden leading-6 text-gray-400"',
