@@ -6,6 +6,7 @@ import {
   extractArticlePagePublishedAt,
   parseDateFromUrl,
 } from "./collectors/HtmlCollector";
+import { siteRules } from "./collectors/siteRules";
 import type { HtmlClient } from "./html/HtmlClient";
 import { normalizeObservationPublishedAt } from "./observationDate";
 
@@ -70,7 +71,10 @@ export async function backfillObservationDates(
 
     try {
       const html = await htmlClient.get(observation.url);
-      pageDate = extractArticlePagePublishedAt(cheerio.load(html));
+      pageDate = extractArticlePagePublishedAt(
+        cheerio.load(html),
+        siteRules[new URL(observation.url).hostname],
+      );
     } catch {
       result.failed += 1;
       continue;

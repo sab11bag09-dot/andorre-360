@@ -7,6 +7,14 @@ export type SiteRule = {
   maxArticles?: number;
   concurrency?: number;
   requireContent?: boolean;
+  /**
+   * Éléments de la page d’article qui affichent sa date de publication,
+   * pour les sites qui ne la déclarent pas selon les conventions standard.
+   * Lus avant les signaux génériques.
+   */
+  publishedAt?: string[];
+  /** Éléments du bloc de la page de liste qui affichent la date de l’article. */
+  listingPublishedAt?: string[];
 };
 
 const comuEncampRule: SiteRule = {
@@ -59,6 +67,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.rtva.ad": {
     listing: ['a[href^="/noticies/"]'],
+    publishedAt: ['[class^="ContentArticle_date"]'],
     articlePathPattern: /^\/noticies\/[^/]+\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
@@ -344,6 +353,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
     "comusantjulia.ad": {
     listing: ['a[href*="/ca/actualitat/noticies/"]'],
+    listingPublishedAt: [".post-meta"],
     articlePathPattern:
       /^\/ca\/actualitat\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
@@ -428,6 +438,7 @@ export const siteRules: Record<string, SiteRule> = {
   },
     "www.afa.ad": {
     listing: ['a[href*="/comunicats-de-premsa/"]'],
+    publishedAt: ["p.text-gray-light:has(.icon-history) span:not(.icon-history)"],
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
@@ -714,6 +725,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "ari.ad": {
     listing: ['a[href*="/noticies/"]'],
+    publishedAt: [".post-meta-date"],
     articlePathPattern: /^\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
@@ -754,6 +766,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "e-e.ad": {
     listing: ['a[href*="/publicacio/"]'],
+    publishedAt: [".post__terms:has(.fa-calendar)"],
     articlePathPattern: /^\/publicacio\/\d+\/[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
