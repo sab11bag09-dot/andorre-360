@@ -828,6 +828,27 @@ Limites constatées pendant cette mesure :
 - seules les observations des 7 derniers jours servent de référence ;
 - un suivi d’une même affaire (nouvelle étape d’une procédure) peut être écarté comme doublon : c’est un choix prudent, l’article peut toujours être créé à la main.
 
+#### Dates propres à certains sites (19 novembre 2026)
+
+Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :
+
+- `publishedAt` : élément de la page d’article, lu avant les signaux génériques, à la collecte comme au redatage (`backfillObservationDates`) ;
+- `listingPublishedAt` : élément du bloc de la page de liste, pour les sites qui n’affichent la date que là.
+
+Le format « jour.mois.année » (année sur 2 ou 4 chiffres) n’est lu que dans un élément désigné par une règle : seul, il se confond avec un numéro de version. Une date future reste refusée.
+
+| Source | Élément lu | Exemple |
+|---|---|---|
+| RTVA | `[class^="ContentArticle_date"]` | 19.11.26 |
+| AR+I | `.post-meta-date` | Publicat: 19/11/2026 |
+| Escaldes-Engordany | `.post__terms` contenant l’icône calendrier | 2026-10-20 |
+| AFA | date sous le titre (`p.text-gray-light`, icône `icon-history`) | 01/09/2026 |
+| Comú de Sant Julià de Lòria | `.post-meta` de la page de liste | 16.11.2026 |
+
+Mesure à blanc du redatage (`dryRun`, copie de `./dev.db`, pages réelles) : 68 observations sur 158 datées (RTVA 31, AR+I 25, Escaldes-Engordany 7, AFA 5), aucune erreur. Sant Julià de Lòria sera daté à la prochaine collecte, puisque sa date ne figure que sur la page de liste. Le redatage réel de `./dev.db` n’a pas été lancé.
+
+Sources toujours sans date exploitable, faute de date de publication sur la page : Consell General, Ordino, CCIS, CASS, Mobilitat (incidents), FAE et PS (seule une description de page contient deux dates, sans indication de leur rôle). L’Agenda n’affiche que des dates d’événements, qui ne sont pas des dates de publication : il ne doit pas être daté ainsi. Pour l’AFA, l’icône utilisée ne permet pas d’exclure qu’il s’agisse d’une date de mise à jour : à vérifier lors de la relecture.
+
 ### Lot E — Automatiser l’ensemble de la chaîne
 
 Quand les lots précédents seront suffisamment fiables :
@@ -1051,7 +1072,7 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - orchestrateur des articles : livré, mode brouillons par défaut, désactivé hors des essais ;
 - publication automatique des articles : désactivée localement, arrêt d’urgence activé ;
 - essais supervisés : le 18 novembre 2026, 5 brouillons (articles 494 à 498) ; le 19 novembre 2026, 5 brouillons rédigés à partir des faits (articles 499 à 503) ; aucune publication (voir lot D) ;
-- dates : 67 % des observations datées à la collecte ; 13 sources sans signal standard ;
+- dates : 67 % des observations datées à la collecte ; règles propres à RTVA, AR+I, Escaldes-Engordany, AFA et Sant Julià de Lòria ; 7 sources restent sans date exploitable, et l’Agenda n’affiche que des dates d’événements ;
 - 4 observations Altaveu du 13 août restent datées au 7 décembre 2026 : données antérieures au correctif #125, sans effet sur l’orchestrateur ;
 - images des brouillons : image générique, amélioration nécessaire ;
 - production : non déployée ;
@@ -1059,7 +1080,7 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
 - sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; sources reclassées dans `./dev.db` le 19 novembre 2026 ;
 - anti-doublon par sujet : titres rapprochés par mots significatifs communs ; pas encore entre langues différentes ;
-- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, anti-doublon par sujet entre langues différentes, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés ;
+- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, anti-doublon par sujet entre langues différentes, choix d’images pertinentes, redatage réel des observations récentes, puis d’autres essais supervisés ;
 - question juridique de la reprise d’articles de presse : réduite par les trois derniers lots, mais non tranchée ; un avis d’avocat reste nécessaire avant toute mise en ligne.
 
 ---

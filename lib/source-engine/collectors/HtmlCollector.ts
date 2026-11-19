@@ -6,7 +6,7 @@ import type {
   Collector,
   ObservationInput,
 } from "./Collector";
-import { siteRules } from "./siteRules";
+import { siteRules, type SiteRule } from "./siteRules";
 import { normalizeObservationPublishedAt } from "../observationDate";
 import { FetchHtmlClient } from "../html/FetchHtmlClient";
 import type { HtmlClient } from "../html/HtmlClient";
@@ -156,6 +156,50 @@ function validUtcDate(year: number, month: number, day: number): Date | null {
     : null;
 }
 
+/**
+ * Date « jour.mois.année » (année sur 2 ou 4 chiffres), lue seulement dans
+ * un élément désigné par une règle de site : seul, ce format se confond avec
+ * des numéros de version.
+ */
+function parseDottedDate(value: string): Date | null {
+  const match = normalizeText(value).match(
+    /^(\d{1,2})\.(\d{1,2})\.(\d{2}|\d{4})$/,
+  );
+
+  if (!match) return null;
+
+  const [, dayValue, monthValue, yearValue] = match;
+  const year =
+    yearValue.length === 2 ? 2000 + Number(yearValue) : Number(yearValue);
+
+  return validUtcDate(year, Number(monthValue) - 1, Number(dayValue));
+}
+
+/** Date lue dans les éléments désignés par une règle de site. */
+function siteRuleDate(
+  $: cheerio.CheerioAPI,
+  root: ReturnType<cheerio.CheerioAPI> | null,
+  selectors: string[] | undefined,
+): Date | null {
+  for (const selector of selectors ?? []) {
+    const element = (root ? root.find(selector) : $(selector)).first();
+    if (element.length === 0) continue;
+
+    const candidates = [element.attr("datetime") ?? "", element.text()].map(
+      normalizeText,
+    );
+    for (const candidate of candidates) {
+      if (!candidate) continue;
+      const date = normalizeObservationPublishedAt(
+        parseDottedDate(candidate) ?? parseGenericDate(candidate),
+      );
+      if (date) return date;
+    }
+  }
+
+  return null;
+}
+
 /** Date année/mois/jour présente dans le chemin de l’adresse, en dernier recours. */
 export function parseDateFromUrl(value: string): Date | null {
   try {
@@ -249,7 +293,12 @@ function firstValidDate(candidates: string[]): Date | null {
  */
 export function extractArticlePagePublishedAt(
   $: cheerio.CheerioAPI,
+  siteRule?: SiteRule,
 ): Date | null {
+  // Une règle propre au site désigne l’élément exact qui porte la date.
+  const ruleDate = siteRuleDate($, null, siteRule?.publishedAt);
+  if (ruleDate) return ruleDate;
+
   // Priorité aux dates déclarées par l’article : une balise time de
   // la page peut afficher la date du jour (en-tête, agenda…).
   return firstValidDate([
@@ -414,7 +463,7 @@ export class HtmlCollector implements Collector {
         }
       }
 
-      const publishedAt = extractArticlePagePublishedAt($);
+      const publishedAt = extractArticlePagePublishedAt($, siteRule);
 
       return {
         content,
@@ -511,9 +560,9 @@ export class HtmlCollector implements Collector {
         links.push({
           title,
           url,
-          publishedAt: dateText
-            ? parseGenericDate(dateText)
-            : null,
+          publishedAt:
+            siteRuleDate($, container, siteRule?.listingPublishedAt) ??
+            (dateText ? parseGenericDate(dateText) : null),
         });
       });
     }

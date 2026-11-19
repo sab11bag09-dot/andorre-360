@@ -190,4 +190,19 @@ describe("backfillObservationDates", () => {
       (await client.observation.findUniqueOrThrow({ where: { id: observation.id } })).publishedAt,
     ).toBeNull();
   });
+
+  it("uses the date rule of the observation’s site", async () => {
+    const observation = await createObservation({ url: "https://ari.ad/noticies/del-microscopi" });
+    const htmlClient = new FakeHtmlClient({
+      "https://ari.ad/noticies/del-microscopi":
+        '<div class="post-meta"><span class="post-meta-date">Publicat: 18/11/2026</span></div>',
+    });
+
+    const result = await backfillObservationDates(client, htmlClient, { now: NOW });
+
+    expect(result).toMatchObject({ dated: 1 });
+    expect(
+      (await client.observation.findUniqueOrThrow({ where: { id: observation.id } })).publishedAt?.toISOString(),
+    ).toBe("2026-11-18T00:00:00.000Z");
+  });
 });

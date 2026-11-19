@@ -712,3 +712,98 @@ describe("HtmlCollector — dates de publication standard", () => {
     ).resolves.toBeNull();
   });
 });
+
+describe("HtmlCollector — dates propres à certains sites", () => {
+  const BODY = `
+    <div class="article-content">
+      <p>Contenu éditorial suffisamment long pour vérifier la lecture de la date de publication propre au site.</p>
+    </div>
+  `;
+
+  async function collectSiteDate(sourceUrl: string, articleUrl: string, articleHtml: string) {
+    const source = { ...createSource(), url: sourceUrl };
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `<h2><a href="${new URL(articleUrl).pathname}">Article de test</a></h2>`,
+      [articleUrl]: articleHtml,
+    });
+    const collector = new HtmlCollector(htmlClient);
+    const observations = await collector.collect(source);
+    return observations.find((observation) => observation.url === articleUrl)?.publishedAt?.toISOString() ?? null;
+  }
+
+  it("lit la date RTVA au format jour.mois.année sur deux chiffres", async () => {
+    await expect(
+      collectSiteDate(
+        "https://www.rtva.ad",
+        "https://www.rtva.ad/noticies/politica/andorra-estudia-donar-suport",
+        `<p class="ContentArticle_date__tJl00">19.11.26</p>
+         <div class="ContentArticle_infoBody__pp8zZ"><p>${"Text de la notícia de RTVA. ".repeat(4)}</p></div>
+         <div class="ContentCard_date__Ds9dC">08.10.26</div>`,
+      ),
+    ).resolves.toBe("2026-11-19T00:00:00.000Z");
+  });
+
+  it("lit la date d’Escaldes-Engordany à côté de l’icône calendrier", async () => {
+    await expect(
+      collectSiteDate(
+        "https://e-e.ad/categoria/66/noticies/",
+        "https://e-e.ad/publicacio/7538/el-carrer-josep-viladomat",
+        `<div class="post__meta-item post__meta-item--category">
+           <span class="post__terms post__terms--category"><i class="fa fa-calendar" aria-hidden="true"></i> 2026-10-20</span>
+         </div>
+         <div class="post__content"><p>${"Text de la notícia d’Escaldes. ".repeat(4)}</p></div>`,
+      ),
+    ).resolves.toBe("2026-10-20T00:00:00.000Z");
+  });
+
+  it("lit la date « Publicat » d’AR+I, même si ce bloc est retiré du contenu", async () => {
+    await expect(
+      collectSiteDate(
+        "https://ari.ad/noticies",
+        "https://ari.ad/noticies/del-microscopi-als-prismatics",
+        `<div class="post-meta"><span class="post-meta-date"><i class="icon-calendar"></i> Publicat: 18/11/2026</span></div>
+         <div class="single-post"><div class="textllarg pt-4"><p>${"Text de la notícia d’AR+I. ".repeat(4)}</p></div></div>`,
+      ),
+    ).resolves.toBe("2026-11-18T00:00:00.000Z");
+  });
+
+  it("lit la date affichée sous le titre d’un communiqué de l’AFA", async () => {
+    await expect(
+      collectSiteDate(
+        "https://www.afa.ad/ca/sala-premsa/comunicats-de-premsa",
+        "https://www.afa.ad/ca/sala-premsa/comunicats-de-premsa/memoria-2025/view",
+        `<p class="text-gray-light"><span class="icon-history" aria-hidden="true"></span> <span>01/09/2026</span></p>
+         <div id="content-core"><p>${"Text del comunicat de l’AFA. ".repeat(4)}</p></div>`,
+      ),
+    ).resolves.toBe("2026-09-01T00:00:00.000Z");
+  });
+
+  it("lit la date de Sant Julià de Lòria sur la page de liste", async () => {
+    const source = { ...createSource(), url: "https://comusantjulia.ad/ca/actualitat/noticies/" };
+    const articleUrl = "https://comusantjulia.ad/ca/actualitat/noticies/consell-d-infants/";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `
+        <ul class="posts-list"><li>
+          <div class="post-info">
+            <a href="/ca/actualitat/noticies/consell-d-infants/">Sant Julià constitueix el 19è Consell d’Infants</a>
+            <div class="post-meta clearfix"> 16.11.2026 </div>
+          </div>
+        </li></ul>`,
+      [articleUrl]: `<div class="post-content"><p>${"Text de la notícia de Sant Julià. ".repeat(4)}</p></div>`,
+    });
+
+    const observations = await new HtmlCollector(htmlClient).collect(source);
+
+    expect(observations[0]?.publishedAt?.toISOString()).toBe("2026-11-16T00:00:00.000Z");
+  });
+
+  it("n’interprète pas un nombre à points quelconque comme une date sur un autre site", async () => {
+    await expect(
+      collectSiteDate(
+        "https://example.com",
+        "https://example.com/article",
+        `<p class="version">19.11.26</p>${BODY}`,
+      ),
+    ).resolves.toBeNull();
+  });
+});
