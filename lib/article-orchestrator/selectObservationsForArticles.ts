@@ -5,6 +5,7 @@ import type {
 } from "@/lib/generated/prisma/client";
 
 import { normalizeObservationPublishedAt } from "../source-engine/observationDate";
+import { isSameTopic, topicWords } from "./topicSimilarity";
 
 /**
  * Sélection déterministe des observations qu’un futur orchestrateur
@@ -112,6 +113,8 @@ export type ObservationSelectionReason =
   | "content_too_short"
   | "duplicate_of_processed_observation"
   | "duplicate_of_selected_observation"
+  | "same_topic_as_processed_observation"
+  | "same_topic_as_selected_observation"
   | "source_limit_reached"
   | "batch_limit_reached";
 
@@ -121,6 +124,8 @@ export type ObservationSelectionDecision = {
   sourcePriority: SourcePriority;
   status: "selected" | "skipped";
   reasons: ObservationSelectionReason[];
+  /** Observation du même sujet, déjà traitée ou retenue, qui motive le refus. */
+  relatedObservationId?: number;
 };
 
 export type ObservationSelectionResult = {
@@ -155,11 +160,17 @@ export function selectObservationsForArticles(input: {
 
   // Les observations déjà traitées servent de référence anti-doublon.
   const processedKeys = new Set<string>();
+  const processedTopics: Array<{ id: number; words: Set<string> }> = [];
   for (const observation of ordered) {
     if (observation.processed || observation.articleId !== null) {
       for (const key of duplicateKeys(observation)) processedKeys.add(key);
+      processedTopics.push({
+        id: observation.id,
+        words: topicWords(observation.title),
+      });
     }
   }
+  const selectedTopics: Array<{ id: number; words: Set<string> }> = [];
 
   const selectedKeys = new Set<string>();
   const selectedObservationIds: number[] = [];
@@ -178,13 +189,26 @@ export function selectObservationsForArticles(input: {
       reasons.unshift("already_attempted_by_orchestrator");
     }
 
+    let relatedObservationId: number | undefined;
+
     if (reasons.length === 0) {
       const keys = duplicateKeys(observation);
+      const words = topicWords(observation.title);
+      const sameTopicAs = (topics: Array<{ id: number; words: Set<string> }>) =>
+        topics.find((topic) => isSameTopic(words, topic.words))?.id;
 
       if (keys.some((key) => processedKeys.has(key))) {
         reasons.push("duplicate_of_processed_observation");
       } else if (keys.some((key) => selectedKeys.has(key))) {
         reasons.push("duplicate_of_selected_observation");
+      } else if (
+        (relatedObservationId = sameTopicAs(processedTopics)) !== undefined
+      ) {
+        reasons.push("same_topic_as_processed_observation");
+      } else if (
+        (relatedObservationId = sameTopicAs(selectedTopics)) !== undefined
+      ) {
+        reasons.push("same_topic_as_selected_observation");
       } else if (
         (selectedPerSource.get(observation.source.id) ?? 0) >=
         policy.maxPerSource
@@ -194,6 +218,7 @@ export function selectObservationsForArticles(input: {
         reasons.push("batch_limit_reached");
       } else {
         for (const key of keys) selectedKeys.add(key);
+        selectedTopics.push({ id: observation.id, words });
         selectedObservationIds.push(observation.id);
         selectedPerSource.set(
           observation.source.id,
@@ -208,6 +233,7 @@ export function selectObservationsForArticles(input: {
       sourcePriority: sourcePriorityOf(observation.source.organizationType),
       status: reasons.length === 0 ? "selected" : "skipped",
       reasons,
+      ...(relatedObservationId !== undefined ? { relatedObservationId } : {}),
     });
   }
 

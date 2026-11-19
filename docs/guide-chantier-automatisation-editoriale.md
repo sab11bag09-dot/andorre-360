@@ -808,6 +808,26 @@ Constats à traiter :
 
 Coût : 10 appels OpenAI (5 extractions, 5 rédactions), sans traduction ; le montant exact se lit dans le tableau de bord OpenAI.
 
+#### Anti-doublon par sujet (19 novembre 2026)
+
+Le deuxième essai a montré que l’anti-doublon exact (titres normalisés et adresses) ne repère pas un même sujet traité par deux sources avec des titres différents. La sélection rapproche désormais aussi les titres par sujet (`lib/article-orchestrator/topicSimilarity.ts`) :
+
+- chaque titre est réduit à ses mots significatifs : sans accents ni casse, au moins 4 lettres (ou un nombre d’au moins 3 chiffres), sans les mots outils catalans, espagnols et français, ni les années, ni les noms très fréquents (Andorra, Govern, Comú, noms des paroisses) ;
+- deux titres traitent le même sujet s’ils partagent au moins 3 mots significatifs, couvrant au moins 60 % de ceux du titre le plus court.
+
+Une observation est écartée si son sujet a déjà été traité (motif « Sujet déjà traité par une autre information ») ou s’il est celui d’une observation déjà retenue dans le même lot (« Même sujet qu’une information retenue »). La décision indique l’observation rapprochée (`relatedObservationId`). Comme le tri place les sources institutionnelles en premier, c’est la version institutionnelle d’un sujet qui est retenue.
+
+Calibrage sur les 533 observations collectées depuis le 12 novembre 2026 : les paires rapprochées sont pour l’essentiel de vrais doublons (Creu dels Set Braços, navettes de bus, procédure canonique, Querola, nationalité et niveau B1). Les faux rapprochements observés venaient de noms de lieux composés (« Sant Julià de Lòria ») ; les paroisses sont donc ignorées.
+
+Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisées : 5 observations écartées par sujet, dont les reprises de la Creu dels Set Braços par le Govern et La Veu Lliure, et deux doublons des navettes de bus de l’article 500. Un rapprochement est discutable : la demande d’explications d’Andorra Endavant sur la cyberattaque de la CASS, écartée car proche de l’observation Concòrdia de l’article 503.
+
+Limites constatées pendant cette mesure :
+
+- deux titres de langues différentes ne sont pas rapprochés : l’annonce des navettes par le FC Andorra, en espagnol, reste retenue alors que l’article 500 traite le même sujet ;
+- les variantes d’un même mot ne sont pas rapprochées (« consellers infantils » et « Consell d’Infants ») : une observation du Diari sur le Consell d’Infants d’Andorra la Vella reste retenue alors que l’article 499 traite le même sujet ;
+- seules les observations des 7 derniers jours servent de référence ;
+- un suivi d’une même affaire (nouvelle étape d’une procédure) peut être écarté comme doublon : c’est un choix prudent, l’article peut toujours être créé à la main.
+
 ### Lot E — Automatiser l’ensemble de la chaîne
 
 Quand les lots précédents seront suffisamment fiables :
@@ -1038,7 +1058,8 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), essayée avec succès le 19 novembre 2026 ;
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
 - sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; sources reclassées dans `./dev.db` le 19 novembre 2026 ;
-- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, anti-doublon par sujet entre sources différentes, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés ;
+- anti-doublon par sujet : titres rapprochés par mots significatifs communs ; pas encore entre langues différentes ;
+- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, anti-doublon par sujet entre langues différentes, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés ;
 - question juridique de la reprise d’articles de presse : réduite par les trois derniers lots, mais non tranchée ; un avis d’avocat reste nécessaire avant toute mise en ligne.
 
 ---
