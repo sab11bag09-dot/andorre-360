@@ -903,6 +903,27 @@ Données de chantier : 164 articles publiés sont rattachés à une source, dont
 
 Les signatures humaines (« Sa.BA », « Salah »), sur des articles sans source, n’ont pas été modifiées.
 
+#### Longueur des titres (19 novembre 2026)
+
+Les titres des brouillons 494 à 503 comptaient de 65 à 101 caractères et étaient coupés sur la page d’accueil. Calibrage dans le navigateur, sur une copie de `./dev.db`, en mesurant le nombre de caractères que chaque emplacement de titre peut afficher avant d’être coupé :
+
+- en bureau (1 440 px) : de 56 à 65 caractères pour presque tous les emplacements ; 39 pour un emplacement de 30 px de corps ;
+- en mobile (375 px) : de 56 à 65 caractères pour les petits emplacements, 39 pour le même emplacement, et seulement 28 pour la grande une et le titre principal en 36 px ;
+- 12 titres sur 14 étaient coupés sur la page d’accueil.
+
+La rédaction limite désormais le titre à 70 caractères (`MAX_TITLE_LENGTH`, consigne `editorial-facts-v2`) :
+
+- la consigne demande un titre d’au plus 70 caractères et pas de date dans le titre, sauf si elle est l’information principale ; le chapô et le corps gardent la date complète ;
+- si le titre reste trop long, un seul appel supplémentaire le fait raccourcir, à partir du titre et de la liste de faits seulement, jamais du texte source ;
+- si le titre raccourci dépasse encore 70 caractères, l’article est bloqué ; le titre raccourci passe aussi les contrôles de texte brut et de citation.
+
+Limites :
+
+- le raccourcissement coûte un appel OpenAI de plus, seulement pour les titres trop longs ;
+- les titres traduits (catalan, espagnol) ne sont pas encore limités ;
+- la grande une en mobile (28 caractères) et l’emplacement de 39 caractères restent trop étroits pour un titre de presse : c’est l’affichage qu’il faut adapter (taille du texte ou nombre de lignes), pas la longueur des titres ;
+- les titres existants et ceux écrits à la main ne sont pas concernés.
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :

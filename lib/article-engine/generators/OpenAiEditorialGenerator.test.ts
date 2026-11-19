@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { StructuredResponseClient } from "./OpenAiEditorialGenerator";
-import { OpenAiEditorialGenerator } from "./OpenAiEditorialGenerator";
+import {
+  MAX_TITLE_LENGTH,
+  OpenAiEditorialGenerator,
+} from "./OpenAiEditorialGenerator";
 
 function makeClient(output: string): StructuredResponseClient {
   return {
@@ -262,7 +265,7 @@ describe("OpenAiEditorialGenerator", () => {
       expect(generator.auditMetadata).toEqual({
         provider: "openai",
         model: "test-model",
-        promptVersion: "editorial-facts-v1",
+        promptVersion: "editorial-facts-v2",
       });
     });
 
@@ -438,6 +441,100 @@ describe("OpenAiEditorialGenerator", () => {
       await expect(prepare(generator)).rejects.toThrow(
         "liste de faits invalide",
       );
+    });
+
+    describe("longueur du titre", () => {
+      const LONG_TITLE =
+        "Le 1er septembre 2026, le gouvernement d’Andorre approuve un plan qui prévoit 120 logements à loyer abordable";
+      const SHORT_TITLE = "Andorre : un plan pour 120 logements à loyer abordable";
+
+      function makeClientWithTitles(...titles: string[]): StructuredResponseClient {
+        const create = vi
+          .fn()
+          .mockResolvedValueOnce(JSON.stringify({ facts: FACTS }))
+          .mockResolvedValueOnce(
+            JSON.stringify({ ...ARTICLE, title: titles[0] }),
+          );
+        for (const title of titles.slice(1)) {
+          create.mockResolvedValueOnce(JSON.stringify({ title }));
+        }
+        return { create };
+      }
+
+      it("fixe une limite de 70 caractères", () => {
+        expect(MAX_TITLE_LENGTH).toBe(70);
+      });
+
+      it("demande un titre court, sans date sauf si elle est l’information principale", async () => {
+        const client = makeTwoStepClient();
+        const generator = new OpenAiEditorialGenerator({ apiKey: "test-key", client });
+
+        await prepare(generator);
+
+        const [, drafting] = requests(client);
+        expect(drafting?.instructions).toContain("70 caractères");
+        expect(drafting?.instructions).toContain(
+          "pas de date dans le titre, sauf si elle est l’information principale",
+        );
+        expect(drafting?.instructions).not.toContain("y compris dans le titre");
+      });
+
+      it("garde un titre de longueur correcte sans appel supplémentaire", async () => {
+        const client = makeTwoStepClient();
+        const generator = new OpenAiEditorialGenerator({ apiKey: "test-key", client });
+
+        await expect(prepare(generator)).resolves.toMatchObject({
+          title: ARTICLE.title,
+        });
+        expect(client.create).toHaveBeenCalledTimes(2);
+      });
+
+      it("fait raccourcir une fois un titre trop long, à partir des faits seulement", async () => {
+        const client = makeClientWithTitles(LONG_TITLE, SHORT_TITLE);
+        const generator = new OpenAiEditorialGenerator({
+          apiKey: "test-key",
+          model: "test-model",
+          client,
+        });
+
+        await expect(prepare(generator)).resolves.toMatchObject({
+          title: SHORT_TITLE,
+          description: ARTICLE.description,
+          content: ARTICLE.content,
+        });
+
+        expect(client.create).toHaveBeenCalledTimes(3);
+        const [, , shortening] = requests(client);
+        expect(shortening?.model).toBe("test-model");
+        expect(shortening?.schemaName).toBe("article_title");
+        expect(shortening?.instructions).toContain("70 caractères");
+        expect(JSON.parse(shortening?.input ?? "{}")).toEqual({
+          title: LONG_TITLE,
+          facts: FACTS,
+          maxLength: 70,
+        });
+        expect(shortening?.input).not.toContain(SOURCE_SENTENCE);
+      });
+
+      it("bloque l’article si le titre raccourci reste trop long", async () => {
+        const client = makeClientWithTitles(LONG_TITLE, LONG_TITLE);
+        const generator = new OpenAiEditorialGenerator({ apiKey: "test-key", client });
+
+        await expect(prepare(generator)).rejects.toThrow(
+          `Le titre dépasse 70 caractères (${LONG_TITLE.length})`,
+        );
+        expect(client.create).toHaveBeenCalledTimes(3);
+      });
+
+      it("applique au titre raccourci les contrôles de texte brut et de citation", async () => {
+        const client = makeClientWithTitles(
+          LONG_TITLE,
+          "Le Govern : « un plan qui changera la vie des familles »",
+        );
+        const generator = new OpenAiEditorialGenerator({ apiKey: "test-key", client });
+
+        await expect(prepare(generator)).rejects.toThrow("citation");
+      });
     });
   });
 
