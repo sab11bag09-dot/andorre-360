@@ -920,7 +920,7 @@ La rédaction limite désormais le titre à 70 caractères (`MAX_TITLE_LENGTH`, 
 Limites :
 
 - le raccourcissement coûte un appel OpenAI de plus, seulement pour les titres trop longs ;
-- les titres traduits (catalan, espagnol) ne sont pas encore limités ;
+- les titres traduits sont limités depuis, voir « Longueur des titres traduits » ;
 - la grande une en mobile (28 caractères) et l’emplacement de 39 caractères restent trop étroits pour un titre de presse : c’est l’affichage qu’il faut adapter (taille du texte ou nombre de lignes), pas la longueur des titres ;
 - les titres existants et ceux écrits à la main ne sont pas concernés.
 
@@ -950,6 +950,16 @@ Les emplacements se ramenaient à quelques familles, corrigées de la même faç
 - grandes cartes du haut de page (Actualité, Économie, Politique, Société, Sports) : 4 lignes jusqu’à 1 280 px, 3 au-delà.
 
 Après les changements : aucun emplacement ne coupe un titre de 70 caractères, sur aucune rubrique ni aucune largeur, sans défilement horizontal. Les pages International et Fil info n’ont pas d’emplacement de titre coupé. Mesures faites dans le navigateur, sur une copie de `./dev.db`. Les tests de mise en page (`*.layout.test.ts`), qui vérifient les classes de chaque emplacement, ont été mis à jour avec les nouvelles limites.
+
+#### Longueur des titres traduits (19 novembre 2026)
+
+Les traductions en catalan et en espagnol sont souvent plus longues que le français. La même limite de 70 caractères s’applique désormais aux titres traduits (`translateArticle`) :
+
+- la consigne de traduction demande un titre d’au plus 70 caractères, resserré si nécessaire sans perdre l’information principale ;
+- si le titre traduit reste trop long, un seul appel supplémentaire le raccourcit dans la langue cible, à partir du titre traduit et du chapô traduit ;
+- s’il dépasse encore 70 caractères, la traduction est refusée ; comme les traductions d’un article sont préparées avant d’être enregistrées, aucune n’est alors enregistrée et l’erreur est signalée.
+
+Le raccourcissement coûte un appel OpenAI de plus, seulement pour les titres traduits trop longs. Le titre traduit raccourci n’est plus une traduction mot à mot du titre français, mais il en garde l’information principale.
 
 #### Dates propres à certains sites (19 novembre 2026)
 
