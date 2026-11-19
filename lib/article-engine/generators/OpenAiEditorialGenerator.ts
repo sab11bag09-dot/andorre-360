@@ -22,7 +22,7 @@ const DEFAULT_TIMEOUT_MS = 30_000;
  * presse : un avis juridique reste nécessaire avant toute mise en ligne.
  */
 export const OPENAI_EDITORIAL_PROMPT_VERSION =
-  "editorial-facts-v1";
+  "editorial-facts-v2";
 
 /** Nombre maximal de faits retenus pour un article. */
 export const MAX_FACTS = 40;
@@ -30,6 +30,12 @@ export const MAX_FACTS = 40;
 export const MAX_FACT_LENGTH = 400;
 /** Au-delà de ce nombre de mots, un passage entre guillemets est une citation. */
 export const MAX_QUOTED_WORDS = 4;
+/**
+ * Longueur maximale d’un titre, espaces compris. Calibrée le 19 novembre
+ * 2026 sur la page d’accueil : la plupart des emplacements de titre
+ * contiennent de 56 à 65 caractères avant d’être coupés.
+ */
+export const MAX_TITLE_LENGTH = 70;
 
 interface TranslationResponse {
   title: string;
@@ -91,6 +97,15 @@ const translationSchema = {
     content: { type: "string" },
   },
   required: ["title", "description", "content"],
+  additionalProperties: false,
+} as const;
+
+const titleSchema = {
+  type: "object",
+  properties: {
+    title: { type: "string" },
+  },
+  required: ["title"],
   additionalProperties: false,
 } as const;
 
@@ -239,6 +254,36 @@ function assertNoLongQuotation(response: TranslationResponse): void {
   }
 }
 
+function parseTitleResponse(output: string): string {
+  let value: unknown;
+
+  try {
+    value = JSON.parse(output);
+  } catch {
+    throw new Error("Le raccourcissement du titre a renvoyé une réponse JSON invalide.");
+  }
+
+  const title =
+    value && typeof value === "object" && !Array.isArray(value) &&
+    typeof (value as Record<string, unknown>).title === "string"
+      ? ((value as Record<string, unknown>).title as string).trim()
+      : "";
+
+  if (!title) {
+    throw new Error("Le raccourcissement du titre a renvoyé un titre vide.");
+  }
+
+  return normalizeEditorialText(title);
+}
+
+function assertTitleLength(title: string): void {
+  if (title.length > MAX_TITLE_LENGTH) {
+    throw new Error(
+      `Le titre dépasse ${MAX_TITLE_LENGTH} caractères (${title.length}).`,
+    );
+  }
+}
+
 function parseTranslationResponse(output: string): TranslationResponse {
   let value: unknown;
 
@@ -319,9 +364,11 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
           "N’insère aucune citation entre guillemets et ne prête à personne des paroles qui ne figurent pas dans la liste.",
           "Indique une fois, de façon naturelle, l’origine de l’information à partir du nom de la source fourni.",
           "Crée un titre informatif, un chapô synthétique et un article entièrement rédigé, organisé selon ton propre plan.",
+          `Le titre compte au plus ${MAX_TITLE_LENGTH} caractères, espaces compris : va à l’essentiel, sans détail secondaire.`,
+          "Ne mets pas de date dans le titre, sauf si elle est l’information principale ; le chapô et le corps donnent la date.",
           "Utilise la date de publication de la source et la date de génération fournies comme contexte temporel.",
           "Remplace toute expression relative comme aujourd’hui, hier ou demain par une date absolue lorsqu’elle peut être déterminée.",
-          "Toute date événementielle déterminable doit comporter le jour, le mois et l’année, y compris dans le titre, le chapô et le corps.",
+          "Toute date événementielle déterminable doit comporter le jour, le mois et l’année, dans le chapô et le corps comme dans le titre lorsqu’il en contient une.",
           "Si une référence temporelle ne peut pas être déterminée avec certitude, reformule-la sans inventer de date.",
           "N’utilise aucun balisage Markdown ou HTML : rends uniquement du texte brut, en conservant les URL sous leur forme brute.",
           "Dans le chapô, conserve les quantités exactes fournies par les faits et évite toute formulation vague lorsqu’un chiffre précis est disponible.",
@@ -345,10 +392,15 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       throw new Error(`La rédaction OpenAI a échoué : ${message}`);
     }
 
-    const rewritten = parseTranslationResponse(output);
+    const drafted = parseTranslationResponse(output);
+    const rewritten =
+      drafted.title.length > MAX_TITLE_LENGTH
+        ? { ...drafted, title: await this.shortenTitle(drafted.title, factSheet) }
+        : drafted;
 
     assertPlainEditorialOutput(rewritten);
     assertNoLongQuotation(rewritten);
+    assertTitleLength(rewritten.title);
 
     return {
       title: rewritten.title,
@@ -358,6 +410,35 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       author: AUTOMATED_ARTICLE_AUTHOR,
       factSheet,
     };
+  }
+
+  /**
+   * Un seul appel supplémentaire, à partir du titre trop long et des faits
+   * seulement ; si le résultat reste trop long, l’article est bloqué.
+   */
+  private async shortenTitle(title: string, facts: string[]): Promise<string> {
+    let output: string;
+
+    try {
+      output = await this.client.create({
+        model: this.model,
+        instructions: [
+          `Raccourcis ce titre d’article en français à ${MAX_TITLE_LENGTH} caractères au plus, espaces compris.`,
+          "Garde l’information principale, exacte et fidèle à la liste de faits ; n’ajoute aucun fait.",
+          "Ne mets pas de date dans le titre, sauf si elle est l’information principale.",
+          "N’utilise ni guillemets de citation, ni balisage Markdown ou HTML.",
+          "Retourne uniquement le champ title.",
+        ].join(" "),
+        input: JSON.stringify({ title, facts, maxLength: MAX_TITLE_LENGTH }),
+        schemaName: "article_title",
+        schema: titleSchema,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "erreur inconnue";
+      throw new Error(`Le raccourcissement du titre OpenAI a échoué : ${message}`);
+    }
+
+    return parseTitleResponse(output);
   }
 
   private async extractFacts(
