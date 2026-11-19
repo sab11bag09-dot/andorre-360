@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 
+import { AUTOMATED_ARTICLE_AUTHOR } from "../editorialSignature";
 import type {
   EditorialGenerator,
   PrepareArticleInput,
@@ -354,7 +355,7 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       description: rewritten.description,
       content: rewritten.content,
       category: input.sourceCategory?.trim() || "Général",
-      author: input.sourceName,
+      author: AUTOMATED_ARTICLE_AUTHOR,
       factSheet,
     };
   }

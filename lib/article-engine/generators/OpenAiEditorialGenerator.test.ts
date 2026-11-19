@@ -205,7 +205,7 @@ describe("OpenAiEditorialGenerator", () => {
       await expect(prepare(generator)).resolves.toEqual({
         ...ARTICLE,
         category: "Actualité",
-        author: "Govern d’Andorra",
+        author: "Rédaction ANDORRE 360",
         factSheet: FACTS,
       });
 

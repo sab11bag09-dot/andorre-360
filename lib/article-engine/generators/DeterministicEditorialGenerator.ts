@@ -1,3 +1,4 @@
+import { AUTOMATED_ARTICLE_AUTHOR } from "../editorialSignature";
 import type {
   EditorialGenerator,
   PrepareArticleInput,
@@ -30,7 +31,7 @@ export class DeterministicEditorialGenerator
       category:
         input.sourceCategory?.trim() ||
         "Général",
-      author: input.sourceName,
+      author: AUTOMATED_ARTICLE_AUTHOR,
     };
   }
 

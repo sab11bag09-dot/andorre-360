@@ -803,7 +803,7 @@ Constats à traiter :
 - fidélité aux sources à vérifier en relecture humaine, en comparant chaque article à sa liste de faits puis à la source (par exemple le lieu indiqué dans le titre de l’article 500) ;
 - articles plus secs sans citations ; l’article 501 ne compte que 852 caractères ;
 - les 5 brouillons utilisent toujours l’image générique `/images/global/hero.jpg` ;
-- le champ auteur reprend le nom brut de la source (par exemple « gouvernement d’andorre ») ;
+- le champ auteur reprenait le nom brut de la source (par exemple « gouvernement d’andorre ») ; corrigé, voir « Signature des articles rédigés automatiquement » ;
 - l’anti-doublon ne repère pas un même sujet traité par deux sources différentes.
 
 Coût : 10 appels OpenAI (5 extractions, 5 rédactions), sans traduction ; le montant exact se lit dans le tableau de bord OpenAI.
@@ -820,6 +820,13 @@ Une observation est écartée si son sujet a déjà été traité (motif « Suje
 Calibrage sur les 533 observations collectées depuis le 12 novembre 2026 : les paires rapprochées sont pour l’essentiel de vrais doublons (Creu dels Set Braços, navettes de bus, procédure canonique, Querola, nationalité et niveau B1). Les faux rapprochements observés venaient de noms de lieux composés (« Sant Julià de Lòria ») ; les paroisses sont donc ignorées.
 
 Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisées : 5 observations écartées par sujet, dont les reprises de la Creu dels Set Braços par le Govern et La Veu Lliure, et deux doublons des navettes de bus de l’article 500. Un rapprochement est discutable : la demande d’explications d’Andorra Endavant sur la cyberattaque de la CASS, écartée car proche de l’observation Concòrdia de l’article 503.
+
+Limites constatées pendant cette mesure :
+
+- deux titres de langues différentes ne sont pas rapprochés : l’annonce des navettes par le FC Andorra, en espagnol, reste retenue alors que l’article 500 traite le même sujet ;
+- les variantes d’un même mot ne sont pas rapprochées (« consellers infantils » et « Consell d’Infants ») : une observation du Diari sur le Consell d’Infants d’Andorra la Vella reste retenue alors que l’article 499 traite le même sujet ;
+- seules les observations des 7 derniers jours servent de référence ;
+- un suivi d’une même affaire (nouvelle étape d’une procédure) peut être écarté comme doublon : c’est un choix prudent, l’article peut toujours être créé à la main.
 
 #### Variantes de mots entre sources (19 novembre 2026)
 
@@ -838,12 +845,19 @@ Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisé
 
 Limites : la méthode ne traduit pas. Le titre espagnol du FC Andorra sur les navettes de bus (« ponen a disposición de la afición autobuses para los partidos en casa ») ne partage que 2 racines avec les titres catalans de l’article 500 et reste retenu. De même, « Consell d’Infants » et « consellers infantils » ne partagent pas assez de mots pour être rapprochés.
 
-Limites constatées pendant cette mesure :
+#### Signature des articles rédigés automatiquement (19 novembre 2026)
 
-- deux titres de langues différentes ne sont pas rapprochés : l’annonce des navettes par le FC Andorra, en espagnol, reste retenue alors que l’article 500 traite le même sujet ;
-- les variantes d’un même mot ne sont pas rapprochées (« consellers infantils » et « Consell d’Infants ») : une observation du Diari sur le Consell d’Infants d’Andorra la Vella reste retenue alors que l’article 499 traite le même sujet ;
-- seules les observations des 7 derniers jours servent de référence ;
-- un suivi d’une même affaire (nouvelle étape d’une procédure) peut être écarté comme doublon : c’est un choix prudent, l’article peut toujours être créé à la main.
+Les brouillons étaient signés du nom brut de la source (« Par gouvernement d’andorre »), alors que la source n’a pas écrit l’article. Ils sont désormais signés « Rédaction ANDORRE 360 » (`lib/article-engine/editorialSignature.ts`) :
+
+- les deux générateurs (OpenAI et déterministe) renvoient cette signature ;
+- `createArticleFromObservation` l’impose en dernier, quel que soit le générateur, à la création comme à la régénération d’un brouillon ;
+- la source reste consignée dans l’audit : observation rattachée à l’article et événement `ARTICLE_CREATED`.
+
+Non traité dans ce lot :
+
+- les articles déjà enregistrés gardent leur signature ; les brouillons 494 à 503 sont signés du nom de leur source, et des articles publiés plus anciens sont signés d’un média (par exemple « BBC », « France 24 ») ;
+- la page publique n’affiche pas encore la source dont l’article est tiré ; un crédit « D’après … » demandera des noms de sources propres, les noms actuels étant bruts (casse, fautes de frappe) ;
+- les communiqués politiques (catégorie « Ils en parlent ») sont eux aussi signés par la rédaction ; leur présentation, qui doit indiquer clairement de qui vient la prise de position, reste à décider.
 
 #### Dates propres à certains sites (19 novembre 2026)
 
