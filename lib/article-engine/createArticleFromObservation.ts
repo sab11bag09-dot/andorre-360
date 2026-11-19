@@ -17,6 +17,7 @@ import {
   evaluateSourceSimilarity,
   measureSourceSimilarity,
 } from "./sourceSimilarity";
+import { checkFactFidelity, describeFactFidelity } from "./factFidelity";
 import {
   recordSystemEditorialEvent,
   type EditorialEventWriter,
@@ -139,6 +140,21 @@ export async function createArticleFromObservation(
     );
   }
 
+  // Contrôle de fidélité : un chiffre absent de la liste de faits bloque
+  // l’article ; un nom propre absent est seulement consigné à vérifier.
+  const factFidelity = factSheet
+    ? checkFactFidelity({
+        article: draft,
+        facts: factSheet,
+        sourceName: observation.source.name,
+        contextDates: [observation.publishedAt, generatedAt],
+      })
+    : null;
+
+  if (factFidelity && factFidelity.unsupportedNumbers.length > 0) {
+    throw new Error(`Article bloqué : ${describeFactFidelity(factFidelity)}.`);
+  }
+
   const sourceEditorialCategory = normalizeEditorialCategory(
     observation.source.category,
   );
@@ -206,6 +222,7 @@ export async function createArticleFromObservation(
           blocked: false,
         },
         ...(factSheet ? { factSheet } : {}),
+        ...(factFidelity ? { factFidelity: { ...factFidelity, blocked: false } } : {}),
       },
     });
   }
