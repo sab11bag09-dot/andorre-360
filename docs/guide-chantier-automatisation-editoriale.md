@@ -821,6 +821,13 @@ Calibrage sur les 533 observations collectées depuis le 12 novembre 2026 : les 
 
 Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisées : 5 observations écartées par sujet, dont les reprises de la Creu dels Set Braços par le Govern et La Veu Lliure, et deux doublons des navettes de bus de l’article 500. Un rapprochement est discutable : la demande d’explications d’Andorra Endavant sur la cyberattaque de la CASS, écartée car proche de l’observation Concòrdia de l’article 503.
 
+Limites constatées pendant cette mesure :
+
+- deux titres de langues différentes ne sont pas rapprochés : l’annonce des navettes par le FC Andorra, en espagnol, reste retenue alors que l’article 500 traite le même sujet ;
+- les variantes d’un même mot ne sont pas rapprochées (« consellers infantils » et « Consell d’Infants ») : une observation du Diari sur le Consell d’Infants d’Andorra la Vella reste retenue alors que l’article 499 traite le même sujet ;
+- seules les observations des 7 derniers jours servent de référence ;
+- un suivi d’une même affaire (nouvelle étape d’une procédure) peut être écarté comme doublon : c’est un choix prudent, l’article peut toujours être créé à la main.
+
 #### Variantes de mots entre sources (19 novembre 2026)
 
 L’anti-doublon par sujet comparait des mots identiques : « autobusos » et « busos », « lloguer » et « lloguin », ou un même mot en catalan et en espagnol (« aficionats », « afición ») n’étaient pas rapprochés. Entre deux sources différentes, la sélection compare désormais aussi les racines des mots significatifs (`topicStems`) :
@@ -851,13 +858,6 @@ Non traité dans ce lot :
 - les articles déjà enregistrés gardent leur signature ; les brouillons 494 à 503 sont signés du nom de leur source, et des articles publiés plus anciens sont signés d’un média (par exemple « BBC », « France 24 ») ;
 - la page publique n’affiche pas encore la source dont l’article est tiré ; un crédit « D’après … » demandera des noms de sources propres, les noms actuels étant bruts (casse, fautes de frappe) ;
 - les communiqués politiques (catégorie « Ils en parlent ») sont eux aussi signés par la rédaction ; leur présentation, qui doit indiquer clairement de qui vient la prise de position, reste à décider.
-
-Limites constatées pendant cette mesure :
-
-- deux titres de langues différentes ne sont pas rapprochés : l’annonce des navettes par le FC Andorra, en espagnol, reste retenue alors que l’article 500 traite le même sujet ;
-- les variantes d’un même mot ne sont pas rapprochées (« consellers infantils » et « Consell d’Infants ») : une observation du Diari sur le Consell d’Infants d’Andorra la Vella reste retenue alors que l’article 499 traite le même sujet ;
-- seules les observations des 7 derniers jours servent de référence ;
-- un suivi d’une même affaire (nouvelle étape d’une procédure) peut être écarté comme doublon : c’est un choix prudent, l’article peut toujours être créé à la main.
 
 #### Dates propres à certains sites (19 novembre 2026)
 
