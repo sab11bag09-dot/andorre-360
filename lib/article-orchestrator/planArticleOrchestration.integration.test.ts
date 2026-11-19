@@ -158,4 +158,62 @@ describe("planArticleOrchestration", () => {
       "no_allowlisted_source",
     ]);
   });
+
+  it("loads the organization type so that institutional sources come first", async () => {
+    const media = await client.source.create({
+      data: {
+        name: "Diari d’Andorra",
+        url: "https://www.diariandorra.ad/",
+        organizationType: "MEDIA",
+        publicationMode: "AUTO",
+        trustLevel: "HIGH",
+      },
+    });
+    await client.source.update({
+      where: { id: sourceId },
+      data: { organizationType: "COMMUNE" },
+    });
+
+    await client.observation.createMany({
+      data: [
+        {
+          sourceId: media.id,
+          title: "Le Diari publie une information très récente",
+          url: "https://www.diariandorra.ad/noticia-1",
+          publishedAt: hoursAgo(1),
+          content: CONTENT,
+          collectedAt: hoursAgo(1),
+        },
+        {
+          sourceId,
+          title: "Le Comú présente son budget pour 2027",
+          url: "https://www.andorralavella.ad/budget-2027",
+          publishedAt: hoursAgo(20),
+          content: CONTENT,
+          collectedAt: hoursAgo(20),
+        },
+      ],
+    });
+
+    const plan = await planArticleOrchestration(client, {
+      now: NOW,
+      runtimeConfig: { ...openConfig, sourceIds: [sourceId, media.id] },
+    });
+
+    const priorities = plan.decisions.map(({ sourceId: id, sourcePriority }) => [
+      id,
+      sourcePriority,
+    ]);
+
+    expect(plan.selectedObservationIds).toHaveLength(2);
+    expect(priorities).toEqual(
+      expect.arrayContaining([
+        [sourceId, "institutional"],
+        [media.id, "media"],
+      ]),
+    );
+    const [first] = plan.selectedObservationIds;
+    const firstDecision = plan.decisions.find(({ observationId }) => observationId === first);
+    expect(firstDecision?.sourceId).toBe(sourceId);
+  });
 });

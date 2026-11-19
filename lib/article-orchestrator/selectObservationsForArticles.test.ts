@@ -63,7 +63,7 @@ describe("selectObservationsForArticles", () => {
 
     expect(result.selectedObservationIds).toEqual([1]);
     expect(result.decisions).toEqual([
-      { observationId: 1, sourceId: 10, status: "selected", reasons: [] },
+      { observationId: 1, sourceId: 10, sourcePriority: "standard", status: "selected", reasons: [] },
     ]);
   });
 
@@ -340,5 +340,108 @@ describe("selectObservationsForArticles — diversité des sources", () => {
         policy: { ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY, maxPerSource: 0 },
       }),
     ).toThrow();
+  });
+
+  describe("priorité aux sources institutionnelles", () => {
+    function sourceOf(
+      id: number,
+      host: string,
+      organizationType?: OrchestrationObservation["source"]["organizationType"],
+    ): OrchestrationObservation["source"] {
+      return {
+        id,
+        url: `https://${host}/`,
+        active: true,
+        publicationMode: "AUTO",
+        trustLevel: "HIGH",
+        organizationType,
+      };
+    }
+
+    const media = makeObservation({
+      id: 1,
+      title: "Le Diari publie une information très récente",
+      url: "https://www.diariandorra.ad/noticia-1",
+      publishedAt: hoursAgo(1),
+      source: sourceOf(11, "www.diariandorra.ad", "MEDIA"),
+    });
+    const club = makeObservation({
+      id: 2,
+      title: "Le FC Andorra annonce son prochain match",
+      url: "https://www.fcandorra.com/match",
+      publishedAt: hoursAgo(5),
+      source: sourceOf(12, "www.fcandorra.com", "SPORTS_CLUB"),
+    });
+    const government = makeObservation({
+      id: 3,
+      title: "Le Govern annonce une nouvelle aide au logement",
+      url: "https://www.govern.ad/actualitat/aide-logement",
+      publishedAt: hoursAgo(20),
+      source: sourceOf(10, "www.govern.ad", "GOVERNMENT"),
+    });
+    const police = makeObservation({
+      id: 4,
+      title: "La Policia lance une campagne de prévention routière",
+      url: "https://www.policia.ad/campagne",
+      publishedAt: hoursAgo(30),
+      source: sourceOf(13, "www.policia.ad", "POLICE"),
+    });
+
+    it("retient une source institutionnelle avant un média plus récent", () => {
+      const result = select([media, government], [10, 11], {
+        ...DEFAULT_ARTICLE_ORCHESTRATION_POLICY,
+        maxSelected: 1,
+      });
+
+      expect(result.selectedObservationIds).toEqual([3]);
+      expect(reasonsOf(result, 1)).toEqual(["batch_limit_reached"]);
+    });
+
+    it("classe les sources institutionnelles, puis les autres, puis les médias", () => {
+      const result = select([media, club, government, police], [10, 11, 12, 13]);
+
+      expect(result.selectedObservationIds).toEqual([3, 4, 2, 1]);
+    });
+
+    it("garde l’ordre chronologique au sein d’une même priorité", () => {
+      const commune = makeObservation({
+        id: 5,
+        title: "Le Comú de Canillo ouvre les inscriptions au camp d’été",
+        url: "https://www.canillo.ad/camp",
+        publishedAt: hoursAgo(2),
+        source: sourceOf(14, "www.canillo.ad", "COMMUNE"),
+      });
+
+      const result = select([government, commune], [10, 14]);
+
+      expect(result.selectedObservationIds).toEqual([5, 3]);
+    });
+
+    it("traite une source non classée comme une source ordinaire, après les institutions et avant les médias", () => {
+      const unclassified = makeObservation({
+        id: 6,
+        title: "Une association annonce une collecte solidaire",
+        url: "https://www.example.ad/collecte",
+        publishedAt: hoursAgo(40),
+        source: sourceOf(15, "www.example.ad"),
+      });
+
+      const result = select([media, unclassified, government], [10, 11, 15]);
+
+      expect(result.selectedObservationIds).toEqual([3, 6, 1]);
+    });
+
+    it("indique la priorité de la source dans chaque décision", () => {
+      const result = select([media, club, government], [10, 11, 12]);
+
+      expect(
+        Object.fromEntries(
+          result.decisions.map((decision) => [
+            decision.observationId,
+            decision.sourcePriority,
+          ]),
+        ),
+      ).toEqual({ 1: "media", 2: "standard", 3: "institutional" });
+    });
   });
 });

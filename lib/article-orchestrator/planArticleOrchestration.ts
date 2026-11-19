@@ -74,6 +74,7 @@ export async function planArticleOrchestration(
           active: true,
           publicationMode: true,
           trustLevel: true,
+          organizationType: true,
         },
       },
     },
