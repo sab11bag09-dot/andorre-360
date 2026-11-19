@@ -32,6 +32,8 @@ const REASON_LABELS: Record<ObservationSelectionReason, string> = {
   content_too_short: "Contenu trop court",
   duplicate_of_processed_observation: "Doublon d’une information traitée",
   duplicate_of_selected_observation: "Doublon d’une information retenue",
+  same_topic_as_processed_observation: "Sujet déjà traité par une autre information",
+  same_topic_as_selected_observation: "Même sujet qu’une information retenue",
   source_limit_reached: "Limite par source atteinte",
   batch_limit_reached: "Limite du lot atteinte",
 };

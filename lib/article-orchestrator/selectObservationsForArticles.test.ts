@@ -292,7 +292,7 @@ describe("selectObservationsForArticles — diversité des sources", () => {
   function fromSource(id: number, sourceId: number, host: string, hours: number) {
     return makeObservation({
       id,
-      title: `Information numéro ${id} de la source ${sourceId}`,
+      title: `Information numéro ${id}`,
       url: `https://${host}/${id}`,
       publishedAt: hoursAgo(hours),
       source: {
@@ -442,6 +442,137 @@ describe("selectObservationsForArticles — diversité des sources", () => {
           ]),
         ),
       ).toEqual({ 1: "media", 2: "standard", 3: "institutional" });
+    });
+  });
+
+  describe("anti-doublon par sujet", () => {
+    const diari = {
+      id: 11,
+      url: "https://www.diariandorra.ad/",
+      active: true,
+      publicationMode: "AUTO" as const,
+      trustLevel: "HIGH" as const,
+      organizationType: "MEDIA" as const,
+    };
+    const govern = {
+      id: 10,
+      url: "https://www.govern.ad/",
+      active: true,
+      publicationMode: "AUTO" as const,
+      trustLevel: "OFFICIAL" as const,
+      organizationType: "GOVERNMENT" as const,
+    };
+
+    // Cas réel du 19 novembre 2026 : même sujet, titres différents.
+    const processedDiari = makeObservation({
+      id: 1,
+      title: "Jaume Bartumeu rep la Creu dels Set Braços, la màxima distinció d'Andorra",
+      url: "https://www.diariandorra.ad/noticies/bartumeu-creu",
+      publishedAt: hoursAgo(10),
+      processed: true,
+      articleId: 495,
+      source: diari,
+    });
+    const governSameTopic = makeObservation({
+      id: 2,
+      title:
+        "Jaume Bartumeu Cassany rep la Creu dels Set Braços en reconeixement a la seva trajectòria al servei d’Andorra",
+      url: "https://www.govern.ad/noticies/bartumeu",
+      publishedAt: hoursAgo(8),
+      source: govern,
+    });
+
+    it("écarte une observation qui traite un sujet déjà traité par une autre source", () => {
+      const result = select([processedDiari, governSameTopic], [10, 11]);
+
+      expect(result.selectedObservationIds).toEqual([]);
+      expect(reasonsOf(result, 2)).toEqual(["same_topic_as_processed_observation"]);
+      expect(
+        result.decisions.find(({ observationId }) => observationId === 2)
+          ?.relatedObservationId,
+      ).toBe(1);
+    });
+
+    it("ne retient qu’une observation par sujet dans un même lot, en gardant la priorité institutionnelle", () => {
+      const mediaSameTopic = makeObservation({
+        ...processedDiari,
+        processed: false,
+        articleId: null,
+        publishedAt: hoursAgo(1),
+      });
+
+      const result = select([mediaSameTopic, governSameTopic], [10, 11]);
+
+      expect(result.selectedObservationIds).toEqual([2]);
+      expect(reasonsOf(result, 1)).toEqual(["same_topic_as_selected_observation"]);
+      expect(
+        result.decisions.find(({ observationId }) => observationId === 1)
+          ?.relatedObservationId,
+      ).toBe(2);
+    });
+
+    it("garde des sujets différents qui partagent seulement un nom de lieu", () => {
+      const processed = makeObservation({
+        id: 1,
+        title: "Sant Julià de Lòria constitueix el 19è Consell d’Infants",
+        url: "https://www.diariandorra.ad/noticies/consell-infants",
+        processed: true,
+        articleId: 10,
+        source: diari,
+      });
+      const other = makeObservation({
+        id: 2,
+        title: "69a Temporada de Teatre Sant Julià de Lòria",
+        url: "https://www.govern.ad/noticies/teatre",
+        source: govern,
+      });
+
+      const result = select([processed, other], [10, 11]);
+
+      expect(result.selectedObservationIds).toEqual([2]);
+    });
+
+    it("garde des sujets différents qui partagent moins de trois mots significatifs", () => {
+      const processed = makeObservation({
+        id: 1,
+        title: "Escaldes estrena mercat de Nadal a la plaça de l’Església",
+        url: "https://www.diariandorra.ad/noticies/mercat-nadal",
+        processed: true,
+        articleId: 10,
+        source: diari,
+      });
+      const other = makeObservation({
+        id: 2,
+        title:
+          "Andorra estrena una pista de gel natural per Nadal on es podrà patinar per només un euro",
+        url: "https://www.govern.ad/noticies/pista-gel",
+        source: govern,
+      });
+
+      const result = select([processed, other], [10, 11]);
+
+      expect(result.selectedObservationIds).toEqual([2]);
+    });
+
+    it("reconnaît le même sujet malgré les accents, la casse et la ponctuation", () => {
+      const processed = makeObservation({
+        id: 1,
+        title: "ROGER MARSAL S’INCORPORA COM A BATLLE EN PRÀCTIQUES AL CSJ",
+        url: "https://www.diariandorra.ad/noticies/marsal",
+        processed: true,
+        articleId: 10,
+        source: diari,
+      });
+      const other = makeObservation({
+        id: 2,
+        title: "Roger Marsal s'incorpora com a batlle en practiques",
+        url: "https://www.govern.ad/noticies/marsal",
+        source: govern,
+      });
+
+      const result = select([processed, other], [10, 11]);
+
+      expect(reasonsOf(result, 2)).toEqual(["same_topic_as_processed_observation"]);
     });
   });
 });
