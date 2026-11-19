@@ -139,6 +139,81 @@ describe("OpenAiEditorialGenerator", () => {
     ).rejects.toThrow("La traduction OpenAI a échoué : délai dépassé");
   });
 
+  describe("longueur des titres traduits", () => {
+    const LONG_TITLE =
+      "El Govern d’Andorra presenta un nou pla de mobilitat per a les parròquies amb llançadores gratuïtes";
+    const SHORT_TITLE = "El Govern presenta un pla de mobilitat amb llançadores gratuïtes";
+    const ARTICLE = {
+      title: "Le Govern présente un plan de mobilité avec des navettes gratuites",
+      description: "Le plan prévoit des navettes gratuites dans les paroisses.",
+      content: "Le Govern d’Andorre a présenté un plan de mobilité.",
+    };
+
+    function makeTranslationClient(...titles: string[]): StructuredResponseClient {
+      const create = vi.fn().mockResolvedValueOnce(
+        JSON.stringify({
+          title: titles[0],
+          description: "El pla preveu llançadores gratuïtes a les parròquies.",
+          content: "El Govern d’Andorra ha presentat un pla de mobilitat.",
+        }),
+      );
+      for (const title of titles.slice(1)) {
+        create.mockResolvedValueOnce(JSON.stringify({ title }));
+      }
+      return { create };
+    }
+
+    function requests(client: StructuredResponseClient) {
+      return vi.mocked(client.create).mock.calls.map(([request]) => request);
+    }
+
+    it("demande un titre traduit de 70 caractères au plus", async () => {
+      const client = makeTranslationClient(SHORT_TITLE);
+      const generator = new OpenAiEditorialGenerator({ apiKey: "test-key", client });
+
+      await generator.translateArticle({ locale: "CA", ...ARTICLE });
+
+      const [translation] = requests(client);
+      expect(translation?.instructions).toContain("70 caractères");
+      expect(client.create).toHaveBeenCalledTimes(1);
+    });
+
+    it("fait raccourcir une fois un titre traduit trop long, dans la langue cible", async () => {
+      const client = makeTranslationClient(LONG_TITLE, SHORT_TITLE);
+      const generator = new OpenAiEditorialGenerator({
+        apiKey: "test-key",
+        model: "test-model",
+        client,
+      });
+
+      await expect(
+        generator.translateArticle({ locale: "CA", ...ARTICLE }),
+      ).resolves.toMatchObject({ locale: "CA", title: SHORT_TITLE });
+
+      expect(client.create).toHaveBeenCalledTimes(2);
+      const [, shortening] = requests(client);
+      expect(shortening?.model).toBe("test-model");
+      expect(shortening?.schemaName).toBe("article_title");
+      expect(shortening?.instructions).toContain("en catalan");
+      expect(shortening?.instructions).toContain("70 caractères");
+      expect(JSON.parse(shortening?.input ?? "{}")).toEqual({
+        title: LONG_TITLE,
+        description: "El pla preveu llançadores gratuïtes a les parròquies.",
+        maxLength: 70,
+      });
+    });
+
+    it("refuse la traduction si le titre raccourci reste trop long", async () => {
+      const client = makeTranslationClient(LONG_TITLE, LONG_TITLE);
+      const generator = new OpenAiEditorialGenerator({ apiKey: "test-key", client });
+
+      await expect(
+        generator.translateArticle({ locale: "ES", ...ARTICLE }),
+      ).rejects.toThrow(`Le titre dépasse 70 caractères (${LONG_TITLE.length})`);
+      expect(client.create).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe("rédaction en deux temps à partir des faits", () => {
     const SOURCE_TITLE = "El Govern aprova el pla d’habitatge";
     const SOURCE_SENTENCE =

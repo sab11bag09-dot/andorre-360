@@ -395,7 +395,12 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
     const drafted = parseTranslationResponse(output);
     const rewritten =
       drafted.title.length > MAX_TITLE_LENGTH
-        ? { ...drafted, title: await this.shortenTitle(drafted.title, factSheet) }
+        ? {
+            ...drafted,
+            title: await this.shortenTitle(drafted.title, "français", {
+              facts: factSheet,
+            }),
+          }
         : drafted;
 
     assertPlainEditorialOutput(rewritten);
@@ -413,23 +418,31 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
   }
 
   /**
-   * Un seul appel supplémentaire, à partir du titre trop long et des faits
-   * seulement ; si le résultat reste trop long, l’article est bloqué.
+   * Un seul appel supplémentaire, à partir du titre trop long et du contexte
+   * fourni (liste de faits pour la rédaction, chapô traduit pour une
+   * traduction), jamais du texte source ; si le résultat reste trop long,
+   * l’article ou la traduction est refusé.
    */
-  private async shortenTitle(title: string, facts: string[]): Promise<string> {
+  private async shortenTitle(
+    title: string,
+    language: string,
+    context: { facts: string[] } | { description: string },
+  ): Promise<string> {
     let output: string;
 
     try {
       output = await this.client.create({
         model: this.model,
         instructions: [
-          `Raccourcis ce titre d’article en français à ${MAX_TITLE_LENGTH} caractères au plus, espaces compris.`,
-          "Garde l’information principale, exacte et fidèle à la liste de faits ; n’ajoute aucun fait.",
+          `Raccourcis ce titre d’article en ${language} à ${MAX_TITLE_LENGTH} caractères au plus, espaces compris, et garde-le en ${language}.`,
+          "facts" in context
+            ? "Garde l’information principale, exacte et fidèle à la liste de faits ; n’ajoute aucun fait."
+            : "Garde l’information principale, exacte et fidèle au chapô fourni ; n’ajoute aucune information.",
           "Ne mets pas de date dans le titre, sauf si elle est l’information principale.",
           "N’utilise ni guillemets de citation, ni balisage Markdown ou HTML.",
           "Retourne uniquement le champ title.",
         ].join(" "),
-        input: JSON.stringify({ title, facts, maxLength: MAX_TITLE_LENGTH }),
+        input: JSON.stringify({ title, ...context, maxLength: MAX_TITLE_LENGTH }),
         schemaName: "article_title",
         schema: titleSchema,
       });
@@ -500,6 +513,7 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
           "N’ajoute, ne retire et n’invente aucune information.",
           "Conserve les noms propres, nombres, URL et la structure HTML ou Markdown.",
           "Adopte un style journalistique naturel adapté à Andorre.",
+          `Le titre traduit compte au plus ${MAX_TITLE_LENGTH} caractères, espaces compris : resserre-le si nécessaire sans perdre l’information principale.`,
           "Retourne uniquement les trois champs demandés.",
         ].join(" "),
         input: JSON.stringify({
@@ -515,7 +529,18 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       throw new Error(`La traduction OpenAI a échoué : ${message}`);
     }
 
-    const translated = parseTranslationResponse(output);
+    const parsed = parseTranslationResponse(output);
+    const translated =
+      parsed.title.length > MAX_TITLE_LENGTH
+        ? {
+            ...parsed,
+            title: await this.shortenTitle(parsed.title, targetLanguage, {
+              description: parsed.description,
+            }),
+          }
+        : parsed;
+
+    assertTitleLength(translated.title);
 
     return {
       locale: input.locale,
