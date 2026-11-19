@@ -752,7 +752,14 @@ La sélection de l’orchestrateur (`selectObservationsForArticles`) classe dés
 
 Au sein d’une même priorité, l’information la plus récente passe d’abord, comme avant. Les règles d’admissibilité, la limite d’un article par source et la limite du lot sont inchangées : un média n’est retenu que s’il reste de la place après les autres sources. Chaque décision indique la priorité de sa source (`sourcePriority`), enregistrée avec le plan de chaque run.
 
-Point d’attention : cette priorité ne vaut que si les sources sont bien classées. Au 19 novembre 2026, seules 4 sources actives sont classées `MEDIA` ; plusieurs médias (RTVA, Diari d’Andorra, Bondia, Andorra Business, Altaveu) sont encore classés `OTHER` et passent donc avant les médias correctement classés. Leur reclassement est une écriture dans `./dev.db`, à faire avec sauvegarde préalable.
+Cette priorité ne vaut que si les sources sont bien classées. Reclassement appliqué à `./dev.db` le 19 novembre 2026, après sauvegarde (`dev.before-source-reclassification-20261119-125929.db`, ignorée par Git, intégrité `ok`) :
+
+| Source (id) | Avant | Après |
+|---|---|---|
+| altaveu test 2 (4), rtva (5), diari de andorra (6), Bondia (7), Andorra Business (22) | `OTHER` | `MEDIA` |
+| Mairie d’Andorre (1), site du Comú d’Andorra la Vella | `OTHER` | `COMMUNE` |
+
+Contrôles après l’écriture : intégrité SQLite `ok`, aucune erreur de clé étrangère. Sources actives après reclassement : 19 institutionnelles (10 `GOVERNMENT`, 7 `COMMUNE`, 1 `POLICE`, 1 `EMERGENCY_SERVICE`), 13 ordinaires (9 `OTHER`, 2 `SPORTS_CLUB`, 2 `SPORTS_FEDERATION`) et 9 `MEDIA`. Les partis, stations de ski, COA, OMS et agenda restent classés `OTHER`. Ce reclassement ne concerne que la base locale : il faudra le reproduire sur la future base de production.
 
 ### Lot E — Automatiser l’ensemble de la chaîne
 
@@ -970,10 +977,10 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 
 ## 18. État exact au moment d’archiver ce guide
 
-État au 18 novembre 2026 :
+État au 19 novembre 2026 :
 
 - branche de référence : `audit/studio-v4` ;
-- dernières pull requests fusionnées : #125 à #133 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons) ;
+- dernières pull requests fusionnées : #125 à #137 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons, premier essai, rédaction à partir des faits, contrôle de ressemblance, priorité institutionnelle) ;
 - orchestrateur des articles : livré, mode brouillons par défaut, désactivé hors des essais ;
 - publication automatique des articles : désactivée localement, arrêt d’urgence activé ;
 - premier essai supervisé : 5 brouillons créés, aucune publication (voir lot D) ;
@@ -983,8 +990,9 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - production : non déployée ;
 - rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), pas encore essayée sur de vrais appels OpenAI ;
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
-- sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; reclassement des médias encore classés `OTHER` à faire ;
-- prochaines priorités : relecture des brouillons de l’essai, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés.
+- sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; sources reclassées dans `./dev.db` le 19 novembre 2026 ;
+- prochaines priorités : relecture des brouillons de l’essai, essai supervisé de la rédaction à partir des faits (avec l’accord explicite de l’utilisateur, deux appels OpenAI par article), choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés ;
+- question juridique de la reprise d’articles de presse : réduite par les trois derniers lots, mais non tranchée ; un avis d’avocat reste nécessaire avant toute mise en ligne.
 
 ---
 
