@@ -1,3 +1,4 @@
+import { AUTOMATED_ARTICLE_AUTHOR } from "./editorialSignature";
 import { assertMultilingualPublicationEnabled } from "../config/multilingualPublication";
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
 import { PrismaObservationRepository } from "../source-engine/repositories/PrismaObservationRepository";
@@ -144,6 +145,8 @@ export async function createArticleFromObservation(
 
   const editorialDraft = {
     ...draft,
+    // Quel que soit le générateur, la source ne signe jamais l’article.
+    author: AUTOMATED_ARTICLE_AUTHOR,
     image: "/images/global/hero.jpg",
     aiRewrittenAt: generatedAt,
     category:

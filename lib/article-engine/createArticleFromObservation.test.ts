@@ -183,7 +183,7 @@ describe("createArticleFromObservation", () => {
       description: "Premier paragraphe.",
       content: "Premier paragraphe.",
       category: "SOCIÉTÉ",
-      author: "Source test",
+      author: "Rédaction ANDORRE 360",
       image: "/images/global/hero.jpg",
       aiRewrittenAt: expect.any(Date),
     });

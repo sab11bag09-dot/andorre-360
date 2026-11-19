@@ -27,7 +27,7 @@ describe("DeterministicEditorialGenerator", () => {
       content:
         "Premier paragraphe collecté.",
       category: "Société",
-      author: "Source test",
+      author: "Rédaction ANDORRE 360",
     });
   });
 

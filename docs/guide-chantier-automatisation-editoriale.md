@@ -803,7 +803,7 @@ Constats à traiter :
 - fidélité aux sources à vérifier en relecture humaine, en comparant chaque article à sa liste de faits puis à la source (par exemple le lieu indiqué dans le titre de l’article 500) ;
 - articles plus secs sans citations ; l’article 501 ne compte que 852 caractères ;
 - les 5 brouillons utilisent toujours l’image générique `/images/global/hero.jpg` ;
-- le champ auteur reprend le nom brut de la source (par exemple « gouvernement d’andorre ») ;
+- le champ auteur reprenait le nom brut de la source (par exemple « gouvernement d’andorre ») ; corrigé, voir « Signature des articles rédigés automatiquement » ;
 - l’anti-doublon ne repère pas un même sujet traité par deux sources différentes.
 
 Coût : 10 appels OpenAI (5 extractions, 5 rédactions), sans traduction ; le montant exact se lit dans le tableau de bord OpenAI.
@@ -837,6 +837,20 @@ Calibrage sur les 533 observations collectées depuis le 12 novembre 2026 : 18 n
 Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisées : 8 observations écartées par sujet au lieu de 6 ; les deux nouvelles (Creu dels Set Braços, procès canonique) sont de vrais doublons ; le lot retenu ne change pas.
 
 Limites : la méthode ne traduit pas. Le titre espagnol du FC Andorra sur les navettes de bus (« ponen a disposición de la afición autobuses para los partidos en casa ») ne partage que 2 racines avec les titres catalans de l’article 500 et reste retenu. De même, « Consell d’Infants » et « consellers infantils » ne partagent pas assez de mots pour être rapprochés.
+
+#### Signature des articles rédigés automatiquement (19 novembre 2026)
+
+Les brouillons étaient signés du nom brut de la source (« Par gouvernement d’andorre »), alors que la source n’a pas écrit l’article. Ils sont désormais signés « Rédaction ANDORRE 360 » (`lib/article-engine/editorialSignature.ts`) :
+
+- les deux générateurs (OpenAI et déterministe) renvoient cette signature ;
+- `createArticleFromObservation` l’impose en dernier, quel que soit le générateur, à la création comme à la régénération d’un brouillon ;
+- la source reste consignée dans l’audit : observation rattachée à l’article et événement `ARTICLE_CREATED`.
+
+Non traité dans ce lot :
+
+- les articles déjà enregistrés gardent leur signature ; les brouillons 494 à 503 sont signés du nom de leur source, et des articles publiés plus anciens sont signés d’un média (par exemple « BBC », « France 24 ») ;
+- la page publique n’affiche pas encore la source dont l’article est tiré ; un crédit « D’après … » demandera des noms de sources propres, les noms actuels étant bruts (casse, fautes de frappe) ;
+- les communiqués politiques (catégorie « Ils en parlent ») sont eux aussi signés par la rédaction ; leur présentation, qui doit indiquer clairement de qui vient la prise de position, reste à décider.
 
 Limites constatées pendant cette mesure :
 
