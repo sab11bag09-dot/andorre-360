@@ -13,14 +13,36 @@
  * années et les noms très fréquents (Andorra, Govern, paroisses) sont
  * ignorés.
  *
- * Fonction pure et déterministe, sans appel à un modèle d’IA. Elle compare
- * des titres dans une même langue ; deux titres de langues différentes ne
- * sont généralement pas rapprochés.
+ * Pour rapprocher deux sources différentes, `topicStems` réduit aussi chaque
+ * mot à sa racine (ses `STEM_LENGTH` premières lettres) : « autobusos » et
+ * « autobuses », « aficionats » et « afición », « lloguer » et « lloguin »
+ * deviennent identiques. Quelques mots courts sans racine commune sont
+ * ramenés à une même forme (`EQUIVALENT_STEMS`), et les mots trop génériques
+ * pour désigner un sujet (montants en euros) sont ignorés.
+ *
+ * Fonctions pures et déterministes, sans appel à un modèle d’IA. Elles ne
+ * traduisent pas : deux titres de langues différentes ne sont rapprochés que
+ * s’ils partagent assez de mots de même racine (noms propres, mots proches
+ * en catalan, espagnol et français).
  */
 
 export const MIN_SHARED_TOPIC_WORDS = 3;
 export const MIN_TOPIC_OVERLAP = 0.6;
 const MIN_WORD_LENGTH = 4;
+export const STEM_LENGTH = 5;
+
+/** Mots sans racine commune ramenés à une même forme. */
+const EQUIVALENT_STEMS: ReadonlyMap<string, string> = new Map([
+  ["busos", "autob"],
+]);
+
+/** Racines trop génériques pour désigner un sujet. */
+const IGNORED_STEMS: ReadonlySet<string> = new Set([
+  "euros",
+  "milio", // milions, milió
+  "millo", // millones, millón
+  "milli", // millions, million
+]);
 
 const IGNORED_WORDS: ReadonlySet<string> = new Set(
   `
@@ -30,7 +52,7 @@ const IGNORED_WORDS: ReadonlySet<string> = new Set(
   para pels perque però pero plus pour poder pourra podrà quan quand que qui
   sans segons selon seva seus seves sobre sont tots totes tota todo toda todos
   todas tous toutes tout toute tres très una unes unos unas avec cette ces leur
-  leurs aquí aqui així asi des del las los les els
+  leurs aquí aqui així asi des del las los les els arran
   andorra andorre andorran andorrana andorrans andorranes andorrano andorrana
   principat principado principaute govern gobierno gouvernement comu
   canillo encamp ordino massana escaldes engordany vella sant julia loria
@@ -75,4 +97,19 @@ export function isSameTopic(
     shared >= MIN_SHARED_TOPIC_WORDS &&
     shared / Math.min(left.size, right.size) >= MIN_TOPIC_OVERLAP
   );
+}
+
+/**
+ * Racines des mots significatifs d’un titre, pour rapprocher des variantes
+ * d’un même mot. Les nombres sont gardés tels quels.
+ */
+export function topicStems(words: ReadonlySet<string>): Set<string> {
+  const stems = new Set<string>();
+  for (const word of words) {
+    const stem = /^\p{N}+$/u.test(word)
+      ? word
+      : (EQUIVALENT_STEMS.get(word) ?? word.slice(0, STEM_LENGTH));
+    if (!IGNORED_STEMS.has(stem)) stems.add(stem);
+  }
+  return stems;
 }

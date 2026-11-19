@@ -574,5 +574,104 @@ describe("selectObservationsForArticles — diversité des sources", () => {
 
       expect(reasonsOf(result, 2)).toEqual(["same_topic_as_processed_observation"]);
     });
+
+    describe("variantes de mots entre sources différentes", () => {
+      it("rapproche des formes différentes d’un même mot (autobusos, busos)", () => {
+        // Cas réel du 19 novembre 2026 (observations 2629 et 2642).
+        const processed = makeObservation({
+          id: 1,
+          title:
+            "Quatre autobusos gratuïts portaran els aficionats a l’estadi d’Encamp",
+          url: "https://www.diariandorra.ad/noticies/autobusos",
+          processed: true,
+          articleId: 10,
+          source: diari,
+        });
+        const other = makeObservation({
+          id: 2,
+          title:
+            "Busos llançadora gratuïts per facilitar l’accés dels aficionats a l’estadi",
+          url: "https://www.govern.ad/noticies/busos",
+          source: govern,
+        });
+
+        const result = select([processed, other], [10, 11]);
+
+        expect(reasonsOf(result, 2)).toEqual([
+          "same_topic_as_processed_observation",
+        ]);
+      });
+
+      it("rapproche des titres dont les mots ne diffèrent que par leur terminaison", () => {
+        // Cas réel (observations 2235 et 2296).
+        const processed = makeObservation({
+          id: 1,
+          title:
+            "Concòrdia vol doblar de 15 a 30 anys el termini de lloguer assequible dels pisos amb incentius públics",
+          url: "https://www.diariandorra.ad/noticies/pisos",
+          processed: true,
+          articleId: 10,
+          source: diari,
+        });
+        const other = makeObservation({
+          id: 2,
+          title:
+            "Concòrdia vol que els pisos del programa d’incentius es lloguin a preu assequible durant 30 anys",
+          url: "https://www.govern.ad/noticies/pisos",
+          source: govern,
+        });
+
+        const result = select([processed, other], [10, 11]);
+
+        expect(reasonsOf(result, 2)).toEqual([
+          "same_topic_as_processed_observation",
+        ]);
+      });
+
+      it("ne rapproche pas par variantes deux informations d’une même source", () => {
+        // Bilans de circulation de la Police : deux accidents distincts.
+        const processed = makeObservation({
+          id: 1,
+          title:
+            "Balanç d'accidents de circulació. Accident on resulta ferida la conductora d'una motocicleta",
+          url: "https://www.diariandorra.ad/noticies/accident-moto",
+          processed: true,
+          articleId: 10,
+          source: diari,
+        });
+        const other = makeObservation({
+          id: 2,
+          title:
+            "Balanç d'accidents de circulació: accident amb el conductor d'un patinet ferit",
+          url: "https://www.diariandorra.ad/noticies/accident-patinet",
+          source: diari,
+        });
+
+        const result = select([processed, other], [10, 11]);
+
+        expect(result.selectedObservationIds).toEqual([2]);
+      });
+
+      it("ne rapproche pas deux sujets qui partagent seulement des montants en euros", () => {
+        const processed = makeObservation({
+          id: 1,
+          title: "Grandvalira inverteix 42,8 milions d’euros",
+          url: "https://www.diariandorra.ad/noticies/grandvalira",
+          processed: true,
+          articleId: 10,
+          source: diari,
+        });
+        const other = makeObservation({
+          id: 2,
+          title: "FEDA preveu invertir 64,1 milions d’euros al 2027",
+          url: "https://www.govern.ad/noticies/feda",
+          source: govern,
+        });
+
+        const result = select([processed, other], [10, 11]);
+
+        expect(result.selectedObservationIds).toEqual([2]);
+      });
+    });
   });
 });

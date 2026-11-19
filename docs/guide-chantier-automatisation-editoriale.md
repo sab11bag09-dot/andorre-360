@@ -821,6 +821,23 @@ Calibrage sur les 533 observations collectées depuis le 12 novembre 2026 : les 
 
 Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisées : 5 observations écartées par sujet, dont les reprises de la Creu dels Set Braços par le Govern et La Veu Lliure, et deux doublons des navettes de bus de l’article 500. Un rapprochement est discutable : la demande d’explications d’Andorra Endavant sur la cyberattaque de la CASS, écartée car proche de l’observation Concòrdia de l’article 503.
 
+#### Variantes de mots entre sources (19 novembre 2026)
+
+L’anti-doublon par sujet comparait des mots identiques : « autobusos » et « busos », « lloguer » et « lloguin », ou un même mot en catalan et en espagnol (« aficionats », « afición ») n’étaient pas rapprochés. Entre deux sources différentes, la sélection compare désormais aussi les racines des mots significatifs (`topicStems`) :
+
+- chaque mot est réduit à ses 5 premières lettres ; les nombres sont gardés tels quels ;
+- « busos » est ramené à la même forme qu’« autobusos » ;
+- les racines trop génériques pour désigner un sujet (euros, millions) et le mot de liaison « arran » sont ignorés ;
+- les seuils ne changent pas : au moins 3 racines communes, couvrant au moins 60 % de celles du titre le plus court.
+
+Au sein d’une même source, seule la comparaison exacte s’applique : une source publie souvent des séries de titres proches sur des faits distincts (bilans d’accidents de la Police, résultats d’un même skieur), que les racines confondraient.
+
+Calibrage sur les 533 observations collectées depuis le 12 novembre 2026 : 18 nouvelles paires entre sources différentes, presque toutes de vrais doublons (Creu dels Set Braços, procès canonique, pisos assequibles de Concòrdia, mémorandum du multifuncional, AD-ALERT, niveau B1, changement des mots de passe des certificats numériques, campagne de Grandvalira en français et en catalan). Une paire est fausse : la délégation du Consell General à l’APF et l’AFA à l’IOSCO, rapprochées par « participa », « regional » et « Europa ». Au sein d’une même source, 6 paires auraient été rapprochées à tort ; elles ne le sont pas.
+
+Mesure à blanc sur une copie de `./dev.db`, toutes sources supposées autorisées : 8 observations écartées par sujet au lieu de 6 ; les deux nouvelles (Creu dels Set Braços, procès canonique) sont de vrais doublons ; le lot retenu ne change pas.
+
+Limites : la méthode ne traduit pas. Le titre espagnol du FC Andorra sur les navettes de bus (« ponen a disposición de la afición autobuses para los partidos en casa ») ne partage que 2 racines avec les titres catalans de l’article 500 et reste retenu. De même, « Consell d’Infants » et « consellers infantils » ne partagent pas assez de mots pour être rapprochés.
+
 Limites constatées pendant cette mesure :
 
 - deux titres de langues différentes ne sont pas rapprochés : l’annonce des navettes par le FC Andorra, en espagnol, reste retenue alors que l’article 500 traite le même sujet ;
@@ -1081,8 +1098,8 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), essayée avec succès le 19 novembre 2026 ;
 - contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
 - sélection de l’orchestrateur : sources institutionnelles d’abord, médias en dernier ; sources reclassées dans `./dev.db` le 19 novembre 2026 ;
-- anti-doublon par sujet : titres rapprochés par mots significatifs communs ; pas encore entre langues différentes ;
-- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, anti-doublon par sujet entre langues différentes, choix d’images pertinentes, puis d’autres essais supervisés ;
+- anti-doublon par sujet : titres rapprochés par mots significatifs communs et, entre sources différentes, par racines communes ; pas de traduction entre langues ;
+- prochaines priorités : relecture des brouillons de l’essai, relecture des brouillons 499 à 503, rapprochement des titres traduits (le cas des navettes du FC Andorra), choix d’images pertinentes, puis d’autres essais supervisés ;
 - question juridique de la reprise d’articles de presse : réduite par les trois derniers lots, mais non tranchée ; un avis d’avocat reste nécessaire avant toute mise en ligne.
 
 ---

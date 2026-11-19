@@ -5,7 +5,43 @@ import type {
 } from "@/lib/generated/prisma/client";
 
 import { normalizeObservationPublishedAt } from "../source-engine/observationDate";
-import { isSameTopic, topicWords } from "./topicSimilarity";
+import { isSameTopic, topicStems, topicWords } from "./topicSimilarity";
+
+type TopicEntry = {
+  id: number;
+  sourceId: number;
+  words: Set<string>;
+  stems: Set<string>;
+};
+
+function topicEntry(observation: {
+  id: number;
+  title: string;
+  source: { id: number };
+}): TopicEntry {
+  const words = topicWords(observation.title);
+  return {
+    id: observation.id,
+    sourceId: observation.source.id,
+    words,
+    stems: topicStems(words),
+  };
+}
+
+/**
+ * Deux observations traitent le même sujet si leurs titres partagent assez de
+ * mots significatifs. Entre deux sources différentes, le rapprochement
+ * accepte aussi des variantes d’un même mot (même racine) : une même source
+ * publie souvent des séries de titres proches sur des faits distincts
+ * (bilans d’accidents, résultats sportifs), alors que deux sources
+ * différentes reprennent plutôt la même information.
+ */
+function isSameTopicEntry(left: TopicEntry, right: TopicEntry): boolean {
+  return (
+    isSameTopic(left.words, right.words) ||
+    (left.sourceId !== right.sourceId && isSameTopic(left.stems, right.stems))
+  );
+}
 
 /**
  * Sélection déterministe des observations qu’un futur orchestrateur
@@ -160,17 +196,14 @@ export function selectObservationsForArticles(input: {
 
   // Les observations déjà traitées servent de référence anti-doublon.
   const processedKeys = new Set<string>();
-  const processedTopics: Array<{ id: number; words: Set<string> }> = [];
+  const processedTopics: TopicEntry[] = [];
   for (const observation of ordered) {
     if (observation.processed || observation.articleId !== null) {
       for (const key of duplicateKeys(observation)) processedKeys.add(key);
-      processedTopics.push({
-        id: observation.id,
-        words: topicWords(observation.title),
-      });
+      processedTopics.push(topicEntry(observation));
     }
   }
-  const selectedTopics: Array<{ id: number; words: Set<string> }> = [];
+  const selectedTopics: TopicEntry[] = [];
 
   const selectedKeys = new Set<string>();
   const selectedObservationIds: number[] = [];
@@ -193,9 +226,9 @@ export function selectObservationsForArticles(input: {
 
     if (reasons.length === 0) {
       const keys = duplicateKeys(observation);
-      const words = topicWords(observation.title);
-      const sameTopicAs = (topics: Array<{ id: number; words: Set<string> }>) =>
-        topics.find((topic) => isSameTopic(words, topic.words))?.id;
+      const topic = topicEntry(observation);
+      const sameTopicAs = (topics: TopicEntry[]) =>
+        topics.find((other) => isSameTopicEntry(topic, other))?.id;
 
       if (keys.some((key) => processedKeys.has(key))) {
         reasons.push("duplicate_of_processed_observation");
@@ -218,7 +251,7 @@ export function selectObservationsForArticles(input: {
         reasons.push("batch_limit_reached");
       } else {
         for (const key of keys) selectedKeys.add(key);
-        selectedTopics.push({ id: observation.id, words });
+        selectedTopics.push(topic);
         selectedObservationIds.push(observation.id);
         selectedPerSource.set(
           observation.source.id,
