@@ -961,6 +961,23 @@ Les traductions en catalan et en espagnol sont souvent plus longues que le fran�
 
 Le raccourcissement coûte un appel OpenAI de plus, seulement pour les titres traduits trop longs. Le titre traduit raccourci n’est plus une traduction mot à mot du titre français, mais il en garde l’information principale.
 
+#### Contrôle de fidélité aux faits (19 novembre 2026)
+
+Priorité 3 de la revue d’ensemble. Après la rédaction et le contrôle de ressemblance, `createArticleFromObservation` vérifie que l’article reste fidèle à la liste de faits dont il est tiré (`lib/article-engine/factFidelity.ts`) :
+
+- chiffres : chaque nombre du titre, du chapô et du corps doit figurer dans la liste de faits ou dans les dates transmises au rédacteur (date de la source, date de génération) ; les écritures différentes sont acceptées (« 19.30 heures » et « 19 h 30 », « deux » et « 2 », « 1 200 000 » et « 1200000 ») ; **un chiffre absent bloque l’article** : aucun brouillon n’est créé ni remplacé, l’observation n’est pas marquée traitée et l’erreur indique les chiffres en cause ;
+- noms propres : un nom absent des faits et du nom de la source est **seulement consigné « à vérifier »** dans l’audit (`ARTICLE_CREATED.factFidelity.namesToCheck`), sans bloquer ; les noms français usuels de lieux andorrans (Andorre, Andorre-la-Vieille, Saint-Julien-de-Loria) sont acceptés ;
+- un article produit sans liste de faits (générateur déterministe) n’est pas contrôlé.
+
+Calibrage sur les brouillons 499 à 503, avec leurs listes de faits enregistrées dans l’audit : aucun chiffre bloquant ; 4 noms à vérifier, tous légitimes mais absents des faits (« Organisation » mondiale de la santé et « Escherichia » coli, sigles développés par le rédacteur ; « Caisse » andorrane de sécurité sociale, traduction du nom catalan). Le premier prototype aurait bloqué l’article 500 à cause des horaires (« 19.30 » écrit « 19 h 30 ») et l’article 503 à cause de la date de la source : ces deux cas sont désormais acceptés.
+
+Limites :
+
+- les nombres sont comparés morceau par morceau pour accepter les horaires et les décimales : un « 30 » est accepté si les faits contiennent « 19.30 », et l’inversion de deux chiffres présents (« 4,7 » écrit « 7,4 ») n’est pas repérée ;
+- les nombres écrits en lettres dans l’article ne sont pas contrôlés ;
+- les noms à vérifier ne bloquent pas : c’est à la relecture humaine d’en juger ;
+- le contrôle ne vérifie pas le sens des phrases : un fait mal attribué ou déformé avec les mêmes chiffres et les mêmes noms passe.
+
 #### Dates propres à certains sites (19 novembre 2026)
 
 Le 19 novembre 2026, 158 observations récentes restaient sans date, donc écartées par l’orchestrateur. Les règles de site (`lib/source-engine/collectors/siteRules.ts`) peuvent désormais désigner l’élément exact qui affiche la date :
@@ -1267,7 +1284,7 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 
 1. Avis d’avocat maintenant ; en attendant, rédaction automatique limitée aux sources institutionnelles.
 2. Relecture humaine des brouillons 494 à 503, puis jeu de référence.
-3. Contrôle automatique de fidélité : chiffres, noms et dates de l’article présents dans la liste de faits.
+3. Contrôle automatique de fidélité : chiffres, noms et dates de l’article présents dans la liste de faits (fait, voir « Contrôle de fidélité aux faits »).
 4. Images.
 5. Préparation de la mise en production : interrupteurs sans `.env`, coûts, hébergement, sauvegardes.
 

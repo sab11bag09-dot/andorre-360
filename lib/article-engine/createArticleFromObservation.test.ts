@@ -369,4 +369,95 @@ describe("createArticleFromObservation", () => {
       });
     });
   });
+
+  describe("contrôle de fidélité aux faits", () => {
+    const FACTS = [
+      "Le Comú de Canillo a ouvert le 3 septembre 2026 les inscriptions au camp d’été pour les enfants de 4 à 12 ans.",
+    ];
+
+    function setup(article: { title: string; description: string; content: string }) {
+      const observation = makeObservation({
+        publishedAt: new Date("2026-09-03T08:00:00.000Z"),
+      } as Partial<ObservationWithSource>);
+      const deps = makeDependencies(observation);
+      const eventCreate = vi.fn(async () => undefined);
+
+      deps.prepareArticle.mockResolvedValue({
+        ...article,
+        category: "SOCIÉTÉ",
+        author: "Source test",
+        factSheet: FACTS,
+      } as Awaited<ReturnType<typeof deps.prepareArticle>>);
+
+      return {
+        ...deps,
+        observation,
+        eventCreate,
+        run: () =>
+          createArticleFromObservation(observation.id, {
+            ...deps.dependencies,
+            editorialEventWriter: {
+              editorialEvent: { create: eventCreate },
+            } as unknown as NonNullable<
+              CreateArticleFromObservationDependencies["editorialEventWriter"]
+            >,
+          }),
+      };
+    }
+
+    it("bloque un article qui contient un chiffre absent des faits, sans créer de brouillon", async () => {
+      const { run, createDraft, updateDraft, markProcessed, eventCreate } = setup({
+        title: "Canillo ouvre son camp d’été",
+        description: "Les inscriptions ont ouvert le 3 septembre 2026.",
+        content: "Le camp accueillera 150 enfants de 4 à 12 ans.",
+      });
+
+      await expect(run()).rejects.toThrow(
+        "Article bloqué : chiffres absents de la liste de faits : 150",
+      );
+
+      expect(createDraft).not.toHaveBeenCalled();
+      expect(updateDraft).not.toHaveBeenCalled();
+      expect(markProcessed).not.toHaveBeenCalled();
+      expect(eventCreate).not.toHaveBeenCalled();
+    });
+
+    it("consigne les noms propres à vérifier sans bloquer l’article", async () => {
+      const { run, createDraft, eventCreate } = setup({
+        title: "Canillo ouvre son camp d’été",
+        description: "Les inscriptions ont ouvert le 3 septembre 2026.",
+        content: "Selon la conseillère Marta Puig, le camp accueillera les enfants de 4 à 12 ans.",
+      });
+
+      await run();
+
+      expect(createDraft).toHaveBeenCalledTimes(1);
+      const [[event]] = eventCreate.mock.calls as unknown as [
+        [{ data: { details: string } }],
+      ];
+      expect(JSON.parse(event.data.details).factFidelity).toEqual({
+        unsupportedNumbers: [],
+        namesToCheck: ["Marta", "Puig"],
+        blocked: false,
+      });
+    });
+
+    it("ne contrôle pas un article produit sans liste de faits", async () => {
+      const observation = makeObservation();
+      const { dependencies, createDraft, prepareArticle } =
+        makeDependencies(observation);
+
+      prepareArticle.mockResolvedValue({
+        title: "Titre test",
+        description: "Premier paragraphe.",
+        content: "Le camp accueillera 150 enfants.",
+        category: "SOCIÉTÉ",
+        author: "Source test",
+      });
+
+      await createArticleFromObservation(observation.id, dependencies);
+
+      expect(createDraft).toHaveBeenCalledTimes(1);
+    });
+  });
 });
