@@ -899,7 +899,7 @@ Les autres articles signés du nom de leur source n’ont pas été re-signés, 
 - 148 articles plus anciens, rattachés à une observation mais créés sans IA, sont des traductions littérales ou des copies du texte de la source (par exemple l’article 276, traduction du Govern, ou l’article 440, paraphrase d’une dépêche de France 24) ; 16 sont classés comme copies par le contrôle de ressemblance, qui ne repère pas les traductions ;
 - pour ces articles, la signature au nom de la source est au moins exacte : les signer par la rédaction reviendrait à s’attribuer un texte qui n’est pas le sien.
 
-Point d’attention juridique : 164 articles publiés sont rattachés à une source, dont 62 à des médias (BBC, France 24, Diari d’Andorra, Andorra Business, Altaveu…). Leur maintien en ligne, ou leur dépublication, est à soumettre à l’avis d’avocat déjà prévu ; aucune décision n’a été prise.
+Données de chantier : 164 articles publiés sont rattachés à une source, dont 62 à des médias (BBC, France 24, Diari d’Andorra, Andorra Business, Altaveu…). Comme tous les articles déjà présents dans `./dev.db`, ils servent uniquement au chantier et seront effacés lors de la mise en production (précision de l’utilisateur, 19 novembre 2026). Ils ne sont donc pas à dépublier ni à re-signer maintenant ; l’avis d’avocat porte sur les articles que produira la chaîne de rédaction.
 
 Les signatures humaines (« Sa.BA », « Salah »), sur des articles sans source, n’ont pas été modifiées.
 
