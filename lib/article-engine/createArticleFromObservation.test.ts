@@ -283,4 +283,90 @@ describe("createArticleFromObservation", () => {
       factSheet,
     });
   });
+
+  describe("contrôle de ressemblance avec la source", () => {
+    const LONG_SOURCE =
+      "Le Comú de Canillo a ouvert les inscriptions au camp d’été destiné aux enfants de 4 à 12 ans. " +
+      "Les familles peuvent s’inscrire en ligne jusqu’au 30 juin. Le camp proposera des activités sportives, " +
+      "culturelles et de montagne pendant tout le mois de juillet, avec un encadrement assuré par des moniteurs diplômés.";
+
+    function makeEventWriter() {
+      const eventCreate = vi.fn(async () => undefined);
+      return {
+        eventCreate,
+        editorialEventWriter: {
+          editorialEvent: { create: eventCreate },
+        } as unknown as NonNullable<
+          CreateArticleFromObservationDependencies["editorialEventWriter"]
+        >,
+      };
+    }
+
+    it("bloque un article trop proche du texte source sans créer de brouillon", async () => {
+      const observation = makeObservation({ content: LONG_SOURCE });
+      const {
+        dependencies,
+        createDraft,
+        updateDraft,
+        markProcessed,
+        prepareArticle,
+      } = makeDependencies(observation);
+      const { eventCreate, editorialEventWriter } = makeEventWriter();
+
+      prepareArticle.mockResolvedValue({
+        title: "Titre test",
+        description: "Premier paragraphe.",
+        content: LONG_SOURCE,
+        category: "SOCIÉTÉ",
+        author: "Source test",
+      });
+
+      await expect(
+        createArticleFromObservation(observation.id, {
+          ...dependencies,
+          editorialEventWriter,
+        }),
+      ).rejects.toThrow("trop proche du texte source");
+
+      expect(createDraft).not.toHaveBeenCalled();
+      expect(updateDraft).not.toHaveBeenCalled();
+      expect(markProcessed).not.toHaveBeenCalled();
+      expect(eventCreate).not.toHaveBeenCalled();
+    });
+
+    it("consigne la mesure de ressemblance dans l’audit d’un article accepté", async () => {
+      const observation = makeObservation({ content: LONG_SOURCE });
+      const { dependencies, createDraft, prepareArticle } =
+        makeDependencies(observation);
+      const { eventCreate, editorialEventWriter } = makeEventWriter();
+
+      prepareArticle.mockResolvedValue({
+        title: "Canillo ouvre son camp d’été aux 4-12 ans",
+        description: "Les inscriptions sont ouvertes jusqu’au 30 juin 2026.",
+        content:
+          "Les enfants âgés de 4 à 12 ans pourront participer cet été au camp organisé par la paroisse. " +
+          "Inscriptions sur internet, au plus tard le 30 juin 2026.",
+        category: "SOCIÉTÉ",
+        author: "Source test",
+      });
+
+      await createArticleFromObservation(observation.id, {
+        ...dependencies,
+        editorialEventWriter,
+      });
+
+      expect(createDraft).toHaveBeenCalledTimes(1);
+
+      const [[event]] = eventCreate.mock.calls as unknown as [
+        [{ data: { details: string } }],
+      ];
+
+      expect(JSON.parse(event.data.details).sourceSimilarity).toMatchObject({
+        shingleSize: 5,
+        blocked: false,
+        sharedShingleRatio: expect.any(Number),
+        longestSharedRun: expect.any(Number),
+      });
+    });
+  });
 });

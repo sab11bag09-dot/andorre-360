@@ -727,7 +727,22 @@ Conséquences :
 - les citations des personnes interrogées disparaissent des articles : c’est voulu, mais les articles seront plus secs ;
 - les tests utilisent un faux client ; la méthode n’a pas encore été essayée sur de vrais appels.
 
-Ce changement éloigne le texte produit de la formulation de la source, mais **ne tranche pas la question juridique** : il ne remplace pas un avis d’avocat, qui reste nécessaire avant toute mise en ligne. Prochains lots prévus : un contrôle automatique de ressemblance entre l’article et la source, puis la priorité aux sources institutionnelles dans la sélection de l’orchestrateur.
+Ce changement éloigne le texte produit de la formulation de la source, mais **ne tranche pas la question juridique** : il ne remplace pas un avis d’avocat, qui reste nécessaire avant toute mise en ligne.
+
+#### Contrôle de ressemblance avec la source (19 novembre 2026)
+
+Après la rédaction, `createArticleFromObservation` compare l’article (titre, chapô et corps) au titre et au texte de l’observation (`lib/article-engine/sourceSimilarity.ts`). La comparaison ignore la casse, les accents, la ponctuation et les apostrophes. Elle mesure :
+
+- la part des passages de 5 mots de l’article qui figurent aussi dans la source ;
+- le plus long passage commun, en nombre de mots consécutifs.
+
+L’article est **bloqué** si plus de 20 % de ses passages de 5 mots figurent dans la source, ou si un passage commun dépasse 12 mots. Dans ce cas, aucun brouillon n’est créé ni remplacé, l’observation n’est pas marquée traitée, et l’erreur indique la mesure ; dans l’orchestrateur, l’observation passe en `FAILED` avec ce message. Pour un article accepté, la mesure est consignée dans l’événement `ARTICLE_CREATED` (champ `sourceSimilarity`).
+
+Le générateur déterministe, qui recopie la source, est désormais bloqué par ce contrôle dès que le texte est assez long : c’est voulu.
+
+Limite : cette comparaison repère la reprise de formulations dans la même langue, pas une traduction fidèle d’une source catalane ou espagnole. La rédaction à partir des faits traite ce cas en amont. Les seuils sont un premier réglage, à confronter aux prochains essais supervisés. Mesure à blanc, en lecture seule, sur les 5 brouillons du premier essai (articles 494 à 498, rédigés avec l’ancienne consigne en un seul appel) : de 0 à 2 % de passages communs, au plus 8 mots consécutifs, donc aucun blocage. Ces sources étant en catalan et les articles en français, ce résultat illustre aussi la limite ci-dessus. Comme le lot précédent, ce contrôle réduit le risque juridique sans le trancher.
+
+Prochain lot prévu : la priorité aux sources institutionnelles dans la sélection de l’orchestrateur.
 
 ### Lot E — Automatiser l’ensemble de la chaîne
 
@@ -957,6 +972,7 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 - images des brouillons : image générique, amélioration nécessaire ;
 - production : non déployée ;
 - rédaction à partir des faits : génération en deux temps (extraction des faits, puis rédaction sans le texte source), pas encore essayée sur de vrais appels OpenAI ;
+- contrôle de ressemblance : article bloqué au-delà de 20 % de passages de 5 mots communs avec la source ou d’un passage commun de plus de 12 mots ;
 - prochaines priorités : relecture des brouillons de l’essai, choix d’images pertinentes, règles de date propres aux 13 sources restantes, puis d’autres essais supervisés.
 
 ---
