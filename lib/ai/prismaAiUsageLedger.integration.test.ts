@@ -9,6 +9,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PrismaClient } from "@/lib/generated/prisma/client";
 
 import { createPrismaAiUsageLedger } from "./prismaAiUsageLedger";
+import { loadAiUsageSummary } from "./summarizeAiUsage";
 
 const databasePath = join(
   tmpdir(),
@@ -75,5 +76,25 @@ describe("createPrismaAiUsageLedger", () => {
 
   it("compte zéro jeton quand rien n’a été consommé", async () => {
     expect(await createPrismaAiUsageLedger(client).tokensUsedSince(new Date(0))).toBe(0);
+  });
+});
+
+describe("loadAiUsageSummary", () => {
+  it("résume la consommation enregistrée avec le plafond configuré", async () => {
+    await createPrismaAiUsageLedger(client).record({
+      provider: "openai",
+      model: "test-model",
+      operation: "article_translation",
+      inputTokens: 1_000,
+      outputTokens: 500,
+    });
+
+    const summary = await loadAiUsageSummary(client, { env: { AI_DAILY_TOKEN_LIMIT: "3000" } });
+
+    expect(summary.window).toMatchObject({ used: 1_500, limit: 3_000, percent: 50 });
+    expect(summary.byOperation).toEqual([
+      { operation: "article_translation", label: "Traduction", calls: 1, tokens: 1_500 },
+    ]);
+    expect(summary.byDay[0]).toMatchObject({ calls: 1, tokens: 1_500 });
   });
 });
