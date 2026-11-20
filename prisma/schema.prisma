@@ -463,11 +463,14 @@ model Media {
   testOnly     Boolean      @default(false)
   /// Adresse d’origine d’une photo reprise d’une source.
   sourceUrl    String?
+  /// Banque d’images : rubrique illustrée par cette image (« ALL » pour toutes), sinon hors banque.
+  bankCategory String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now()) @updatedAt
   usages       MediaUsage[]
 
   @@index([sourceUrl])
+  @@index([bankCategory])
 }
 
 model MediaUsage {

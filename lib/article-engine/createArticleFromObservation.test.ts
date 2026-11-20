@@ -528,3 +528,61 @@ describe("createArticleFromObservation — photo de la source", () => {
     expect(images.importImage).not.toHaveBeenCalled();
   });
 });
+
+describe("createArticleFromObservation — banque d’images", () => {
+  function bank(picked: { mediaId: number; path: string } | null) {
+    return { pick: vi.fn(async () => picked) };
+  }
+
+  const noSourceImage = {
+    importImage: vi.fn(async () => null),
+    linkToArticle: vi.fn(async () => undefined),
+  };
+
+  it("illustre le brouillon par une image de la banque de sa rubrique quand la source n’en fournit pas", async () => {
+    const observation = makeObservation();
+    const { dependencies, createDraft } = makeDependencies(observation);
+    const bankImages = bank({ mediaId: 30, path: "/api/media/files/originals/sport.jpg" });
+    const sourceImages = { ...noSourceImage, linkToArticle: vi.fn(async () => undefined) };
+
+    await createArticleFromObservation(observation.id, { ...dependencies, sourceImages, bankImages });
+
+    expect(bankImages.pick).toHaveBeenCalledWith("SOCIÉTÉ");
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({ image: "/api/media/files/originals/sport.jpg" }),
+    );
+    expect(sourceImages.linkToArticle).toHaveBeenCalledWith(30, 42);
+  });
+
+  it("garde la photo de la source quand elle existe", async () => {
+    const observation = makeObservation();
+    const { dependencies, createDraft } = makeDependencies(observation);
+    const bankImages = bank({ mediaId: 30, path: "/api/media/files/originals/sport.jpg" });
+    const sourceImages = {
+      importImage: vi.fn(async () => ({ mediaId: 9, path: "/api/media/files/sources/p.jpg", testOnly: true })),
+      linkToArticle: vi.fn(async () => undefined),
+    };
+
+    await createArticleFromObservation(observation.id, { ...dependencies, sourceImages, bankImages });
+
+    expect(bankImages.pick).not.toHaveBeenCalled();
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({ image: "/api/media/files/sources/p.jpg" }),
+    );
+  });
+
+  it("garde l’image générique quand la banque est vide", async () => {
+    const observation = makeObservation();
+    const { dependencies, createDraft } = makeDependencies(observation);
+
+    await createArticleFromObservation(observation.id, {
+      ...dependencies,
+      sourceImages: noSourceImage,
+      bankImages: bank(null),
+    });
+
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({ image: "/images/global/hero.jpg" }),
+    );
+  });
+});

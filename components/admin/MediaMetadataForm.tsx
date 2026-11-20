@@ -3,9 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { BANK_CATEGORY_OPTIONS } from "@/lib/media/bankImage";
+
 import {
   Button,
   Input,
+  Select,
   Textarea,
 } from "@/components/admin/ui";
 
@@ -16,6 +19,10 @@ type MediaMetadataFormProps = {
   initialCaption: string | null;
   initialCredit: string | null;
   initialCopyright: string | null;
+  /** Rubrique de la banque d’images, ou null hors banque. */
+  initialBankCategory?: string | null;
+  /** Seules les images qui appartiennent à la rédaction peuvent entrer dans la banque. */
+  bankAvailable?: boolean;
 };
 
 export default function MediaMetadataForm({
@@ -25,6 +32,8 @@ export default function MediaMetadataForm({
   initialCaption,
   initialCredit,
   initialCopyright,
+  initialBankCategory = null,
+  bankAvailable = false,
 }: MediaMetadataFormProps) {
   const router = useRouter();
 
@@ -39,6 +48,7 @@ export default function MediaMetadataForm({
   const [copyright, setCopyright] = useState(
     initialCopyright ?? ""
   );
+  const [bankCategory, setBankCategory] = useState(initialBankCategory ?? "");
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [hasError, setHasError] = useState(false);
@@ -64,6 +74,7 @@ export default function MediaMetadataForm({
           caption,
           credit,
           copyright,
+          ...(bankAvailable ? { bankCategory } : {}),
         }),
       });
 
@@ -184,6 +195,34 @@ export default function MediaMetadataForm({
           className="mt-0"
         />
       </div>
+
+      {bankAvailable ? (
+        <div>
+          <label
+            htmlFor={`media-bank-${mediaId}`}
+            className="mb-1 block text-xs text-zinc-400"
+          >
+            Banque d’images
+          </label>
+
+          <Select
+            id={`media-bank-${mediaId}`}
+            value={bankCategory}
+            onChange={(event) => setBankCategory(event.target.value)}
+            className="mt-0"
+          >
+            {BANK_CATEGORY_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </Select>
+
+          <p className="mt-1 text-xs text-zinc-500">
+            Seulement pour une image qui appartient à la rédaction ou sous licence.
+          </p>
+        </div>
+      ) : null}
 
       <Button
         type="submit"
