@@ -120,6 +120,12 @@ describe("HomePageView : blocs figés et colonnes alignées en bas de page", () 
     expect(total(main, gaps.main)).toBe(total(aside, gaps.aside));
   });
 
+  it("donne la même hauteur aux photos de la grande carte et du grand format", () => {
+    // Bloc du grand format : 191 px d’en-tête (catégorie, titre, marges) et la photo.
+    expect(html).toContain("xl:h-[585px]");
+    expect(main.essentials - 191).toBe(585);
+  });
+
   it("fige la hauteur de chaque bloc sur grand écran", () => {
     for (const height of [...Object.values(main), ...Object.values(aside)]) {
       expect(html).toContain(`xl:h-[${height}px]`);

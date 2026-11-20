@@ -33,16 +33,21 @@ const FALLBACK_IMAGE = "/images/global/hero.jpg";
  * colonnes finissent au même niveau : avec leurs espacements (40 px à
  * gauche, 36 px à droite), elles totalisent la même hauteur. Mesurées dans le
  * navigateur le 21 novembre 2026 ; un test vérifie l’égalité des totaux.
+ *
+ * Choix de l’utilisateur (21 novembre 2026) : la photo du grand format est
+ * réduite d’un quart (780 → 585 px), le bloc L’essentiel et grand format
+ * d’autant (971 → 776 px), et la photo de la grande carte agrandie d’autant
+ * (390 → 585 px) : les deux photos ont la même hauteur.
  */
 export const HOME_XL_BLOCK_HEIGHTS = {
-  main: { feature: 825, essentials: 971, advertisement: 531 },
+  main: { feature: 1020, essentials: 776, advertisement: 531 },
   aside: { editorial: 628, selection: 1177, discover: 530 },
   gaps: { main: 40, aside: 36 },
 } as const;
 
 const XL_HEIGHT = {
-  feature: "xl:h-[825px] xl:overflow-hidden",
-  essentials: "xl:h-[971px] xl:overflow-hidden",
+  feature: "xl:h-[1020px] xl:overflow-hidden",
+  essentials: "xl:h-[776px] xl:overflow-hidden",
   advertisement: "xl:h-[531px]",
   editorial: "xl:h-[628px] xl:overflow-hidden",
   selection: "xl:h-[1177px] xl:overflow-hidden",
@@ -128,7 +133,7 @@ function FeatureCard({ article }: { article: HomeArticle }) {
           {article.title}
         </h2>
 
-        <div className="relative mt-7 h-[330px] overflow-hidden md:h-[390px]">
+        <div className="relative mt-7 h-[330px] overflow-hidden md:h-[390px] xl:h-[585px]">
           <SafeImage
             src={article.image || FALLBACK_IMAGE}
               alt={article.title}
