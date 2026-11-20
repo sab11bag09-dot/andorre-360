@@ -1388,6 +1388,23 @@ Correctif :
 
 Mesure après correction, à 1 280, 768 et 375 pixels de large : tout reste en place sur toutes les pages. Seul l’encadré fixe « Trafic et état des routes » de Loisirs et Lifestyle, dont le texte est écrit dans le code et ne vient d’aucun article, n’est pas concerné.
 
+### Page d’accueil : blocs figés et colonnes alignées en bas (21 novembre 2026)
+
+Après la correction précédente, l’utilisateur a jugé la une déstructurée. Deux défauts étaient visibles. Le chapô du grand format s’arrêtait après 6 lignes à côté d’une grande photo. La colonne de droite finissait environ 340 px plus bas que la colonne principale ; l’écart existait déjà, la correction précédente l’avait augmenté de 55 px.
+
+Règle de l’utilisateur : les blocs ne bougent pas, tous finissent alignés en bas de page, et une fois alignés chacun garde une hauteur figée.
+
+- Sur grand écran (`xl`, 1 280 px et plus), la page est limitée à 1 280 px de large et chaque bloc a donc toujours la même largeur. Chaque bloc y reçoit une hauteur fixe (`HOME_XL_BLOCK_HEIGHTS` dans `components/home/HomePageView.tsx`), mesurée dans le navigateur :
+  - à gauche : grande carte 825 px, L’essentiel et Grand format 971 px, publicité 531 px ;
+  - à droite : Édito 628 px, Sélection 1 177 px, À découvrir 530 px.
+- Avec leurs espacements (40 px à gauche, 36 px à droite), les deux colonnes totalisent la même hauteur. Un test vérifie cette égalité.
+- Aucun bloc n’est étiré pour combler un écart. La hauteur d’un bloc ne dépend ni des textes ni du nombre d’articles : une Sélection de 3 cartes ou une une sans édito gardent les mêmes hauteurs.
+- La photo du grand format occupe la hauteur restante de son bloc. Son chapô peut aller jusqu’à 14 lignes et s’affiche en entier.
+- Mesures à 1 280 et 1 440 px : les deux colonnes finissent toutes deux à 3 233 px ; aucun bloc ne déborde ; aucun élément ne bouge avec des textes très courts ou très longs, ni avec deux cartes de moins en Sélection et dans À découvrir.
+- Sous 1 280 px, les colonnes sont empilées et les hauteurs fixes ne s’appliquent pas ; la règle des lignes réservées continue de s’appliquer.
+
+Une modification des cartes de l’accueil (police, marges, nombre d’articles par zone) oblige à remesurer ces hauteurs.
+
 ---
 
 ## 19. Résumé en une minute

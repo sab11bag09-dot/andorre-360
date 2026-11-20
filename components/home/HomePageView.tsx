@@ -27,6 +27,29 @@ const READ_MORE = "text-xs font-semibold uppercase tracking-[0.2em] text-yellow-
 const FALLBACK_IMAGE = "/images/global/hero.jpg";
 
 /**
+ * Hauteurs figées des blocs sur grand écran (`xl`, 1 280 px et plus : la page
+ * est alors limitée à 1 280 px, chaque bloc a toujours la même largeur).
+ * Elles ne dépendent ni des textes ni du nombre d’articles, et les deux
+ * colonnes finissent au même niveau : avec leurs espacements (40 px à
+ * gauche, 36 px à droite), elles totalisent la même hauteur. Mesurées dans le
+ * navigateur le 21 novembre 2026 ; un test vérifie l’égalité des totaux.
+ */
+export const HOME_XL_BLOCK_HEIGHTS = {
+  main: { feature: 825, essentials: 971, advertisement: 531 },
+  aside: { editorial: 628, selection: 1177, discover: 530 },
+  gaps: { main: 40, aside: 36 },
+} as const;
+
+const XL_HEIGHT = {
+  feature: "xl:h-[825px] xl:overflow-hidden",
+  essentials: "xl:h-[971px] xl:overflow-hidden",
+  advertisement: "xl:h-[531px]",
+  editorial: "xl:h-[628px] xl:overflow-hidden",
+  selection: "xl:h-[1177px] xl:overflow-hidden",
+  discover: "xl:h-[530px] xl:overflow-hidden",
+} as const;
+
+/**
  * Mise en page indépendante des textes : chaque titre et chaque chapô réserve
  * son nombre de lignes (`line-clamp-N min-h-[Nlh]`), un chapô absent garde sa
  * place et une photo absente est remplacée par l’image générique. Les blocs et
@@ -97,7 +120,7 @@ function Hero({ article }: { article: HomeArticle }) {
 
 function FeatureCard({ article }: { article: HomeArticle }) {
   return (
-    <Link href={href(article)} className="group block">
+    <Link href={href(article)} className={`group block ${XL_HEIGHT.feature}`}>
       <article className="border-y-4 border-yellow-500 py-8">
         <p className={KICKER}>Grande carte · {article.category}</p>
 
@@ -156,8 +179,8 @@ function Briefs({ articles }: { articles: HomeArticle[] }) {
 
 function GrandFormat({ article }: { article: HomeArticle }) {
   return (
-    <Link href={href(article)} className="group block lg:col-span-3">
-      <article className="border-gray-800 lg:border-l lg:pl-7">
+    <Link href={href(article)} className="group flex flex-col lg:col-span-3">
+      <article className="flex flex-1 flex-col border-gray-800 lg:border-l lg:pl-7">
         <p className={KICKER}>Grand Format · {article.category}</p>
 
         {/* Titre sur toute la largeur des trois colonnes */}
@@ -165,19 +188,20 @@ function GrandFormat({ article }: { article: HomeArticle }) {
           {article.title}
         </h2>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
+        {/* La photo occupe la hauteur restante du bloc, figée sur grand écran. */}
+        <div className="mt-6 grid flex-1 gap-6 md:grid-cols-3">
           {/* Chapô : une colonne à gauche */}
           <div className="flex flex-col justify-between md:col-span-1">
             <Description
               text={article.description}
-              className="line-clamp-6 min-h-[6lh] leading-relaxed text-gray-300"
+              className="line-clamp-4 min-h-[4lh] leading-relaxed text-gray-300 md:line-clamp-14 md:min-h-[14lh]"
             />
 
             <p className={`mt-6 ${READ_MORE}`}>Lire l’article →</p>
           </div>
 
           {/* Photo : deux colonnes à droite */}
-          <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
+          <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-auto md:min-h-[440px]">
             <SafeImage
               src={article.image || FALLBACK_IMAGE}
                 alt={article.title}
@@ -194,7 +218,7 @@ function GrandFormat({ article }: { article: HomeArticle }) {
 
 function BriefingAdvertisement() {
   return (
-    <section className="overflow-hidden border-y border-gray-800 bg-white">
+    <section className={`overflow-hidden border-y border-gray-800 bg-white ${XL_HEIGHT.advertisement}`}>
       <Image
         src="/images/home/briefing-andorra-360.jpg"
         alt="Andorra 360 — Le briefing quotidien pour comprendre l’Andorre"
@@ -211,7 +235,7 @@ function Editorial({ article }: { article: HomeArticle | null }) {
   const videoEmbedUrl = article?.videoUrl ? getVideoEmbedUrl(article.videoUrl) : null;
 
   return (
-    <section className="border-b border-gray-800 pb-8">
+    <section className={`border-b border-gray-800 pb-8 ${XL_HEIGHT.editorial}`}>
       <div className="flex items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-500 text-3xl text-yellow-500">
           ✒
@@ -283,7 +307,7 @@ function Editorial({ article }: { article: HomeArticle | null }) {
 
 function Selection({ articles }: { articles: HomeArticle[] }) {
   return (
-    <section className="border-t-2 border-yellow-500 pt-5">
+    <section className={`border-t-2 border-yellow-500 pt-5 ${XL_HEIGHT.selection}`}>
       <div className="mb-4">
         <span className="text-xs uppercase tracking-[0.2em] text-gray-500">La rédaction</span>
 
@@ -331,7 +355,7 @@ function Selection({ articles }: { articles: HomeArticle[] }) {
 
 function Discover({ articles }: { articles: HomeArticle[] }) {
   return (
-    <section className="rounded-xl bg-zinc-900 p-6 xl:flex xl:flex-1 xl:flex-col">
+    <section className={`rounded-xl bg-zinc-900 p-6 ${XL_HEIGHT.discover}`}>
       <p className={KICKER}>Continuer la lecture</p>
 
       <h2 className="mt-2 font-serif text-2xl">À découvrir</h2>
@@ -374,12 +398,13 @@ export default function HomePageView({ home }: { home: HomeComposition<HomeArtic
 
       {/* CORPS ÉDITORIAL : 4 COLONNES + 2 COLONNES */}
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-10 md:py-14">
+        {/* Blocs de hauteur figée sur grand écran : voir HOME_XL_BLOCK_HEIGHTS. */}
         <div className="grid items-start gap-10 xl:grid-cols-6">
           <div className="flex flex-col gap-10 xl:col-span-4">
             {home.feature && <FeatureCard article={home.feature} />}
 
             {(home.briefs.length > 0 || home.grandFormat) && (
-              <div className="grid gap-8 lg:grid-cols-4">
+              <div className={`grid gap-8 lg:grid-cols-4 ${XL_HEIGHT.essentials}`}>
                 {home.briefs.length > 0 && <Briefs articles={home.briefs} />}
                 {home.grandFormat && <GrandFormat article={home.grandFormat} />}
               </div>
