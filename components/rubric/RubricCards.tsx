@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import MediaPreview from "@/components/article/MediaPreview";
 import SafeImage from "@/components/SafeImage";
@@ -54,17 +54,61 @@ function Description({ text, className }: { text: string | null; className: stri
 // Structure de page
 // ---------------------------------------------------------------------------
 
+/**
+ * Bloc d’une colonne. Sur grand écran, sa hauteur est figée (`height`, en
+ * pixels, voir `RUBRIC_XL_HEIGHTS`) et un bloc sans article reste un cadre
+ * vide de la même hauteur. Entre 1 024 et 1 280 px, la largeur de la page
+ * varie : le bloc `fill` s’étire alors pour aligner les deux colonnes.
+ */
+export type RubricSlot = { height: number; fill?: boolean; content: ReactNode };
+
+/** Associe à chaque contenu la hauteur figée de son bloc, dans l’ordre. */
+export function rubricColumn(
+  heights: readonly number[],
+  contents: readonly ReactNode[],
+  options: { fill?: number } = {},
+): RubricSlot[] {
+  if (heights.length !== contents.length) {
+    throw new Error(
+      `Colonne de rubrique : ${contents.length} blocs pour ${heights.length} hauteurs figées.`,
+    );
+  }
+
+  return contents.map((content, index) => ({
+    height: heights[index],
+    fill: index === options.fill,
+    content,
+  }));
+}
+
+function isEmpty(content: ReactNode): boolean {
+  return content === null || content === undefined || content === false || content === "";
+}
+
+function RubricSlotFrame({ slot }: { slot: RubricSlot }) {
+  const display = isEmpty(slot.content) ? "hidden xl:flex" : "flex";
+
+  return (
+    <div
+      className={`${display} flex-col${slot.fill ? " lg:flex-1" : ""} xl:h-[var(--rubric-slot-height)] xl:flex-none xl:overflow-hidden`}
+      style={{ "--rubric-slot-height": `${slot.height}px` } as CSSProperties}
+    >
+      {slot.content}
+    </div>
+  );
+}
+
 /** Squelette commun : une, bandeau facultatif, colonne principale et colonne latérale. */
 export function RubricPage({
   hero,
   banner,
+  main,
   aside,
-  children,
 }: {
   hero?: ReactNode;
   banner?: ReactNode;
-  aside: ReactNode;
-  children: ReactNode;
+  main: readonly RubricSlot[];
+  aside: readonly RubricSlot[];
 }) {
   return (
     <main className="min-h-screen bg-black text-white">
@@ -73,8 +117,16 @@ export function RubricPage({
 
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
         <div className="grid gap-8 lg:grid-cols-6">
-          <div className="flex flex-col gap-8 lg:col-span-4">{children}</div>
-          <aside className="flex flex-col gap-6 lg:col-span-2">{aside}</aside>
+          <div className="flex flex-col gap-8 lg:col-span-4">
+            {main.map((slot, index) => (
+              <RubricSlotFrame key={index} slot={slot} />
+            ))}
+          </div>
+          <aside className="flex flex-col gap-6 lg:col-span-2">
+            {aside.map((slot, index) => (
+              <RubricSlotFrame key={index} slot={slot} />
+            ))}
+          </aside>
         </div>
       </section>
     </main>
@@ -83,20 +135,27 @@ export function RubricPage({
 
 /**
  * Grille de cartes de la colonne principale. `fill` l’étire pour qu’elle
- * termine la colonne à la hauteur de la colonne latérale.
+ * remplisse son bloc. Sur grand écran, la grille garde toujours `rows`
+ * rangées de même hauteur : une carte manquante laisse sa place vide, et les
+ * autres ne changent pas de taille.
  */
 export function RubricGrid({
   columns,
+  rows,
   fill = false,
   children,
 }: {
   columns: 2 | 3;
+  rows: 1 | 2;
   fill?: boolean;
   children: ReactNode;
 }) {
   const layout = columns === 3 ? "gap-4 md:grid-cols-3" : "gap-6 md:grid-cols-2";
+  const fixedRows = rows === 2 ? "xl:grid-rows-2" : "xl:grid-rows-1";
 
-  return <div className={`grid ${layout}${fill ? " lg:flex-1" : ""}`}>{children}</div>;
+  return (
+    <div className={`grid ${layout} ${fixedRows} xl:h-full${fill ? " lg:flex-1" : ""}`}>{children}</div>
+  );
 }
 
 /** Bouton vers un partenaire, en tête de colonne latérale. */

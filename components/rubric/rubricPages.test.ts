@@ -74,3 +74,17 @@ describe("pages de rubrique", () => {
     expect(actualite).toContain('activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD"');
   });
 });
+
+describe("pages de rubrique : hauteurs figées", () => {
+  it.each(Object.entries(PAGES))("%s : déclare ses blocs avec leurs hauteurs figées", (_, path) => {
+    const page = source(path);
+    const plan = page.includes("<NewsRubricPage") ? source(NEWS_RUBRIC_PAGE) : page;
+
+    expect(plan).toContain("RUBRIC_XL_HEIGHTS.");
+    expect(plan.match(/rubricColumn\(/g)).toHaveLength(2);
+    // Chaque grille garde son nombre de rangées.
+    for (const grid of plan.matchAll(/<RubricGrid\b[^>]*>/g)) {
+      expect(grid[0]).toMatch(/rows=\{[12]\}/);
+    }
+  });
+});

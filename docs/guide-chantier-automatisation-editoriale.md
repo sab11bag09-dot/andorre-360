@@ -1412,6 +1412,26 @@ Rééquilibrage demandé par l’utilisateur le même jour :
 
 Les deux photos ont désormais la même hauteur. Mesure à 1 440 px : les deux colonnes finissent toujours à 3 233 px, sans débordement.
 
+### Pages de rubrique : blocs figés et colonnes alignées en bas (21 novembre 2026)
+
+Même règle que la une, appliquée aux 10 pages de rubrique. Avant ce changement, les colonnes finissaient au même niveau, mais par étirement : si un bloc manquait, la hauteur d’un autre changeait (Politique : grille du bas de 722 à 401 px).
+
+- `RubricPage` reçoit désormais deux listes de blocs (`rubricColumn`). Chaque bloc a une hauteur figée sur grand écran, de 1 280 px et plus. Un bloc sans article reste un cadre vide de la même hauteur ; sur les écrans plus étroits, ce cadre vide est masqué.
+- Les hauteurs de chaque page sont regroupées dans `lib/rubric/rubricXlHeights.ts`. Un test vérifie que les deux colonnes de chaque page totalisent la même hauteur, avec leurs espacements de 32 px à gauche et 24 px à droite. Les rubriques d’information n’ont pas la même hauteur avec le lien partenaire (Économie, Société) et sans lui (Politique, International).
+- Chaque grille garde son nombre de rangées (`rows`) : une carte manquante laisse sa place vide et les autres cartes ne changent pas de taille.
+- Entre 1 024 et 1 280 px, la largeur de la page varie : les colonnes restent alignées par étirement du dernier bloc, comme avant.
+- Actualité : une publicité pleine largeur prend désormais la place des deux cartes du bas, dans le même bloc figé, au lieu de s’ajouter à la colonne. Aucune publicité n’était active le 21 novembre 2026.
+
+Mesures à 1 280 et 1 440 px, sur les 10 pages :
+- les deux colonnes finissent au même pixel ;
+- chaque bloc a sa hauteur déclarée et aucun ne déborde ;
+- les blocs et les cartes gardent leur taille quand on retire des cartes ;
+- rien ne bouge avec des textes très courts ou très longs.
+
+À 1 024 px, les colonnes restent alignées. À 375 px, les colonnes sont empilées et aucun cadre vide n’apparaît.
+
+Le Fil info n’est pas encore traité : sa colonne « La sélection » suit la longueur du fil chronologique.
+
 ---
 
 ## 19. Résumé en une minute

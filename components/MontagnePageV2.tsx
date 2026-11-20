@@ -6,9 +6,11 @@ import {
   RubricPage,
   RubricQuestionCard,
   RubricTextCard,
+  rubricColumn,
 } from "@/components/rubric/RubricCards";
 import { getArticlesByCategory } from "@/lib/articles";
 import { allocateRubricSlots } from "@/lib/rubric/allocateRubricSlots";
+import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 export const dynamic = "force-dynamic";
 
@@ -31,44 +33,45 @@ export default async function MontagnePageV2() {
     imageCards: 4,
   });
 
+  const heights = RUBRIC_XL_HEIGHTS.montagne;
+
   return (
     <RubricPage
       hero={featured && <RubricHero article={featured} />}
-      aside={
-        <>
-          {questionArticle && (
-            <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
-          )}
-
-          {side.map((article, index) => (
-            <RubricImageCard
-              key={article.id}
-              article={article}
-              size="side"
-              stretch={index === side.length - 1}
-            />
-          ))}
-        </>
-      }
-    >
-      {mainArticle && <RubricMainCard article={mainArticle} />}
-
-      {/* Deux cartes sans photo, puis quatre cartes avec photo. */}
-      {textCards.length > 0 && (
-        <RubricGrid columns={2}>
-          {textCards.map((article) => (
-            <RubricTextCard key={article.id} article={article} />
-          ))}
-        </RubricGrid>
+      aside={rubricColumn(heights.aside, [
+        questionArticle && (
+          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
+        ),
+        side[0] && <RubricImageCard article={side[0]} size="side" />,
+        side[1] && <RubricImageCard article={side[1]} size="side" />,
+        side[2] && <RubricImageCard article={side[2]} size="side" stretch />,
+      ], { fill: 3 })}
+      main={rubricColumn(
+        heights.main,
+        [
+          mainArticle && <RubricMainCard article={mainArticle} />,
+          textCards.length > 0 && (
+            <RubricGrid columns={2} rows={1}>
+              {textCards.map((article) => (
+                <RubricTextCard key={article.id} article={article} />
+              ))}
+            </RubricGrid>
+          ),
+          imageCards.length > 0 && (
+            <RubricGrid columns={2} rows={2} fill>
+              {imageCards.map((article) => (
+                <RubricImageCard
+                  key={article.id}
+                  article={article}
+                  size="wide"
+                  stretch
+                />
+              ))}
+            </RubricGrid>
+          ),
+        ],
+        { fill: 2 },
       )}
-
-      {imageCards.length > 0 && (
-        <RubricGrid columns={2} fill>
-          {imageCards.map((article) => (
-            <RubricImageCard key={article.id} article={article} size="wide" stretch />
-          ))}
-        </RubricGrid>
-      )}
-    </RubricPage>
+    />
   );
 }
