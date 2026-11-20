@@ -1,5 +1,8 @@
 import OpenAI from "openai";
 
+import { meterAiCall, type AiUsageLedger } from "@/lib/ai/aiUsageBudget";
+import { defaultAiUsageLedger } from "@/lib/ai/prismaAiUsageLedger";
+
 import { AUTOMATED_ARTICLE_AUTHOR } from "../editorialSignature";
 import type {
   EditorialGenerator,
@@ -55,22 +58,52 @@ export interface StructuredResponseClient {
   create(request: StructuredResponseRequest): Promise<string>;
 }
 
+/** Partie de l’API Responses utilisée ici ; remplaçable dans les tests. */
+export interface ResponsesApi {
+  create(
+    body: Parameters<OpenAI["responses"]["create"]>[0] & { stream?: false },
+  ): Promise<{
+    output_text: string;
+    usage?: { input_tokens: number; output_tokens: number } | null;
+  }>;
+}
+
 interface OpenAiEditorialGeneratorOptions {
   apiKey: string;
   model?: string;
   timeoutMs?: number;
   client?: StructuredResponseClient;
+  /** Remplace l’API OpenAI réelle, plafond et suivi des jetons compris. */
+  responsesApi?: ResponsesApi;
+  /** Registre des jetons consommés ; par défaut, la base de l’application. */
+  usageLedger?: AiUsageLedger;
+  env?: Record<string, string | undefined>;
 }
 
+/**
+ * Client réel : chaque appel vérifie d’abord le plafond de dépense, puis
+ * enregistre ses jetons, sous le nom du schéma demandé.
+ */
 class OpenAiResponsesClient implements StructuredResponseClient {
-  private readonly client: OpenAI;
-
-  constructor(apiKey: string, timeoutMs: number) {
-    this.client = new OpenAI({ apiKey, timeout: timeoutMs });
-  }
+  constructor(
+    private readonly responses: ResponsesApi,
+    private readonly usageLedger: AiUsageLedger,
+    private readonly env?: Record<string, string | undefined>,
+  ) {}
 
   async create(request: StructuredResponseRequest): Promise<string> {
-    const response = await this.client.responses.create({
+    const response = await meterAiCall(
+      this.usageLedger,
+      { provider: "openai", model: request.model, operation: request.schemaName },
+      () => this.send(request),
+      { env: this.env },
+    );
+
+    return response.output_text;
+  }
+
+  private send(request: StructuredResponseRequest) {
+    return this.responses.create({
       model: request.model,
       instructions: request.instructions,
       input: request.input,
@@ -84,8 +117,6 @@ class OpenAiResponsesClient implements StructuredResponseClient {
         },
       },
     });
-
-    return response.output_text;
   }
 }
 
@@ -337,8 +368,13 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
     this.client =
       options.client ??
       new OpenAiResponsesClient(
-        options.apiKey,
-        options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+        options.responsesApi ??
+          new OpenAI({
+            apiKey: options.apiKey,
+            timeout: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+          }).responses,
+        options.usageLedger ?? defaultAiUsageLedger,
+        options.env,
       );
   }
 

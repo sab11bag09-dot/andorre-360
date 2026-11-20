@@ -623,3 +623,65 @@ describe("OpenAiEditorialGenerator", () => {
     ).toThrow("OPENAI_API_KEY");
   });
 });
+
+describe("OpenAiEditorialGenerator — plafond de dépense", () => {
+  function fakeLedger(used: number) {
+    return {
+      tokensUsedSince: vi.fn(async () => used),
+      record: vi.fn(async () => {}),
+    };
+  }
+
+  const TRANSLATION = {
+    locale: "CA" as const,
+    title: "Titre français",
+    description: "Description française",
+    content: "Contenu français",
+  };
+
+  it("enregistre les jetons de chaque appel réel", async () => {
+    const responsesApi = {
+      create: vi.fn(async () => ({
+        output_text: JSON.stringify({
+          title: "Títol",
+          description: "Descripció",
+          content: "Contingut",
+        }),
+        usage: { input_tokens: 800, output_tokens: 200 },
+      })),
+    };
+    const usageLedger = fakeLedger(0);
+    const generator = new OpenAiEditorialGenerator({
+      apiKey: "test-key",
+      model: "test-model",
+      responsesApi,
+      usageLedger,
+      env: {},
+    });
+
+    await generator.translateArticle(TRANSLATION);
+
+    expect(usageLedger.record).toHaveBeenCalledWith({
+      provider: "openai",
+      model: "test-model",
+      operation: "article_translation",
+      inputTokens: 800,
+      outputTokens: 200,
+    });
+  });
+
+  it("ne contacte pas OpenAI quand le plafond est atteint", async () => {
+    const responsesApi = { create: vi.fn() };
+    const generator = new OpenAiEditorialGenerator({
+      apiKey: "test-key",
+      responsesApi,
+      usageLedger: fakeLedger(50_000),
+      env: { AI_DAILY_TOKEN_LIMIT: "50000" },
+    });
+
+    await expect(generator.translateArticle(TRANSLATION)).rejects.toThrow(
+      "Plafond de dépense OpenAI atteint",
+    );
+    expect(responsesApi.create).not.toHaveBeenCalled();
+  });
+});

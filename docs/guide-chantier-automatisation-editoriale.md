@@ -1272,7 +1272,7 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 #### Exploitation et sécurité
 
 - Les interrupteurs `AI_*` se modifient en éditant `.env` à la main, ce qui est risqué (le jour de l’essai l’a montré) : une page d’administration ou un petit script.
-- Aucun suivi du coût par article (2 à 4 appels OpenAI) ni plafond de dépense.
+- Aucun suivi du coût par article (2 à 4 appels OpenAI) ni plafond de dépense. Plafond sur 24 heures et enregistrement des jetons de chaque appel : fait le 20 novembre 2026 (voir « Suivi des jetons et plafond de dépense OpenAI » ci-dessous) ; reste l’affichage de la consommation.
 - Mise en production non préparée : hébergement, choix de la base (SQLite ou base serveur), sauvegardes automatiques, effacement des articles de chantier.
 
 #### Méthode de travail
@@ -1359,6 +1359,17 @@ Migration appliquée à `./dev.db` le 20 novembre 2026 après sauvegarde vérifi
 - essai sur une copie de `./dev.db` avec deux images rangées en Sports, l’une déjà utilisée 3 fois : six brouillons ont reçu 12, 12, 12, 14, 12, 14, la moins utilisée rattrapant son retard puis les deux alternant.
 
 La banque est vide tant que personne n’y range d’image : elle attend des photos qui appartiennent à ANDORRE 360 ou sous licence, avec leur crédit.
+
+### Suivi des jetons et plafond de dépense OpenAI (20 novembre 2026)
+
+- chaque appel réel à OpenAI est enregistré dans la table `AiUsage` (migration `20261120180000_add_ai_usage`) : date, modèle, nature de l’appel (`article_fact_sheet`, `article_from_facts`, `article_title`, `article_translation`, `home_candidate_assessment`), jetons d’entrée et de sortie ;
+- avant chaque appel, les jetons consommés sur les 24 dernières heures sont comparés au plafond `AI_DAILY_TOKEN_LIMIT` ; une fois le plafond atteint, l’appel est refusé sans contacter OpenAI (`lib/ai/aiUsageBudget.ts`) ;
+- sans variable, ou avec une valeur invalide, le plafond est de 500 000 jetons ; `0` interdit tout appel. Le plafond est exprimé en jetons et non en euros, car le prix dépend du modèle : le montant exact se lit toujours dans le tableau de bord OpenAI ;
+- le dernier appel peut dépasser légèrement le plafond, sa taille n’étant connue qu’après coup ;
+- l’orchestrateur ne lance rien si le plafond est déjà atteint (garde-fou « Plafond de dépense OpenAI atteint ») et s’arrête avant l’observation suivante s’il est atteint en cours de lot (statut « Arrêtée par un garde-fou ») ; l’aperçu l’affiche parmi les garde-fous fermés ;
+- la protection couvre la rédaction, les traductions et l’évaluation de la page d’accueil : tous passent par les deux clients OpenAI du projet.
+
+Reste à faire : afficher la consommation (par jour et par article) dans l’administration.
 
 ---
 

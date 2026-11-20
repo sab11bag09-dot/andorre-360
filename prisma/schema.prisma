@@ -552,3 +552,18 @@ enum SourceImageReuse {
   /// Reprise autorisée (licence ou accord de la source).
   ALLOWED
 }
+
+/// Jetons consommés par chaque appel réel à OpenAI : sert au suivi du coût
+/// et au plafond de dépense sur 24 heures (`AI_DAILY_TOKEN_LIMIT`).
+model AiUsage {
+  id           Int      @id @default(autoincrement())
+  createdAt    DateTime @default(now())
+  provider     String
+  model        String
+  operation    String
+  inputTokens  Int
+  outputTokens Int
+  totalTokens  Int
+
+  @@index([createdAt])
+}

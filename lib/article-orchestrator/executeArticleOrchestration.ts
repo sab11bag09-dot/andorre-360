@@ -1,5 +1,7 @@
 import { Prisma, type PrismaClient } from "@/lib/generated/prisma/client";
 
+import { aiBudgetStatus, type AiUsageLedger } from "../ai/aiUsageBudget";
+import { createPrismaAiUsageLedger } from "../ai/prismaAiUsageLedger";
 import { readAutoPublicationRuntimeConfig } from "../article-engine/autoPublicationRuntime";
 import {
   planArticleOrchestration,
@@ -30,7 +32,8 @@ import {
  * - une erreur reste limitée à son observation et n’est jamais relancée
  *   automatiquement : une génération partielle pourrait sinon créer un
  *   second brouillon ;
- * - l’arrêt d’urgence est relu avant chaque observation.
+ * - l’arrêt d’urgence et le plafond de dépense OpenAI
+ *   (`AI_DAILY_TOKEN_LIMIT`) sont relus avant chaque observation.
  *
  * Chaque génération réelle appelle OpenAI et engage donc un coût.
  */
@@ -40,7 +43,8 @@ const MAX_ERROR_MESSAGE_LENGTH = 500;
 
 export type ArticleOrchestrationExecutionBlockReason =
   | ArticleOrchestrationBlockReason
-  | "orchestrator_disabled";
+  | "orchestrator_disabled"
+  | "ai_budget_exceeded";
 
 export type ArticleOrchestrationMode = "DRAFTS_ONLY" | "PUBLISH";
 
@@ -108,7 +112,7 @@ export type ArticleOrchestrationExecutionResult =
 
 type OrchestrationClient = Pick<
   PrismaClient,
-  "observation" | "articleOrchestrationRun" | "articleOrchestrationItem"
+  "observation" | "articleOrchestrationRun" | "articleOrchestrationItem" | "aiUsage"
 >;
 
 export type ExecuteArticleOrchestrationOptions = {
@@ -128,6 +132,8 @@ export type ExecuteArticleOrchestrationOptions = {
    * diffère de la sélection recalculée, aucune génération n’a lieu.
    */
   expectedSelectedObservationIds?: number[];
+  /** Registre des jetons OpenAI ; par défaut, celui de `client`. */
+  usageLedger?: AiUsageLedger;
 };
 
 export function isArticleOrchestratorEnabled(
@@ -147,6 +153,9 @@ export async function executeArticleOrchestration(
   const sleep = options.sleep ?? defaultSleep;
   const delayMs = Math.max(0, options.delayBetweenArticlesMs ?? 1_000);
   const mode = readArticleOrchestrationMode(env);
+  const usageLedger = options.usageLedger ?? createPrismaAiUsageLedger(client);
+  const budgetAvailable = async () =>
+    (await aiBudgetStatus(usageLedger, { env, now: options.now ?? new Date() })).available;
 
   const plan = await planArticleOrchestration(client, {
     now,
@@ -172,6 +181,7 @@ export async function executeArticleOrchestration(
     env,
     plan.executionBlockedReasons,
   );
+  if (!(await budgetAvailable())) blockedReasons.push("ai_budget_exceeded");
 
   const runId = crypto.randomUUID();
   const serializedPlan = JSON.stringify({
@@ -228,7 +238,7 @@ export async function executeArticleOrchestration(
     let generations = 0;
 
     for (const observationId of plan.selectedObservationIds) {
-      if (!isStillAllowed(env, mode)) {
+      if (!isStillAllowed(env, mode) || !(await budgetAvailable())) {
         items.push({ observationId, status: "STOPPED" });
         continue;
       }

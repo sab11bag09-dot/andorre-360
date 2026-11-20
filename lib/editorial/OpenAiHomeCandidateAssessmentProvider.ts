@@ -1,5 +1,9 @@
 import OpenAI from "openai";
 
+import { meterAiCall, type AiUsageLedger } from "@/lib/ai/aiUsageBudget";
+import { defaultAiUsageLedger } from "@/lib/ai/prismaAiUsageLedger";
+import type { ResponsesApi } from "@/lib/article-engine/generators/OpenAiEditorialGenerator";
+
 import type {
   HomeCandidateAssessment,
   HomeCandidateAssessmentProvider,
@@ -29,20 +33,35 @@ export type OpenAiHomeCandidateAssessmentOptions = {
   batchSize?: number;
   now?: Date;
   client?: StructuredHomeAssessmentClient;
+  /** Remplace l’API OpenAI réelle, plafond et suivi des jetons compris. */
+  responsesApi?: ResponsesApi;
+  /** Registre des jetons consommés ; par défaut, la base de l’application. */
+  usageLedger?: AiUsageLedger;
+  env?: Record<string, string | undefined>;
 };
 
-class OpenAiResponsesAssessmentClient implements StructuredHomeAssessmentClient {
-  private readonly client: OpenAI;
+const ASSESSMENT_OPERATION = "home_candidate_assessment";
 
-  constructor(apiKey: string, timeoutMs: number) {
-    this.client = new OpenAI({
-      apiKey,
-      timeout: timeoutMs,
-    });
-  }
+class OpenAiResponsesAssessmentClient implements StructuredHomeAssessmentClient {
+  constructor(
+    private readonly responses: ResponsesApi,
+    private readonly usageLedger: AiUsageLedger,
+    private readonly env?: Record<string, string | undefined>,
+  ) {}
 
   async create(request: StructuredAssessmentRequest): Promise<string> {
-    const response = await this.client.responses.create({
+    const response = await meterAiCall(
+      this.usageLedger,
+      { provider: "openai", model: request.model, operation: ASSESSMENT_OPERATION },
+      () => this.send(request),
+      { env: this.env },
+    );
+
+    return response.output_text;
+  }
+
+  private send(request: StructuredAssessmentRequest) {
+    return this.responses.create({
       model: request.model,
       instructions: request.instructions,
       input: request.input,
@@ -50,14 +69,12 @@ class OpenAiResponsesAssessmentClient implements StructuredHomeAssessmentClient 
       text: {
         format: {
           type: "json_schema",
-          name: "home_candidate_assessment",
+          name: ASSESSMENT_OPERATION,
           strict: true,
           schema: request.schema,
         },
       },
     });
-
-    return response.output_text;
   }
 }
 
@@ -310,8 +327,13 @@ export class OpenAiHomeCandidateAssessmentProvider implements HomeCandidateAsses
     this.client =
       options.client ??
       new OpenAiResponsesAssessmentClient(
-        options.apiKey,
-        options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+        options.responsesApi ??
+          new OpenAI({
+            apiKey: options.apiKey,
+            timeout: options.timeoutMs ?? DEFAULT_TIMEOUT_MS,
+          }).responses,
+        options.usageLedger ?? defaultAiUsageLedger,
+        options.env,
       );
   }
 

@@ -43,6 +43,7 @@ const BLOCK_LABELS: Record<ArticleOrchestrationExecutionBlockReason, string> = {
   feature_disabled: "Publication automatique désactivée (AI_AUTO_PUBLICATION_ENABLED)",
   emergency_stop: "Arrêt d’urgence actif (AI_AUTO_PUBLICATION_EMERGENCY_STOP)",
   no_allowlisted_source: "Aucune source autorisée (AI_AUTO_PUBLICATION_SOURCE_IDS)",
+  ai_budget_exceeded: "Plafond de dépense OpenAI atteint sur 24 heures (AI_DAILY_TOKEN_LIMIT)",
 };
 
 const MODE_DESCRIPTIONS: Record<"DRAFTS_ONLY" | "PUBLISH", string> = {
@@ -56,7 +57,7 @@ const ITEM_STATUS_LABELS: Record<ArticleOrchestrationLaunchItemView["status"], s
   CREATED: "Article créé",
   FAILED: "Échec",
   ALREADY_ATTEMPTED: "Déjà tentée",
-  STOPPED: "Arrêtée par l’arrêt d’urgence",
+  STOPPED: "Arrêtée par un garde-fou (arrêt d’urgence ou plafond de dépense)",
 };
 
 /** N’affiche un lien que vers une adresse web : jamais `javascript:` ou autre. */

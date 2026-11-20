@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
+import { aiBudgetStatus } from "@/lib/ai/aiUsageBudget";
+import { createPrismaAiUsageLedger } from "@/lib/ai/prismaAiUsageLedger";
 import {
   articleOrchestrationBlockers,
   executeArticleOrchestration,
@@ -147,6 +149,13 @@ export async function previewArticleOrchestration(): Promise<ArticleOrchestratio
       };
     };
 
+    const blockedReasons = articleOrchestrationBlockers(
+      process.env,
+      plan.executionBlockedReasons,
+    );
+    const budget = await aiBudgetStatus(createPrismaAiUsageLedger(prisma));
+    if (!budget.available) blockedReasons.push("ai_budget_exceeded");
+
     return {
       success: true,
       mode: readArticleOrchestrationMode(process.env),
@@ -158,10 +167,7 @@ export async function previewArticleOrchestration(): Promise<ArticleOrchestratio
       routineSkippedCount: routine.length,
       skippedByReason,
       detailedSkipped: informative.map(({ observationId }) => toView(observationId)),
-      blockedReasons: articleOrchestrationBlockers(
-        process.env,
-        plan.executionBlockedReasons,
-      ),
+      blockedReasons,
     };
   } catch {
     return {
