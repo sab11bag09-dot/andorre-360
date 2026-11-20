@@ -9,6 +9,8 @@ import {
 } from "@/lib/article-engine/articleSeo";
 import { recordArticleView } from "@/lib/analytics";
 import { loadArticleSourceCredits } from "@/lib/article-engine/articleSourceCredits";
+import { loadImageCredit } from "@/lib/media/imageCredit";
+import { prisma } from "@/lib/prisma";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -72,10 +74,11 @@ export default async function TranslatedArticlePage({
   await recordArticleView(translation.articleId);
 
   const sourceCredits = await loadArticleSourceCredits(translation.articleId);
+  const imageCredit = await loadImageCredit(translation.image, prisma);
 
   return (
     <PublicArticleView
-      article={{ ...translation, sourceCredits }}
+      article={{ ...translation, sourceCredits, imageCredit }}
       dateLocale={locale === "ca" ? "ca-ES" : "es-ES"}
       contentLanguage={locale}
     />

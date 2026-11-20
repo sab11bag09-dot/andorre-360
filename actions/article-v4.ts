@@ -6,6 +6,7 @@ import { requireAdmin, type AdminIdentity } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
 import { revalidatePublicArticlePages } from "@/lib/public-revalidation";
 import { canPublishEditorialStatus } from "@/lib/article-engine/editorialWorkflow";
+import { isTestOnlyImage, TEST_ONLY_IMAGE_MESSAGE } from "@/lib/media/sourceImagePolicy";
 import { recordEditorialEvent } from "@/lib/editorial-history";
 import { normalizeFilInfoFormat } from "@/lib/fil-info-format";
 import {
@@ -330,6 +331,14 @@ async function updateArticle(
     return {
       success: false,
       message: "Cet article doit être relu et approuvé avant sa publication.",
+    };
+  }
+
+  if (shouldPublish && (await isTestOnlyImage(draft.image, prisma))) {
+    return {
+      success: false,
+      message: TEST_ONLY_IMAGE_MESSAGE,
+      field: "image",
     };
   }
 

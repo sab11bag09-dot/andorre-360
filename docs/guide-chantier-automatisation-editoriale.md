@@ -1337,7 +1337,19 @@ Décision de l’utilisateur : deux pistes. Une banque d’images classée par r
 
 Essai à blanc sur la dernière page de chaque source active, sans écriture : 20 sources sur 41 fournissent une photo propre à l’article, 23 une mention de droits. Les autres n’en déclarent pas, ou n’ont pas répondu (Govern, Consell General, Encamp, Andorra Business).
 
-La migration n’est pas encore appliquée à `./dev.db` : elle le sera après sauvegarde, avec l’accord de l’utilisateur.
+Migration appliquée à `./dev.db` le 20 novembre 2026 après sauvegarde vérifiée (`dev.before-observation-image-20261120-141756.db`, intégrité `ok`, 2 141 observations conservées).
+
+### Images, étape 2 : photo de la source dans les brouillons (20 novembre 2026)
+
+- `Source.imageReuse` : `NONE` (défaut, aucune reprise), `TESTS` (essais du chantier) ou `ALLOWED` (licence ou accord). Migration `20261120160000_add_source_image_reuse`, par ajout de colonnes seulement ;
+- `lib/media/importSourceImage.ts` télécharge la photo relevée (JPEG, PNG ou WebP, 10 Mo au plus, 480 pixels de large au moins), la range dans `storage/media/sources/` (hors Git) et crée un média avec le nom de la source pour crédit, la mention de droits relevée, l’adresse d’origine et `testOnly` pour une source en `TESTS`. Une photo déjà importée depuis la même adresse est réutilisée. Le serveur ne télécharge jamais une adresse locale ou du réseau interne. Un échec laisse l’image générique, sans bloquer l’article ;
+- `createArticleFromObservation` reprend la photo après les contrôles bloquants, la rattache à l’article (`MediaUsage`) et consigne la reprise dans l’audit ;
+- garde-fou (`lib/media/sourceImagePolicy.ts`) : la publication est refusée, dans le Studio comme en publication automatique, tant que l’image est réservée aux essais ;
+- page publique : crédit « Photo : … » (« Foto: … » en catalan et en espagnol) sous l’image, lu dans la médiathèque.
+
+Essai sur une copie de `./dev.db`, sans OpenAI : collecte réelle d’Altaveu, RTVA et Policia d’Andorra passées en `TESTS`, puis un brouillon par source avec un générateur neutre. Les trois brouillons ont reçu la photo de leur article, avec crédit et mention de droits, et la publication a été refusée pour chacun. Copie et fichiers d’essai supprimés ensuite.
+
+Toutes les sources restent en `NONE` dans `./dev.db` : passer des sources en `TESTS` est une écriture en base, à faire avec l’accord de l’utilisateur.
 
 ---
 

@@ -350,6 +350,8 @@ model Source {
   availabilityStatus          SourceAvailabilityStatus @default(UNKNOWN)
   publicationMode             SourcePublicationMode    @default(MANUAL)
   trustLevel                  SourceTrustLevel         @default(HIGH)
+  /// Réutilisation des photos de la source : jamais par défaut.
+  imageReuse                  SourceImageReuse         @default(NONE)
   category                    String?
   lastCheckedAt               DateTime?
   lastSuccessAt               DateTime?
@@ -457,9 +459,15 @@ model Media {
   caption      String?
   credit       String?
   copyright    String?
+  /// Photo reprise d’une source et réservée aux essais : sa publication est refusée.
+  testOnly     Boolean      @default(false)
+  /// Adresse d’origine d’une photo reprise d’une source.
+  sourceUrl    String?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now()) @updatedAt
   usages       MediaUsage[]
+
+  @@index([sourceUrl])
 }
 
 model MediaUsage {
@@ -530,4 +538,14 @@ model Advertisement {
   updatedAt DateTime            @updatedAt
 
   @@index([pageKey, active, startsAt, endsAt])
+}
+
+/// Réutilisation des photos d’une source dans les articles.
+enum SourceImageReuse {
+  /// Aucune reprise.
+  NONE
+  /// Reprise pour les essais du chantier : la publication de l’article est refusée.
+  TESTS
+  /// Reprise autorisée (licence ou accord de la source).
+  ALLOWED
 }

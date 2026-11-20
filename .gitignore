@@ -55,3 +55,7 @@ next-env.d.ts
 backup
 andorre-360.zip
 
+
+# Photos reprises des sources pendant les essais du chantier
+/storage/media/sources/
+/storage/media/thumbnails/source-*
