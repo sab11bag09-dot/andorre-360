@@ -27,6 +27,7 @@ import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository"
 import { PrismaArticleTranslationRepository } from "./repositories/PrismaArticleTranslationRepository";
 import { prisma } from "../prisma";
 import { prismaSourceImages, type SourceImageService } from "../media/sourceImages";
+import { prismaBankImages, type BankImageService } from "../media/bankImages";
 
 const GENERIC_ARTICLE_IMAGE = "/images/global/hero.jpg";
 
@@ -50,6 +51,8 @@ export interface CreateArticleFromObservationDependencies {
   editorialEventWriter?: EditorialEventWriter;
   /** Reprise de la photo de la source ; sans elle, l’article garde l’image générique. */
   sourceImages?: SourceImageService;
+  /** Banque d’images de la rédaction, quand la source ne fournit pas de photo. */
+  bankImages?: BankImageService;
 }
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
@@ -58,6 +61,7 @@ const defaultDependencies: CreateArticleFromObservationDependencies = {
   editorialGenerator: new DeterministicEditorialGenerator(),
   editorialEventWriter: prisma,
   sourceImages: prismaSourceImages,
+  bankImages: prismaBankImages,
 };
 
 export async function createArticleFromObservation(
@@ -175,17 +179,23 @@ export async function createArticleFromObservation(
   const sourceEditorialCategory = normalizeEditorialCategory(
     observation.source.category,
   );
+  const category =
+    sourceEditorialCategory === "ILS_EN_PARLENT"
+      ? "ILS_EN_PARLENT"
+      : normalizeEditorialCategory(draft.category);
+
+  // Image : photo de la source si elle l’autorise, sinon banque de la rubrique, sinon image générique.
+  const articleImage =
+    sourceImage ??
+    (dependencies.bankImages ? await dependencies.bankImages.pick(category) : null);
 
   const editorialDraft = {
     ...draft,
     // Quel que soit le générateur, la source ne signe jamais l’article.
     author: AUTOMATED_ARTICLE_AUTHOR,
-    image: sourceImage?.path ?? GENERIC_ARTICLE_IMAGE,
+    image: articleImage?.path ?? GENERIC_ARTICLE_IMAGE,
     aiRewrittenAt: generatedAt,
-    category:
-      sourceEditorialCategory === "ILS_EN_PARLENT"
-        ? "ILS_EN_PARLENT"
-        : normalizeEditorialCategory(draft.category),
+    category,
   };
 
   let articleId: number;
@@ -208,8 +218,9 @@ export async function createArticleFromObservation(
       await dependencies.articleRepository.createDraft(editorialDraft);
   }
 
-  if (sourceImage && dependencies.sourceImages) {
-    await dependencies.sourceImages.linkToArticle(sourceImage.mediaId, articleId);
+  // Le rattachement vaut pour toute image de la médiathèque, de la source ou de la banque.
+  if (articleImage && dependencies.sourceImages) {
+    await dependencies.sourceImages.linkToArticle(articleImage.mediaId, articleId);
   }
 
   const autoPublication = prepareAutoPublication({

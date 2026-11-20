@@ -101,6 +101,8 @@ export default async function AdminMediaPage({
   caption: item.caption,
   credit: item.credit,
   copyright: item.copyright,
+  testOnly: item.testOnly,
+  bankCategory: item.bankCategory,
   usages: item.usages.map((usage) => ({
     id: usage.id,
     entityType: usage.entityType,

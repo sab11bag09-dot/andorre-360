@@ -29,6 +29,8 @@ type MediaItem = {
   caption: string | null;
   credit: string | null;
   copyright: string | null;
+  testOnly: boolean;
+  bankCategory: string | null;
   usages: MediaUsageItem[];
 };
 
@@ -447,6 +449,12 @@ export default function MediaLibrary({
                       Ouvrir le fichier original
                     </a>
 
+                    {selectedMedia.testOnly ? (
+                      <p className="rounded-lg border border-amber-700 bg-amber-950/40 p-3 text-xs text-amber-200">
+                        Photo reprise d’une source pour les essais : un article qui l’utilise ne peut pas être publié.
+                      </p>
+                    ) : null}
+
                     <MediaMetadataForm
                       key={`metadata-${selectedMedia.id}`}
                       mediaId={selectedMedia.id}
@@ -455,6 +463,8 @@ export default function MediaLibrary({
                       initialTitle={selectedMedia.title}
 initialCredit={selectedMedia.credit}
 initialCopyright={selectedMedia.copyright}
+                      initialBankCategory={selectedMedia.bankCategory}
+                      bankAvailable={selectedMedia.type === "IMAGE" && !selectedMedia.testOnly}
                     />
 
                    <div className="rounded-lg bg-zinc-900 p-4">

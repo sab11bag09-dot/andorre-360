@@ -1349,7 +1349,16 @@ Migration appliquée à `./dev.db` le 20 novembre 2026 après sauvegarde vérifi
 
 Essai sur une copie de `./dev.db`, sans OpenAI : collecte réelle d’Altaveu, RTVA et Policia d’Andorra passées en `TESTS`, puis un brouillon par source avec un générateur neutre. Les trois brouillons ont reçu la photo de leur article, avec crédit et mention de droits, et la publication a été refusée pour chacun. Copie et fichiers d’essai supprimés ensuite.
 
-Toutes les sources restent en `NONE` dans `./dev.db` : passer des sources en `TESTS` est une écriture en base, à faire avec l’accord de l’utilisateur.
+Migration appliquée à `./dev.db` le 20 novembre 2026 après sauvegarde vérifiée (`dev.before-source-image-reuse-20261120-143050.db`). Le même jour, avec l’accord de l’utilisateur et après sauvegarde (`dev.before-source-image-tests-20261120-143238.db`), les 20 sources qui fournissent une photo d’article sont passées en `TESTS` (21 lignes : Diari d’Andorra a deux entrées, site et flux RSS) : Acció, Agenda.ad, Altaveu, Andorra Ara, Andorra Recerca + Innovació, BC MoraBanc Andorra, Bondia, Cambra de Comerç, Comitè Olímpic Andorrà, Comú d’Escaldes-Engordany, Concòrdia, Creu Roja Andorrana, Diari d’Andorra, El Periòdic d’Andorra, FC Andorra, Federació Andorrana de Ciclisme, La Veu Lliure, OMS Europe, Policia d’Andorra et RTVA. Les 42 autres restent en `NONE`. La question de la reprise des photos figure dans les questions à l’avocat (question 20).
+
+### Images, étape 3 : banque d’images par rubrique (20 novembre 2026)
+
+- `Media.bankCategory` (migration `20261120170000_add_media_bank_category`) : la rubrique qu’une image de la médiathèque peut illustrer, `ALL` pour toutes, vide hors banque. Réglage dans la médiathèque (« Banque d’images ») ; une photo de source réservée aux essais ou une vidéo est refusée ;
+- ordre de choix à la création d’un brouillon : photo de la source si son réglage le permet, sinon image de la banque de la rubrique, sinon image valable pour toutes, sinon image générique ;
+- rotation (`lib/media/bankImage.ts`) : l’image la moins utilisée par des articles, puis la plus anciennement utilisée ;
+- essai sur une copie de `./dev.db` avec deux images rangées en Sports, l’une déjà utilisée 3 fois : six brouillons ont reçu 12, 12, 12, 14, 12, 14, la moins utilisée rattrapant son retard puis les deux alternant.
+
+La banque est vide tant que personne n’y range d’image : elle attend des photos qui appartiennent à ANDORRE 360 ou sous licence, avec leur crédit.
 
 ---
 

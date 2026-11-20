@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { requireAdminApi } from "@/lib/admin/requireAdmin";
 import { prisma } from "@/lib/prisma";
+import { parseBankCategory } from "@/lib/media/bankImage";
 
 type RouteContext = {
   params: Promise<{
@@ -51,6 +52,11 @@ export async function PATCH(
     const caption = normalizeOptionalString(body.caption);
     const credit = normalizeOptionalString(body.credit);
     const copyright = normalizeOptionalString(body.copyright);
+    const bankCategory = "bankCategory" in body ? parseBankCategory(body.bankCategory) : null;
+
+    if (bankCategory && !bankCategory.ok) {
+      return NextResponse.json({ error: bankCategory.error }, { status: 400 });
+    }
 
     const media = await prisma.media.findUnique({
       where: {
@@ -65,6 +71,20 @@ export async function PATCH(
       );
     }
 
+    if (bankCategory?.value && media.testOnly) {
+      return NextResponse.json(
+        { error: "Une photo reprise d’une source pour les essais ne peut pas entrer dans la banque d’images." },
+        { status: 400 },
+      );
+    }
+
+    if (bankCategory?.value && media.type !== "IMAGE") {
+      return NextResponse.json(
+        { error: "Seules les images peuvent entrer dans la banque d’images." },
+        { status: 400 },
+      );
+    }
+
     const updatedMedia = await prisma.media.update({
       where: {
         id: mediaId,
@@ -75,6 +95,7 @@ export async function PATCH(
         caption,
         credit,
         copyright,
+        ...(bankCategory ? { bankCategory: bankCategory.value } : {}),
       },
     });
 
