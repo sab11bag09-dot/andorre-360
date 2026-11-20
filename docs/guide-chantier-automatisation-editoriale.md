@@ -1430,7 +1430,25 @@ Mesures à 1 280 et 1 440 px, sur les 10 pages :
 
 À 1 024 px, les colonnes restent alignées. À 375 px, les colonnes sont empilées et aucun cadre vide n’apparaît.
 
-Le Fil info n’est pas encore traité : sa colonne « La sélection » suit la longueur du fil chronologique.
+
+### Fil info : date dans chaque ligne et rangées figées (21 novembre 2026)
+
+Choix de l’utilisateur : la date figure dans chaque ligne du fil chronologique. Les intertitres de jour sont supprimés, car leur nombre (de 1 à 8) changeait la hauteur du fil.
+
+- **Lignes du fil.** Chaque ligne montre son jour court (« 21 nov. ») au-dessus de l’heure. Elle montre aussi son chapô sur deux lignes, quel que soit le format (auparavant seules les brèves l’affichaient), pour que toutes les lignes aient la même structure. Le titre d’une alerte, en plus gros caractères, est limité à deux lignes.
+- **Rangées figées.** Sur grand écran, les deux rangées ont une hauteur figée (`FIL_INFO_XL_ROW_HEIGHTS` dans `lib/fil-info.ts`) :
+  - fil et La sélection : 1 810 px ;
+  - À suivre et À retenir : 1 205 px.
+- **Partage des rangées.** Le fil garde 8 lignes de même hauteur, La sélection 2 cartes, À suivre 2 rangées et À retenir 7 lignes. Une publication manquante laisse sa place vide. Les photos de La sélection remplissent leur carte.
+- **La sélection** reste en place même sans article.
+- **Pages traduites.** `/ca/fil-info` et `/es/fil-info` reçoivent aussi la date dans chaque ligne, sans hauteur figée : le fil y est seul, sur toute la largeur.
+
+Mesures à 1 280 et 1 440 px :
+- les deux colonnes de chaque rangée finissent au même pixel ;
+- toutes les lignes du fil mesurent 207 px ;
+- rien ne déborde, et rien ne bouge avec des textes très courts ou très longs, ni avec deux publications de moins.
+
+À 1 024 px, les colonnes restent alignées. À 375 px, les colonnes sont empilées et la page n’a pas de défilement horizontal.
 
 ---
 

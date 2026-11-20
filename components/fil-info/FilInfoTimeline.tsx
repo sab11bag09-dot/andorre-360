@@ -31,35 +31,37 @@ function formatHour(value: Date, locale: PublicFilInfoLocale) {
   }).format(value);
 }
 
-function formatDate(value: Date, locale: PublicFilInfoLocale) {
+/** Jour court affiché dans chaque ligne, au-dessus de l’heure : « 21 nov. ». */
+export function formatFilInfoDay(value: Date, locale: PublicFilInfoLocale) {
   return new Intl.DateTimeFormat(localeNames[locale], {
-    weekday: "long",
     day: "numeric",
-    month: "long",
+    month: "short",
     timeZone: "Europe/Andorra",
   }).format(value);
 }
 
-function getDateKey(value: Date) {
-  return new Intl.DateTimeFormat("fr-CA", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "Europe/Andorra",
-  }).format(value);
-}
+/**
+ * Sur grand écran, le fil garde ce nombre de lignes de même hauteur : une
+ * publication manquante laisse sa ligne vide et le bloc ne change pas de
+ * taille (voir la page Fil info).
+ */
+const FIXED_ROWS = { 8: "xl:grid xl:min-h-0 xl:flex-1 xl:grid-rows-8" } as const;
 
 export default function FilInfoTimeline({
   entries,
   locale = "fr",
+  fixedRows,
 }: {
   entries: readonly FilInfoTimelineEntry[];
   locale?: PublicFilInfoLocale;
+  fixedRows?: keyof typeof FIXED_ROWS;
 }) {
   return (
     <section
       aria-labelledby="fil-info-timeline-title"
-      className="overflow-hidden border border-gray-800 bg-neutral-950/90"
+      className={`overflow-hidden border border-gray-800 bg-neutral-950/90 ${
+        fixedRows ? "xl:flex xl:h-full xl:flex-col" : ""
+      }`}
     >
       <header className="border-b border-gray-800">
         <div className="bg-yellow-500 px-5 py-3 text-black sm:px-7">
@@ -83,27 +85,22 @@ export default function FilInfoTimeline({
       </header>
 
       {entries.length > 0 ? (
-        <ol className="divide-y divide-gray-800" aria-label="Publications chronologiques">
+        <ol
+          className={`divide-y divide-gray-800 ${fixedRows ? FIXED_ROWS[fixedRows] : ""}`}
+          aria-label="Publications chronologiques"
+        >
           {entries.map((entry, index) => {
             const format = normalizeFilInfoFormat(entry.filInfoFormat);
             const isAlert = format === "ALERT";
-            const isBrief = format === "BRIEF";
-            const previousEntry = entries[index - 1];
-            const startsNewDay =
-              !previousEntry ||
-              getDateKey(previousEntry.publicationDate) !==
-                getDateKey(entry.publicationDate);
 
+            // La date figure dans chaque ligne : plus d’intertitre de jour, dont le
+            // nombre variait avec la répartition des dates et changeait la hauteur
+            // du fil.
             return (
-              <li key={entry.id}>
-                {startsNewDay && (
-                  <h3 className="border-b border-gray-800 bg-black/70 px-5 py-3 text-[10px] font-bold capitalize tracking-[0.18em] text-gray-500 sm:px-7">
-                    {formatDate(entry.publicationDate, locale)}
-                  </h3>
-                )}
+              <li key={entry.id} className="xl:min-h-0">
                 <Link
                   href={getFilInfoArticlePath(locale, entry.slug)}
-                  className={`group grid grid-cols-[64px_1fr] gap-4 px-5 py-5 transition-colors duration-300 motion-reduce:transition-none sm:grid-cols-[76px_1fr] sm:px-7 sm:py-6 ${
+                  className={`group grid h-full grid-cols-[64px_1fr] gap-4 overflow-hidden px-5 py-5 transition-colors duration-300 motion-reduce:transition-none sm:grid-cols-[76px_1fr] sm:px-7 sm:py-6 ${
                     isAlert
                       ? "bg-yellow-500 text-black hover:bg-yellow-400"
                       : "hover:bg-white/[0.04]"
@@ -111,11 +108,18 @@ export default function FilInfoTimeline({
                 >
                   <time
                     dateTime={entry.publicationDate.toISOString()}
-                    className={`pt-0.5 text-base font-black tabular-nums tracking-[-0.02em] ${
-                      isAlert ? "text-black" : "text-yellow-500"
-                    }`}
+                    className={`flex flex-col pt-0.5 ${isAlert ? "text-black" : "text-yellow-500"}`}
                   >
-                    {formatHour(entry.publicationDate, locale)}
+                    <span
+                      className={`text-[10px] font-bold uppercase tracking-[0.12em] ${
+                        isAlert ? "text-black/70" : "text-gray-500"
+                      }`}
+                    >
+                      {formatFilInfoDay(entry.publicationDate, locale)}
+                    </span>
+                    <span className="mt-0.5 text-base font-black tabular-nums tracking-[-0.02em]">
+                      {formatHour(entry.publicationDate, locale)}
+                    </span>
                   </time>
 
                   <div
@@ -140,25 +144,30 @@ export default function FilInfoTimeline({
                       {getFilInfoFormatLabel(format, locale)} · {String(index + 1).padStart(2, "0")}
                     </p>
 
+                    {/* Une alerte, en plus gros caractères, tient sur deux lignes. */}
                     <h4
-                      className={`mt-2 line-clamp-3 min-h-[3lh] font-serif leading-[1.3] transition-colors duration-300 ${
+                      className={`mt-2 font-serif leading-[1.3] transition-colors duration-300 ${
                         isAlert
-                          ? "text-xl font-semibold text-black sm:text-2xl"
-                          : "text-lg group-hover:text-yellow-500 sm:text-xl"
+                          ? "line-clamp-2 min-h-[2lh] text-xl font-semibold text-black sm:text-2xl"
+                          : "line-clamp-3 min-h-[3lh] text-lg group-hover:text-yellow-500 sm:text-xl"
                       }`}
                     >
                       {entry.title}
                     </h4>
 
-                    {/* Une brève garde la place de son chapô, même absent. */}
-                    {isBrief && (
-                      <p
-                        aria-hidden={entry.description ? undefined : true}
-                        className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400"
-                      >
-                        {entry.description}
-                      </p>
-                    )}
+                    {/*
+                      Chaque publication montre son chapô sur deux lignes, quel que
+                      soit son format : toutes les lignes du fil ont la même
+                      structure et donc la même hauteur.
+                    */}
+                    <p
+                      aria-hidden={entry.description ? undefined : true}
+                      className={`mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 ${
+                        isAlert ? "text-black/75" : "text-gray-400"
+                      }`}
+                    >
+                      {entry.description}
+                    </p>
                   </div>
                 </Link>
               </li>
