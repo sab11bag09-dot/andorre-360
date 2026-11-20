@@ -299,6 +299,7 @@ for (const file of files) {
 }
 
 console.log("");
+console.log(`${scannedFiles} fichier(s) analysé(s).`);
 
 if (WRITE_MODE) {
   console.log("Transformation terminée.");

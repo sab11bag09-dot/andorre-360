@@ -1217,10 +1217,10 @@ Faux. La production demande en plus une infrastructure, une supervision, des sau
 
 ## 18. État exact au moment d’archiver ce guide
 
-État au 19 novembre 2026 :
+État au 20 novembre 2026 :
 
 - branche de référence : `audit/studio-v4` ;
-- dernières pull requests fusionnées : #125 à #152 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons, essais supervisés, rédaction à partir des faits, contrôle de ressemblance, priorité institutionnelle, anti-doublon par sujet, signature et crédit des sources, longueur et affichage des titres) ;
+- dernières pull requests fusionnées : #125 à #154 (dates futures, génération, orchestrateur, Studio, limite par source, lecture et redatage des dates, mode brouillons, essais supervisés, rédaction à partir des faits, contrôle de ressemblance, priorité institutionnelle, anti-doublon par sujet, signature et crédit des sources, longueur et affichage des titres, contrôle de fidélité aux faits) ;
 - orchestrateur des articles : livré, mode brouillons par défaut, désactivé hors des essais ;
 - publication automatique des articles : désactivée localement, arrêt d’urgence activé ;
 - essais supervisés : le 18 novembre 2026, 5 brouillons (articles 494 à 498) ; le 19 novembre 2026, 5 brouillons rédigés à partir des faits (articles 499 à 503) ; aucune publication (voir lot D) ;
@@ -1245,7 +1245,7 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 #### Juridique
 
 - C’est la plus grande incertitude, et tout le reste en dépend : consulter l’avocat dès maintenant plutôt qu’à la fin, avec trois questions précises (reprise de communiqués institutionnels, réécriture à partir des faits d’un article de presse, crédit de la source avec un lien).
-- En attendant l’avis : limiter la rédaction automatique aux sources institutionnelles (Govern, comuns, Policia, CASS…), dont les communiqués sont faits pour être repris et qui sont les plus fiables.
+- En attendant l’avis : limiter la rédaction automatique aux sources institutionnelles (Govern, comuns, Policia, CASS…), dont les communiqués sont faits pour être repris et qui sont les plus fiables. Décision de l’utilisateur (19 novembre 2026) : pas de limitation pendant le chantier ; rien n’étant mis en ligne, les tests peuvent s’appuyer sur des articles de confrères. La question revient à la préparation de la mise en production.
 - Angle mort : le contrôle de ressemblance compare des mots ; les sources étant surtout en catalan et les articles en français, il ne repère pas une traduction fidèle. La rédaction à partir des faits limite ce risque, mais rien ne le mesure. Piste : comparer après avoir retraduit l’article vers la langue de la source.
 
 #### Qualité éditoriale
@@ -1265,7 +1265,7 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 
 - 10 composants de rubrique recopient les mêmes cartes (41 corrections identiques dans 9 fichiers pour les titres) : quelques composants de carte partagés.
 - Les tests de mise en page vérifient des chaînes de classes CSS, ce qui est fragile : les remplacer par un test automatique qui mesure les titres coupés dans un navigateur.
-- Nettoyage : `HomePageEditorial.fusion.tsx`, `HomePageEditorial.apres-fusion.tsx`, 11 avertissements de lint, sauvegardes `dev.before-*.db` qui s’accumulent à la racine.
+- Nettoyage : fait le 20 novembre 2026 pour les fichiers morts et les avertissements de lint (voir « Nettoyage des fichiers morts » ci-dessous) ; restent les sauvegardes `dev.before-*.db` qui s’accumulent à la racine.
 - Configuration des sources dans la base, règles par site dans le code : un fichier de définition des sources, versionné, rendrait tout reproductible.
 - Collecte : 948 observations sans date, 2 sources en erreur 403 (Andorra Business, Encamp), aucune alerte quand une source tombe.
 
@@ -1282,11 +1282,24 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 
 #### Priorités retenues, dans l’ordre
 
-1. Avis d’avocat maintenant ; en attendant, rédaction automatique limitée aux sources institutionnelles.
+1. Avis d’avocat maintenant (questions préparées le 19 novembre 2026) ; pas de limitation aux sources institutionnelles pendant le chantier, décision de l’utilisateur.
 2. Relecture humaine des brouillons 494 à 503, puis jeu de référence.
 3. Contrôle automatique de fidélité : chiffres, noms et dates de l’article présents dans la liste de faits (fait, voir « Contrôle de fidélité aux faits »).
 4. Images.
 5. Préparation de la mise en production : interrupteurs sans `.env`, coûts, hébergement, sauvegardes.
+
+### Nettoyage des fichiers morts (20 novembre 2026)
+
+Vingt fichiers que plus rien n’utilisait ont été supprimés ; Git garde leur historique :
+
+- copies de sauvegarde de la page d’accueil : `HomePageEditorial.fusion.tsx`, `HomePageEditorial.apres-fusion.tsx`, `HomePageEditorial.apres-recherche.tsx` ;
+- anciennes versions du site public : `CategoryPage.tsx`, `CategoryPageDB.tsx`, `CategoryPageDB-v2.tsx`, `HomePageDB.tsx`, `Navbar.tsx` ;
+- ancien éditeur d’articles, remplacé par le Studio V4 : `components/admin/article/ArticleEditor.tsx`, `ArticleContent.tsx`, `actions/articles.ts`, `components/admin/media/MediaUploader.tsx` ;
+- modules abandonnés : `lib/utils.js` (doublon de `lib/utils.ts`, que Next lit en priorité), `lib/media/index.ts`, `image.ts`, `metadata.ts`, `lib/editorial/assign.ts`, `lib/analytics/score.ts`, et `lib/publications.ts` avec son test (calcul de l’ancienne page d’accueil, appelé seulement par ce test).
+
+Garde-fou : `lib/orphanModules.test.ts` suit les imports depuis les pages et routes de `app/`, les scripts, les fichiers de configuration et les tests. Il échoue si un module n’est importé par rien, ou seulement par des tests hors des exceptions listées avec leur raison (`lib/editorial/testUtils.ts`, `lib/source-engine/backfillObservationDates.ts`).
+
+Lint : les trois variables inutilisées restantes sont corrigées. Restent 4 avertissements `<img>`, qui relèvent du lot images.
 
 ---
 

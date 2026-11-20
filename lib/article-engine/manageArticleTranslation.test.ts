@@ -47,12 +47,9 @@ function makeDependencies(
     async () => undefined,
   );
 
-  const publishApproved = vi.fn(
-    async (
-      _translationId: number,
-      _publishedAt: Date,
-    ) => undefined,
-  );
+  const publishApproved = vi.fn<
+    (translationId: number, publishedAt: Date) => Promise<undefined>
+  >(async () => undefined);
 
   const dependencies: ManageArticleTranslationDependencies = {
     translationRepository: {
