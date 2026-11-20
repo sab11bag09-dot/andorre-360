@@ -8,10 +8,9 @@ const homePageSource = readFileSync(
 );
 
 describe("cohérence entre la composition automatique et la Une", () => {
-  it("laisse le Grand format vide sans placement éditorial explicite", () => {
-    expect(homePageSource).toContain("const hasActiveAutomatedComposition =");
-    expect(homePageSource).toContain("!hasActiveAutomatedComposition");
-    expect(homePageSource).toContain("activeAutomatedPublicationCount > 0");
+  it("transmet à la composition l’existence d’une composition automatique active", () => {
     expect(homePageSource).toContain("automationRunId:");
+    expect(homePageSource).toContain("hasActiveAutomatedComposition: activeAutomatedPublicationCount > 0");
+    expect(homePageSource).toContain("composeHomePage(editorialLayout, publishedArticles");
   });
 });

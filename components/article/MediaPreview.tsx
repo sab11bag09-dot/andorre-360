@@ -1,4 +1,5 @@
 import SafeImage from "@/components/SafeImage";
+import { getVideoEmbedUrl } from "@/lib/media/videoEmbed";
 
 type MediaPreviewProps = {
   image: string | null;
@@ -6,45 +7,6 @@ type MediaPreviewProps = {
   title: string;
   mode?: "featured" | "thumbnail";
 };
-
-function getVideoEmbedUrl(url: string): string | null {
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname.toLowerCase();
-
-    if (hostname.includes("youtube.com")) {
-      const videoId = parsedUrl.searchParams.get("v");
-      return videoId
-        ? `https://www.youtube.com/embed/${videoId}`
-        : null;
-    }
-
-    if (hostname.includes("youtu.be")) {
-      const videoId = parsedUrl.pathname
-        .split("/")
-        .filter(Boolean)[0];
-
-      return videoId
-        ? `https://www.youtube.com/embed/${videoId}`
-        : null;
-    }
-
-    if (hostname.includes("vimeo.com")) {
-      const videoId = parsedUrl.pathname
-        .split("/")
-        .filter(Boolean)
-        .find((part) => /^\d+$/.test(part));
-
-      return videoId
-        ? `https://player.vimeo.com/video/${videoId}`
-        : null;
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 export default function MediaPreview({
   image,
