@@ -8,10 +8,12 @@ import {
   RubricMainCard,
   RubricPage,
   RubricPartnerLink,
+  rubricColumn,
 } from "@/components/rubric/RubricCards";
 import { getArticlesByCategory } from "@/lib/articles";
 import { prisma } from "@/lib/prisma";
 import { allocateRubricSlots } from "@/lib/rubric/allocateRubricSlots";
+import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 export const dynamic = "force-dynamic";
 
@@ -25,9 +27,15 @@ function AdvertisementBlock({
   sizes: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-yellow-500">
-      <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="block">
-        <div className="relative h-[480px]">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-yellow-500 lg:flex-1">
+      <a
+        href={targetUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex flex-1 flex-col"
+      >
+        {/* Sur grand écran, l’image remplit le bloc figé du bas de colonne. */}
+        <div className="relative h-[480px] xl:h-auto xl:min-h-[480px] xl:flex-1">
           <SafeImage src={imagePath} alt="Publicité" fill sizes={sizes} className="object-cover" />
         </div>
 
@@ -78,63 +86,32 @@ export default async function ActualitePage() {
     goodToKnow: 1,
   });
 
-  return (
-    <RubricPage
-      hero={featured && <RubricHero article={featured} />}
-      aside={
-        <>
-          <RubricPartnerLink
-            href="https://www.andorracorporate.com"
-            label="Visiter Andorra Corporate"
-          />
+  const heights = RUBRIC_XL_HEIGHTS.actualite;
 
-          {side.map((article) => (
-            <RubricImageCard
-              key={article.id}
-              article={article}
-              size="side"
-              showDescription={false}
-            />
-          ))}
-
-          {goodToKnow && <RubricGoodToKnow article={goodToKnow} />}
-        </>
-      }
-    >
-      {mainArticle && <RubricMainCard article={mainArticle} />}
-
-      {briefs.length > 0 && (
-        <RubricGrid columns={3}>
-          {briefs.map((article) => (
-            <RubricBriefCard key={article.id} article={article} />
-          ))}
-        </RubricGrid>
-      )}
-
-      {activeAdvertisement?.format === "FOUR_COLUMNS" && (
+  // Bas de colonne, de hauteur figée : la publicité y remplace les deux
+  // cartes, pour que les colonnes restent alignées.
+  const bottomBlock =
+    activeAdvertisement?.format === "FOUR_COLUMNS" ? (
+      <AdvertisementBlock
+        imagePath={activeAdvertisement.imagePath}
+        targetUrl={activeAdvertisement.targetUrl}
+        sizes="(max-width: 1024px) 100vw, 66vw"
+      />
+    ) : activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" ? (
+      <RubricGrid columns={2} rows={1} fill>
         <AdvertisementBlock
           imagePath={activeAdvertisement.imagePath}
           targetUrl={activeAdvertisement.targetUrl}
-          sizes="(max-width: 1024px) 100vw, 66vw"
+          sizes="(max-width: 768px) 100vw, 50vw"
         />
-      )}
 
-      {activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" && (
-        <RubricGrid columns={2}>
-          <AdvertisementBlock
-            imagePath={activeAdvertisement.imagePath}
-            targetUrl={activeAdvertisement.targetUrl}
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-
-          {bottom[0] && (
-            <RubricImageCard article={bottom[0]} size="wide" showDescription={false} stretch />
-          )}
-        </RubricGrid>
-      )}
-
-      {!activeAdvertisement && bottom.length > 0 && (
-        <RubricGrid columns={2} fill>
+        {bottom[0] && (
+          <RubricImageCard article={bottom[0]} size="wide" showDescription={false} stretch />
+        )}
+      </RubricGrid>
+    ) : (
+      bottom.length > 0 && (
+        <RubricGrid columns={2} rows={1} fill>
           {bottom.map((article) => (
             <RubricImageCard
               key={article.id}
@@ -145,7 +122,46 @@ export default async function ActualitePage() {
             />
           ))}
         </RubricGrid>
+      )
+    );
+
+  return (
+    <RubricPage
+      hero={featured && <RubricHero article={featured} />}
+      aside={rubricColumn(heights.aside, [
+        <RubricPartnerLink
+          key="partner"
+          href="https://www.andorracorporate.com"
+          label="Visiter Andorra Corporate"
+        />,
+        ...[0, 1, 2, 3].map(
+          (index) =>
+            side[index] && (
+              <RubricImageCard
+                key={side[index].id}
+                article={side[index]}
+                size="side"
+                showDescription={false}
+              />
+            ),
+        ),
+        goodToKnow && <RubricGoodToKnow article={goodToKnow} />,
+      ])}
+      main={rubricColumn(
+        heights.main,
+        [
+          mainArticle && <RubricMainCard article={mainArticle} />,
+          briefs.length > 0 && (
+            <RubricGrid columns={3} rows={2}>
+              {briefs.map((article) => (
+                <RubricBriefCard key={article.id} article={article} />
+              ))}
+            </RubricGrid>
+          ),
+          bottomBlock,
+        ],
+        { fill: 2 },
       )}
-    </RubricPage>
+    />
   );
 }

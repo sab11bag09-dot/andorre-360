@@ -4,7 +4,16 @@ import { describe, expect, it } from "vitest";
 import { unreservedLineClamps } from "@/components/testing/reservedLines";
 
 import {
+  RUBRIC_COLUMN_GAPS,
+  RUBRIC_XL_HEIGHTS,
+  rubricColumnTotal,
+} from "@/lib/rubric/rubricXlHeights";
+
+import {
   RubricBriefCard,
+  RubricGrid,
+  RubricPage,
+  rubricColumn,
   RubricGoodToKnow,
   RubricHero,
   RubricImageCard,
@@ -140,5 +149,45 @@ describe("cartes partagées des rubriques : mise en page indépendante des texte
       expect(html.match(/min-h-\[\d+lh\]/g)).toEqual(withDescription.match(/min-h-\[\d+lh\]/g));
       expect(html).toContain('aria-hidden="true"');
     }
+  });
+});
+
+describe("pages de rubrique : blocs figés et colonnes alignées en bas", () => {
+  it.each(Object.entries(RUBRIC_XL_HEIGHTS))("%s : les deux colonnes ont la même hauteur totale", (_, heights) => {
+    expect(rubricColumnTotal(heights.main, RUBRIC_COLUMN_GAPS.main)).toBe(
+      rubricColumnTotal(heights.aside, RUBRIC_COLUMN_GAPS.aside),
+    );
+  });
+
+  it("fige chaque bloc à sa hauteur et garde le cadre d’un bloc sans article", () => {
+    const html = renderToStaticMarkup(
+      <RubricPage
+        main={rubricColumn([689, 354], [<RubricMainCard key="main" article={article()} />, null])}
+        aside={rubricColumn([534, 509], [null, <RubricTextCard key="text" article={article()} />], { fill: 1 })}
+      />,
+    );
+
+    for (const height of [689, 354, 534, 509]) {
+      expect(html).toContain(`--rubric-slot-height:${height}px`);
+    }
+    // Les cadres vides n’apparaissent que sur grand écran, où ils gardent la hauteur.
+    expect(html.match(/class="hidden xl:flex flex-col/g)).toHaveLength(2);
+    expect(html).toContain("xl:h-[var(--rubric-slot-height)]");
+    expect(html).toContain("lg:flex-1 xl:h-[var(--rubric-slot-height)] xl:flex-none");
+  });
+
+  it("refuse une colonne dont le nombre de blocs ne correspond pas aux hauteurs", () => {
+    expect(() => rubricColumn([689, 354], [null])).toThrow("1 blocs pour 2 hauteurs figées");
+  });
+
+  it("garde le nombre de rangées d’une grille, même avec moins de cartes", () => {
+    const html = renderToStaticMarkup(
+      <RubricGrid columns={3} rows={2}>
+        <RubricBriefCard article={article()} />
+      </RubricGrid>,
+    );
+
+    expect(html).toContain("xl:grid-rows-2");
+    expect(html).toContain("xl:h-full");
   });
 });

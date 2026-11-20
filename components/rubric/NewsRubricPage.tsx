@@ -9,9 +9,11 @@ import {
   RubricPartnerLink,
   RubricQuestionCard,
   RubricTextCard,
+  rubricColumn,
 } from "@/components/rubric/RubricCards";
 import { getArticlesByCategory } from "@/lib/articles";
 import { allocateRubricSlots } from "@/lib/rubric/allocateRubricSlots";
+import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 /**
  * Plan commun des rubriques d’information (Économie, Politique, Société,
@@ -50,61 +52,59 @@ export default async function NewsRubricPage({
     goodToKnowBrief: 1,
   });
 
+  const heights = partner ? RUBRIC_XL_HEIGHTS.newsWithPartner : RUBRIC_XL_HEIGHTS.news;
+  const sideCards = [0, 1, 2].map(
+    (index) =>
+      side[index] && (
+        <RubricImageCard key={side[index].id} article={side[index]} size="side" showDescription={false} />
+      ),
+  );
+
   return (
     <RubricPage
       hero={featured && <RubricHero article={featured} />}
-      aside={
-        <>
-          {partner && <RubricPartnerLink href={partner.href} label={partner.label} />}
-
-          {questionArticle && (
-            <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
-          )}
-
-          {side.map((article) => (
-            <RubricImageCard
-              key={article.id}
-              article={article}
-              size="side"
-              showDescription={false}
-            />
-          ))}
-
-          {goodToKnow && <RubricGoodToKnow article={goodToKnow} brief={goodToKnowBrief} />}
-        </>
-      }
-    >
-      {mainArticle && <RubricMainCard article={mainArticle} />}
-
-      {briefs.length > 0 && (
-        <RubricGrid columns={3}>
-          {briefs.map((article) => (
-            <RubricBriefCard key={article.id} article={article} />
-          ))}
-        </RubricGrid>
+      aside={rubricColumn(heights.aside, [
+        ...(partner ? [<RubricPartnerLink key="partner" href={partner.href} label={partner.label} />] : []),
+        questionArticle && (
+          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
+        ),
+        ...sideCards,
+        goodToKnow && <RubricGoodToKnow article={goodToKnow} brief={goodToKnowBrief} />,
+      ])}
+      main={rubricColumn(
+        heights.main,
+        [
+          mainArticle && <RubricMainCard article={mainArticle} />,
+          briefs.length > 0 && (
+            <RubricGrid columns={3} rows={2}>
+              {briefs.map((article) => (
+                <RubricBriefCard key={article.id} article={article} />
+              ))}
+            </RubricGrid>
+          ),
+          middle.length > 0 && (
+            <RubricGrid columns={2} rows={1}>
+              {middle.map((article) => (
+                <RubricTextCard key={article.id} article={article} />
+              ))}
+            </RubricGrid>
+          ),
+          bottom.length > 0 && (
+            <RubricGrid columns={2} rows={1} fill>
+              {bottom.map((article) => (
+                <RubricImageCard
+                  key={article.id}
+                  article={article}
+                  size="wide"
+                  showDescription={false}
+                  stretch
+                />
+              ))}
+            </RubricGrid>
+          ),
+        ],
+        { fill: 3 },
       )}
-
-      {middle.length > 0 && (
-        <RubricGrid columns={2}>
-          {middle.map((article) => (
-            <RubricTextCard key={article.id} article={article} />
-          ))}
-        </RubricGrid>
-      )}
-
-      {bottom.length > 0 && (
-        <RubricGrid columns={2} fill>
-          {bottom.map((article) => (
-            <RubricImageCard
-              key={article.id}
-              article={article}
-              size="wide"
-              showDescription={false}
-              stretch
-            />
-          ))}
-        </RubricGrid>
-      )}
-    </RubricPage>
+    />
   );
 }
