@@ -150,6 +150,27 @@ describe("HtmlCollector", () => {
     expect(htmlClient.maxActiveRequests).toBe(4);
   });
 
+  it("relève l’image de partage et la mention de droits de l’article", async () => {
+    const source = createSource();
+    const articleUrl = "https://example.com/noticia/1";
+    const htmlClient = new FakeHtmlClient({
+      [source.url]: `<h2><a href="/noticia/1">Article illustré</a></h2>`,
+      [articleUrl]: `
+        <head><meta property="og:image" content="/media/photo.jpg"></head>
+        <div class="article-body"><p>Paragraphe éditorial assez long pour être conservé par la collecte.</p></div>
+        <footer>© 2026 Source de test. Tots els drets reservats.</footer>
+      `,
+    });
+
+    const [observation] = await new HtmlCollector(htmlClient).collect(source);
+
+    expect(observation).toMatchObject({
+      url: articleUrl,
+      imageUrl: "https://example.com/media/photo.jpg",
+      imageRights: "© 2026 Source de test. Tots els drets reservats.",
+    });
+  });
+
   it("extrait le corps éditorial de La Veu Lliure", async () => {
     const source = {
       ...createSource(),

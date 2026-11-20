@@ -10,6 +10,7 @@ import { siteRules, type SiteRule } from "./siteRules";
 import { normalizeObservationPublishedAt } from "../observationDate";
 import { FetchHtmlClient } from "../html/FetchHtmlClient";
 import type { HtmlClient } from "../html/HtmlClient";
+import { extractArticleImage, extractRightsNotice } from "../articleImage";
 
 function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -367,6 +368,8 @@ export class HtmlCollector implements Collector {
   ): Promise<{
     content: string | null;
     publishedAt: Date | null;
+    imageUrl: string | null;
+    imageRights: string | null;
   }> {
     try {
       const html = await this.htmlClient.get(url);
@@ -468,6 +471,8 @@ export class HtmlCollector implements Collector {
       return {
         content,
         publishedAt,
+        imageUrl: extractArticleImage($, url),
+        imageRights: extractRightsNotice($),
       };
     } catch (error) {
       console.error(
@@ -478,6 +483,8 @@ export class HtmlCollector implements Collector {
       return {
         content: null,
         publishedAt: null,
+        imageUrl: null,
+        imageRights: null,
       };
     }
   }
@@ -584,6 +591,8 @@ export class HtmlCollector implements Collector {
             link.publishedAt ??
             parseDateFromUrl(link.url),
           content: article.content,
+          imageUrl: article.imageUrl,
+          imageRights: article.imageRights,
         };
       },
     );

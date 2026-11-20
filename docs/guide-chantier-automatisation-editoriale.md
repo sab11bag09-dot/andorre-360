@@ -1323,6 +1323,22 @@ Vérification dans un navigateur, sur une copie de `./dev.db`, aux largeurs 375,
 - `lib/media/videoEmbed.ts` remplace trois copies de la conversion des adresses vidéo et n’accepte plus un domaine qui imite seulement YouTube, Vimeo, Facebook ou TikTok.
 - Vérification dans un navigateur, sur une copie de `./dev.db` : aucun des 15 titres coupé à 375, 768, 1024, 1280 et 1440, aucun débordement ; 15 articles affichés contre 14 avant.
 
+### Images, étape 1 : relevé à la collecte (20 novembre 2026)
+
+Décision de l’utilisateur : deux pistes. Une banque d’images classée par rubrique, utilisable en production ; et, pour les essais du chantier seulement, la photo de la source avec son crédit, derrière un réglage par source fermé par défaut et un garde-fou qui interdira la publication. Les images générées par IA sont écartées pour l’information.
+
+État de départ : chaque brouillon reçoit `/images/global/hero.jpg` ; la collecte n’enregistrait aucune image ; 13 des 41 sources affichent des droits réservés, aucune une licence libre.
+
+Étape 1, sans effet sur l’affichage :
+
+- `Observation.imageUrl` et `Observation.imageRights` (migration `20261120150000_add_observation_image`) ;
+- `lib/source-engine/articleImage.ts` relève l’image de partage de l’article (Open Graph, Twitter, JSON-LD, `image_src`) ou du flux RSS (`enclosure`, `media:content`, `media:thumbnail`), écarte les logos, icônes, images par défaut et SVG, et relève la mention de droits du site ;
+- une nouvelle collecte qui ne trouve pas d’image n’efface jamais celle déjà connue.
+
+Essai à blanc sur la dernière page de chaque source active, sans écriture : 20 sources sur 41 fournissent une photo propre à l’article, 23 une mention de droits. Les autres n’en déclarent pas, ou n’ont pas répondu (Govern, Consell General, Encamp, Andorra Business).
+
+La migration n’est pas encore appliquée à `./dev.db` : elle le sera après sauvegarde, avec l’accord de l’utilisateur.
+
 ---
 
 ## 19. Résumé en une minute

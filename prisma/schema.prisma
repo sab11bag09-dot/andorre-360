@@ -375,6 +375,11 @@ model Observation {
   publishedAt DateTime?
   content     String?
 
+  /// Image de partage déclarée par l’article (Open Graph, Twitter, JSON-LD ou flux).
+  imageUrl    String?
+  /// Mention de droits relevée sur la page de l’article.
+  imageRights String?
+
   processed   Boolean   @default(false)
   processedAt DateTime?
 

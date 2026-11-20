@@ -52,6 +52,8 @@ describe("PrismaObservationRepository", () => {
         url: "https://example.com/article-futur",
         publishedAt: null,
         content: "Contenu de l’observation.",
+        imageUrl: null,
+        imageRights: null,
       },
     });
   });
@@ -98,5 +100,44 @@ describe("PrismaObservationRepository", () => {
         content: "Contenu actualisé",
       },
     });
+  });
+
+  it("enregistre l’image et la mention de droits de l’article", async () => {
+    create.mockResolvedValue({ id: 14, url: "https://example.com/photo" });
+
+    await new PrismaObservationRepository().saveMany(3, [
+      {
+        title: "Article illustré",
+        url: "https://example.com/photo",
+        publishedAt: null,
+        content: null,
+        imageUrl: "https://example.com/photo.jpg",
+        imageRights: "© Source",
+      },
+    ]);
+
+    expect(create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        imageUrl: "https://example.com/photo.jpg",
+        imageRights: "© Source",
+      }),
+    });
+  });
+
+  it("n’efface pas une image connue quand une nouvelle collecte n’en trouve pas", async () => {
+    create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Observation déjà présente", {
+        code: "P2002",
+        clientVersion: "test",
+      }),
+    );
+    update.mockResolvedValue({ id: 12, url: "https://example.com/article", content: null });
+
+    await new PrismaObservationRepository().saveMany(3, [
+      { title: "Titre", url: "https://example.com/article", publishedAt: null, content: null, imageUrl: null },
+    ]);
+
+    expect(update.mock.calls[0][0].data).not.toHaveProperty("imageUrl");
+    expect(update.mock.calls[0][0].data).not.toHaveProperty("imageRights");
   });
 });

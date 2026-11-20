@@ -1,6 +1,8 @@
 import { Source } from "@/lib/generated/prisma/client";
 import { XMLParser } from "fast-xml-parser";
 
+import { extractRssItemImage } from "../articleImage";
+
 import {
   Collector,
   ObservationInput,
@@ -139,6 +141,7 @@ function parseRssItem(
       getText(item.encoded) ??
       getText(item.description) ??
       getText(item.summary),
+    imageUrl: extractRssItemImage(item, sourceUrl),
   };
 }
 
@@ -165,6 +168,7 @@ function parseAtomEntry(
     content:
       getText(entry.content) ??
       getText(entry.summary),
+    imageUrl: extractRssItemImage(entry, sourceUrl),
   };
 }
 
