@@ -461,3 +461,70 @@ describe("createArticleFromObservation", () => {
     });
   });
 });
+
+describe("createArticleFromObservation — photo de la source", () => {
+  function sourceImages(imported: { mediaId: number; path: string; testOnly: boolean } | null) {
+    return {
+      importImage: vi.fn(async () => imported),
+      linkToArticle: vi.fn(async () => undefined),
+    };
+  }
+
+  it("illustre le brouillon avec la photo reprise et la rattache à l’article", async () => {
+    const observation = makeObservation({
+      imageUrl: "https://example.com/photo.jpg",
+      imageRights: "© Source test",
+      source: { id: 2, name: "Source test", category: "SOCIÉTÉ", imageReuse: "TESTS" },
+    } as Partial<ObservationWithSource>);
+    const { dependencies, createDraft } = makeDependencies(observation);
+    const images = sourceImages({ mediaId: 9, path: "/api/media/files/sources/p.jpg", testOnly: true });
+
+    await createArticleFromObservation(observation.id, { ...dependencies, sourceImages: images });
+
+    expect(images.importImage).toHaveBeenCalledWith({
+      imageUrl: "https://example.com/photo.jpg",
+      imageRights: "© Source test",
+      sourceName: "Source test",
+      reuse: "TESTS",
+      alt: "Titre test",
+    });
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({ image: "/api/media/files/sources/p.jpg" }),
+    );
+    expect(images.linkToArticle).toHaveBeenCalledWith(9, 42);
+  });
+
+  it("garde l’image générique quand aucune photo n’est reprise", async () => {
+    const observation = makeObservation();
+    const { dependencies, createDraft } = makeDependencies(observation);
+    const images = sourceImages(null);
+
+    await createArticleFromObservation(observation.id, { ...dependencies, sourceImages: images });
+
+    expect(createDraft).toHaveBeenCalledWith(
+      expect.objectContaining({ image: "/images/global/hero.jpg" }),
+    );
+    expect(images.linkToArticle).not.toHaveBeenCalled();
+  });
+
+  it("ne cherche pas de photo pour un article bloqué", async () => {
+    const observation = makeObservation({
+      content: "Texte source repris mot pour mot dans un article beaucoup trop proche de lui.",
+    });
+    const { dependencies, prepareArticle } = makeDependencies(observation);
+    const images = sourceImages(null);
+
+    prepareArticle.mockResolvedValue({
+      title: "Titre test",
+      description: "Texte source repris mot pour mot.",
+      content: "Texte source repris mot pour mot dans un article beaucoup trop proche de lui.",
+      category: "SOCIÉTÉ",
+      author: "Source test",
+    });
+
+    await expect(
+      createArticleFromObservation(observation.id, { ...dependencies, sourceImages: images }),
+    ).rejects.toThrow("Article bloqué");
+    expect(images.importImage).not.toHaveBeenCalled();
+  });
+});

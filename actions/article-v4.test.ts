@@ -16,7 +16,9 @@ const {
   editorialEventCreate,
   revalidatePublicArticlePages,
   revalidatePath,
+  imagePolicyFindUnique,
 } = vi.hoisted(() => ({
+  imagePolicyFindUnique: vi.fn(),
   requireAdmin: vi.fn(),
   findUnique: vi.fn(),
   translationFindMany: vi.fn(),
@@ -53,6 +55,9 @@ vi.mock("@/lib/prisma", () => ({
     },
     articleTranslation: {
       findMany: translationFindMany,
+    },
+    media: {
+      findUnique: imagePolicyFindUnique,
     },
     $transaction: transaction,
   },
@@ -100,6 +105,8 @@ function createDraft(): ArticleDraft {
 describe("durcissement de la sauvegarde principale", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
+    imagePolicyFindUnique.mockResolvedValue(null);
 
     translationFindMany.mockResolvedValue([
       {
@@ -166,6 +173,24 @@ describe("durcissement de la sauvegarde principale", () => {
     expect(findUnique).not.toHaveBeenCalled();
     expect(transaction).not.toHaveBeenCalled();
     expect(revalidatePublicArticlePages).not.toHaveBeenCalled();
+  });
+
+  it("refuse la publication d’un article illustré par une photo réservée aux essais", async () => {
+    imagePolicyFindUnique.mockResolvedValue({ testOnly: true });
+
+    const result = await saveArticle({
+      mode: "update",
+      intent: "publish",
+      article: createDraft(),
+    });
+
+    expect(result).toEqual({
+      success: false,
+      message:
+        "Publication refusée : l’image vient d’une source réservée aux essais. Remplace-la avant de publier.",
+      field: "image",
+    });
+    expect(transaction).not.toHaveBeenCalled();
   });
 
   it("refuse la publication lorsqu’une traduction manque", async () => {

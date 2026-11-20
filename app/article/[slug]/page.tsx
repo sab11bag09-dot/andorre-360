@@ -5,6 +5,7 @@ import {
 } from "@/lib/article-engine/articleSeo";
 import { recordArticleView } from "@/lib/analytics";
 import { loadArticleSourceCredits } from "@/lib/article-engine/articleSourceCredits";
+import { loadImageCredit } from "@/lib/media/imageCredit";
 import { getArticleBySlug } from "@/lib/articles";
 import { getPublicArticleDate } from "@/lib/public-article";
 import type { Metadata } from "next";
@@ -56,6 +57,7 @@ export default async function ArticlePage({
   await recordArticleView(article.id);
 
   const sourceCredits = await loadArticleSourceCredits(article.id);
+  const imageCredit = await loadImageCredit(article.image, prisma);
 
   const variants = await prisma.articleTranslation.findMany({
     where: { articleId: article.id, status: "PUBLISHED" },
@@ -79,6 +81,7 @@ export default async function ArticlePage({
         publishedAt: getPublicArticleDate(article),
         languageVariants,
         sourceCredits,
+        imageCredit,
       }}
       dateLocale="fr-FR"
       contentLanguage="fr"

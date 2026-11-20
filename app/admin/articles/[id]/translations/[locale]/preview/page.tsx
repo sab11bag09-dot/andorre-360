@@ -1,4 +1,5 @@
 import { loadArticleSourceCredits } from "@/lib/article-engine/articleSourceCredits";
+import { loadImageCredit } from "@/lib/media/imageCredit";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -68,6 +69,7 @@ export default async function TranslationPreviewPage({
 
   const contentLanguage = locale === "CA" ? "ca" : "es";
   const sourceCredits = await loadArticleSourceCredits(articleId);
+  const imageCredit = await loadImageCredit(translation.article.image.trim() || null, prisma);
 
   return (
     <>
@@ -96,6 +98,7 @@ export default async function TranslationPreviewPage({
           publishedAt:
             translation.publishedAt ?? translation.updatedAt,
           sourceCredits,
+          imageCredit,
         }}
         dateLocale={locale === "CA" ? "ca-ES" : "es-ES"}
         contentLanguage={contentLanguage}

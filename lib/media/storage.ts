@@ -10,7 +10,9 @@ const MEDIA_ROOT = path.join(
 export type MediaStorageFolder =
   | "originals"
   | "optimized"
-  | "thumbnails";
+  | "thumbnails"
+  // Photos reprises des sources (données de chantier, hors Git).
+  | "sources";
 
 export function getMediaDirectory(
   folder: MediaStorageFolder

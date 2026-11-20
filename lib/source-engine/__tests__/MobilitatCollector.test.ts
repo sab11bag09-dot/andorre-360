@@ -33,6 +33,7 @@ function createSource(): Source {
     lastErrorMessage: null,
     createdAt: new Date("2026-01-01T00:00:00.000Z"),
     consecutiveEmptyCollections: 0,
+    imageReuse: "NONE",
     updatedAt: new Date("2026-01-01T00:00:00.000Z"),
   };
 }

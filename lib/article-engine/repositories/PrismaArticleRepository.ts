@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { PrismaClient } from "@/lib/generated/prisma/client";
+import { assertImagePublishable } from "@/lib/media/sourceImagePolicy";
 
 import type {
   ArticleDraftInput,
@@ -11,7 +12,7 @@ export class PrismaArticleRepository
   implements ArticleRepository
 {
   constructor(
-    private readonly client: Pick<PrismaClient, "article"> = prisma,
+    private readonly client: Pick<PrismaClient, "article" | "media"> = prisma,
   ) {}
 
   async findById(
@@ -89,6 +90,15 @@ export class PrismaArticleRepository
   async publishDraft(
     articleId: number,
   ): Promise<void> {
+    const article = await this.client.article.findUnique({
+      where: { id: articleId },
+      select: { image: true },
+    });
+
+    if (article) {
+      await assertImagePublishable(article.image, this.client);
+    }
+
     const result = await this.client.article.updateMany({
       where: {
         id: articleId,

@@ -1,6 +1,7 @@
 import ArticleRenderer from "@/components/article/ArticleRenderer";
 import SafeImage from "@/components/SafeImage";
 import { getVideoEmbedUrl } from "@/lib/media/videoEmbed";
+import { imageCreditLabel } from "@/lib/media/imageCredit";
 import {
   type ArticleSourceCredit,
   sourceCreditLabel,
@@ -19,6 +20,8 @@ export interface PublicArticleViewData {
   languageVariants?: Array<{ locale: string; label: string; href: string }>;
   /** Sources dont l’article est tiré, créditées sous la signature. */
   sourceCredits?: ArticleSourceCredit[];
+  /** Crédit de la photo (médiathèque), par exemple le nom de la source. */
+  imageCredit?: string | null;
 }
 
 type Props = {
@@ -92,6 +95,14 @@ export default function PublicArticleView({
           />
 
           <div className="absolute inset-0 bg-black/50" />
+
+          {article.imageCredit ? (
+            <p className="absolute bottom-3 right-4 z-10 text-xs text-gray-300">
+              {imageCreditLabel(contentLanguage)}
+              {contentLanguage === "fr" ? " : " : ": "}
+              {article.imageCredit}
+            </p>
+          ) : null}
 
           <div className="absolute bottom-0 left-0 p-10">
             <p className="tracking-widest text-yellow-500">

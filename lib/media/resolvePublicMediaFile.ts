@@ -9,6 +9,7 @@ const PUBLIC_MEDIA_FOLDERS = new Set([
   "originals",
   "optimized",
   "thumbnails",
+  "sources",
 ]);
 
 const MEDIA_MIME_TYPES: Record<string, string> = {

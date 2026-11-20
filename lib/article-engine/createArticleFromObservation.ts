@@ -26,6 +26,9 @@ import type { ArticleRepository } from "./repositories/ArticleRepository";
 import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
 import { PrismaArticleTranslationRepository } from "./repositories/PrismaArticleTranslationRepository";
 import { prisma } from "../prisma";
+import { prismaSourceImages, type SourceImageService } from "../media/sourceImages";
+
+const GENERIC_ARTICLE_IMAGE = "/images/global/hero.jpg";
 
 export interface CreateArticleFromObservationResult {
   articleId: number;
@@ -45,6 +48,8 @@ export interface CreateArticleFromObservationDependencies {
     "prepareArticle" | "auditMetadata"
   >;
   editorialEventWriter?: EditorialEventWriter;
+  /** Reprise de la photo de la source ; sans elle, l’article garde l’image générique. */
+  sourceImages?: SourceImageService;
 }
 
 const defaultDependencies: CreateArticleFromObservationDependencies = {
@@ -52,6 +57,7 @@ const defaultDependencies: CreateArticleFromObservationDependencies = {
   articleRepository: new PrismaArticleRepository(),
   editorialGenerator: new DeterministicEditorialGenerator(),
   editorialEventWriter: prisma,
+  sourceImages: prismaSourceImages,
 };
 
 export async function createArticleFromObservation(
@@ -155,6 +161,17 @@ export async function createArticleFromObservation(
     throw new Error(`Article bloqué : ${describeFactFidelity(factFidelity)}.`);
   }
 
+  // Après les contrôles bloquants : un article refusé ne laisse aucune photo orpheline.
+  const sourceImage = dependencies.sourceImages
+    ? await dependencies.sourceImages.importImage({
+        imageUrl: observation.imageUrl ?? null,
+        imageRights: observation.imageRights ?? null,
+        sourceName: observation.source.name,
+        reuse: observation.source.imageReuse ?? "NONE",
+        alt: draft.title,
+      })
+    : null;
+
   const sourceEditorialCategory = normalizeEditorialCategory(
     observation.source.category,
   );
@@ -163,7 +180,7 @@ export async function createArticleFromObservation(
     ...draft,
     // Quel que soit le générateur, la source ne signe jamais l’article.
     author: AUTOMATED_ARTICLE_AUTHOR,
-    image: "/images/global/hero.jpg",
+    image: sourceImage?.path ?? GENERIC_ARTICLE_IMAGE,
     aiRewrittenAt: generatedAt,
     category:
       sourceEditorialCategory === "ILS_EN_PARLENT"
@@ -189,6 +206,10 @@ export async function createArticleFromObservation(
   } else {
     articleId =
       await dependencies.articleRepository.createDraft(editorialDraft);
+  }
+
+  if (sourceImage && dependencies.sourceImages) {
+    await dependencies.sourceImages.linkToArticle(sourceImage.mediaId, articleId);
   }
 
   const autoPublication = prepareAutoPublication({
@@ -223,11 +244,13 @@ export async function createArticleFromObservation(
         },
         ...(factSheet ? { factSheet } : {}),
         ...(factFidelity ? { factFidelity: { ...factFidelity, blocked: false } } : {}),
+        ...(sourceImage ? { sourceImage } : {}),
       },
     });
   }
 
-  if (autoPublication.decision.allowed) {
+  // Une photo réservée aux essais interdit toute publication, automatique comprise.
+  if (autoPublication.decision.allowed && !sourceImage?.testOnly) {
     assertMultilingualPublicationEnabled();
 
     const generatedTranslations = await generateArticleTranslations(articleId, {
