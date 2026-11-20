@@ -1272,7 +1272,7 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 #### Exploitation et sécurité
 
 - Les interrupteurs `AI_*` se modifient en éditant `.env` à la main, ce qui est risqué (le jour de l’essai l’a montré) : une page d’administration ou un petit script.
-- Aucun suivi du coût par article (2 à 4 appels OpenAI) ni plafond de dépense. Plafond sur 24 heures et enregistrement des jetons de chaque appel : fait le 20 novembre 2026 (voir « Suivi des jetons et plafond de dépense OpenAI » ci-dessous) ; reste l’affichage de la consommation.
+- Aucun suivi du coût par article (2 à 4 appels OpenAI) ni plafond de dépense. Plafond sur 24 heures et enregistrement des jetons de chaque appel : fait le 20 novembre 2026 (voir « Suivi des jetons et plafond de dépense OpenAI » ci-dessous) ; consommation affichée sur la page de l’orchestrateur ; reste le coût par article.
 - Mise en production non préparée : hébergement, choix de la base (SQLite ou base serveur), sauvegardes automatiques, effacement des articles de chantier.
 
 #### Méthode de travail
@@ -1369,7 +1369,9 @@ La banque est vide tant que personne n’y range d’image : elle attend des pho
 - l’orchestrateur ne lance rien si le plafond est déjà atteint (garde-fou « Plafond de dépense OpenAI atteint ») et s’arrête avant l’observation suivante s’il est atteint en cours de lot (statut « Arrêtée par un garde-fou ») ; l’aperçu l’affiche parmi les garde-fous fermés ;
 - la protection couvre la rédaction, les traductions et l’évaluation de la page d’accueil : tous passent par les deux clients OpenAI du projet.
 
-Reste à faire : afficher la consommation (par jour et par article) dans l’administration.
+Affichage (20 novembre 2026) : la page de l’orchestrateur (`/admin/diffusion/orchestrateur`) montre en tête une carte « Consommation OpenAI » : jetons des 24 dernières heures face au plafond, avec une jauge et un avertissement quand le plafond est atteint, détail par type d’appel, et les 7 derniers jours découpés à l’heure d’Andorre (`lib/ai/summarizeAiUsage.ts`). Vérifiée dans le navigateur, sur ordinateur et sur téléphone. Le même jour, le choix « Banque d’images » de la médiathèque a été vu dans le navigateur.
+
+Reste à faire : rattacher chaque appel à son article, pour connaître le coût d’un article.
 
 ---
 

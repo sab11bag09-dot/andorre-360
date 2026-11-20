@@ -1,8 +1,17 @@
+import { connection } from "next/server";
+
+import AiUsagePanel from "@/components/admin/editorial/AiUsagePanel";
 import ArticleOrchestrationPanel from "@/components/admin/editorial/ArticleOrchestrationPanel";
 import { Button, PageHeader } from "@/components/admin/ui";
+import { loadAiUsageSummary } from "@/lib/ai/summarizeAiUsage";
 import { DEFAULT_ARTICLE_ORCHESTRATION_POLICY } from "@/lib/article-orchestrator/selectObservationsForArticles";
+import { prisma } from "@/lib/prisma";
 
-export default function ArticleOrchestrationPage() {
+export default async function ArticleOrchestrationPage() {
+  // La consommation dépend de l’heure de la requête : jamais précalculée.
+  await connection();
+  const usage = await loadAiUsageSummary(prisma);
+
   return (
     <>
       <PageHeader
@@ -18,7 +27,8 @@ export default function ArticleOrchestrationPage() {
         }
       />
 
-      <section className="py-8">
+      <section className="space-y-8 py-8">
+        <AiUsagePanel summary={usage} />
         <ArticleOrchestrationPanel
           maxSelected={DEFAULT_ARTICLE_ORCHESTRATION_POLICY.maxSelected}
           maxPerSource={DEFAULT_ARTICLE_ORCHESTRATION_POLICY.maxPerSource}
