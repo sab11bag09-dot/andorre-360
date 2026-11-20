@@ -1405,6 +1405,13 @@ Règle de l’utilisateur : les blocs ne bougent pas, tous finissent alignés en
 
 Une modification des cartes de l’accueil (police, marges, nombre d’articles par zone) oblige à remesurer ces hauteurs.
 
+Rééquilibrage demandé par l’utilisateur le même jour :
+- la photo du grand format est réduite d’un quart (780 → 585 px) ;
+- le bloc L’essentiel et grand format est réduit d’autant (971 → 776 px) ;
+- la photo de la grande carte est agrandie d’autant (390 → 585 px), et la grande carte passe de 825 à 1 020 px.
+
+Les deux photos ont désormais la même hauteur. Mesure à 1 440 px : les deux colonnes finissent toujours à 3 233 px, sans débordement.
+
 ---
 
 ## 19. Résumé en une minute
