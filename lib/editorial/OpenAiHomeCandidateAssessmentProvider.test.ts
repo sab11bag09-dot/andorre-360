@@ -233,3 +233,43 @@ describe("OpenAiHomeCandidateAssessmentProvider", () => {
     );
   });
 });
+
+describe("OpenAiHomeCandidateAssessmentProvider — plafond de dépense", () => {
+  it("enregistre les jetons puis refuse l’appel une fois le plafond atteint", async () => {
+    const responsesApi = {
+      create: vi.fn(async () => ({
+        output_text: JSON.stringify({ assessments: [makeAssessment(1)] }),
+        usage: { input_tokens: 3_000, output_tokens: 400 },
+      })),
+    };
+    let used = 0;
+    const usageLedger = {
+      tokensUsedSince: vi.fn(async () => used),
+      record: vi.fn(async (entry: { inputTokens: number; outputTokens: number }) => {
+        used += entry.inputTokens + entry.outputTokens;
+      }),
+    };
+    const provider = new OpenAiHomeCandidateAssessmentProvider({
+      apiKey: "test-key",
+      model: "test-model",
+      responsesApi,
+      usageLedger,
+      env: { AI_DAILY_TOKEN_LIMIT: "3400" },
+    });
+
+    await provider.assess([makeFacts(1)]);
+
+    expect(usageLedger.record).toHaveBeenCalledWith({
+      provider: "openai",
+      model: "test-model",
+      operation: "home_candidate_assessment",
+      inputTokens: 3_000,
+      outputTokens: 400,
+    });
+
+    await expect(provider.assess([makeFacts(1)])).rejects.toThrow(
+      "Plafond de dépense OpenAI atteint",
+    );
+    expect(responsesApi.create).toHaveBeenCalledTimes(1);
+  });
+});

@@ -57,6 +57,7 @@ let observationIds: number[];
 let env: Record<string, string | undefined>;
 
 beforeEach(async () => {
+  await client.aiUsage.deleteMany();
   await client.articleOrchestrationItem.deleteMany();
   await client.articleOrchestrationRun.deleteMany();
   await client.observation.deleteMany();
@@ -103,6 +104,20 @@ function fakeCreateArticle() {
   return vi.fn<(observationId: number) => Promise<{ articleId: number }>>(
     async () => ({ articleId: nextArticleId++ }),
   );
+}
+
+async function recordUsage(totalTokens: number, createdAt: Date) {
+  await client.aiUsage.create({
+    data: {
+      provider: "openai",
+      model: "test-model",
+      operation: "article_from_facts",
+      inputTokens: totalTokens,
+      outputTokens: 0,
+      totalTokens,
+      createdAt,
+    },
+  });
 }
 
 function run(createArticle: (observationId: number) => Promise<{ articleId: number }>) {
@@ -257,6 +272,44 @@ describe("executeArticleOrchestration", () => {
       { observationId: observationIds[1], status: "STOPPED" },
     ]);
     expect(await client.articleOrchestrationItem.count()).toBe(1);
+  });
+
+  it("does nothing once the OpenAI spending limit is reached", async () => {
+    env.AI_DAILY_TOKEN_LIMIT = "10000";
+    await recordUsage(10_000, hoursAgo(2));
+    const createArticle = fakeCreateArticle();
+
+    const result = await run(createArticle);
+
+    expect(result.status).toBe("BLOCKED");
+    expect(result.blockedReasons).toEqual(["ai_budget_exceeded"]);
+    expect(createArticle).not.toHaveBeenCalled();
+    expect(await client.articleOrchestrationItem.count()).toBe(0);
+  });
+
+  it("ignores spending older than 24 hours", async () => {
+    env.AI_DAILY_TOKEN_LIMIT = "10000";
+    await recordUsage(10_000, hoursAgo(25));
+
+    const result = await run(fakeCreateArticle());
+
+    expect(result.status).toBe("COMPLETED");
+  });
+
+  it("stops before the next observation when the spending limit is reached mid-run", async () => {
+    env.AI_DAILY_TOKEN_LIMIT = "10000";
+    const createArticle = vi.fn(async () => {
+      await recordUsage(10_000, NOW);
+      return { articleId: 701 };
+    });
+
+    const result = await run(createArticle);
+
+    expect(createArticle).toHaveBeenCalledTimes(1);
+    expect(result.items).toEqual([
+      { observationId: observationIds[0], status: "CREATED", articleId: 701 },
+      { observationId: observationIds[1], status: "STOPPED" },
+    ]);
   });
 
   it("records the administrator who launched the run", async () => {

@@ -5,8 +5,10 @@ const {
   planArticleOrchestration,
   executeArticleOrchestration,
   findMany,
+  aggregate,
   revalidatePath,
 } = vi.hoisted(() => ({
+  aggregate: vi.fn(),
   requireAdmin: vi.fn(),
   planArticleOrchestration: vi.fn(),
   executeArticleOrchestration: vi.fn(),
@@ -16,7 +18,7 @@ const {
 
 vi.mock("@/lib/admin/requireAdmin", () => ({ requireAdmin }));
 vi.mock("next/cache", () => ({ revalidatePath }));
-vi.mock("@/lib/prisma", () => ({ prisma: { observation: { findMany } } }));
+vi.mock("@/lib/prisma", () => ({ prisma: { observation: { findMany }, aiUsage: { aggregate } } }));
 vi.mock("@/lib/article-orchestrator/planArticleOrchestration", () => ({
   planArticleOrchestration,
 }));
@@ -41,6 +43,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.unstubAllEnvs();
   requireAdmin.mockResolvedValue(admin);
+  aggregate.mockResolvedValue({ _sum: { totalTokens: null } });
   findMany.mockImplementation(async ({ where }: { where: { id: { in: number[] } } }) =>
     where.id.in.map((id) => ({
       id,
@@ -210,5 +213,26 @@ describe("previewArticleOrchestration — mode publication", () => {
     if (!result.success) throw new Error(result.message);
     expect(result.mode).toBe("PUBLISH");
     expect(result.blockedReasons).toEqual(["feature_disabled"]);
+  });
+});
+
+describe("previewArticleOrchestration — plafond de dépense", () => {
+  it("signale le plafond OpenAI atteint comme garde-fou fermé", async () => {
+    vi.stubEnv("AI_ARTICLE_ORCHESTRATOR_ENABLED", "true");
+    vi.stubEnv("AI_DAILY_TOKEN_LIMIT", "1000");
+    aggregate.mockResolvedValue({ _sum: { totalTokens: 1_000 } });
+    planArticleOrchestration.mockResolvedValue({
+      generatedAt: new Date("2026-11-18T12:00:00.000Z"),
+      loadedObservationCount: 0,
+      policy: { maxSelected: 5 },
+      selectedObservationIds: [],
+      executionBlockedReasons: [],
+      decisions: [],
+    });
+
+    const result = await previewArticleOrchestration();
+
+    if (!result.success) throw new Error(result.message);
+    expect(result.blockedReasons).toEqual(["ai_budget_exceeded"]);
   });
 });
