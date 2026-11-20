@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { unreservedLineClamps } from "@/components/testing/reservedLines";
 
-import HomePageView, { type HomeArticle } from "./HomePageView";
+import HomePageView, { HOME_XL_BLOCK_HEIGHTS, type HomeArticle } from "./HomePageView";
 
 const TITLE_70 = "Le Govern présente un plan de 12 mesures pour le logement des jeunes";
 
@@ -107,5 +107,42 @@ describe("HomePageView : mise en page indépendante des textes", () => {
     const reserved = (markup: string) => markup.match(/min-h-\[\d+lh\]|h-\[\d+px\]/g);
 
     expect(reserved(withoutExtras)).toEqual(reserved(html));
+  });
+});
+
+describe("HomePageView : blocs figés et colonnes alignées en bas de page", () => {
+  const html = renderToStaticMarkup(<HomePageView home={COMPLETE_HOME} />);
+  const { main, aside, gaps } = HOME_XL_BLOCK_HEIGHTS;
+  const total = (blocks: Record<string, number>, gap: number) =>
+    Object.values(blocks).reduce((sum, height) => sum + height, 0) + gap * (Object.keys(blocks).length - 1);
+
+  it("donne aux deux colonnes la même hauteur totale", () => {
+    expect(total(main, gaps.main)).toBe(total(aside, gaps.aside));
+  });
+
+  it("fige la hauteur de chaque bloc sur grand écran", () => {
+    for (const height of [...Object.values(main), ...Object.values(aside)]) {
+      expect(html).toContain(`xl:h-[${height}px]`);
+    }
+  });
+
+  it("n’étire aucun bloc pour combler un écart", () => {
+    expect(html).not.toContain("xl:flex-1");
+    expect(html).not.toMatch(/class="[^"]*\bxl:col-span-4\b[^"]*\bxl:self-stretch\b/);
+  });
+
+  it("garde des blocs figés avec moins d’articles", () => {
+    const sparse = renderToStaticMarkup(
+      <HomePageView home={{ ...COMPLETE_HOME, cards: range(7, 8), discover: range(13, 13), editorial: null }} />,
+    );
+    for (const height of [...Object.values(main), ...Object.values(aside)]) {
+      expect(sparse).toContain(`xl:h-[${height}px]`);
+    }
+  });
+
+  it("laisse au chapô du grand format toute la hauteur de sa photo", () => {
+    const grandFormat = html.slice(html.indexOf("Grand Format"));
+    const chapo = /<p class="([^"]*)">Description de l’article\.<\/p>/.exec(grandFormat);
+    expect(chapo?.[1].split(" ")).toEqual(expect.arrayContaining(["md:line-clamp-14", "md:min-h-[14lh]"]));
   });
 });
