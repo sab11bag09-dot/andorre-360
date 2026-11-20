@@ -1373,6 +1373,21 @@ Affichage (20 novembre 2026) : la page de l’orchestrateur (`/admin/diffusion/o
 
 Reste à faire : rattacher chaque appel à son article, pour connaître le coût d’un article.
 
+### Mise en page indépendante de la longueur des textes (20 novembre 2026)
+
+Règle demandée par l’utilisateur : les blocs et les photos ne doivent pas bouger selon le nombre de lignes du titre ou du chapô d’un article.
+
+Mesure dans le navigateur, avant correction, sur l’accueil, les 13 rubriques et le Fil info : chaque titre et chaque chapô a été remplacé par un texte très court, puis très long, et la position et la taille de chaque carte et de chaque photo ont été comparées. Presque toutes les cartes grandissaient ou rétrécissaient, et dans les rubriques les photos des cartes étirées changeaient de taille.
+
+Correctif :
+
+- chaque texte limité à N lignes (`line-clamp-N`) réserve aussi N lignes (`min-h-[Nlh]`), à chaque largeur d’écran ;
+- un chapô absent garde sa place, et une photo absente de l’accueil est remplacée par l’image générique ;
+- au Fil info, les titres n’étaient plus coupés en plein milieu d’une ligne par une hauteur fixe (`overflow-hidden`) : ils sont désormais limités en lignes, avec des points de suspension ; les titres et chapôs qui n’avaient aucune limite en ont reçu une ;
+- `components/testing/reservedLines.ts` vérifie la règle dans les tests des cartes de rubrique, de l’accueil et du Fil info.
+
+Mesure après correction, à 1 280, 768 et 375 pixels de large : tout reste en place sur toutes les pages. Seul l’encadré fixe « Trafic et état des routes » de Loisirs et Lifestyle, dont le texte est écrit dans le code et ne vient d’aucun article, n’est pas concerné.
+
 ---
 
 ## 19. Résumé en une minute

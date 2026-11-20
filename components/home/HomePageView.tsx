@@ -24,6 +24,17 @@ export type HomeArticle = {
 
 const KICKER = "text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500";
 const READ_MORE = "text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500";
+const FALLBACK_IMAGE = "/images/global/hero.jpg";
+
+/**
+ * Mise en page indépendante des textes : chaque titre et chaque chapô réserve
+ * son nombre de lignes (`line-clamp-N min-h-[Nlh]`), un chapô absent garde sa
+ * place et une photo absente est remplacée par l’image générique. Les blocs et
+ * les photos ne bougent donc pas selon la longueur des textes.
+ */
+function Description({ text, className }: { text: string | null; className: string }) {
+  return text ? <p className={className}>{text}</p> : <p aria-hidden="true" className={className} />;
+}
 
 function href(article: HomeArticle): string {
   return `/article/${article.slug}`;
@@ -68,15 +79,14 @@ function Hero({ article }: { article: HomeArticle }) {
             À la Une · {article.category}
           </p>
 
-          <h1 className="line-clamp-4 max-w-5xl font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:text-5xl lg:text-6xl">
+          <h1 className="line-clamp-4 min-h-[4lh] max-w-5xl font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:min-h-[3lh] md:text-5xl lg:text-6xl">
             {article.title}
           </h1>
 
-          {article.description ? (
-            <p className="mt-5 line-clamp-2 max-w-2xl text-base leading-relaxed text-gray-200 md:text-lg">
-              {article.description}
-            </p>
-          ) : null}
+          <Description
+            text={article.description}
+            className="mt-5 line-clamp-2 min-h-[2lh] max-w-2xl text-base leading-relaxed text-gray-200 md:text-lg"
+          />
 
           <p className={`mt-7 ${KICKER}`}>Lire l’article →</p>
         </div>
@@ -91,28 +101,25 @@ function FeatureCard({ article }: { article: HomeArticle }) {
       <article className="border-y-4 border-yellow-500 py-8">
         <p className={KICKER}>Grande carte · {article.category}</p>
 
-        <h2 className="mt-4 line-clamp-4 max-w-4xl font-serif text-[1.75rem] leading-tight md:line-clamp-3 md:text-5xl">
+        <h2 className="mt-4 line-clamp-4 min-h-[4lh] max-w-4xl font-serif text-[1.75rem] leading-tight md:line-clamp-3 md:min-h-[3lh] md:text-5xl">
           {article.title}
         </h2>
 
-        {article.image ? (
-          <div className="relative mt-7 h-[330px] overflow-hidden md:h-[390px]">
-            <SafeImage
-              src={article.image}
+        <div className="relative mt-7 h-[330px] overflow-hidden md:h-[390px]">
+          <SafeImage
+            src={article.image || FALLBACK_IMAGE}
               alt={article.title}
               fill
-              sizes="(max-width: 1024px) 100vw, 66vw"
-              className="object-cover transition duration-500 group-hover:scale-[1.02]"
-            />
-          </div>
-        ) : null}
+            sizes="(max-width: 1024px) 100vw, 66vw"
+            className="object-cover transition duration-500 group-hover:scale-[1.02]"
+          />
+        </div>
 
         <div className="pt-6">
-          {article.description ? (
-            <p className="line-clamp-2 max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg">
-              {article.description}
-            </p>
-          ) : null}
+          <Description
+            text={article.description}
+            className="line-clamp-2 min-h-[2lh] max-w-3xl text-base leading-relaxed text-gray-300 md:text-lg"
+          />
 
           <p className={`mt-6 ${READ_MORE}`}>Lire l’article →</p>
         </div>
@@ -135,7 +142,7 @@ function Briefs({ articles }: { articles: HomeArticle[] }) {
               {article.category}
             </p>
 
-            <h3 className="mt-2 line-clamp-4 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+            <h3 className="mt-2 line-clamp-4 min-h-[4lh] font-serif text-lg leading-snug transition group-hover:text-yellow-500">
               {article.title}
             </h3>
 
@@ -154,32 +161,31 @@ function GrandFormat({ article }: { article: HomeArticle }) {
         <p className={KICKER}>Grand Format · {article.category}</p>
 
         {/* Titre sur toute la largeur des trois colonnes */}
-        <h2 className="mt-4 line-clamp-3 max-w-4xl font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
+        <h2 className="mt-4 line-clamp-3 min-h-[3lh] max-w-4xl font-serif text-2xl leading-tight md:text-3xl lg:text-4xl">
           {article.title}
         </h2>
 
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {/* Chapô : une colonne à gauche */}
           <div className="flex flex-col justify-between md:col-span-1">
-            {article.description ? (
-              <p className="leading-relaxed text-gray-300">{article.description}</p>
-            ) : null}
+            <Description
+              text={article.description}
+              className="line-clamp-6 min-h-[6lh] leading-relaxed text-gray-300"
+            />
 
             <p className={`mt-6 ${READ_MORE}`}>Lire l’article →</p>
           </div>
 
           {/* Photo : deux colonnes à droite */}
-          {article.image ? (
-            <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
-              <SafeImage
-                src={article.image}
+          <div className="relative h-[320px] overflow-hidden md:col-span-2 md:h-[440px]">
+            <SafeImage
+              src={article.image || FALLBACK_IMAGE}
                 alt={article.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 44vw"
-                className="object-cover transition duration-500 group-hover:scale-[1.02]"
-              />
-            </div>
-          ) : null}
+              sizes="(max-width: 768px) 100vw, 44vw"
+              className="object-cover transition duration-500 group-hover:scale-[1.02]"
+            />
+          </div>
         </div>
       </article>
     </Link>
@@ -227,15 +233,14 @@ function Editorial({ article }: { article: HomeArticle | null }) {
               La voix de la rédaction
             </p>
 
-            <h3 className="mt-3 line-clamp-3 font-serif text-2xl leading-snug transition group-hover:text-yellow-500">
+            <h3 className="mt-3 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-snug transition group-hover:text-yellow-500">
               {article.title}
             </h3>
 
-            {article.description ? (
-              <p className="mt-4 line-clamp-2 leading-relaxed text-gray-400">
-                {article.description}
-              </p>
-            ) : null}
+            <Description
+              text={article.description}
+              className="mt-4 line-clamp-2 min-h-[2lh] leading-relaxed text-gray-400"
+            />
           </Link>
 
           {/* Le lecteur vidéo reste hors du lien : on peut lancer la vidéo sans quitter la page. */}
@@ -251,7 +256,7 @@ function Editorial({ article }: { article: HomeArticle | null }) {
             ) : (
               <Link href={href(article)} className="block h-full">
                 <SafeImage
-                  src={article.image || "/images/global/hero.jpg"}
+                  src={article.image || FALLBACK_IMAGE}
                   alt={article.title}
                   fill
                   sizes="(max-width: 1280px) 100vw, 33vw"
@@ -291,7 +296,7 @@ function Selection({ articles }: { articles: HomeArticle[] }) {
             <article className="grid grid-cols-[110px_1fr] gap-4">
               <div className="relative h-[110px] overflow-hidden">
                 <SafeImage
-                  src={article.image || "/images/global/hero.jpg"}
+                  src={article.image || FALLBACK_IMAGE}
                   alt={article.title}
                   fill
                   sizes="110px"
@@ -310,7 +315,7 @@ function Selection({ articles }: { articles: HomeArticle[] }) {
                   </p>
                 </div>
 
-                <h3 className="mt-3 line-clamp-4 font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+                <h3 className="mt-3 line-clamp-4 min-h-[4lh] font-serif text-lg leading-snug transition group-hover:text-yellow-500">
                   {article.title}
                 </h3>
 
@@ -343,7 +348,7 @@ function Discover({ articles }: { articles: HomeArticle[] }) {
                 {article.category}
               </p>
 
-              <h3 className="mt-1 line-clamp-3 font-serif leading-snug transition group-hover:text-yellow-500">
+              <h3 className="mt-1 line-clamp-3 min-h-[3lh] font-serif leading-snug transition group-hover:text-yellow-500">
                 {article.title}
               </h3>
 

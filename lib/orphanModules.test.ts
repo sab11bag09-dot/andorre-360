@@ -20,6 +20,7 @@ const EXTENSIONS = [".ts", ".tsx", ".js", ".mjs", ".css"];
 const RESOLVE_SUFFIXES = ["", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".css", "/index.tsx", "/index.ts"];
 
 const TEST_ONLY_MODULES: Readonly<Record<string, string>> = {
+  "components/testing/reservedLines.ts": "contrôle de mise en page partagé par les tests",
   "lib/editorial/testUtils.ts": "outils partagés par les tests",
   "lib/source-engine/backfillObservationDates.ts":
     "outil de redatage lancé à la main (guide du chantier, lot sources)",

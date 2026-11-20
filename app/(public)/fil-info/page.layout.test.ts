@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
+import { unreservedLineClamps } from "../../../components/testing/reservedLines";
+
 const pageSource = readFileSync(new URL("./page.tsx", import.meta.url), "utf8");
 
 const timelineSource = readFileSync(
@@ -77,10 +79,10 @@ describe("mise en page Fil info", () => {
     expect(pageSource).toContain('id="fil-info-selection-title"');
     expect(pageSource).toContain("La sélection");
     expect(pageSource).toContain(
-      'className="mt-2 h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-2xl leading-9',
+      'className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-9',
     );
     expect(pageSource).toContain(
-      'className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400"',
+      'className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400"',
     );
   });
 
@@ -91,7 +93,7 @@ describe("mise en page Fil info", () => {
       'className="grid border-b border-gray-800 md:grid-cols-3"',
     );
     expect(pageSource).toContain(
-      'className="mt-5 h-24 max-h-24 overflow-hidden font-serif text-xl leading-6',
+      'className="mt-5 line-clamp-4 min-h-[4lh] font-serif text-xl leading-6',
     );
   });
 
@@ -108,10 +110,10 @@ describe("mise en page Fil info", () => {
 
   it("conserve les limites des cartes À suivre", () => {
     expect(pageSource).toContain(
-      'className="h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7',
+      'className="line-clamp-3 min-h-[3lh] font-serif text-2xl leading-7',
     );
     expect(pageSource).toContain(
-      'className="mt-3 h-24 max-h-24 overflow-hidden text-sm leading-6 text-gray-400"',
+      'className="mt-3 line-clamp-4 min-h-[4lh] text-sm leading-6 text-gray-400"',
     );
   });
 
@@ -155,5 +157,26 @@ describe("mise en page Fil info", () => {
     expect(partitionSource).toContain(
       "export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000",
     );
+  });
+});
+
+describe("Fil info : mise en page indépendante des textes", () => {
+  it.each([
+    ["la page", pageSource],
+    ["le fil chronologique", timelineSource],
+  ])("%s réserve les lignes de chaque titre et de chaque chapô", (_, source) => {
+    expect(unreservedLineClamps(source)).toEqual([]);
+  });
+
+  it("ne coupe plus les titres par une hauteur fixe", () => {
+    expect(pageSource).not.toMatch(/max-h-/);
+  });
+
+  it("limite chaque titre et chaque chapô en nombre de lignes", () => {
+    for (const source of [pageSource, timelineSource]) {
+      for (const [, , quoted, template] of source.matchAll(/<(h[2-4]|p)\b[^>]*?className=(?:"([^"]*)"|\{`([^`]*)`\})[^>]*>\s*\{(?:pinned|article|entry)\.(?:title|description)\}/g)) {
+        expect(quoted ?? template).toMatch(/line-clamp-\d/);
+      }
+    }
   });
 });

@@ -141,7 +141,7 @@ export default function FilInfoTimeline({
                     </p>
 
                     <h4
-                      className={`mt-2 font-serif leading-[1.3] transition-colors duration-300 ${
+                      className={`mt-2 line-clamp-3 min-h-[3lh] font-serif leading-[1.3] transition-colors duration-300 ${
                         isAlert
                           ? "text-xl font-semibold text-black sm:text-2xl"
                           : "text-lg group-hover:text-yellow-500 sm:text-xl"
@@ -150,8 +150,12 @@ export default function FilInfoTimeline({
                       {entry.title}
                     </h4>
 
-                    {isBrief && entry.description && (
-                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-gray-400">
+                    {/* Une brève garde la place de son chapô, même absent. */}
+                    {isBrief && (
+                      <p
+                        aria-hidden={entry.description ? undefined : true}
+                        className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400"
+                      >
                         {entry.description}
                       </p>
                     )}

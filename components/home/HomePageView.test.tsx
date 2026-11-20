@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { unreservedLineClamps } from "@/components/testing/reservedLines";
+
 import HomePageView, { type HomeArticle } from "./HomePageView";
 
 const TITLE_70 = "Le Govern présente un plan de 12 mesures pour le logement des jeunes";
@@ -78,5 +80,32 @@ describe("HomePageView", () => {
 
     expect(empty).toContain("Aucune Une principale définie");
     expect(empty).toContain('href="/admin/diffusion"');
+  });
+});
+
+describe("HomePageView : mise en page indépendante des textes", () => {
+  const html = renderToStaticMarkup(<HomePageView home={COMPLETE_HOME} />);
+
+  it("réserve les lignes de chaque titre et de chaque chapô", () => {
+    expect(unreservedLineClamps(html)).toEqual([]);
+  });
+
+  it("limite aussi le chapô du grand format", () => {
+    expect(html).toMatch(/class="[^"]*line-clamp-\d+[^"]*"[^>]*>Description de l’article\./);
+    const chapos = [...html.matchAll(/<p class="([^"]*)">Description de l’article\.<\/p>/g)];
+    expect(chapos.length).toBeGreaterThan(0);
+    for (const [, classes] of chapos) expect(classes).toMatch(/\bline-clamp-\d+\b/);
+  });
+
+  it("garde la place des chapôs et des photos quand un article n’en a pas", () => {
+    const bare = (id: number) => article(id, { description: null, image: null });
+    const withoutExtras = renderToStaticMarkup(
+      <HomePageView
+        home={{ ...COMPLETE_HOME, hero: bare(1), feature: bare(2), grandFormat: bare(6), editorial: bare(12) }}
+      />,
+    );
+    const reserved = (markup: string) => markup.match(/min-h-\[\d+lh\]|h-\[\d+px\]/g);
+
+    expect(reserved(withoutExtras)).toEqual(reserved(html));
   });
 });
