@@ -11,8 +11,9 @@ import SafeImage from "@/components/SafeImage";
  * rôle (une, article principal, brève, carte, Question à…, Bon à savoir) est
  * défini ici une seule fois. Les titres sont limités en nombre de lignes,
  * jamais par une hauteur fixe : un titre de 70 caractères s’affiche en entier
- * à toutes les largeurs d’écran. Les cartes d’une même rangée ont la même
- * hauteur, et l’appel à lire est aligné en bas de chacune.
+ * à toutes les largeurs d’écran. Chaque texte réserve aussi ce nombre de
+ * lignes (`min-h-[Nlh]`) : un titre court occupe la même place qu’un long,
+ * et les cartes comme les photos ne bougent pas selon la longueur des textes.
  */
 
 export type RubricArticle = {
@@ -41,8 +42,12 @@ function ReadMore({ label = "Lire l’article →" }: { label?: string }) {
   );
 }
 
+/**
+ * Chapô. Sans texte, le paragraphe reste vide mais garde sa hauteur : une
+ * carte sans chapô a la même taille que les autres.
+ */
 function Description({ text, className }: { text: string | null; className: string }) {
-  return text ? <p className={className}>{text}</p> : null;
+  return text ? <p className={className}>{text}</p> : <p aria-hidden="true" className={className} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -139,13 +144,13 @@ export function RubricHero({
             {categoryLabel ?? article.category}
           </p>
 
-          <h1 className="mt-4 line-clamp-4 font-serif text-[1.75rem] leading-[1.15] md:line-clamp-3 md:text-5xl">
+          <h1 className="mt-4 line-clamp-4 min-h-[4lh] font-serif text-[1.75rem] leading-[1.15] md:line-clamp-3 md:min-h-[3lh] md:text-5xl">
             {article.title}
           </h1>
 
           <Description
             text={article.description}
-            className="mt-4 line-clamp-2 leading-6 text-gray-300"
+            className="mt-4 line-clamp-2 min-h-[2lh] leading-6 text-gray-300"
           />
 
           <p className="mt-5 text-sm font-semibold uppercase tracking-widest text-yellow-500">
@@ -172,13 +177,13 @@ export function RubricMainCard({ article }: { article: RubricArticle }) {
         </div>
 
         <div className="flex flex-1 flex-col p-6">
-          <h2 className="line-clamp-4 font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:text-4xl">
+          <h2 className="line-clamp-4 min-h-[4lh] font-serif text-[1.75rem] leading-[1.1] md:line-clamp-3 md:min-h-[3lh] md:text-4xl">
             {article.title}
           </h2>
 
           <Description
             text={article.description}
-            className="mt-4 line-clamp-2 leading-6 text-gray-400"
+            className="mt-4 line-clamp-2 min-h-[2lh] leading-6 text-gray-400"
           />
 
           <ReadMore />
@@ -193,7 +198,7 @@ export function RubricBriefCard({ article }: { article: RubricArticle }) {
   return (
     <Link href={articleHref(article)} className="block">
       <article className="flex h-full flex-col rounded-lg md:min-h-[150px] border border-gray-800 p-4 transition hover:border-yellow-500">
-        <h3 className="line-clamp-4 font-serif text-lg leading-snug">{article.title}</h3>
+        <h3 className="line-clamp-4 min-h-[4lh] font-serif text-lg leading-snug">{article.title}</h3>
 
         <ReadMore />
       </article>
@@ -206,13 +211,13 @@ export function RubricTextCard({ article }: { article: RubricArticle }) {
   return (
     <Link href={articleHref(article)} className="block">
       <article className={`${CARD_FRAME} p-5`}>
-        <h2 className="line-clamp-3 font-serif text-xl leading-snug xl:text-2xl">
+        <h2 className="line-clamp-3 min-h-[3lh] font-serif text-xl leading-snug xl:text-2xl">
           {article.title}
         </h2>
 
         <Description
           text={article.description}
-          className="mt-3 line-clamp-2 leading-6 text-gray-400"
+          className="mt-3 line-clamp-2 min-h-[2lh] leading-6 text-gray-400"
         />
 
         <ReadMore />
@@ -254,17 +259,17 @@ export function RubricImageCard({
 
         <div className={`flex flex-col ${wide ? "p-5" : "p-4"}${stretch ? "" : " flex-1"}`}>
           {wide ? (
-            <h2 className="line-clamp-3 font-serif text-xl leading-snug xl:text-2xl">
+            <h2 className="line-clamp-3 min-h-[3lh] font-serif text-xl leading-snug xl:text-2xl">
               {article.title}
             </h2>
           ) : (
-            <h3 className="line-clamp-4 font-serif text-lg leading-snug">{article.title}</h3>
+            <h3 className="line-clamp-4 min-h-[4lh] font-serif text-lg leading-snug">{article.title}</h3>
           )}
 
           {showDescription ? (
             <Description
               text={article.description}
-              className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400"
+              className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-relaxed text-gray-400"
             />
           ) : null}
 
@@ -297,13 +302,13 @@ export function RubricQuestionCard({
         <div className="flex flex-1 flex-col p-4">
           <p className={KICKER}>Question à…</p>
 
-          <h2 className="mt-3 line-clamp-4 font-serif text-xl leading-snug xl:text-2xl">
+          <h2 className="mt-3 line-clamp-4 min-h-[4lh] font-serif text-xl leading-snug xl:text-2xl">
             {article.title}
           </h2>
 
           <Description
             text={article.description}
-            className="mt-3 line-clamp-3 text-sm leading-relaxed text-gray-400"
+            className="mt-3 line-clamp-3 min-h-[3lh] text-sm leading-relaxed text-gray-400"
           />
 
           <ReadMore label="Lire l’entretien →" />
@@ -329,13 +334,13 @@ export function RubricGoodToKnow({
       >
         <p className={KICKER}>Bon à savoir</p>
 
-        <h2 className="mt-4 line-clamp-4 font-serif text-xl leading-snug xl:line-clamp-3 xl:text-2xl">
+        <h2 className="mt-4 line-clamp-4 min-h-[4lh] font-serif text-xl leading-snug xl:line-clamp-3 xl:min-h-[3lh] xl:text-2xl">
           {article.title}
         </h2>
 
         <Description
           text={article.description}
-          className="mt-4 line-clamp-3 leading-6 text-gray-400"
+          className="mt-4 line-clamp-3 min-h-[3lh] leading-6 text-gray-400"
         />
 
         <ReadMore />
@@ -346,7 +351,7 @@ export function RubricGoodToKnow({
           href={articleHref(brief)}
           className="flex flex-col border-t border-zinc-700 p-5 transition hover:bg-zinc-800"
         >
-          <h3 className="line-clamp-4 font-serif text-lg leading-snug">{brief.title}</h3>
+          <h3 className="line-clamp-4 min-h-[4lh] font-serif text-lg leading-snug">{brief.title}</h3>
 
           <ReadMore />
         </Link>

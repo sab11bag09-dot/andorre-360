@@ -113,16 +113,18 @@ export default async function FilInfoPage() {
               </p>
               <h2
                 id="fil-info-pinned-title"
-                className="mt-2 font-serif text-2xl leading-tight sm:text-3xl"
+                className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-tight sm:line-clamp-2 sm:min-h-[2lh] sm:text-3xl"
               >
                 {pinned.title}
               </h2>
-              {normalizeFilInfoFormat(pinned.filInfoFormat) === "BRIEF" &&
-                pinned.description && (
-                  <p className="mt-3 max-w-3xl text-sm leading-6 text-black/70">
-                    {pinned.description}
-                  </p>
-                )}
+              {normalizeFilInfoFormat(pinned.filInfoFormat) === "BRIEF" && (
+                <p
+                  aria-hidden={pinned.description ? undefined : true}
+                  className="mt-3 line-clamp-2 min-h-[2lh] max-w-3xl text-sm leading-6 text-black/70"
+                >
+                  {pinned.description}
+                </p>
+              )}
               <time
                 dateTime={getArticlePublicationDate(pinned).toISOString()}
                 className="mt-4 block text-xs font-semibold capitalize text-black/60"
@@ -181,11 +183,11 @@ export default async function FilInfoPage() {
                         Actualité
                       </p>
 
-                      <h3 className="mt-2 h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-2xl leading-9 tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
+                      <h3 className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-9 tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
                         {article.title}
                       </h3>
 
-                      <p className="mt-3 h-12 max-h-12 overflow-hidden text-sm leading-6 text-gray-400">
+                      <p className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400">
                         {article.description}
                       </p>
 
@@ -236,7 +238,7 @@ export default async function FilInfoPage() {
                         <span aria-hidden="true" className="h-px flex-1 bg-gray-800" />
                       </div>
 
-                      <h3 className="mt-5 h-24 max-h-24 overflow-hidden font-serif text-xl leading-6 transition-colors duration-300 group-hover:text-yellow-500">
+                      <h3 className="mt-5 line-clamp-4 min-h-[4lh] font-serif text-xl leading-6 transition-colors duration-300 group-hover:text-yellow-500">
                         {article.title}
                       </h3>
                     </div>
@@ -286,11 +288,11 @@ export default async function FilInfoPage() {
                             {getFilInfoFormatLabel(article.filInfoFormat)}
                           </p>
 
-                          <h3 className="h-[5.25rem] max-h-[5.25rem] overflow-hidden font-serif text-2xl leading-7 transition group-hover:text-yellow-500">
+                          <h3 className="line-clamp-3 min-h-[3lh] font-serif text-2xl leading-7 transition group-hover:text-yellow-500">
                             {article.title}
                           </h3>
 
-                          <p className="mt-3 h-24 max-h-24 overflow-hidden text-sm leading-6 text-gray-400">
+                          <p className="mt-3 line-clamp-4 min-h-[4lh] text-sm leading-6 text-gray-400">
                             {article.description}
                           </p>
 
@@ -342,7 +344,7 @@ export default async function FilInfoPage() {
                               {getFilInfoFormatLabel(article.filInfoFormat)}
                             </p>
 
-                            <h3 className="font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
+                            <h3 className="line-clamp-3 min-h-[3lh] font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
                               {article.title}
                             </h3>
                           </div>

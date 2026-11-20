@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { unreservedLineClamps } from "@/components/testing/reservedLines";
+
 import {
   RubricBriefCard,
   RubricGoodToKnow,
@@ -114,5 +116,29 @@ describe("cartes partagées des rubriques", () => {
     expect(html).toContain("Bon à savoir");
     expect(html).toContain('href="/article/breve-utile"');
     expect(html).toContain("Brève utile");
+  });
+});
+
+describe("cartes partagées des rubriques : mise en page indépendante des textes", () => {
+  it.each(Object.entries(CARDS))("%s : chaque texte réserve ses lignes", (_, card) => {
+    expect(unreservedLineClamps(renderToStaticMarkup(card))).toEqual([]);
+  });
+
+  it("garde la place du chapô quand l’article n’en a pas", () => {
+    for (const card of [
+      <RubricMainCard key="main" article={article({ description: null })} />,
+      <RubricTextCard key="text" article={article({ description: null })} />,
+      <RubricImageCard key="wide" article={article({ description: null })} size="wide" />,
+      <RubricQuestionCard key="question" article={article({ description: null })} />,
+      <RubricGoodToKnow key="good" article={article({ description: null })} />,
+    ]) {
+      const html = renderToStaticMarkup(card);
+      const withDescription = renderToStaticMarkup(
+        { ...card, props: { ...card.props, article: article() } },
+      );
+
+      expect(html.match(/min-h-\[\d+lh\]/g)).toEqual(withDescription.match(/min-h-\[\d+lh\]/g));
+      expect(html).toContain('aria-hidden="true"');
+    }
   });
 });
