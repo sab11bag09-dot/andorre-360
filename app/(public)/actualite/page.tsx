@@ -1,11 +1,43 @@
 import SafeImage from "@/components/SafeImage";
-import Link from "next/link";
-
+import {
+  RubricBriefCard,
+  RubricGoodToKnow,
+  RubricGrid,
+  RubricHero,
+  RubricImageCard,
+  RubricMainCard,
+  RubricPage,
+  RubricPartnerLink,
+} from "@/components/rubric/RubricCards";
 import { getArticlesByCategory } from "@/lib/articles";
-import MediaPreview from "@/components/article/MediaPreview";
 import { prisma } from "@/lib/prisma";
+import { allocateRubricSlots } from "@/lib/rubric/allocateRubricSlots";
 
 export const dynamic = "force-dynamic";
+
+function AdvertisementBlock({
+  imagePath,
+  targetUrl,
+  sizes,
+}: {
+  imagePath: string;
+  targetUrl: string;
+  sizes: string;
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-yellow-500">
+      <a href={targetUrl} target="_blank" rel="noopener noreferrer" className="block">
+        <div className="relative h-[480px]">
+          <SafeImage src={imagePath} alt="Publicité" fill sizes={sizes} className="object-cover" />
+        </div>
+
+        <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
+          Découvrir le site
+        </div>
+      </a>
+    </div>
+  );
+}
 
 export default async function ActualitePage() {
   const [items, advertisements] = await Promise.all([
@@ -30,320 +62,90 @@ export default async function ActualitePage() {
     );
   });
 
-  const featured = items[0];
-  const mainArticle = items[1];
-  const rightCards = items.slice(2, 6);
-  const briefs = items.slice(6, 12);
-  const bottomCard = items[12];
-  const secondBottomCard = items[13];
-  const bonASavoir = items[14];
+  const {
+    hero: [featured],
+    main: [mainArticle],
+    side,
+    briefs,
+    bottom,
+    goodToKnow: [goodToKnow],
+  } = allocateRubricSlots(items, {
+    hero: 1,
+    main: 1,
+    side: 4,
+    briefs: 6,
+    bottom: 2,
+    goodToKnow: 1,
+  });
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      {/* HERO DE LA RUBRIQUE */}
+    <RubricPage
+      hero={featured && <RubricHero article={featured} />}
+      aside={
+        <>
+          <RubricPartnerLink
+            href="https://www.andorracorporate.com"
+            label="Visiter Andorra Corporate"
+          />
 
-      {featured && (
-        <Link href={`/article/${featured.slug}`} className="block">
-          <section className="relative h-[60vh] min-h-[480px] overflow-hidden">
-            <SafeImage
-              src={featured.image}
-              alt={featured.title}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
+          {side.map((article) => (
+            <RubricImageCard
+              key={article.id}
+              article={article}
+              size="side"
+              showDescription={false}
             />
+          ))}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          {goodToKnow && <RubricGoodToKnow article={goodToKnow} />}
+        </>
+      }
+    >
+      {mainArticle && <RubricMainCard article={mainArticle} />}
 
-            <div className="absolute bottom-10 left-8 max-w-3xl">
-              <p className="text-sm uppercase tracking-widest text-yellow-500">
-                {featured.category}
-              </p>
-
-              <h1 className="mt-4 h-[7rem] max-h-[7rem] overflow-hidden font-serif text-4xl leading-[1.15] md:text-5xl">
-                {featured.title}
-              </h1>
-
-              <p className="mt-4 h-12 max-h-12 overflow-hidden text-gray-300 leading-6">
-                {featured.description}
-              </p>
-
-              <p className="mt-5 text-sm font-semibold uppercase tracking-widest text-yellow-500">
-                Lire l’article →
-              </p>
-            </div>
-          </section>
-        </Link>
+      {briefs.length > 0 && (
+        <RubricGrid columns={3}>
+          {briefs.map((article) => (
+            <RubricBriefCard key={article.id} article={article} />
+          ))}
+        </RubricGrid>
       )}
 
-      <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
-        <div className="grid gap-8 lg:grid-cols-6">
-          {/* PARTIE GAUCHE : 4 COLONNES */}
+      {activeAdvertisement?.format === "FOUR_COLUMNS" && (
+        <AdvertisementBlock
+          imagePath={activeAdvertisement.imagePath}
+          targetUrl={activeAdvertisement.targetUrl}
+          sizes="(max-width: 1024px) 100vw, 66vw"
+        />
+      )}
 
-          <div className="lg:col-span-4 lg:flex lg:flex-col">
-            {/* ARTICLE PRINCIPAL */}
+      {activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" && (
+        <RubricGrid columns={2}>
+          <AdvertisementBlock
+            imagePath={activeAdvertisement.imagePath}
+            targetUrl={activeAdvertisement.targetUrl}
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
 
-            {mainArticle && (
-              <Link href={`/article/${mainArticle.slug}`} className="block">
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className="relative h-[420px]">
-                    <MediaPreview
-                      image={mainArticle.image}
-                      videoUrl={mainArticle.videoUrl}
-                      title={mainArticle.title}
-                      mode="featured"
-                    />
-                  </div>
+          {bottom[0] && (
+            <RubricImageCard article={bottom[0]} size="wide" showDescription={false} stretch />
+          )}
+        </RubricGrid>
+      )}
 
-                  <div className="p-6">
-                    <h2 className="h-18 max-h-18 overflow-hidden font-serif text-3xl leading-9">
-                      {mainArticle.title}
-                    </h2>
-
-                    <p className="mt-4 h-[4.5rem] max-h-[4.5rem] overflow-hidden text-gray-400 leading-6">
-                      {mainArticle.description}
-                    </p>
-
-                    <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’article →
-                    </p>
-                  </div>
-                </article>
-              </Link>
-            )}
-
-            {/* TROIS BRÈVES */}
-
-            {briefs.length > 0 && (
-              <div className="mt-8 grid gap-4 md:grid-cols-3 md:auto-rows-[150px]">
-                {briefs.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/article/${article.slug}`}
-                    className="block h-full"
-                  >
-                    <article className="flex h-full max-h-[150px] flex-col justify-between overflow-hidden rounded-lg border border-gray-800 p-4 transition hover:border-yellow-500">
-                      <h3 className="h-[4.5rem] max-h-[4.5rem] overflow-hidden font-serif text-lg leading-6">
-                        {article.title}
-                      </h3>
-
-                      <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                        Lire l’article →
-                      </p>
-                    </article>
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {activeAdvertisement?.format === "FOUR_COLUMNS" && (
-              <div className="mt-10 overflow-hidden rounded-xl border border-yellow-500">
-                <a
-                  href={activeAdvertisement.targetUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block"
-                >
-                  <div className="relative h-[480px]">
-                    <SafeImage
-                      src={activeAdvertisement.imagePath}
-                      alt="Publicité"
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 66vw"
-                      className="object-cover"
-                    />
-                  </div>
-
-                  <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
-                    Découvrir le site
-                  </div>
-                </a>
-              </div>
-            )}
-            {activeAdvertisement?.format === "TWO_COLUMNS_WITH_CARD" && (
-              <div className="mt-10 grid items-start gap-8 md:grid-cols-2">
-                <div className="overflow-hidden rounded-xl border border-yellow-500">
-                  <a
-                    href={activeAdvertisement.targetUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block"
-                  >
-                    <div className="relative h-[480px]">
-                      <SafeImage
-                        src={activeAdvertisement.imagePath}
-                        alt="Publicité"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover"
-                      />
-                    </div>
-
-                    <div className="bg-yellow-500 px-5 py-4 text-center text-sm font-semibold uppercase tracking-[0.15em] text-black">
-                      Découvrir le site
-                    </div>
-                  </a>
-                </div>
-
-                {bottomCard && (
-                  <Link href={`/article/${bottomCard.slug}`} className="block">
-                    <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                      <div className="relative h-[370px]">
-                        <SafeImage
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="font-serif text-2xl">
-                          {bottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
-              </div>
-            )}
-            {/* DEUX PAPIERS DE PIED SUR LES 4 COLONNES */}
-
-            {!activeAdvertisement && (bottomCard || secondBottomCard) && (
-              <div className="mt-10 grid gap-8 md:grid-cols-2 lg:flex-1">
-                {bottomCard && (
-                  <Link
-                    href={`/article/${bottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={bottomCard.image}
-                          alt={bottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="line-clamp-3 overflow-hidden font-serif text-xl leading-tight xl:text-2xl">
-                          {bottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
-
-                {secondBottomCard && (
-                  <Link
-                    href={`/article/${secondBottomCard.slug}`}
-                    className="block lg:h-full"
-                  >
-                    <article className="h-full overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500 lg:flex lg:flex-col">
-                      <div className="relative h-64 lg:h-auto lg:min-h-64 lg:flex-1">
-                        <SafeImage
-                          src={secondBottomCard.image}
-                          alt={secondBottomCard.title}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 33vw"
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="p-5">
-                        <h2 className="line-clamp-3 overflow-hidden font-serif text-xl leading-tight xl:text-2xl">
-                          {secondBottomCard.title}
-                        </h2>
-
-                        <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                          Lire l’article →
-                        </p>
-                      </div>
-                    </article>
-                  </Link>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* PARTIE DROITE : 2 COLONNES */}
-
-          <aside className="space-y-6 lg:col-span-2">
-            <a
-              href="https://www.andorracorporate.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full rounded-lg bg-yellow-500 px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-yellow-400"
-            >
-              Visiter Andorra Corporate
-            </a>
-            {rightCards.map((article, index) => (
-              <Link
-                key={article.id}
-                href={`/article/${article.slug}`}
-                className="block"
-              >
-                <article className="overflow-hidden rounded-xl border border-gray-800 transition hover:border-yellow-500">
-                  <div className={`relative ${index === 3 ? "h-48" : "h-40"}`}>
-                    <MediaPreview
-                      image={article.image}
-                      videoUrl={article.videoUrl}
-                      title={article.title}
-                      mode={index === 0 ? "featured" : "thumbnail"}
-                    />
-                  </div>
-
-                  <div className="p-4">
-                    <h3 className="h-12 max-h-12 overflow-hidden font-serif text-lg leading-6">
-                      {article.title}
-                    </h3>
-
-                    <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                      Lire l’article →
-                    </p>
-                  </div>
-                </article>
-              </Link>
-            ))}
-
-            {/* BON À SAVOIR */}
-
-            {bonASavoir && (
-              <Link href={`/article/${bonASavoir.slug}`} className="block">
-                <article className="rounded-xl border-t-2 border-yellow-500 bg-zinc-900 p-6 transition hover:bg-zinc-800">
-                  <p className="text-xs font-semibold uppercase tracking-[0.25em] text-yellow-500">
-                    Bon à savoir
-                  </p>
-
-                  <h2 className="mt-4 line-clamp-4 font-serif text-xl leading-snug xl:line-clamp-3 xl:text-2xl">
-                    {bonASavoir.title}
-                  </h2>
-
-                  <p className="mt-4 line-clamp-5 leading-relaxed text-gray-400">
-                    {bonASavoir.description}
-                  </p>
-
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    Lire l’article →
-                  </p>
-                </article>
-              </Link>
-            )}
-          </aside>
-        </div>
-      </section>
-    </main>
+      {!activeAdvertisement && bottom.length > 0 && (
+        <RubricGrid columns={2} fill>
+          {bottom.map((article) => (
+            <RubricImageCard
+              key={article.id}
+              article={article}
+              size="wide"
+              showDescription={false}
+              stretch
+            />
+          ))}
+        </RubricGrid>
+      )}
+    </RubricPage>
   );
 }

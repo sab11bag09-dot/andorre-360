@@ -1263,8 +1263,8 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 
 #### Technique
 
-- 10 composants de rubrique recopient les mêmes cartes (41 corrections identiques dans 9 fichiers pour les titres) : quelques composants de carte partagés.
-- Les tests de mise en page vérifient des chaînes de classes CSS, ce qui est fragile : les remplacer par un test automatique qui mesure les titres coupés dans un navigateur.
+- 10 composants de rubrique recopient les mêmes cartes (41 corrections identiques dans 9 fichiers pour les titres) : quelques composants de carte partagés. Fait le 20 novembre 2026 (voir « Cartes partagées des rubriques » ci-dessous).
+- Les tests de mise en page vérifient des chaînes de classes CSS, ce qui est fragile : les remplacer par un test automatique qui mesure les titres coupés dans un navigateur. Les tests des rubriques sont remplacés le 20 novembre 2026 ; ceux de la page d’accueil restent à remplacer.
 - Nettoyage : fait le 20 novembre 2026 pour les fichiers morts et les avertissements de lint (voir « Nettoyage des fichiers morts » ci-dessous) ; restent les sauvegardes `dev.before-*.db` qui s’accumulent à la racine.
 - Configuration des sources dans la base, règles par site dans le code : un fichier de définition des sources, versionné, rendrait tout reproductible.
 - Collecte : 948 observations sans date, 2 sources en erreur 403 (Andorra Business, Encamp), aucune alerte quand une source tombe.
@@ -1300,6 +1300,19 @@ Vingt fichiers que plus rien n’utilisait ont été supprimés ; Git garde leur
 Garde-fou : `lib/orphanModules.test.ts` suit les imports depuis les pages et routes de `app/`, les scripts, les fichiers de configuration et les tests. Il échoue si un module n’est importé par rien, ou seulement par des tests hors des exceptions listées avec leur raison (`lib/editorial/testUtils.ts`, `lib/source-engine/backfillObservationDates.ts`).
 
 Lint : les trois variables inutilisées restantes sont corrigées. Restent 4 avertissements `<img>`, qui relèvent du lot images.
+
+### Cartes partagées des rubriques (20 novembre 2026)
+
+Les 10 pages de rubrique recopiaient les mêmes cartes, et les copies avaient dérivé : une trentaine de styles de titre pour 7 rôles, d’anciennes unes à hauteur fixe à côté des nouvelles. Elles sont harmonisées :
+
+- `components/rubric/RubricCards.tsx` définit une seule fois chaque rôle : une de rubrique, article principal, brève, carte sans image, carte avec image (large ou latérale), « Question à… », « Bon à savoir », ainsi que le squelette de page, les grilles et le bouton partenaire. Les titres sont limités en lignes, jamais par une hauteur fixe ; l’appel à lire est aligné en bas des cartes d’une même rangée ;
+- `components/rubric/NewsRubricPage.tsx` porte le plan commun à Économie, Politique, Société et International, qui ne gardent que leur catégorie et leur partenaire ;
+- `lib/rubric/allocateRubricSlots.ts` répartit les articles dans les emplacements, dans l’ordre et sans trou. Correctif au passage : Économie, Politique, Société et International sautaient les 13ᵉ et 14ᵉ articles ; International, Politique et Société affichent désormais un article de plus avec la base de chantier ;
+- seule la carte principale lit une vidéo ; « Question à… » et les cartes latérales n’intègrent plus de lecteur dans une carte cliquable.
+
+Tests : les 10 tests qui vérifiaient des chaînes de classes CSS sont remplacés par des tests de rendu des cartes (`RubricCards.test.tsx`) et un garde-fou (`rubricPages.test.ts`) qui refuse toute carte recopiée dans une page et tout article sauté.
+
+Vérification dans un navigateur, sur une copie de `./dev.db`, aux largeurs 375, 768, 1024, 1280 et 1440 sur les 10 rubriques : aucun titre de 70 caractères coupé, aucun débordement horizontal, colonne latérale contenue dans la page.
 
 ---
 
