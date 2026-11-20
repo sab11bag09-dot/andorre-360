@@ -85,6 +85,8 @@ export class PrismaObservationRepository
             url: observation.url,
             publishedAt,
             content: observation.content,
+            imageUrl: observation.imageUrl ?? null,
+            imageRights: observation.imageRights ?? null,
           },
         });
 
@@ -106,6 +108,13 @@ export class PrismaObservationRepository
               title: observation.title,
               publishedAt,
               content: observation.content,
+              // Une collecte qui ne trouve pas d’image n’efface pas celle déjà connue.
+              ...(observation.imageUrl
+                ? {
+                    imageUrl: observation.imageUrl,
+                    imageRights: observation.imageRights ?? null,
+                  }
+                : {}),
             },
           });
 

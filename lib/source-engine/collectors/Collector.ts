@@ -5,6 +5,10 @@ export interface ObservationInput {
   url: string;
   publishedAt: Date | null;
   content: string | null;
+  /** Image de partage déclarée par l’article, sans décision de réutilisation. */
+  imageUrl?: string | null;
+  /** Mention de droits relevée sur la page de l’article. */
+  imageRights?: string | null;
 }
 
 export interface Collector {
