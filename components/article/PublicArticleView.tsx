@@ -1,5 +1,6 @@
 import ArticleRenderer from "@/components/article/ArticleRenderer";
 import SafeImage from "@/components/SafeImage";
+import { getVideoEmbedUrl } from "@/lib/media/videoEmbed";
 import {
   type ArticleSourceCredit,
   sourceCreditLabel,
@@ -25,67 +26,6 @@ type Props = {
   dateLocale: "ca-ES" | "es-ES" | "fr-FR";
   contentLanguage: "ca" | "es" | "fr";
 };
-
-function getVideoEmbedUrl(url: string) {
-  try {
-    const parsedUrl = new URL(url);
-    const hostname = parsedUrl.hostname.toLowerCase();
-
-    if (hostname.includes("youtube.com")) {
-      const videoId = parsedUrl.searchParams.get("v");
-
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
-
-      const shortsMatch = parsedUrl.pathname.match(/^\/shorts\/([^/?]+)/);
-
-      if (shortsMatch) {
-        return `https://www.youtube.com/embed/${shortsMatch[1]}`;
-      }
-    }
-
-    if (hostname.includes("youtu.be")) {
-      const videoId = parsedUrl.pathname.split("/").filter(Boolean)[0];
-
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
-    }
-
-    if (hostname.includes("vimeo.com")) {
-      const videoId = parsedUrl.pathname
-        .split("/")
-        .filter(Boolean)
-        .find((segment) => /^\d+$/.test(segment));
-
-      if (videoId) {
-        return `https://player.vimeo.com/video/${videoId}`;
-      }
-    }
-
-    if (
-      hostname.includes("facebook.com") ||
-      hostname.includes("fb.watch")
-    ) {
-      return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(
-        url,
-      )}&show_text=false`;
-    }
-
-    if (hostname.includes("tiktok.com")) {
-      const videoId = parsedUrl.pathname.match(/\/video\/(\d+)/)?.[1];
-
-      if (videoId) {
-        return `https://www.tiktok.com/player/v1/${videoId}`;
-      }
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 function isUploadedVideo(url: string) {
   return url.startsWith("/") || /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);

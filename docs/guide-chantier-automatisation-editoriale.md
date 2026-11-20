@@ -1264,7 +1264,7 @@ Revue franche du chantier demandée par l’utilisateur, sur tous les plans, du 
 #### Technique
 
 - 10 composants de rubrique recopient les mêmes cartes (41 corrections identiques dans 9 fichiers pour les titres) : quelques composants de carte partagés. Fait le 20 novembre 2026 (voir « Cartes partagées des rubriques » ci-dessous).
-- Les tests de mise en page vérifient des chaînes de classes CSS, ce qui est fragile : les remplacer par un test automatique qui mesure les titres coupés dans un navigateur. Les tests des rubriques sont remplacés le 20 novembre 2026 ; ceux de la page d’accueil restent à remplacer.
+- Les tests de mise en page vérifient des chaînes de classes CSS, ce qui est fragile : les remplacer par un test automatique qui mesure les titres coupés dans un navigateur. Remplacés le 20 novembre 2026 pour les rubriques et la page d’accueil.
 - Nettoyage : fait le 20 novembre 2026 pour les fichiers morts et les avertissements de lint (voir « Nettoyage des fichiers morts » ci-dessous) ; restent les sauvegardes `dev.before-*.db` qui s’accumulent à la racine.
 - Configuration des sources dans la base, règles par site dans le code : un fichier de définition des sources, versionné, rendrait tout reproductible.
 - Collecte : 948 observations sans date, 2 sources en erreur 403 (Andorra Business, Encamp), aucune alerte quand une source tombe.
@@ -1313,6 +1313,15 @@ Les 10 pages de rubrique recopiaient les mêmes cartes, et les copies avaient d�
 Tests : les 10 tests qui vérifiaient des chaînes de classes CSS sont remplacés par des tests de rendu des cartes (`RubricCards.test.tsx`) et un garde-fou (`rubricPages.test.ts`) qui refuse toute carte recopiée dans une page et tout article sauté.
 
 Vérification dans un navigateur, sur une copie de `./dev.db`, aux largeurs 375, 768, 1024, 1280 et 1440 sur les 10 rubriques : aucun titre de 70 caractères coupé, aucun débordement horizontal, colonne latérale contenue dans la page.
+
+### Page d’accueil : calcul séparé de l’affichage (20 novembre 2026)
+
+- `lib/editorial/composeHomePage.ts` calcule la composition (zones placées prioritaires, complément par les derniers articles, Grand format vide pendant une composition automatique sans placement) ; `components/home/HomePageView.tsx` l’affiche ; `HomePageEditorial.tsx` ne fait plus que charger les données.
+- Correctif : la Sélection n’affichait que les cartes 2 à 5, alors que l’automatisation en place 5 (`HOME_VISIBLE_ZONE_CAPACITIES`). La première carte, la mieux classée, restait invisible. Le nombre d’emplacements affichés suit désormais les capacités de l’automatisation.
+- Les blocs n’ont plus de hauteur fixe qui coupait leur contenu ; le lecteur vidéo de l’édito n’est plus enfermé dans un lien.
+- La publicité du briefing, intégrée au code en base64 (51 Ko, envoyée deux fois par page), est un fichier : `public/images/home/briefing-andorra-360.jpg`. La page d’accueil passe de 171 Ko à 76 Ko de HTML.
+- `lib/media/videoEmbed.ts` remplace trois copies de la conversion des adresses vidéo et n’accepte plus un domaine qui imite seulement YouTube, Vimeo, Facebook ou TikTok.
+- Vérification dans un navigateur, sur une copie de `./dev.db` : aucun des 15 titres coupé à 375, 768, 1024, 1280 et 1440, aucun débordement ; 15 articles affichés contre 14 avant.
 
 ---
 
