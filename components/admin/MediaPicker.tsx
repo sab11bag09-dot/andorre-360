@@ -156,7 +156,6 @@ export default function MediaPicker({
   }
 
   const singularLabel = type === "image" ? "image" : "vidéo";
-  const pluralLabel = type === "image" ? "images" : "vidéos";
 
   return (
     <>
