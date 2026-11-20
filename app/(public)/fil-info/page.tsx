@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { CSSProperties } from "react";
 import FilInfoTimeline from "@/components/fil-info/FilInfoTimeline";
 import FilInfoPagination from "@/components/fil-info/FilInfoPagination";
 import FilInfoImage from "@/components/fil-info/FilInfoImage";
@@ -7,6 +8,7 @@ import Link from "next/link";
 import { getFilInfoArticles } from "@/lib/articles";
 import {
   FIL_INFO_QUERY_LIMIT,
+  FIL_INFO_XL_ROW_HEIGHTS,
   getArticlePublicationDate,
   partitionFilInfoArticles,
 } from "@/lib/fil-info";
@@ -137,69 +139,65 @@ export default async function FilInfoPage() {
           </section>
         )}
 
+        {/* Rangée figée sur grand écran : voir FIL_INFO_XL_ROW_HEIGHTS. */}
         <div
-          className={
-            featured
-              ? "grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] xl:gap-14"
-              : ""
-          }
+          className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] xl:h-[var(--fil-info-row-height)] xl:gap-14"
+          style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHTS.feed}px` } as CSSProperties}
         >
-          <FilInfoTimeline entries={newsFeedEntries} />
+          <FilInfoTimeline entries={newsFeedEntries} fixedRows={8} />
 
-          {selection.length > 0 && (
-            <aside
-              aria-labelledby="fil-info-selection-title"
-              className="flex h-full flex-col"
-            >
-              <div className="mb-5 flex items-center gap-4 border-t-2 border-yellow-500 pt-4">
-                <h2
-                  id="fil-info-selection-title"
-                  className="font-serif text-3xl"
+          <aside
+            aria-labelledby="fil-info-selection-title"
+            className="flex h-full flex-col"
+          >
+            <div className="mb-5 flex items-center gap-4 border-t-2 border-yellow-500 pt-4">
+              <h2
+                id="fil-info-selection-title"
+                className="font-serif text-3xl"
+              >
+                La sélection
+              </h2>
+            </div>
+
+            <div className="grid flex-1 gap-8 md:grid-cols-2 lg:grid-cols-1 xl:min-h-0 xl:grid-rows-2">
+              {selection.map((article) => (
+                <Link
+                  key={article.id}
+                  href={`/article/${article.slug}`}
+                  className="group flex min-h-0"
                 >
-                  La sélection
-                </h2>
-              </div>
+                  <article className="flex w-full min-h-0 flex-col overflow-hidden">
+                    <div className="relative h-64 min-h-0 overflow-hidden bg-neutral-900 sm:h-72 xl:h-auto xl:flex-1">
+                      <FilInfoImage
+                        src={article.image}
+                        alt={article.title}
+                        priority={article.id === featured?.id}
+                        sizes="(max-width: 768px) 100vw, 34vw"
+                        className="object-cover transition duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
+                      />
+                      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+                    </div>
 
-              <div className="grid flex-1 gap-8 md:grid-cols-2 lg:grid-cols-1">
-                {selection.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/article/${article.slug}`}
-                    className="group flex min-h-0"
-                  >
-                    <article className="flex w-full min-h-0 flex-col overflow-hidden">
-                      <div className="relative h-64 min-h-0 overflow-hidden bg-neutral-900 sm:h-72">
-                        <FilInfoImage
-                          src={article.image}
-                          alt={article.title}
-                          priority={article.id === featured?.id}
-                          sizes="(max-width: 768px) 100vw, 34vw"
-                          className="object-cover transition duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
-                        />
-                        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-                      </div>
+                    <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-yellow-500">
+                      Actualité
+                    </p>
 
-                      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-yellow-500">
-                        Actualité
-                      </p>
+                    <h3 className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-9 tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
+                      {article.title}
+                    </h3>
 
-                      <h3 className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-9 tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
-                        {article.title}
-                      </h3>
+                    <p className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400">
+                      {article.description}
+                    </p>
 
-                      <p className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400">
-                        {article.description}
-                      </p>
-
-                      <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
-                        Lire l’article →
-                      </p>
-                    </article>
-                  </Link>
-                ))}
-              </div>
-            </aside>
-          )}
+                    <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
+                      Lire l’article →
+                    </p>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          </aside>
         </div>
 
         {briefs.length > 0 && (
@@ -254,7 +252,10 @@ export default async function FilInfoPage() {
         )}
 
         {(cards.length > 0 || illustratedBriefs.length > 0) && (
-          <div className="mt-16 grid items-stretch gap-12 md:mt-20 lg:grid-cols-6 lg:gap-14">
+          <div
+            className="mt-16 grid items-stretch gap-12 md:mt-20 lg:grid-cols-6 lg:gap-14 xl:h-[var(--fil-info-row-height)]"
+            style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHTS.follow}px` } as CSSProperties}
+          >
             {cards.length > 0 && (
               <section
                 aria-labelledby="fil-info-follow-title"
@@ -266,7 +267,7 @@ export default async function FilInfoPage() {
                   </h2>
                 </div>
 
-                <div className="grid flex-1 gap-x-8 gap-y-12 md:grid-cols-2">
+                <div className="grid flex-1 gap-x-8 gap-y-12 md:grid-cols-2 xl:min-h-0 xl:grid-rows-2">
                   {cards.map((article) => (
                     <Link
                       key={article.id}
@@ -310,7 +311,7 @@ export default async function FilInfoPage() {
             {illustratedBriefs.length > 0 && (
               <aside
                 aria-labelledby="fil-info-remember-title"
-                className="h-full overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
+                className="flex h-full flex-col overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
               >
                 <div className="border-b border-gray-800 px-5 py-6">
                   <h2
@@ -321,7 +322,7 @@ export default async function FilInfoPage() {
                   </h2>
                 </div>
 
-                <div className="divide-y divide-gray-800">
+                <div className="divide-y divide-gray-800 xl:grid xl:min-h-0 xl:flex-1 xl:grid-rows-7">
                   {illustratedBriefs.slice(0, 7).map((article) => (
                     <Link
                       key={article.id}

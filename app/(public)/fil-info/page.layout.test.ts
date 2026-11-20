@@ -71,7 +71,7 @@ describe("mise en page Fil info", () => {
 
   it("conserve le Fil Info et La sélection côte à côte", () => {
     expect(pageSource).toContain(
-      "<FilInfoTimeline entries={newsFeedEntries} />",
+      "<FilInfoTimeline entries={newsFeedEntries} fixedRows={8} />",
     );
     expect(pageSource).toContain(
       "lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)]",
@@ -123,10 +123,7 @@ describe("mise en page Fil info", () => {
     );
     expect(timelineSource).toContain('timeZone: "Europe/Andorra"');
     expect(timelineSource).toContain('const isAlert = format === "ALERT"');
-    expect(timelineSource).toContain('const isBrief = format === "BRIEF"');
-    expect(timelineSource).toContain(
-      "getDateKey(previousEntry.publicationDate)",
-    );
+    expect(timelineSource).toContain("formatFilInfoDay(entry.publicationDate, locale)");
     expect(timelineSource).toContain(
       "getFilInfoArticlePath(locale, entry.slug)",
     );
@@ -178,5 +175,23 @@ describe("Fil info : mise en page indépendante des textes", () => {
         expect(quoted ?? template).toMatch(/line-clamp-\d/);
       }
     }
+  });
+});
+
+describe("Fil info : rangées figées et colonnes alignées en bas", () => {
+  it("fige la hauteur des deux rangées sur grand écran", () => {
+    expect(pageSource.match(/xl:h-\[var\(--fil-info-row-height\)\]/g)).toHaveLength(2);
+    expect(pageSource).toContain("FIL_INFO_XL_ROW_HEIGHTS.feed");
+    expect(pageSource).toContain("FIL_INFO_XL_ROW_HEIGHTS.follow");
+  });
+
+  it("partage chaque rangée à parts égales entre ses cartes, quel que soit leur nombre", () => {
+    expect(pageSource).toContain("lg:grid-cols-1 xl:min-h-0 xl:grid-rows-2");
+    expect(pageSource).toContain("md:grid-cols-2 xl:min-h-0 xl:grid-rows-2");
+    expect(pageSource).toContain("xl:grid xl:min-h-0 xl:flex-1 xl:grid-rows-7");
+  });
+
+  it("garde la colonne La sélection même sans article", () => {
+    expect(pageSource).not.toContain("selection.length > 0 &&");
   });
 });

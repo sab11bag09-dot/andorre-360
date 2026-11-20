@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import { unreservedLineClamps } from "@/components/testing/reservedLines";
+
 import FilInfoTimeline from "./FilInfoTimeline";
 
 describe("FilInfoTimeline", () => {
@@ -68,7 +70,7 @@ describe("FilInfoTimeline", () => {
     expect(html).toContain('aria-labelledby="fil-info-timeline-title"');
   });
 
-  it("regroupe les publications lorsque le jour change", () => {
+  it("affiche la date dans chaque ligne, sans intertitre de jour", () => {
     const html = renderToStaticMarkup(
       <FilInfoTimeline
         entries={[
@@ -92,8 +94,40 @@ describe("FilInfoTimeline", () => {
       />,
     );
 
-    expect(html).toContain("dimanche 2 août");
-    expect(html).toContain("samedi 1 août");
+    expect(html).toContain("2 août</span>");
+    expect(html).toContain("1 août</span>");
+    expect(html).not.toContain("dimanche");
+    expect(html).not.toContain("<h3");
     expect(html).toContain('aria-label="Publications chronologiques"');
+  });
+
+  it("donne la même structure à chaque ligne, chapô compris, quel que soit le format", () => {
+    const entry = (id: number, filInfoFormat: "ARTICLE" | "BRIEF" | "ALERT") => ({
+      id,
+      slug: `entree-${id}`,
+      title: `Titre ${id}`,
+      description: `Chapô ${id}`,
+      filInfoFormat,
+      publicationDate: new Date("2026-08-02T10:00:00.000Z"),
+    });
+    const html = renderToStaticMarkup(
+      <FilInfoTimeline entries={[entry(1, "ARTICLE"), entry(2, "BRIEF"), entry(3, "ALERT")]} />,
+    );
+
+    for (const id of [1, 2, 3]) expect(html).toContain(`Chapô ${id}`);
+    expect(unreservedLineClamps(html)).toEqual([]);
+  });
+
+  it("garde huit lignes de même hauteur sur grand écran quand on le demande", () => {
+    const html = renderToStaticMarkup(<FilInfoTimeline entries={[]} fixedRows={8} />);
+    expect(html).toContain("xl:flex xl:h-full xl:flex-col");
+
+    const withEntry = renderToStaticMarkup(
+      <FilInfoTimeline
+        fixedRows={8}
+        entries={[{ id: 1, slug: "a", title: "A", description: "", filInfoFormat: "ARTICLE", publicationDate: new Date() }]}
+      />,
+    );
+    expect(withEntry).toContain("xl:grid-rows-8");
   });
 });

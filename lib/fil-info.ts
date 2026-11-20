@@ -11,6 +11,16 @@ export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000;
 export const FIL_INFO_QUERY_LIMIT =
   FIL_INFO_PAGE_SIZE;
 
+/**
+ * Hauteurs figées des deux rangées de la page Fil info sur grand écran (`xl`,
+ * 1 280 px et plus : largeur de page constante). Rangée du fil et de La
+ * sélection, puis rangée À suivre et À retenir. Les deux colonnes de chaque
+ * rangée en prennent la hauteur ; leurs cartes et leurs lignes la partagent à
+ * parts égales, quel que soit leur nombre. Mesurées dans le navigateur le
+ * 21 novembre 2026.
+ */
+export const FIL_INFO_XL_ROW_HEIGHTS = { feed: 1810, follow: 1205 } as const;
+
 type FilInfoPartitionArticle = {
   featured: boolean;
   filInfoFormat: string;
