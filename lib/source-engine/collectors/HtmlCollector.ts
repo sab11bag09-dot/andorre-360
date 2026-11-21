@@ -175,6 +175,48 @@ function parseDottedDate(value: string): Date | null {
   return validUtcDate(year, Number(monthValue) - 1, Number(dayValue));
 }
 
+const SHORT_MONTHS: Record<string, number> = {
+  gen: 0, ene: 0, jan: 0,
+  feb: 1, fev: 1,
+  mar: 2,
+  abr: 3, apr: 3, avr: 3,
+  mai: 4, may: 4,
+  jun: 5,
+  jul: 6,
+  ag: 7, ago: 7, aug: 7,
+  set: 8, sep: 8,
+  oct: 9,
+  nov: 10,
+  des: 11, dic: 11, dec: 11,
+};
+
+/**
+ * « 16 Nov », sans année (Comú de Sant Julià de Lòria) : l’année est celle de
+ * la date de référence, ou la précédente si la date tomberait dans le futur
+ * (un article du 28 décembre lu le 3 janvier). Réservé aux éléments désignés
+ * par une règle de site : seul, ce format est trop ambigu.
+ */
+export function parseDayMonthWithoutYear(value: string, reference: Date = new Date()): Date | null {
+  const match = normalizeText(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .match(/^(\d{1,2})\s+(?:de\s+|d['’]\s*)?([a-z]{2,4})\.?$/);
+  if (!match) return null;
+
+  const [, dayValue, monthValue] = match;
+  const month = SHORT_MONTHS[monthValue] ?? SHORT_MONTHS[monthValue.slice(0, 3)];
+  if (month === undefined) return null;
+
+  const day = Number(dayValue);
+  const year = reference.getUTCFullYear();
+  const date = validUtcDate(year, month, day);
+  if (!date) return null;
+
+  const tomorrow = reference.getTime() + 24 * 60 * 60 * 1000;
+  return date.getTime() > tomorrow ? validUtcDate(year - 1, month, day) : date;
+}
+
 /** Date lue dans les éléments désignés par une règle de site. */
 function siteRuleDate(
   $: cheerio.CheerioAPI,
@@ -191,7 +233,10 @@ function siteRuleDate(
     for (const candidate of candidates) {
       if (!candidate) continue;
       const date = normalizeObservationPublishedAt(
-        parseDottedDate(candidate) ?? parseGenericDate(candidate),
+        parseDottedDate(candidate) ??
+          // Avant la lecture générique, qui prendrait « 16 Nov » pour 2001.
+          parseDayMonthWithoutYear(candidate) ??
+          parseGenericDate(candidate),
       );
       if (date) return date;
     }
@@ -288,6 +333,45 @@ function firstValidDate(candidates: string[]): Date | null {
 }
 
 /**
+ * Adresse de la fiche JSON d’un article WordPress (`/wp-json/wp/v2/…`),
+ * déclarée par la page elle-même, sur le même site que l’article.
+ */
+export function wordPressPostJsonUrl($: cheerio.CheerioAPI, articleUrl: string): string | null {
+  const href = $('link[rel="alternate"][type="application/json"]')
+    .map((_, element) => $(element).attr("href") ?? "")
+    .get()
+    .find((value) => value.includes("/wp-json/wp/v2/"));
+  if (!href) return null;
+
+  try {
+    const url = new URL(href, articleUrl);
+    return url.hostname === new URL(articleUrl).hostname ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Date de publication d’une fiche JSON WordPress : `date_gmt` (UTC, sans
+ * fuseau écrit), sinon `date`, à l’heure du site.
+ */
+export function parseWordPressPostDate(json: string): Date | null {
+  try {
+    const post = JSON.parse(json) as { date_gmt?: unknown; date?: unknown };
+    const value =
+      typeof post.date_gmt === "string" && post.date_gmt
+        ? `${post.date_gmt}Z`
+        : typeof post.date === "string"
+          ? post.date
+          : null;
+    if (!value || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z?$/.test(value)) return null;
+    return normalizeObservationPublishedAt(new Date(value));
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Date de publication lue sur la page d’un article, dans l’ordre :
  * dates déclarées par l’article, puis balises time et classes de date.
  */
@@ -377,6 +461,20 @@ export class HtmlCollector implements Collector {
     private readonly htmlClient: HtmlClient =
       new FetchHtmlClient(),
   ) {}
+
+  private async getWordPressPublishedAt(
+    $: cheerio.CheerioAPI,
+    articleUrl: string,
+  ): Promise<Date | null> {
+    const jsonUrl = wordPressPostJsonUrl($, articleUrl);
+    if (!jsonUrl) return null;
+
+    try {
+      return parseWordPressPostDate(await this.htmlClient.get(jsonUrl));
+    } catch {
+      return null;
+    }
+  }
 
   private async getArticleContent(
     url: string,
@@ -481,7 +579,11 @@ export class HtmlCollector implements Collector {
         }
       }
 
-      const publishedAt = extractArticlePagePublishedAt($, siteRule);
+      // Les sites WordPress qui n’affichent pas la date la donnent dans la
+      // fiche JSON de l’article : une requête de plus, seulement dans ce cas.
+      const publishedAt =
+        extractArticlePagePublishedAt($, siteRule) ??
+        (await this.getWordPressPublishedAt($, url));
 
       return {
         content,

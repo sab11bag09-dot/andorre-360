@@ -112,6 +112,7 @@ export const siteRules: Record<string, SiteRule> = {
 
   "www.consellgeneral.ad": {
     listing: [".noticiesDestacades .titleItem a"],
+    listingPublishedAt: [".tileDate"],
     content: ["#parent-fieldname-text"],
   },
 
@@ -353,7 +354,9 @@ export const siteRules: Record<string, SiteRule> = {
   },
     "comusantjulia.ad": {
     listing: ['a[href*="/ca/actualitat/noticies/"]'],
-    listingPublishedAt: [".post-meta"],
+    // « 16 Nov », sans année. Le `.post-meta` daté (« 16.11.2026 ») n’est
+    // plus que dans une colonne mise en commentaire : gardé en secours.
+    listingPublishedAt: [".post-date", ".post-meta"],
     articlePathPattern:
       /^\/ca\/actualitat\/noticies\/[^/]+\/?$/,
     maxArticles: 24,
@@ -652,8 +655,10 @@ export const siteRules: Record<string, SiteRule> = {
       "article h2",
       "article h3",
     ],
+    // Les articles ont la forme « /titre/ » : la page des actualités et la
+    // boutique, de même forme, sont écartées.
     articlePathPattern:
-      /^\/(?!category\/|tag\/|page\/|wp-)[^/]+\/?$/,
+      /^\/(?!category\/|tag\/|page\/|wp-|(?:noticies-bca|botiga)\/?$)[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
@@ -707,7 +712,9 @@ export const siteRules: Record<string, SiteRule> = {
 
   "somaccio.org": {
     listing: ['a[href^="/"]', 'a[href^="https://somaccio.org/"]'],
-    articlePathPattern: /^\/[^/]+\/?$/,
+    // Articles en « /titre/ » ; les pages du parti, du blog et de contact,
+    // de même forme, sont écartées.
+    articlePathPattern: /^\/(?!(?:partit|blog-2|blog|contact)\/?$)[^/]+\/?$/,
     maxArticles: 24,
     concurrency: 4,
     requireContent: true,
