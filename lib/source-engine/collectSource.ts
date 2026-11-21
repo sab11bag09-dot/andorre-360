@@ -1,3 +1,4 @@
+import { summarizeCollectionDates } from "./collectionDates";
 import { CollectorFactory } from "./factories/CollectorFactory";
 import { CollectorFactoryInterface } from "./factories/CollectorFactoryInterface";
 import { PrismaCollectionSourceRepository } from "./repositories/PrismaCollectionSourceRepository";
@@ -8,6 +9,10 @@ import { ObservationRepository } from "./repositories/ObservationRepository";
 export type CollectionResult = {
   collected: number;
   created: number;
+  /** Observations collectées sans date exploitable. */
+  undated: number;
+  /** Dont dates refusées parce que trop loin dans le futur. */
+  futureRejected: number;
 };
 
 const MAX_ERROR_MESSAGE_LENGTH = 1_000;
@@ -52,25 +57,23 @@ export async function collectSource(
     );
 
     const checkedAt = new Date();
+    const dates = summarizeCollectionDates(observations, checkedAt);
 
-    await repository.markCollectionSucceeded(
-      source.id,
-      checkedAt,
-    );
-
-    if (
-      observations.length === 0 &&
-      repository.markCollectionEmpty
-    ) {
-      await repository.markCollectionEmpty(
+    if (observations.length === 0 && repository.markCollectionEmpty) {
+      await repository.markCollectionEmpty(source.id, checkedAt);
+    } else {
+      await repository.markCollectionSucceeded(
         source.id,
         checkedAt,
+        dates,
       );
     }
 
     return {
       collected: observations.length,
       created,
+      undated: dates.undated,
+      futureRejected: dates.futureRejected,
     };
   } catch (error) {
     await repository.markCollectionFailed(

@@ -6,6 +6,7 @@ import {
   Collector,
   ObservationInput,
 } from "../collectors/Collector";
+import type { CollectionDateSummary } from "../collectionDates";
 import { collectSource } from "../collectSource";
 import { CollectorFactoryInterface } from "../factories/CollectorFactoryInterface";
 import { CollectionSourceRepository } from "../repositories/CollectionSourceRepository";
@@ -15,6 +16,8 @@ class FakeCollectionSourceRepository
   implements CollectionSourceRepository
 {
   public succeededAt: Date | null = null;
+  public succeededDates: CollectionDateSummary | undefined;
+  public emptyAt: Date | null = null;
   public failure: { checkedAt: Date; message: string } | null = null;
 
   constructor(private readonly source: Source | null) {}
@@ -26,8 +29,17 @@ class FakeCollectionSourceRepository
   async markCollectionSucceeded(
     _id: number,
     checkedAt: Date,
+    dates?: CollectionDateSummary,
   ): Promise<void> {
     this.succeededAt = checkedAt;
+    this.succeededDates = dates;
+  }
+
+  async markCollectionEmpty(
+    _id: number,
+    checkedAt: Date,
+  ): Promise<void> {
+    this.emptyAt = checkedAt;
   }
 
   async markCollectionFailed(
@@ -195,7 +207,12 @@ describe("collectSource", () => {
       observationRepository,
     );
 
-    expect(result).toEqual({ collected: 1, created: 1 });
+    expect(result).toEqual({
+      collected: 1,
+      created: 1,
+      undated: 0,
+      futureRejected: 0,
+    });
     expect(repository.succeededAt).toBeInstanceOf(Date);
     expect(repository.failure).toBeNull();
   });
@@ -217,5 +234,69 @@ describe("collectSource", () => {
       checkedAt: expect.any(Date),
       message: "Collecte impossible",
     });
+  });
+
+  it("compte les observations sans date et les dates futures refusées", async () => {
+    const source = createSource();
+    const repository =
+      new FakeCollectionSourceRepository(source);
+    const factory = new FakeCollectorFactory(
+      new FakeCollector([
+        {
+          title: "Datée",
+          url: "https://example.com/datee",
+          publishedAt: new Date("2026-01-02T10:00:00.000Z"),
+          content: null,
+        },
+        {
+          title: "Sans date",
+          url: "https://example.com/sans-date",
+          publishedAt: null,
+          content: null,
+        },
+        {
+          title: "Date future",
+          url: "https://example.com/future",
+          publishedAt: new Date("2999-01-01T00:00:00.000Z"),
+          content: null,
+        },
+      ]),
+    );
+
+    const result = await collectSource(
+      1,
+      repository,
+      factory,
+      new FakeObservationRepository(3),
+    );
+
+    expect(result).toEqual({
+      collected: 3,
+      created: 3,
+      undated: 2,
+      futureRejected: 1,
+    });
+    expect(repository.succeededDates).toEqual({
+      total: 3,
+      dated: 1,
+      undated: 2,
+      futureRejected: 1,
+    });
+  });
+
+  it("enregistre une collecte vide comme telle, sans remettre le compteur à zéro", async () => {
+    const repository = new FakeCollectionSourceRepository(
+      createSource(),
+    );
+
+    await collectSource(
+      1,
+      repository,
+      new FakeCollectorFactory(new FakeCollector([])),
+      new FakeObservationRepository(0),
+    );
+
+    expect(repository.emptyAt).toBeInstanceOf(Date);
+    expect(repository.succeededAt).toBeNull();
   });
 });

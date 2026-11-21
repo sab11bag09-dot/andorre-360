@@ -7,6 +7,15 @@ const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_RESPONSE_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECTS = 5;
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+/**
+ * En-têtes envoyés à chaque page. Sans `User-Agent`, Node envoie « node »,
+ * que des pare-feu applicatifs refusent (réponse 403).
+ */
+export const HTML_REQUEST_HEADERS = {
+  Accept: "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "ca,fr;q=0.9,es;q=0.8,en;q=0.7",
+  "User-Agent": "ANDORRE-360-Source-Engine/1.0",
+} as const;
 
 function isPrivateIpv4(address: string): boolean {
   const parts = address.split(".").map(Number);
@@ -86,6 +95,7 @@ export class FetchHtmlClient implements HtmlClient {
 
     for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
       const response = await fetch(url, {
+        headers: HTML_REQUEST_HEADERS,
         redirect: "manual",
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });

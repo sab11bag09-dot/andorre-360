@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import {
+  getSourceCollectionIssues,
+  loadRecentDateStats,
+} from "@/lib/sources/collectionHealth";
+import {
   isPublicArticle,
   PUBLIC_ARTICLE_FILTER,
 } from "@/lib/public-article";
@@ -29,6 +33,8 @@ export default async function AdminPage() {
     mediaCount,
     publicationCount,
     recentArticles,
+    recentDateStats,
+    activeSources,
   ] = await Promise.all([
     prisma.article.count(),
 
@@ -66,7 +72,27 @@ export default async function AdminPage() {
         updatedAt: true,
       },
     }),
+
+    loadRecentDateStats(prisma),
+
+    prisma.source.findMany({
+      where: { active: true },
+      select: {
+        id: true,
+        active: true,
+        availabilityStatus: true,
+        lastErrorAt: true,
+        lastSuccessAt: true,
+        lastErrorMessage: true,
+      },
+    }),
   ]);
+
+  const sourcesToWatchCount = activeSources.filter(
+    (source) =>
+      getSourceCollectionIssues(source, recentDateStats.get(source.id))
+        .length > 0,
+  ).length;
 
   const navigationCards = [
     {
@@ -128,6 +154,18 @@ export default async function AdminPage() {
     </>
   }
 />
+
+        {sourcesToWatchCount > 0 ? (
+          <Link
+            href="/admin/sources?status=issues"
+            className="mt-8 block rounded-xl border border-red-500/30 bg-red-500/5 px-5 py-4 text-sm text-red-300 transition hover:border-red-400"
+          >
+            {sourcesToWatchCount} source
+            {sourcesToWatchCount > 1 ? "s" : ""} active
+            {sourcesToWatchCount > 1 ? "s" : ""} à surveiller (en erreur
+            ou sans date de publication) →
+          </Link>
+        ) : null}
 
         <section className="grid gap-4 py-8 sm:grid-cols-2 xl:grid-cols-5">
   <StatCard

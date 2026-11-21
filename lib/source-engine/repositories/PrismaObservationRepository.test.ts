@@ -140,4 +140,27 @@ describe("PrismaObservationRepository", () => {
     expect(update.mock.calls[0][0].data).not.toHaveProperty("imageUrl");
     expect(update.mock.calls[0][0].data).not.toHaveProperty("imageRights");
   });
+
+  it("n’efface pas une date connue quand une nouvelle collecte n’en trouve pas", async () => {
+    create.mockRejectedValue(
+      new Prisma.PrismaClientKnownRequestError("Observation déjà présente", {
+        code: "P2002",
+        clientVersion: "test",
+      }),
+    );
+    update.mockResolvedValue({ id: 12, url: "https://example.com/article", content: null });
+
+    await new PrismaObservationRepository().saveMany(3, [
+      { title: "Titre", url: "https://example.com/article", publishedAt: null, content: null },
+      {
+        title: "Titre",
+        url: "https://example.com/article",
+        publishedAt: new Date("2999-01-01T00:00:00.000Z"),
+        content: null,
+      },
+    ]);
+
+    expect(update.mock.calls[0][0].data).not.toHaveProperty("publishedAt");
+    expect(update.mock.calls[1][0].data).not.toHaveProperty("publishedAt");
+  });
 });

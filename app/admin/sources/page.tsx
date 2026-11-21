@@ -17,6 +17,11 @@ import {
 } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
+  getSourceCollectionIssues,
+  loadRecentDateStats,
+  type SourceCollectionIssue,
+} from "@/lib/sources/collectionHealth";
+import {
   COLLECTION_MODES,
   getOptionLabel,
   ORGANIZATION_TYPES,
@@ -59,6 +64,17 @@ function getAvailabilityBadge(
     default:
       return <Badge>Non vérifiée</Badge>;
   }
+}
+
+function getIssueBadge(issue: SourceCollectionIssue) {
+  return (
+    <Badge
+      key={issue.kind}
+      variant={issue.kind === "error" ? "danger" : "warning"}
+    >
+      {issue.label}
+    </Badge>
+  );
 }
 
 function isCollectionMode(
@@ -165,6 +181,42 @@ export default async function AdminSourcesPage({
     },
   });
 
+  // Les alertes portent sur toutes les sources actives, pas seulement
+  // sur celles que le filtre affiche.
+  const [recentDateStats, activeSources] = await Promise.all([
+    loadRecentDateStats(prisma),
+    prisma.source.findMany({
+      where: { active: true },
+      orderBy: { name: "asc" },
+      select: {
+        id: true,
+        name: true,
+        active: true,
+        availabilityStatus: true,
+        lastErrorAt: true,
+        lastSuccessAt: true,
+        lastErrorMessage: true,
+      },
+    }),
+  ]);
+
+  const sourcesToWatch = activeSources
+    .map((source) => ({
+      source,
+      issues: getSourceCollectionIssues(
+        source,
+        recentDateStats.get(source.id),
+      ),
+    }))
+    .filter(({ issues }) => issues.length > 0);
+
+  const visibleSources =
+    status === "issues"
+      ? sources.filter((source) =>
+          sourcesToWatch.some(({ source: watched }) => watched.id === source.id),
+        )
+      : sources;
+
   return (
     <>
       <PageHeader
@@ -180,7 +232,7 @@ export default async function AdminSourcesPage({
         }
       />
 
-      <section className="grid gap-4 py-8 sm:grid-cols-3">
+      <section className="grid gap-4 py-8 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard title="Sources" value={totalCount} />
 
         <StatCard title="Actives" value={activeCount} />
@@ -189,7 +241,60 @@ export default async function AdminSourcesPage({
           title="Publication automatique"
           value={autoCount}
         />
+
+        <StatCard
+          title="À surveiller"
+          value={sourcesToWatch.length}
+          description="En erreur ou sans date"
+          valueClassName={
+            sourcesToWatch.length > 0 ? "text-red-400" : undefined
+          }
+          href="/admin/sources?status=issues"
+        />
       </section>
+
+      {sourcesToWatch.length > 0 ? (
+        <section
+          aria-labelledby="sources-a-surveiller"
+          className="mb-8 rounded-xl border border-red-500/30 bg-red-500/5 p-5"
+        >
+          <h2
+            id="sources-a-surveiller"
+            className="font-semibold text-red-300"
+          >
+            {sourcesToWatch.length} source
+            {sourcesToWatch.length > 1 ? "s" : ""} active
+            {sourcesToWatch.length > 1 ? "s" : ""} à surveiller
+          </h2>
+
+          <ul className="mt-4 space-y-3">
+            {sourcesToWatch.map(({ source, issues }) => (
+              <li key={source.id} className="min-w-0 text-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={`/admin/sources/${source.id}`}
+                    className="font-medium text-white transition hover:text-yellow-500"
+                  >
+                    {source.name}
+                  </a>
+                  {issues.map(getIssueBadge)}
+                </div>
+
+                {issues
+                  .filter((issue) => issue.detail)
+                  .map((issue) => (
+                    <p
+                      key={issue.kind}
+                      className="mt-1 break-words text-xs text-zinc-400"
+                    >
+                      {issue.detail}
+                    </p>
+                  ))}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="border-t border-zinc-800 py-8">
         <form className="grid gap-4 rounded-xl border border-zinc-800 bg-zinc-950 p-5 md:grid-cols-4">
@@ -208,6 +313,7 @@ export default async function AdminSourcesPage({
             <option value="all">Tous les statuts</option>
             <option value="active">Actives</option>
             <option value="inactive">Inactives</option>
+            <option value="issues">À surveiller</option>
           </Select>
 
           <Select
@@ -258,13 +364,13 @@ export default async function AdminSourcesPage({
 
       <SectionHeader
         title="Sources enregistrées"
-        description={`${sources.length} résultat${
-          sources.length > 1 ? "s" : ""
+        description={`${visibleSources.length} résultat${
+          visibleSources.length > 1 ? "s" : ""
         }`}
       />
 
       <section>
-        {sources.length === 0 ? (
+        {visibleSources.length === 0 ? (
           <EmptyState
             title="Aucune source"
             description="Ajoute la première source que la Veille devra surveiller."
@@ -305,7 +411,11 @@ export default async function AdminSourcesPage({
             ]}
             gridTemplateColumns={SOURCE_GRID_TEMPLATE}
           >
-            {sources.map((source) => {
+            {visibleSources.map((source) => {
+              const issues = getSourceCollectionIssues(
+                source,
+                recentDateStats.get(source.id),
+              );
               const toggleAction = toggleSource.bind(
                 null,
                 source.id,
@@ -354,6 +464,8 @@ export default async function AdminSourcesPage({
                       {getAvailabilityBadge(
                         source.availabilityStatus,
                       )}
+
+                      {issues.map(getIssueBadge)}
 
                       {source.lastErrorMessage ? (
                         <span
