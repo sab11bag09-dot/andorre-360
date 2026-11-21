@@ -25,6 +25,9 @@ function layoutServer(name: LayoutDatasetName) {
       LAYOUT_DATASET: name,
       DATABASE_URL: layoutDatabaseUrl(name),
       AUTH_SECRET: process.env.AUTH_SECRET ?? "secret-du-test-de-mise-en-page",
+      // En production, Auth.js n’accepte que l’hôte déclaré (AUTH_URL) ou, comme
+      // ici derrière 127.0.0.1, un hôte explicitement approuvé.
+      AUTH_URL: url,
       NEXT_PUBLIC_SITE_URL: url,
       MULTILINGUAL_PUBLICATION_ENABLED: "false",
     },

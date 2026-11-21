@@ -26,6 +26,11 @@ export default function LoginPage() {
 
     setLoading(false);
 
+    if (result?.code === "too_many_attempts") {
+      setError("Trop de tentatives de connexion. Réessayez dans 15 minutes.");
+      return;
+    }
+
     if (result?.error) {
       setError("E-mail ou mot de passe incorrect.");
       return;
