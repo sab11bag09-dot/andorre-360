@@ -59,6 +59,7 @@ export default function FilInfoTimeline({
   return (
     <section
       aria-labelledby="fil-info-timeline-title"
+      {...(fixedRows ? { "data-layout-column": "fil", "data-layout-block": "fil" } : {})}
       className={`overflow-hidden border border-gray-800 bg-neutral-950/90 ${
         fixedRows ? "xl:flex xl:h-full xl:flex-col" : ""
       }`}

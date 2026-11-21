@@ -63,8 +63,10 @@ export default async function FilInfoPage() {
     newsFeed,
   } = partitionFilInfoArticles(visibleItems);
 
+  // `cards[0]` vaut `undefined` quand le fil a trop peu d’articles pour la
+  // rangée À suivre : les deux cas sont écartés.
   const selection = [featured, cards[0]].filter(
-    (article): article is NonNullable<typeof article> => article !== null,
+    (article): article is NonNullable<typeof article> => article != null,
   );
 
   const oldestVisibleItem = visibleItems.at(-1);
@@ -141,6 +143,7 @@ export default async function FilInfoPage() {
 
         {/* Rangée figée sur grand écran : voir FIL_INFO_XL_ROW_HEIGHTS. */}
         <div
+          data-layout-row="fil"
           className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] xl:h-[var(--fil-info-row-height)] xl:gap-14"
           style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHTS.feed}px` } as CSSProperties}
         >
@@ -148,6 +151,8 @@ export default async function FilInfoPage() {
 
           <aside
             aria-labelledby="fil-info-selection-title"
+            data-layout-column="selection"
+            data-layout-block="selection"
             className="flex h-full flex-col"
           >
             <div className="mb-5 flex items-center gap-4 border-t-2 border-yellow-500 pt-4">
@@ -253,12 +258,15 @@ export default async function FilInfoPage() {
 
         {(cards.length > 0 || illustratedBriefs.length > 0) && (
           <div
+            data-layout-row="a-suivre"
             className="mt-16 grid items-stretch gap-12 md:mt-20 lg:grid-cols-6 lg:gap-14 xl:h-[var(--fil-info-row-height)]"
             style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHTS.follow}px` } as CSSProperties}
           >
             {cards.length > 0 && (
               <section
                 aria-labelledby="fil-info-follow-title"
+                data-layout-column="a-suivre"
+                data-layout-block="a-suivre"
                 className="flex h-full flex-col lg:col-span-4"
               >
                 <div className="mb-7 border-t-2 border-yellow-500 pt-5">
@@ -311,6 +319,8 @@ export default async function FilInfoPage() {
             {illustratedBriefs.length > 0 && (
               <aside
                 aria-labelledby="fil-info-remember-title"
+                data-layout-column="a-retenir"
+                data-layout-block="a-retenir"
                 className="flex h-full flex-col overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
               >
                 <div className="border-b border-gray-800 px-5 py-6">

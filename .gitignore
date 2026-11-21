@@ -59,3 +59,8 @@ andorre-360.zip
 # Photos reprises des sources pendant les essais du chantier
 /storage/media/sources/
 /storage/media/thumbnails/source-*
+
+# Test de mise en page dans le navigateur (Playwright)
+/.playwright/
+/test-results/
+/playwright-report/

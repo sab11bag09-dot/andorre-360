@@ -125,7 +125,7 @@ function Hero({ article }: { article: HomeArticle }) {
 
 function FeatureCard({ article }: { article: HomeArticle }) {
   return (
-    <Link href={href(article)} className={`group block ${XL_HEIGHT.feature}`}>
+    <Link href={href(article)} data-layout-block="grande-carte" className={`group block ${XL_HEIGHT.feature}`}>
       <article className="border-y-4 border-yellow-500 py-8">
         <p className={KICKER}>Grande carte · {article.category}</p>
 
@@ -223,7 +223,7 @@ function GrandFormat({ article }: { article: HomeArticle }) {
 
 function BriefingAdvertisement() {
   return (
-    <section className={`overflow-hidden border-y border-gray-800 bg-white ${XL_HEIGHT.advertisement}`}>
+    <section data-layout-block="briefing" className={`overflow-hidden border-y border-gray-800 bg-white ${XL_HEIGHT.advertisement}`}>
       <Image
         src="/images/home/briefing-andorra-360.jpg"
         alt="Andorra 360 — Le briefing quotidien pour comprendre l’Andorre"
@@ -240,7 +240,7 @@ function Editorial({ article }: { article: HomeArticle | null }) {
   const videoEmbedUrl = article?.videoUrl ? getVideoEmbedUrl(article.videoUrl) : null;
 
   return (
-    <section className={`border-b border-gray-800 pb-8 ${XL_HEIGHT.editorial}`}>
+    <section data-layout-block="edito" className={`border-b border-gray-800 pb-8 ${XL_HEIGHT.editorial}`}>
       <div className="flex items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-yellow-500 text-3xl text-yellow-500">
           ✒
@@ -312,7 +312,7 @@ function Editorial({ article }: { article: HomeArticle | null }) {
 
 function Selection({ articles }: { articles: HomeArticle[] }) {
   return (
-    <section className={`border-t-2 border-yellow-500 pt-5 ${XL_HEIGHT.selection}`}>
+    <section data-layout-block="selection" className={`border-t-2 border-yellow-500 pt-5 ${XL_HEIGHT.selection}`}>
       <div className="mb-4">
         <span className="text-xs uppercase tracking-[0.2em] text-gray-500">La rédaction</span>
 
@@ -360,7 +360,7 @@ function Selection({ articles }: { articles: HomeArticle[] }) {
 
 function Discover({ articles }: { articles: HomeArticle[] }) {
   return (
-    <section className={`rounded-xl bg-zinc-900 p-6 ${XL_HEIGHT.discover}`}>
+    <section data-layout-block="a-decouvrir" className={`rounded-xl bg-zinc-900 p-6 ${XL_HEIGHT.discover}`}>
       <p className={KICKER}>Continuer la lecture</p>
 
       <h2 className="mt-2 font-serif text-2xl">À découvrir</h2>
@@ -404,12 +404,12 @@ export default function HomePageView({ home }: { home: HomeComposition<HomeArtic
       {/* CORPS ÉDITORIAL : 4 COLONNES + 2 COLONNES */}
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-10 md:py-14">
         {/* Blocs de hauteur figée sur grand écran : voir HOME_XL_BLOCK_HEIGHTS. */}
-        <div className="grid items-start gap-10 xl:grid-cols-6">
-          <div className="flex flex-col gap-10 xl:col-span-4">
+        <div data-layout-row="une" className="grid items-start gap-10 xl:grid-cols-6">
+          <div data-layout-column="principale" className="flex flex-col gap-10 xl:col-span-4">
             {home.feature && <FeatureCard article={home.feature} />}
 
             {(home.briefs.length > 0 || home.grandFormat) && (
-              <div className={`grid gap-8 lg:grid-cols-4 ${XL_HEIGHT.essentials}`}>
+              <div data-layout-block="essentiel" className={`grid gap-8 lg:grid-cols-4 ${XL_HEIGHT.essentials}`}>
                 {home.briefs.length > 0 && <Briefs articles={home.briefs} />}
                 {home.grandFormat && <GrandFormat article={home.grandFormat} />}
               </div>
@@ -418,7 +418,7 @@ export default function HomePageView({ home }: { home: HomeComposition<HomeArtic
             <BriefingAdvertisement />
           </div>
 
-          <aside className="flex flex-col gap-9 xl:col-span-2 xl:self-stretch xl:border-l xl:border-gray-800 xl:pl-8">
+          <aside data-layout-column="laterale" className="flex flex-col gap-9 xl:col-span-2 xl:self-stretch xl:border-l xl:border-gray-800 xl:pl-8">
             <Editorial article={home.editorial} />
             {home.cards.length > 0 && <Selection articles={home.cards} />}
             {home.discover.length > 0 && <Discover articles={home.discover} />}
