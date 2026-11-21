@@ -714,6 +714,35 @@ describe("HtmlCollector — dates de publication standard", () => {
     ).resolves.toBe("2026-11-12T08:00:00.000Z");
   });
 
+  it("lit une date jour-mois-année avec tirets sans inverser le jour et le mois", async () => {
+    // `new Date("12-08-2026")` donnerait le 8 décembre : origine des
+    // quatre dates futures d’Altaveu relevées en août 2026.
+    await expect(
+      collectDate(`<span class="date">12-08-2026</span>${BODY}`),
+    ).resolves.toBe("2026-08-12T00:00:00.000Z");
+  });
+
+  it("refuse une date numérique ambiguë plutôt que de la mal lire", async () => {
+    await expect(
+      collectDate(`<span class="date">08.12.2026</span>${BODY}`),
+    ).resolves.toBeNull();
+    await expect(
+      collectDate(`<span class="date">8/12/26</span>${BODY}`),
+    ).resolves.toBeNull();
+  });
+
+  it("lit une date catalane abrégée à minuit UTC, quel que soit le fuseau du serveur", async () => {
+    await expect(
+      collectDate(`<span class="date">12-ag-2026</span>${BODY}`),
+    ).resolves.toBe("2026-08-12T00:00:00.000Z");
+  });
+
+  it("garde la lecture des dates dont le mois est écrit en lettres", async () => {
+    await expect(
+      collectDate(`<span class="date">Wed, 12 Aug 2026 10:00:00 GMT</span>${BODY}`),
+    ).resolves.toBe("2026-08-12T10:00:00.000Z");
+  });
+
   it("retrouve datePublished dans un JSON-LD mal formé", async () => {
     await expect(
       collectDate(`

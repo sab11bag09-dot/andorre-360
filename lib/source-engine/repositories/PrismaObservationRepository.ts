@@ -106,7 +106,9 @@ export class PrismaObservationRepository
             },
             data: {
               title: observation.title,
-              publishedAt,
+              // Une collecte qui ne trouve pas de date (page d’article
+              // injoignable, date refusée) n’efface pas celle déjà connue.
+              ...(publishedAt ? { publishedAt } : {}),
               content: observation.content,
               // Une collecte qui ne trouve pas d’image n’efface pas celle déjà connue.
               ...(observation.imageUrl

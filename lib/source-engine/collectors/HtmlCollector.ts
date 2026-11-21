@@ -74,29 +74,28 @@ function parseCatalanDate(value: string): Date | null {
     return null;
   }
 
-  const date = new Date(
-    Number(yearValue),
-    month,
-    Number(dayValue),
-  );
-
-  return Number.isNaN(date.getTime())
-    ? null
-    : date;
+  // Minuit UTC, comme les autres dates sans heure : le résultat ne dépend
+  // pas du fuseau horaire du serveur qui collecte.
+  return validUtcDate(Number(yearValue), month, Number(dayValue));
 }
 
+/**
+ * Date numérique « jour/mois/année » ou « jour-mois-année », la convention
+ * des sites andorrans. Lue avant toute interprétation générique : le moteur
+ * JavaScript lit « 12/08/2026 » ou « 12-08-2026 » comme le 8 décembre.
+ */
 function parseDayFirstNumericDate(
   value: string,
 ): Date | null {
   const match = normalizeText(value).match(
-    /(?:^|\D)(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\D|$)/,
+    /(?:^|\D)(\d{1,2})([/-])(\d{1,2})\2(\d{4})(?:\D|$)/,
   );
 
   if (!match) {
     return null;
   }
 
-  const [, dayValue, monthValue, yearValue] = match;
+  const [, dayValue, , monthValue, yearValue] = match;
   const day = Number(dayValue);
   const month = Number(monthValue);
   const year = Number(yearValue);
@@ -318,15 +317,31 @@ function parseGenericDate(value: string): Date | null {
     parseCatalanDate(value) ??
     parseDayFirstNumericDate(value) ??
     parseLongWrittenDate(value) ??
-    (() => {
-      const genericDate = new Date(value);
-
-      return Number.isNaN(genericDate.getTime())
-        ? null
-        : genericDate;
-    })();
+    parseStandardDate(value);
 
   return normalizeObservationPublishedAt(parsedDate);
+}
+
+/**
+ * Dernier recours, confié à `new Date()` : ISO 8601 (métadonnées, attribut
+ * `datetime`) ou date dont le mois est écrit en lettres (« Wed, 12 Aug
+ * 2026 », « August 12, 2026 »). Une date purement numérique hors ISO est
+ * refusée : `new Date()` y lit le mois avant le jour (« 12.08.2026 » devient
+ * le 8 décembre) et ces formats sont déjà traités plus haut quand ils sont
+ * sûrs.
+ */
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}(?:$|[T ])/;
+
+function parseStandardDate(value: string): Date | null {
+  const text = normalizeText(value);
+
+  if (!text || (!ISO_DATE_PATTERN.test(text) && !/[a-z]{3}/i.test(text))) {
+    return null;
+  }
+
+  const date = new Date(text);
+
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 async function mapWithConcurrency<T, R>(

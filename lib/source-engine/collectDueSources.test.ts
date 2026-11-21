@@ -46,7 +46,12 @@ describe("collectDueSources", () => {
     ]);
     const collectOne = vi
       .fn()
-      .mockResolvedValue({ collected: 2, created: 1 });
+      .mockResolvedValue({
+        collected: 2,
+        created: 1,
+        undated: 1,
+        futureRejected: 0,
+      });
 
     const result = await collectDueSources(
       { now, batchSize: 10 },
@@ -62,6 +67,7 @@ describe("collectDueSources", () => {
       failed: 0,
       collected: 4,
       created: 2,
+      undated: 2,
       failures: [],
     });
   });
@@ -117,6 +123,7 @@ describe("collectDueSources", () => {
       failed: 1,
       collected: 3,
       created: 2,
+      undated: 0,
       failures: [
         { sourceId: 1, message: "Flux indisponible" },
       ],

@@ -18,6 +18,8 @@ export type ScheduledCollectionResult = {
   failed: number;
   collected: number;
   created: number;
+  /** Observations collectées sans date exploitable, toutes sources confondues. */
+  undated: number;
   failures: Array<{ sourceId: number; message: string }>;
 };
 
@@ -76,6 +78,7 @@ export async function collectDueSources(
     failed: 0,
     collected: 0,
     created: 0,
+    undated: 0,
     failures: [],
   };
 
@@ -98,6 +101,7 @@ export async function collectDueSources(
       result.succeeded += 1;
       result.collected += collection.collected;
       result.created += collection.created;
+      result.undated += collection.undated ?? 0;
     } catch (error) {
       result.failed += 1;
       result.failures.push({
