@@ -405,37 +405,6 @@ export const siteRules: Record<string, SiteRule> = {
       ".share",
     ],
   },
-    "www.agenda.ad": {
-    listing: ['a[href*="/activitat/"]'],
-    maxArticles: 24,
-    concurrency: 4,
-    requireContent: true,
-    content: ["#activitat__contingut", "main"],
-    remove: [
-      "header",
-      "footer",
-      "nav",
-      "script",
-      "style",
-      "#activitat__altres",
-    ],
-  },
-
-  "agenda.ad": {
-    listing: ['a[href*="/activitat/"]'],
-    maxArticles: 24,
-    concurrency: 4,
-    requireContent: true,
-    content: ["#activitat__contingut", "main"],
-    remove: [
-      "header",
-      "footer",
-      "nav",
-      "script",
-      "style",
-      "#activitat__altres",
-    ],
-  },
     "www.afa.ad": {
     listing: ['a[href*="/comunicats-de-premsa/"]'],
     publishedAt: ["p.text-gray-light:has(.icon-history) span:not(.icon-history)"],
