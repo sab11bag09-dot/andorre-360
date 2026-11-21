@@ -101,7 +101,7 @@ jobs:
 
       # Deux serveurs de production, chacun sur sa base de test remplie par un
       # jeu de données déterministe (voir playwright.config.ts et e2e/layout).
-      - name: Check the layout at 1280, 1440 and 375 px
+      - name: Check the layout (1280, 1440 and 375 px) and the security headers
         run: npm run test:mise-en-page
 
       - name: Upload the Playwright report
