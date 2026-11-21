@@ -85,11 +85,12 @@ function isEmpty(content: ReactNode): boolean {
   return content === null || content === undefined || content === false || content === "";
 }
 
-function RubricSlotFrame({ slot }: { slot: RubricSlot }) {
+function RubricSlotFrame({ slot, name }: { slot: RubricSlot; name: string }) {
   const display = isEmpty(slot.content) ? "hidden xl:flex" : "flex";
 
   return (
     <div
+      data-layout-block={name}
       className={`${display} flex-col${slot.fill ? " lg:flex-1" : ""} xl:h-[var(--rubric-slot-height)] xl:flex-none xl:overflow-hidden`}
       style={{ "--rubric-slot-height": `${slot.height}px` } as CSSProperties}
     >
@@ -116,15 +117,15 @@ export function RubricPage({
       {banner}
 
       <section className="mx-auto max-w-7xl px-6 py-10 md:px-8">
-        <div className="grid gap-8 lg:grid-cols-6">
-          <div className="flex flex-col gap-8 lg:col-span-4">
+        <div data-layout-row="rubrique" className="grid gap-8 lg:grid-cols-6">
+          <div data-layout-column="principale" className="flex flex-col gap-8 lg:col-span-4">
             {main.map((slot, index) => (
-              <RubricSlotFrame key={index} slot={slot} />
+              <RubricSlotFrame key={index} slot={slot} name={`principale-${index + 1}`} />
             ))}
           </div>
-          <aside className="flex flex-col gap-6 lg:col-span-2">
+          <aside data-layout-column="laterale" className="flex flex-col gap-6 lg:col-span-2">
             {aside.map((slot, index) => (
-              <RubricSlotFrame key={index} slot={slot} />
+              <RubricSlotFrame key={index} slot={slot} name={`laterale-${index + 1}`} />
             ))}
           </aside>
         </div>
