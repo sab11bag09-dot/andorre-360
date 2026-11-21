@@ -40,7 +40,7 @@ const PAGES = [
 /** Rangées de colonnes attendues sur chaque page. */
 function expectedRows(path: string): string[] {
   if (path === "/") return ["une"];
-  if (path === "/fil-info") return ["fil", "a-suivre"];
+  if (path === "/fil-info") return ["fil"];
   return ["rubrique"];
 }
 
@@ -106,10 +106,8 @@ for (const width of WIDE_SCREENS) {
         }
 
         // Même page servie avec très peu d’articles (jeu « clairsemé ») : les
-        // blocs vides restent des cadres de la même hauteur. Seule une rangée
-        // entière sans aucun article peut être omise (au Fil info, la rangée
-        // À suivre et À retenir, en bas de page) ; un bloc d’une rangée
-        // affichée ne disparaît jamais.
+        // blocs vides restent des cadres de la même hauteur, et aucun bloc
+        // d’une rangée affichée ne disparaît.
         await page.goto(`${layoutServerUrl("clairseme")}${path}`);
         await waitForStableLayout(page);
         const sparse = await snapshotLayout(page);

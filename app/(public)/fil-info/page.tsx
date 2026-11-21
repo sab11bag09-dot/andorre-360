@@ -8,7 +8,7 @@ import Link from "next/link";
 import { getFilInfoArticles } from "@/lib/articles";
 import {
   FIL_INFO_QUERY_LIMIT,
-  FIL_INFO_XL_ROW_HEIGHTS,
+  FIL_INFO_XL_ROW_HEIGHT,
   getArticlePublicationDate,
   partitionFilInfoArticles,
 } from "@/lib/fil-info";
@@ -51,28 +51,13 @@ export default async function FilInfoPage() {
   const items = await getFilInfoArticles("ACTUALITÉ", {
     limit: FIL_INFO_QUERY_LIMIT + 1,
   });
-  const hasMore = items.length > FIL_INFO_QUERY_LIMIT;
-  const visibleItems = items.slice(0, FIL_INFO_QUERY_LIMIT);
+  const { pinned, selection, newsFeed, rest } = partitionFilInfoArticles(items);
 
-  const {
-    pinned,
-    featured,
-    briefs,
-    cards,
-    illustratedBriefs,
-    newsFeed,
-  } = partitionFilInfoArticles(visibleItems);
-
-  // `cards[0]` vaut `undefined` quand le fil a trop peu d’articles pour la
-  // rangée À suivre : les deux cas sont écartés.
-  const selection = [featured, cards[0]].filter(
-    (article): article is NonNullable<typeof article> => article != null,
-  );
-
-  const oldestVisibleItem = visibleItems.at(-1);
-  const latestChronologicalItem = visibleItems.find(
-    (article) => !article.filInfoPinned,
-  );
+  // « Afficher plus » reprend après la dernière ligne du fil : les
+  // publications non affichées sont toutes plus anciennes qu’elle.
+  const hasMore = rest.length > 0;
+  const lastFeedItem = newsFeed.at(-1);
+  const latestChronologicalItem = items.find((article) => !article.filInfoPinned);
   const newsFeedEntries = newsFeed.map((article) => ({
     id: article.id,
     slug: article.slug,
@@ -84,19 +69,16 @@ export default async function FilInfoPage() {
 
   return (
     <main className="min-h-screen bg-black text-white">
-      <section className="mx-auto max-w-7xl px-5 py-10 sm:px-6 md:px-10 md:py-16">
-        <header className="mb-10 border-b border-gray-800 pb-9 md:mb-14">
-          <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-yellow-500">
-                Andorra 360
-              </p>
+      <section className="mx-auto max-w-7xl px-5 py-8 sm:px-6 md:px-10 md:py-12">
+        <header className="mb-8 flex items-end justify-between gap-6 border-b border-gray-800 pb-6">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-yellow-500">
+              Andorra 360 · Fil info
+            </p>
 
-              <h1 className="mt-3 max-w-4xl font-serif text-4xl leading-[0.95] tracking-[-0.025em] sm:text-5xl md:text-6xl">
-                L’actualité en continu
-              </h1>
-            </div>
-
+            <h1 className="mt-2 font-serif text-3xl leading-tight tracking-[-0.02em] sm:text-4xl md:text-5xl">
+              L’actualité en continu
+            </h1>
           </div>
         </header>
 
@@ -141,11 +123,11 @@ export default async function FilInfoPage() {
           </section>
         )}
 
-        {/* Rangée figée sur grand écran : voir FIL_INFO_XL_ROW_HEIGHTS. */}
+        {/* Rangée figée sur grand écran : voir FIL_INFO_XL_ROW_HEIGHT. */}
         <div
           data-layout-row="fil"
           className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] xl:h-[var(--fil-info-row-height)] xl:gap-14"
-          style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHTS.feed}px` } as CSSProperties}
+          style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHT}px` } as CSSProperties}
         >
           <FilInfoTimeline entries={newsFeedEntries} fixedRows={8} />
 
@@ -156,15 +138,12 @@ export default async function FilInfoPage() {
             className="flex h-full flex-col"
           >
             <div className="mb-5 flex items-center gap-4 border-t-2 border-yellow-500 pt-4">
-              <h2
-                id="fil-info-selection-title"
-                className="font-serif text-3xl"
-              >
+              <h2 id="fil-info-selection-title" className="font-serif text-3xl">
                 La sélection
               </h2>
             </div>
 
-            <div className="grid flex-1 gap-8 md:grid-cols-2 lg:grid-cols-1 xl:min-h-0 xl:grid-rows-2">
+            <div className="grid flex-1 gap-8 md:grid-cols-2 lg:grid-cols-1 xl:min-h-0 xl:grid-rows-4">
               {selection.map((article) => (
                 <Link
                   key={article.id}
@@ -172,31 +151,22 @@ export default async function FilInfoPage() {
                   className="group flex min-h-0"
                 >
                   <article className="flex w-full min-h-0 flex-col overflow-hidden">
-                    <div className="relative h-64 min-h-0 overflow-hidden bg-neutral-900 sm:h-72 xl:h-auto xl:flex-1">
+                    <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-neutral-900">
                       <FilInfoImage
                         src={article.image}
                         alt={article.title}
-                        priority={article.id === featured?.id}
-                        sizes="(max-width: 768px) 100vw, 34vw"
+                        priority={article.id === selection[0]?.id}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 400px"
                         className="object-cover transition duration-700 ease-out group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
                       />
-                      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
                     </div>
 
-                    <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.24em] text-yellow-500">
-                      Actualité
-                    </p>
-
-                    <h3 className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-9 tracking-[-0.02em] transition-colors duration-300 group-hover:text-yellow-500">
+                    <h3 className="mt-3 line-clamp-3 min-h-[3lh] font-serif text-xl leading-7 transition-colors duration-300 group-hover:text-yellow-500">
                       {article.title}
                     </h3>
 
-                    <p className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400">
+                    <p className="mt-2 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400">
                       {article.description}
-                    </p>
-
-                    <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
-                      Lire l’article →
                     </p>
                   </article>
                 </Link>
@@ -205,182 +175,10 @@ export default async function FilInfoPage() {
           </aside>
         </div>
 
-        {briefs.length > 0 && (
-          <section
-            aria-labelledby="fil-info-briefs-title"
-            className="mt-16 md:mt-20"
-          >
-            <div className="mb-7 flex items-end justify-between gap-6 border-t border-gray-800 pt-5">
-              <h2 id="fil-info-briefs-title" className="font-serif text-3xl">
-                Autres publications
-              </h2>
-
-              <p className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-600 sm:block">
-                La suite du fil
-              </p>
-            </div>
-
-            <div className="grid border-b border-gray-800 md:grid-cols-3">
-              {briefs.map((article, index) => (
-                <Link
-                  key={article.id}
-                  href={`/article/${article.slug}`}
-                  className={`group block border-t border-gray-800 ${
-                    index % 3 !== 0
-                      ? "md:border-l md:border-gray-800 md:pl-7"
-                      : ""
-                  } ${index % 3 !== 2 ? "md:pr-7" : ""}`}
-                >
-                  <article className="flex h-full min-h-48 flex-col justify-between py-8">
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-serif text-2xl text-yellow-500">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-
-                        <span aria-hidden="true" className="h-px flex-1 bg-gray-800" />
-                      </div>
-
-                      <h3 className="mt-5 line-clamp-4 min-h-[4lh] font-serif text-xl leading-6 transition-colors duration-300 group-hover:text-yellow-500">
-                        {article.title}
-                      </h3>
-                    </div>
-
-                    <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.21em] text-gray-500 transition group-hover:text-yellow-500">
-                      {getFilInfoFormatLabel(article.filInfoFormat)} →
-                    </p>
-                  </article>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {(cards.length > 0 || illustratedBriefs.length > 0) && (
-          <div
-            data-layout-row="a-suivre"
-            className="mt-16 grid items-stretch gap-12 md:mt-20 lg:grid-cols-6 lg:gap-14 xl:h-[var(--fil-info-row-height)]"
-            style={{ "--fil-info-row-height": `${FIL_INFO_XL_ROW_HEIGHTS.follow}px` } as CSSProperties}
-          >
-            {cards.length > 0 && (
-              <section
-                aria-labelledby="fil-info-follow-title"
-                data-layout-column="a-suivre"
-                data-layout-block="a-suivre"
-                className="flex h-full flex-col lg:col-span-4"
-              >
-                <div className="mb-7 border-t-2 border-yellow-500 pt-5">
-                  <h2 id="fil-info-follow-title" className="font-serif text-3xl">
-                    À suivre
-                  </h2>
-                </div>
-
-                <div className="grid flex-1 gap-x-8 gap-y-12 md:grid-cols-2 xl:min-h-0 xl:grid-rows-2">
-                  {cards.map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/article/${article.slug}`}
-                      className="group block"
-                    >
-                      <article className="flex h-full flex-col border-b border-gray-800 pb-8">
-                        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
-                          <FilInfoImage
-                            src={article.image}
-                            alt={article.title}
-                            sizes="(max-width: 768px) 100vw, 33vw"
-                            className="object-cover transition duration-700 group-hover:scale-[1.025] motion-reduce:transition-none motion-reduce:transform-none"
-                          />
-                        </div>
-
-                        <div className="pt-5">
-                          <p className="mb-3 text-[9px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                            {getFilInfoFormatLabel(article.filInfoFormat)}
-                          </p>
-
-                          <h3 className="line-clamp-3 min-h-[3lh] font-serif text-2xl leading-7 transition group-hover:text-yellow-500">
-                            {article.title}
-                          </h3>
-
-                          <p className="mt-3 line-clamp-4 min-h-[4lh] text-sm leading-6 text-gray-400">
-                            {article.description}
-                          </p>
-
-                          <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.21em] text-yellow-500">
-                            Lire l’article →
-                          </p>
-                        </div>
-                      </article>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {illustratedBriefs.length > 0 && (
-              <aside
-                aria-labelledby="fil-info-remember-title"
-                data-layout-column="a-retenir"
-                data-layout-block="a-retenir"
-                className="flex h-full flex-col overflow-hidden border border-gray-800 bg-neutral-950/90 lg:col-span-2"
-              >
-                <div className="border-b border-gray-800 px-5 py-6">
-                  <h2
-                    id="fil-info-remember-title"
-                    className="font-serif text-3xl leading-none"
-                  >
-                    À retenir
-                  </h2>
-                </div>
-
-                <div className="divide-y divide-gray-800 xl:grid xl:min-h-0 xl:flex-1 xl:grid-rows-7">
-                  {illustratedBriefs.slice(0, 7).map((article) => (
-                    <Link
-                      key={article.id}
-                      href={`/article/${article.slug}`}
-                      className="group block px-5 py-5 transition-colors duration-300 hover:bg-white/[0.03]"
-                    >
-                      <article className="grid grid-cols-[112px_1fr] gap-4">
-                        <div className="relative aspect-[4/3] overflow-hidden bg-neutral-900">
-                          <FilInfoImage
-                            src={article.image}
-                            alt={article.title}
-                            sizes="112px"
-                            className="object-cover transition duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none motion-reduce:transform-none"
-                          />
-                        </div>
-
-                        <div className="flex min-w-0 flex-col justify-between">
-                          <div>
-                            <p className="mb-2 text-[8px] font-semibold uppercase tracking-[0.18em] text-yellow-500">
-                              {getFilInfoFormatLabel(article.filInfoFormat)}
-                            </p>
-
-                            <h3 className="line-clamp-3 min-h-[3lh] font-serif text-[1.05rem] leading-[1.25] transition group-hover:text-yellow-500">
-                              {article.title}
-                            </h3>
-                          </div>
-
-                          <p className="mt-3 text-[9px] font-semibold uppercase tracking-[0.18em] text-gray-500 transition group-hover:text-yellow-500">
-                            Lire →
-                          </p>
-                        </div>
-                      </article>
-                    </Link>
-                  ))}
-                </div>
-              </aside>
-            )}
-          </div>
-        )}
-
         <FilInfoPagination
-          initialCursor={
-            oldestVisibleItem ? createFilInfoCursor(oldestVisibleItem) : null
-          }
+          initialCursor={lastFeedItem ? createFilInfoCursor(lastFeedItem) : null}
           latestCursor={
-            latestChronologicalItem
-              ? createFilInfoCursor(latestChronologicalItem)
-              : null
+            latestChronologicalItem ? createFilInfoCursor(latestChronologicalItem) : null
           }
           initialHasMore={hasMore}
         />
