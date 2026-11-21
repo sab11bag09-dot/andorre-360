@@ -1,25 +1,32 @@
 import { normalizeFilInfoFormat } from "./fil-info-format";
 import { getPublicArticleDate } from "./public-article";
 
+/**
+ * Page Fil info allégée (21 novembre 2026) : le fil chronologique et, à côté,
+ * La sélection ; plus de zones en dessous. « Afficher plus » prolonge le fil
+ * juste en dessous.
+ */
 export const FIL_INFO_NEWS_FEED_SIZE = 8;
-export const FIL_INFO_BRIEFS_SIZE = 6;
-export const FIL_INFO_CARDS_SIZE = 4;
-export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 7;
-export const FIL_INFO_PAGE_SIZE = 26;
+export const FIL_INFO_SELECTION_SIZE = 4;
+/** Publications chargées à chaque « Afficher plus ». */
+export const FIL_INFO_PAGE_SIZE = 20;
 export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000;
 
-export const FIL_INFO_QUERY_LIMIT =
-  FIL_INFO_PAGE_SIZE;
+/**
+ * Articles affichés au plus sur la première page : l’information épinglée,
+ * La sélection et le fil. La page en lit un de plus pour savoir s’il reste
+ * une suite.
+ */
+export const FIL_INFO_QUERY_LIMIT = 1 + FIL_INFO_SELECTION_SIZE + FIL_INFO_NEWS_FEED_SIZE;
 
 /**
- * Hauteurs figées des deux rangées de la page Fil info sur grand écran (`xl`,
- * 1 280 px et plus : largeur de page constante). Rangée du fil et de La
- * sélection, puis rangée À suivre et À retenir. Les deux colonnes de chaque
- * rangée en prennent la hauteur ; leurs cartes et leurs lignes la partagent à
- * parts égales, quel que soit leur nombre. Mesurées dans le navigateur le
- * 21 novembre 2026.
+ * Hauteur figée de la rangée du fil et de La sélection sur grand écran (`xl`,
+ * 1 280 px et plus : largeur de page constante). Les deux colonnes en prennent
+ * la hauteur ; leurs lignes et leurs cartes la partagent à parts égales, quel
+ * que soit leur nombre. Mesurée dans le navigateur le 21 novembre 2026 ; le
+ * fil et ses huit lignes n’ont pas changé.
  */
-export const FIL_INFO_XL_ROW_HEIGHTS = { feed: 1810, follow: 1205 } as const;
+export const FIL_INFO_XL_ROW_HEIGHT = 1810;
 
 type FilInfoPartitionArticle = {
   featured: boolean;
@@ -27,62 +34,31 @@ type FilInfoPartitionArticle = {
   filInfoPinned: boolean;
 };
 
+/**
+ * Répartit la première page : l’information épinglée, La sélection (l’article
+ * mis en avant, puis les articles les plus récents) et le fil, dans l’ordre
+ * chronologique. Les publications restantes (`rest`, plus anciennes que la
+ * dernière ligne du fil) ne sont pas affichées : « Afficher plus » les charge.
+ */
 export function partitionFilInfoArticles<T extends FilInfoPartitionArticle>(
   items: readonly T[],
 ) {
   const pinnedIndex = items.findIndex((item) => item.filInfoPinned);
   const pinned = pinnedIndex >= 0 ? items[pinnedIndex] : null;
   const unpinnedItems = items.filter((_, index) => index !== pinnedIndex);
-  const explicitSelectionIndex = unpinnedItems.findIndex(
-    (item) =>
-      item.featured &&
-      normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
-  );
-  const selectionIndex =
-    explicitSelectionIndex >= 0
-      ? explicitSelectionIndex
-      : unpinnedItems.findIndex(
-          (item) =>
-            normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE",
-        );
-  const featured =
-    selectionIndex >= 0 ? unpinnedItems[selectionIndex] : null;
-  const remainingItems = unpinnedItems.filter(
-    (_, index) => index !== selectionIndex,
-  );
-  let cursor = 0;
+  const isArticle = (item: T) => normalizeFilInfoFormat(item.filInfoFormat) === "ARTICLE";
 
-  const newsFeed = remainingItems.slice(
-    cursor,
-    cursor + FIL_INFO_NEWS_FEED_SIZE,
-  );
-  cursor += newsFeed.length;
+  const explicit = unpinnedItems.find((item) => item.featured && isArticle(item));
+  const selection = [
+    ...(explicit ? [explicit] : []),
+    ...unpinnedItems.filter((item) => item !== explicit && isArticle(item)),
+  ].slice(0, FIL_INFO_SELECTION_SIZE);
 
-  const briefs = remainingItems.slice(
-    cursor,
-    cursor + FIL_INFO_BRIEFS_SIZE,
-  );
-  cursor += briefs.length;
+  const remainingItems = unpinnedItems.filter((item) => !selection.includes(item));
+  const newsFeed = remainingItems.slice(0, FIL_INFO_NEWS_FEED_SIZE);
+  const rest = remainingItems.slice(FIL_INFO_NEWS_FEED_SIZE);
 
-  const cards = remainingItems.slice(
-    cursor,
-    cursor + FIL_INFO_CARDS_SIZE,
-  );
-  cursor += cards.length;
-
-  const illustratedBriefs = remainingItems.slice(
-    cursor,
-    cursor + FIL_INFO_ILLUSTRATED_BRIEFS_SIZE,
-  );
-
-  return {
-    pinned,
-    featured,
-    newsFeed,
-    briefs,
-    cards,
-    illustratedBriefs,
-  };
+  return { pinned, selection, newsFeed, rest };
 }
 
 export function getArticlePublicationDate(article: {

@@ -40,24 +40,18 @@ describe("mise en page Fil info", () => {
   it("conserve la requête et la pagination initiale", () => {
     expect(pageSource).toContain('getFilInfoArticles("ACTUALITÉ"');
     expect(pageSource).toContain("limit: FIL_INFO_QUERY_LIMIT + 1");
-    expect(pageSource).toContain(
-      "const hasMore = items.length > FIL_INFO_QUERY_LIMIT",
-    );
-    expect(pageSource).toContain(
-      "const visibleItems = items.slice(0, FIL_INFO_QUERY_LIMIT)",
-    );
+    expect(pageSource).toContain("const hasMore = rest.length > 0");
     expect(pageSource).toContain("<FilInfoPagination");
     expect(pageSource).toContain("initialHasMore={hasMore}");
+    // La suite reprend après la dernière ligne du fil.
+    expect(pageSource).toContain("createFilInfoCursor(lastFeedItem)");
   });
 
-  it("conserve les différentes zones éditoriales", () => {
-    expect(pageSource).toContain("partitionFilInfoArticles(visibleItems)");
-    expect(pageSource).toContain("pinned,");
-    expect(pageSource).toContain("featured,");
-    expect(pageSource).toContain("briefs,");
-    expect(pageSource).toContain("cards,");
-    expect(pageSource).toContain("illustratedBriefs,");
-    expect(pageSource).toContain("newsFeed,");
+  it("ne garde que le fil et La sélection", () => {
+    expect(pageSource).toContain("partitionFilInfoArticles(items)");
+    for (const removed of ["Autres publications", "À suivre", "À retenir", "illustratedBriefs"]) {
+      expect(pageSource).not.toContain(removed);
+    }
   });
 
   it("conserve l’information épinglée", () => {
@@ -79,42 +73,15 @@ describe("mise en page Fil info", () => {
     expect(pageSource).toContain('id="fil-info-selection-title"');
     expect(pageSource).toContain("La sélection");
     expect(pageSource).toContain(
-      'className="mt-2 line-clamp-3 min-h-[3lh] font-serif text-2xl leading-9',
+      'className="mt-3 line-clamp-3 min-h-[3lh] font-serif text-xl leading-7',
     );
     expect(pageSource).toContain(
-      'className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400"',
+      'className="mt-2 line-clamp-2 min-h-[2lh] text-sm leading-6 text-gray-400"',
     );
   });
 
-  it("conserve les six autres publications", () => {
-    expect(pageSource).toContain('id="fil-info-briefs-title"');
-    expect(pageSource).toContain("Autres publications");
-    expect(pageSource).toContain(
-      'className="grid border-b border-gray-800 md:grid-cols-3"',
-    );
-    expect(pageSource).toContain(
-      'className="mt-5 line-clamp-4 min-h-[4lh] font-serif text-xl leading-6',
-    );
-  });
-
-  it("conserve À suivre et À retenir", () => {
-    expect(pageSource).toContain('id="fil-info-follow-title"');
-    expect(pageSource).toContain("À suivre");
-    expect(pageSource).toContain('id="fil-info-remember-title"');
-    expect(pageSource).toContain("À retenir");
-    expect(pageSource).toContain("illustratedBriefs.slice(0, 7)");
-    expect(pageSource).toContain("lg:grid-cols-6");
-    expect(pageSource).toContain("lg:col-span-4");
-    expect(pageSource).toContain("lg:col-span-2");
-  });
-
-  it("conserve les limites des cartes À suivre", () => {
-    expect(pageSource).toContain(
-      'className="line-clamp-3 min-h-[3lh] font-serif text-2xl leading-7',
-    );
-    expect(pageSource).toContain(
-      'className="mt-3 line-clamp-4 min-h-[4lh] text-sm leading-6 text-gray-400"',
-    );
+  it("garde des photos de La sélection au même format, sans étirement", () => {
+    expect(pageSource).toContain('className="relative aspect-[16/10] shrink-0 overflow-hidden');
   });
 
   it("conserve la chronologie multilingue", () => {
@@ -142,15 +109,9 @@ describe("mise en page Fil info", () => {
   });
 
   it("conserve les volumes et la fréquence officiels", () => {
-    expect(partitionSource).toContain(
-      "export const FIL_INFO_NEWS_FEED_SIZE = 8",
-    );
-    expect(partitionSource).toContain("export const FIL_INFO_BRIEFS_SIZE = 6");
-    expect(partitionSource).toContain("export const FIL_INFO_CARDS_SIZE = 4");
-    expect(partitionSource).toContain(
-      "export const FIL_INFO_ILLUSTRATED_BRIEFS_SIZE = 7",
-    );
-    expect(partitionSource).toContain("export const FIL_INFO_PAGE_SIZE = 26");
+    expect(partitionSource).toContain("export const FIL_INFO_NEWS_FEED_SIZE = 8");
+    expect(partitionSource).toContain("export const FIL_INFO_SELECTION_SIZE = 4");
+    expect(partitionSource).toContain("export const FIL_INFO_PAGE_SIZE = 20");
     expect(partitionSource).toContain(
       "export const FIL_INFO_REFRESH_INTERVAL_MS = 45_000",
     );
@@ -178,17 +139,15 @@ describe("Fil info : mise en page indépendante des textes", () => {
   });
 });
 
-describe("Fil info : rangées figées et colonnes alignées en bas", () => {
-  it("fige la hauteur des deux rangées sur grand écran", () => {
-    expect(pageSource.match(/xl:h-\[var\(--fil-info-row-height\)\]/g)).toHaveLength(2);
-    expect(pageSource).toContain("FIL_INFO_XL_ROW_HEIGHTS.feed");
-    expect(pageSource).toContain("FIL_INFO_XL_ROW_HEIGHTS.follow");
+describe("Fil info : rangée figée et colonnes alignées en bas", () => {
+  it("fige la hauteur de la rangée sur grand écran", () => {
+    expect(pageSource.match(/xl:h-\[var\(--fil-info-row-height\)\]/g)).toHaveLength(1);
+    expect(pageSource).toContain("FIL_INFO_XL_ROW_HEIGHT}px");
+    expect(partitionSource).toContain("export const FIL_INFO_XL_ROW_HEIGHT = 1810");
   });
 
-  it("partage chaque rangée à parts égales entre ses cartes, quel que soit leur nombre", () => {
-    expect(pageSource).toContain("lg:grid-cols-1 xl:min-h-0 xl:grid-rows-2");
-    expect(pageSource).toContain("md:grid-cols-2 xl:min-h-0 xl:grid-rows-2");
-    expect(pageSource).toContain("xl:grid xl:min-h-0 xl:flex-1 xl:grid-rows-7");
+  it("partage La sélection en quatre cartes de même hauteur, quel que soit leur nombre", () => {
+    expect(pageSource).toContain("lg:grid-cols-1 xl:min-h-0 xl:grid-rows-4");
   });
 
   it("garde la colonne La sélection même sans article", () => {
