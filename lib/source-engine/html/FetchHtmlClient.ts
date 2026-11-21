@@ -1,6 +1,7 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 
+import { fetchOrExplain } from "../http/networkError";
 import { HtmlClient } from "./HtmlClient";
 
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -94,7 +95,7 @@ export class FetchHtmlClient implements HtmlClient {
     let url = await assertSafeUrl(initialUrl);
 
     for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
-      const response = await fetch(url, {
+      const response = await fetchOrExplain(url, {
         headers: HTML_REQUEST_HEADERS,
         redirect: "manual",
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),

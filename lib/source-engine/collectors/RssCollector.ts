@@ -2,6 +2,7 @@ import { Source } from "@/lib/generated/prisma/client";
 import { XMLParser } from "fast-xml-parser";
 
 import { extractRssItemImage } from "../articleImage";
+import { fetchOrExplain } from "../http/networkError";
 
 import {
   Collector,
@@ -176,7 +177,7 @@ export class RssCollector implements Collector {
   async collect(
     source: Source,
   ): Promise<ObservationInput[]> {
-    const response = await fetch(source.url, {
+    const response = await fetchOrExplain(source.url, {
       headers: {
         accept:
           "application/rss+xml, application/atom+xml, application/xml, text/xml",
