@@ -20,12 +20,12 @@ import {
   type SaveArticleResult,
   calculateArticleReadingTime,
   slugifyArticleTitle,
-} from "@/components/admin/article-v4/types";
+} from "@/components/admin/article-editor/types";
 
 import {
   getFirstValidationError,
   validateArticleDraft,
-} from "@/components/admin/article-v4/validation";
+} from "@/components/admin/article-editor/validation";
 
 /* =========================================================
    OUTILS

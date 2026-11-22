@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
  * grandes photos et une carte latérale) ont été retirées le 22 novembre 2026,
  * à la demande de l’utilisateur : la page était trop chargée.
  */
-export default async function ImmobilierPageV2() {
+export default async function IlsEnParlentPage() {
   const [currentItems, legacyItems] = await Promise.all([
     getArticlesByCategory("ILS_EN_PARLENT"),
     getArticlesByCategory("IMMOBILIER"),

@@ -15,7 +15,7 @@ import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 export const dynamic = "force-dynamic";
 
-export default async function LifestylePageV2() {
+export default async function LoisirsPage() {
   const [layout, mountainItems] = await Promise.all([
     buildEditorialLayout("category:LOISIRS"),
     getArticlesByCategory("MONTAGNE"),

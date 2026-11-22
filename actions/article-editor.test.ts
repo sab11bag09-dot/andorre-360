@@ -63,7 +63,7 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/components/admin/article-v4/validation", () => ({
+vi.mock("@/components/admin/article-editor/validation", () => ({
   validateArticleDraft: vi.fn(() => ({
     success: true,
     errors: [],
@@ -74,9 +74,9 @@ vi.mock("@/components/admin/article-v4/validation", () => ({
 import {
   EMPTY_ARTICLE_DRAFT,
   type ArticleDraft,
-} from "@/components/admin/article-v4/types";
+} from "@/components/admin/article-editor/types";
 
-import { saveArticle } from "./article-v4";
+import { saveArticle } from "./article-editor";
 
 const existingArticle = {
   id: 7,

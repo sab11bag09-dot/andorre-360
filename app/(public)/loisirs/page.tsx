@@ -1,7 +1,3 @@
-import LifestylePageV2 from "@/components/LifestylePageV2";
+export { default } from "@/components/rubric/pages/LoisirsPage";
 
 export const dynamic = "force-dynamic";
-
-export default function LoisirsPage() {
-  return <LifestylePageV2 />;
-}

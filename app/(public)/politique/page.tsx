@@ -1,7 +1,3 @@
-import PolitiquePageV2 from "@/components/PolitiquePageV2";
+export { default } from "@/components/rubric/pages/PolitiquePage";
 
 export const dynamic = "force-dynamic";
-
-export default function PolitiquePage() {
-  return <PolitiquePageV2 />;
-}

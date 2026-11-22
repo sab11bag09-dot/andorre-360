@@ -1,7 +1,3 @@
-import SportsPageV2 from "@/components/SportsPageV2";
+export { default } from "@/components/rubric/pages/SportsPage";
 
 export const dynamic = "force-dynamic";
-
-export default function SportslePage() {
-  return <SportsPageV2 />;
-}

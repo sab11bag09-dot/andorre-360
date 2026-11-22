@@ -1,7 +1,3 @@
-import SocietePageV2 from "@/components/SocietePageV2";
+export { default } from "@/components/rubric/pages/SocietePage";
 
 export const dynamic = "force-dynamic";
-
-export default function SocietePage() {
-  return <SocietePageV2 />;
-}
