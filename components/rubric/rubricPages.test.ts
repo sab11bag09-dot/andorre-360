@@ -54,6 +54,36 @@ describe("Actualité : photos du bas réduites, trois cartes latérales", () => 
   });
 });
 
+describe("Loisirs : sans les trois cartes du bas", () => {
+  it("garde deux cartes en bas et agrandit les photos des cartes latérales", () => {
+    const page = source(PAGES.Loisirs);
+    expect(page).toContain("takeArticles(layout.card, 2)");
+    expect(page).toContain("takeArticles([], 1)");
+    expect(page).toContain("<RubricGrid columns={2} rows={1} fill>");
+    // Question à… et les deux cartes latérales remplissent leur bloc.
+    expect(page.match(/ stretch \/>/g)).toHaveLength(3);
+  });
+});
+
+describe("Culture : photos du bas réduites, sans Question à…", () => {
+  it("affiche quatre cartes latérales et aucune carte Question à…", () => {
+    const page = source(PAGES.Culture);
+    expect(page).toContain("side: 4,");
+    expect(page).not.toContain("RubricQuestionCard");
+    expect(page).not.toContain("question:");
+  });
+});
+
+describe("Sports : page allégée", () => {
+  it("garde trois brèves, deux cartes photo et deux cartes latérales, sans Bon à savoir", () => {
+    const page = source(PAGES.Sports);
+    expect(page).toContain("briefs: 3,");
+    expect(page).toContain("bottom: 2,");
+    expect(page).toContain("side: 2,");
+    expect(page).not.toContain("RubricGoodToKnow");
+  });
+});
+
 describe("pages de rubrique", () => {
   it.each(Object.entries(PAGES))("%s : utilise les cartes partagées, sans carte recopiée", (_, path) => {
     const page = source(path);
