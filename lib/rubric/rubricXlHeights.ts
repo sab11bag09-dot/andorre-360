@@ -22,7 +22,12 @@ export type RubricXlHeights = { main: readonly number[]; aside: readonly number[
 
 export const RUBRIC_XL_HEIGHTS = {
   /** Article principal, brèves, deux cartes ; lien partenaire, quatre cartes, Bon à savoir. */
-  actualite: { main: [689, 354, 678], aside: [44, 329, 329, 329, 329, 305] },
+  /**
+   * Actualité (22 novembre 2026) : photos du bas ramenées de 501 à environ
+   * 259 px de haut ; à droite, trois cartes au lieu de quatre, qui gagnent
+   * 37 px chacune, donnés à leur photo.
+   */
+  actualite: { main: [689, 354, 436], aside: [44, 366, 366, 366, 305] },
   /** Politique et International. */
   news: { main: [689, 354, 237, 722], aside: [534, 329, 329, 329, 481] },
   /** Économie et Société, avec le lien partenaire en tête de colonne. */

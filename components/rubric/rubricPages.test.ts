@@ -41,6 +41,19 @@ describe("Économie, Société et Politique : photos du bas en format paysage", 
   });
 });
 
+describe("Actualité : photos du bas réduites, trois cartes latérales", () => {
+  it("garde trois cartes latérales qui remplissent leur bloc", () => {
+    const page = source(PAGES.Actualité);
+    expect(page).toContain("side: 3,");
+    expect(page).toContain("...[0, 1, 2].map(");
+    expect(page).toContain("stretch\n");
+  });
+
+  it("laisse la publicité du bas tenir dans le bloc réduit", () => {
+    expect(source(PAGES.Actualité)).toContain("xl:h-auto xl:min-h-0 xl:flex-1");
+  });
+});
+
 describe("Loisirs : sans les trois cartes du bas", () => {
   it("garde deux cartes en bas et agrandit les photos des cartes latérales", () => {
     const page = source(PAGES.Loisirs);

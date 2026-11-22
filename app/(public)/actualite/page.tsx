@@ -34,8 +34,9 @@ function AdvertisementBlock({
         rel="noopener noreferrer"
         className="flex flex-1 flex-col"
       >
-        {/* Sur grand écran, l’image remplit le bloc figé du bas de colonne. */}
-        <div className="relative h-[480px] xl:h-auto xl:min-h-[480px] xl:flex-1">
+        {/* Sur grand écran, l’image remplit le bloc figé du bas de colonne
+            (436 px depuis le 22 novembre 2026 : plus de hauteur minimale). */}
+        <div className="relative h-[480px] xl:h-auto xl:min-h-0 xl:flex-1">
           <SafeImage src={imagePath} alt="Publicité" fill sizes={sizes} className="object-cover" />
         </div>
 
@@ -80,7 +81,7 @@ export default async function ActualitePage() {
   } = allocateRubricSlots(items, {
     hero: 1,
     main: 1,
-    side: 4,
+    side: 3,
     briefs: 6,
     bottom: 2,
     goodToKnow: 1,
@@ -134,7 +135,9 @@ export default async function ActualitePage() {
           href="https://www.andorracorporate.com"
           label="Visiter Andorra Corporate"
         />,
-        ...[0, 1, 2, 3].map(
+        // Trois cartes au lieu de quatre ; chacune agrandit sa photo pour que
+        // la colonne finisse au niveau de la colonne principale.
+        ...[0, 1, 2].map(
           (index) =>
             side[index] && (
               <RubricImageCard
@@ -142,6 +145,7 @@ export default async function ActualitePage() {
                 article={side[index]}
                 size="side"
                 showDescription={false}
+                stretch
               />
             ),
         ),
