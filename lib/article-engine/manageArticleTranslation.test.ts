@@ -351,6 +351,38 @@ describe("manageArticleTranslation", () => {
     },
   );
 
+  it("refuse de retirer la traduction publiée d’un article en ligne", async () => {
+    const { dependencies, transitionStatus } = makeDependencies({
+      id: 12,
+      status: "PUBLISHED",
+      articlePublic: true,
+    });
+
+    await expect(
+      transitionArticleTranslation(
+        { articleId: 7, locale: "CA", nextStatus: "ARCHIVED" },
+        dependencies,
+      ),
+    ).rejects.toThrow("chaque article publié doit exister en catalan et en espagnol");
+
+    expect(transitionStatus).not.toHaveBeenCalled();
+  });
+
+  it("retire la traduction publiée d’un article qui n’est plus en ligne", async () => {
+    const { dependencies, transitionStatus } = makeDependencies({
+      id: 12,
+      status: "PUBLISHED",
+      articlePublic: false,
+    });
+
+    await transitionArticleTranslation(
+      { articleId: 7, locale: "ES", nextStatus: "ARCHIVED" },
+      dependencies,
+    );
+
+    expect(transitionStatus).toHaveBeenCalledWith(12, "PUBLISHED", "ARCHIVED");
+  });
+
   it("interdit la publication directe", async () => {
     const {
       dependencies,
