@@ -41,6 +41,15 @@ describe("Économie, Société et Politique : photos du bas en format paysage", 
   });
 });
 
+describe("Culture : photos du bas réduites, sans Question à…", () => {
+  it("affiche quatre cartes latérales et aucune carte Question à…", () => {
+    const page = source(PAGES.Culture);
+    expect(page).toContain("side: 4,");
+    expect(page).not.toContain("RubricQuestionCard");
+    expect(page).not.toContain("question:");
+  });
+});
+
 describe("Sports : page allégée", () => {
   it("garde trois brèves, deux cartes photo et deux cartes latérales, sans Bon à savoir", () => {
     const page = source(PAGES.Sports);

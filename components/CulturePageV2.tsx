@@ -5,7 +5,6 @@ import {
   RubricImageCard,
   RubricMainCard,
   RubricPage,
-  RubricQuestionCard,
   rubricColumn,
 } from "@/components/rubric/RubricCards";
 import { getArticlesByCategory } from "@/lib/articles";
@@ -14,21 +13,24 @@ import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Rubrique Culture, ajustée le 22 novembre 2026 à la demande de
+ * l’utilisateur : photos du bas moins hautes, et la carte « Question à… »
+ * retirée de la colonne latérale, remplacée par une quatrième carte.
+ */
 export default async function CulturePageV2() {
   const items = await getArticlesByCategory("CULTURE");
 
   const {
     hero: [featured],
     main: [mainArticle],
-    question: [questionArticle],
     side,
     briefs,
     bottom,
   } = allocateRubricSlots(items, {
     hero: 1,
     main: 1,
-    question: 1,
-    side: 3,
+    side: 4,
     briefs: 6,
     bottom: 2,
   });
@@ -38,14 +40,15 @@ export default async function CulturePageV2() {
   return (
     <RubricPage
       hero={featured && <RubricHero article={featured} />}
-      aside={rubricColumn(heights.aside, [
-        questionArticle && (
-          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
+      aside={rubricColumn(
+        heights.aside,
+        [0, 1, 2, 3].map(
+          (index) =>
+            side[index] && (
+              <RubricImageCard key={side[index].id} article={side[index]} size="side" />
+            ),
         ),
-        side[0] && <RubricImageCard article={side[0]} size="side" />,
-        side[1] && <RubricImageCard article={side[1]} size="side" />,
-        side[2] && <RubricImageCard article={side[2]} size="side" stretch />,
-      ], { fill: 3 })}
+      )}
       main={rubricColumn(
         heights.main,
         [
