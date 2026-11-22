@@ -77,9 +77,10 @@ export default async function LifestylePageV2() {
   const featured = takeArticle(layout.hero);
   const mainArticle = takeArticle(layout.feature);
   const questionArticle = takeArticle(layout.question);
-  const side = takeArticles(layout.card, 3);
+  const side = takeArticles(layout.card, 2);
   const briefs = takeArticles(layout.briefs, 6);
-  const bottom = [takeArticle(layout.grandFormat), ...takeArticles([], 3)].filter(
+  // Une seule rangée de deux cartes en bas (22 novembre 2026).
+  const bottom = [takeArticle(layout.grandFormat), ...takeArticles([], 1)].filter(
     (article): article is LeisureArticle => Boolean(article),
   );
 
@@ -100,14 +101,15 @@ export default async function LifestylePageV2() {
         )
       }
       banner={<PasDeLaCasaTraffic />}
+      // Sans les trois cartes du bas : chaque carte restante agrandit sa photo
+      // pour que la colonne finisse au niveau de la colonne principale.
       aside={rubricColumn(heights.aside, [
         questionArticle && (
-          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
+          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} stretch />
         ),
-        side[0] && <RubricImageCard article={side[0]} size="side" />,
-        side[1] && <RubricImageCard article={side[1]} size="side" />,
-        side[2] && <RubricImageCard article={side[2]} size="side" stretch />,
-      ], { fill: 3 })}
+        side[0] && <RubricImageCard article={side[0]} size="side" stretch />,
+        side[1] && <RubricImageCard article={side[1]} size="side" stretch />,
+      ], { fill: 2 })}
       main={rubricColumn(
         heights.main,
         [
@@ -120,7 +122,7 @@ export default async function LifestylePageV2() {
             </RubricGrid>
           ),
           bottom.length > 0 && (
-            <RubricGrid columns={2} rows={2} fill>
+            <RubricGrid columns={2} rows={1} fill>
               {bottom.map((article) => (
                 <RubricImageCard
                   key={article.id}
