@@ -29,6 +29,14 @@ const PAGES = {
   Sports: "components/SportsPageV2.tsx",
 };
 
+describe("Économie : photos du bas en format paysage", () => {
+  it("utilise le bas compact et deux cartes latérales", () => {
+    expect(source(PAGES.Économie)).toContain("compactBottom");
+    expect(source(NEWS_RUBRIC_PAGE)).toContain("RUBRIC_XL_HEIGHTS.newsWithPartnerCompact");
+    expect(source(NEWS_RUBRIC_PAGE)).toContain("const sideCount = compactBottom ? 2 : 3;");
+  });
+});
+
 describe("pages de rubrique", () => {
   it.each(Object.entries(PAGES))("%s : utilise les cartes partagées, sans carte recopiée", (_, path) => {
     const page = source(path);
