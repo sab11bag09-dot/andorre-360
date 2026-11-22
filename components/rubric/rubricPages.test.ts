@@ -30,12 +30,8 @@ const PAGES = {
 };
 
 describe("Économie, Société et Politique : photos du bas en format paysage", () => {
-  it.each(["Économie", "Société", "Politique"] as const)("%s utilise le bas compact", (page) => {
+  it.each(["Économie", "Société", "Politique", "International"] as const)("%s utilise le bas compact", (page) => {
     expect(source(PAGES[page])).toContain("compactBottom");
-  });
-
-  it("garde International inchangée", () => {
-    expect(source(PAGES.International)).not.toContain("compactBottom");
   });
 
   it("utilise le bas compact et deux cartes latérales", () => {
