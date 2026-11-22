@@ -44,8 +44,17 @@ export const RUBRIC_XL_HEIGHTS = {
    * gagnent 12 px (237 → 249) pour que les colonnes finissent au même niveau.
    */
   ilsEnParlent: { main: [689, 354, 249], aside: [534, 387, 387] },
-  sports: { main: [689, 354, 989], aside: [534, 387, 387, 387, 305] },
-  culture: { main: [689, 354, 660], aside: [534, 387, 387, 387] },
+  /**
+   * Sports, allégée (22 novembre 2026) : une rangée de brèves (169 px) et une
+   * rangée de cartes photo (482 px) ; à droite, Question à… et deux cartes,
+   * qui gagnent 24 px chacune (387 → 411) pour finir au même niveau.
+   */
+  sports: { main: [689, 169, 482], aside: [534, 411, 411] },
+  /**
+   * Culture (22 novembre 2026) : photos du bas ramenées d’environ 426 à
+   * 280 px de haut ; à droite, quatre cartes, sans Question à….
+   */
+  culture: { main: [689, 354, 513], aside: [387, 387, 387, 387] },
   montagne: { main: [689, 237, 941], aside: [534, 387, 387, 551] },
   /**
    * Loisirs, sans les trois cartes du bas (22 novembre 2026) : une rangée de

@@ -52,6 +52,25 @@ describe("Loisirs : sans les trois cartes du bas", () => {
   });
 });
 
+describe("Culture : photos du bas réduites, sans Question à…", () => {
+  it("affiche quatre cartes latérales et aucune carte Question à…", () => {
+    const page = source(PAGES.Culture);
+    expect(page).toContain("side: 4,");
+    expect(page).not.toContain("RubricQuestionCard");
+    expect(page).not.toContain("question:");
+  });
+});
+
+describe("Sports : page allégée", () => {
+  it("garde trois brèves, deux cartes photo et deux cartes latérales, sans Bon à savoir", () => {
+    const page = source(PAGES.Sports);
+    expect(page).toContain("briefs: 3,");
+    expect(page).toContain("bottom: 2,");
+    expect(page).toContain("side: 2,");
+    expect(page).not.toContain("RubricGoodToKnow");
+  });
+});
+
 describe("pages de rubrique", () => {
   it.each(Object.entries(PAGES))("%s : utilise les cartes partagées, sans carte recopiée", (_, path) => {
     const page = source(path);
