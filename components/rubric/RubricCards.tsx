@@ -344,14 +344,17 @@ export function RubricImageCard({
 export function RubricQuestionCard({
   article,
   fallbackImage,
+  stretch = false,
 }: {
   article: RubricArticle;
   fallbackImage?: string | null;
+  /** Agrandit la photo pour que la carte remplisse la hauteur de son bloc. */
+  stretch?: boolean;
 }) {
   return (
-    <Link href={articleHref(article)} className="block">
+    <Link href={articleHref(article)} className={`block${stretch ? " lg:flex-1" : ""}`}>
       <article className={CARD_FRAME}>
-        <div className="relative h-56 shrink-0">
+        <div className={`relative h-56 shrink-0${stretch ? " lg:h-auto lg:min-h-56 lg:flex-1" : ""}`}>
           <MediaPreview
             image={article.image ?? fallbackImage ?? null}
             videoUrl={article.videoUrl}

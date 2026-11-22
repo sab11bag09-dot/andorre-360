@@ -41,6 +41,17 @@ describe("Économie, Société et Politique : photos du bas en format paysage", 
   });
 });
 
+describe("Loisirs : sans les trois cartes du bas", () => {
+  it("garde deux cartes en bas et agrandit les photos des cartes latérales", () => {
+    const page = source(PAGES.Loisirs);
+    expect(page).toContain("takeArticles(layout.card, 2)");
+    expect(page).toContain("takeArticles([], 1)");
+    expect(page).toContain("<RubricGrid columns={2} rows={1} fill>");
+    // Question à… et les deux cartes latérales remplissent leur bloc.
+    expect(page.match(/ stretch \/>/g)).toHaveLength(3);
+  });
+});
+
 describe("pages de rubrique", () => {
   it.each(Object.entries(PAGES))("%s : utilise les cartes partagées, sans carte recopiée", (_, path) => {
     const page = source(path);

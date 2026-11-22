@@ -47,7 +47,12 @@ export const RUBRIC_XL_HEIGHTS = {
   sports: { main: [689, 354, 989], aside: [534, 387, 387, 387, 305] },
   culture: { main: [689, 354, 660], aside: [534, 387, 387, 387] },
   montagne: { main: [689, 237, 941], aside: [534, 387, 387, 551] },
-  loisirs: { main: [689, 354, 941], aside: [534, 387, 387, 668] },
+  /**
+   * Loisirs, sans les trois cartes du bas (22 novembre 2026) : une rangée de
+   * deux cartes photo en bas ; à droite, les trois cartes restantes gagnent
+   * 70 px chacune, donnés à leur photo.
+   */
+  loisirs: { main: [689, 354, 459], aside: [604, 457, 457] },
 } as const satisfies Record<string, RubricXlHeights>;
 
 export function rubricColumnTotal(heights: readonly number[], gap: number): number {
