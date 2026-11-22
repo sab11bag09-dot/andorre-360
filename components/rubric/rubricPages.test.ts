@@ -74,10 +74,14 @@ describe("pages de rubrique", () => {
     expect(page).toContain("<PasDeLaCasaTraffic />");
   });
 
-  it("Ils en parlent affiche les cartes du milieu sur sa route", () => {
-    expect(source("app/(public)/ils-en-parlent/page.tsx")).toContain(
-      "<ImmobilierPageV2 showMiddleCards />",
-    );
+  it("Ils en parlent n’a plus les trois cartes du bas", () => {
+    const page = source(PAGES["Ils en parlent"]);
+    expect(page).toContain("side: 2,");
+    expect(page).not.toContain("bottom");
+    expect(page).toContain("RUBRIC_XL_HEIGHTS.ilsEnParlent;");
+    expect(source("app/(public)/ils-en-parlent/page.tsx")).toContain("<ImmobilierPageV2 />");
+    // Le nom de la catégorie s’affiche sans tirets bas.
+    expect(page).toContain('featured.category === "ILS_EN_PARLENT"');
   });
 
   it("conserve les liens partenaires et les formats publicitaires", () => {

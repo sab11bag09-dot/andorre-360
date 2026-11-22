@@ -15,12 +15,14 @@ import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 export const dynamic = "force-dynamic";
 
-/** Rubrique « Ils en parlent », qui reprend aussi les anciens articles Immobilier. */
-export default async function ImmobilierPageV2({
-  showMiddleCards = false,
-}: {
-  showMiddleCards?: boolean;
-}) {
+/**
+ * Rubrique « Ils en parlent », qui reprend aussi les anciens articles
+ * Immobilier : une, article principal, six brèves, deux cartes sans image ;
+ * à droite, Question à… et deux cartes. Les trois cartes du bas (deux
+ * grandes photos et une carte latérale) ont été retirées le 22 novembre 2026,
+ * à la demande de l’utilisateur : la page était trop chargée.
+ */
+export default async function ImmobilierPageV2() {
   const [currentItems, legacyItems] = await Promise.all([
     getArticlesByCategory("ILS_EN_PARLENT"),
     getArticlesByCategory("IMMOBILIER"),
@@ -39,28 +41,16 @@ export default async function ImmobilierPageV2({
     side,
     briefs,
     middle,
-    bottom,
   } = allocateRubricSlots(items, {
     hero: 1,
     main: 1,
     question: 1,
-    side: 3,
+    side: 2,
     briefs: 6,
-    bottom: 2,
-    // En dernier : sans les cartes du milieu, aucun article n’est sauté.
     middle: 2,
   });
 
-  const heights = showMiddleCards
-    ? RUBRIC_XL_HEIGHTS.ilsEnParlent
-    : RUBRIC_XL_HEIGHTS.ilsEnParlentSansMilieu;
-  const middleCards = middle.length > 0 && (
-    <RubricGrid columns={2} rows={1}>
-      {middle.map((article) => (
-        <RubricTextCard key={article.id} article={article} />
-      ))}
-    </RubricGrid>
-  );
+  const heights = RUBRIC_XL_HEIGHTS.ilsEnParlent;
 
   return (
     <RubricPage
@@ -69,23 +59,20 @@ export default async function ImmobilierPageV2({
           <RubricHero
             article={featured}
             categoryLabel={
-              featured.category === "IMMOBILIER" ? "ILS EN PARLENT" : featured.category
+              featured.category === "IMMOBILIER" || featured.category === "ILS_EN_PARLENT"
+                ? "ILS EN PARLENT"
+                : featured.category
             }
           />
         )
       }
-      aside={rubricColumn(
-        heights.aside,
-        [
-          questionArticle && (
-            <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
-          ),
-          side[0] && <RubricImageCard article={side[0]} size="side" />,
-          side[1] && <RubricImageCard article={side[1]} size="side" />,
-          side[2] && <RubricImageCard article={side[2]} size="side" stretch />,
-        ],
-        { fill: 3 },
-      )}
+      aside={rubricColumn(heights.aside, [
+        questionArticle && (
+          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
+        ),
+        side[0] && <RubricImageCard article={side[0]} size="side" />,
+        side[1] && <RubricImageCard article={side[1]} size="side" />,
+      ])}
       main={rubricColumn(
         heights.main,
         [
@@ -97,16 +84,15 @@ export default async function ImmobilierPageV2({
               ))}
             </RubricGrid>
           ),
-          ...(showMiddleCards ? [middleCards] : []),
-          bottom.length > 0 && (
+          middle.length > 0 && (
             <RubricGrid columns={2} rows={1} fill>
-              {bottom.map((article) => (
-                <RubricImageCard key={article.id} article={article} size="wide" stretch />
+              {middle.map((article) => (
+                <RubricTextCard key={article.id} article={article} />
               ))}
             </RubricGrid>
           ),
         ],
-        { fill: showMiddleCards ? 3 : 2 },
+        { fill: 2 },
       )}
     />
   );
