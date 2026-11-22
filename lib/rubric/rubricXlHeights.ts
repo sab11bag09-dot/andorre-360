@@ -39,8 +39,11 @@ export const RUBRIC_XL_HEIGHTS = {
    * photos du bas de même format qu’en Économie et Société.
    */
   newsCompact: { main: [689, 354, 237, 437], aside: [534, 329, 329, 549] },
-  ilsEnParlent: { main: [689, 354, 237, 459], aside: [534, 387, 387, 455] },
-  ilsEnParlentSansMilieu: { main: [689, 354, 728], aside: [534, 387, 387, 455] },
+  /**
+   * Sans les trois cartes du bas (22 novembre 2026). Les cartes sans image
+   * gagnent 12 px (237 → 249) pour que les colonnes finissent au même niveau.
+   */
+  ilsEnParlent: { main: [689, 354, 249], aside: [534, 387, 387] },
   sports: { main: [689, 354, 989], aside: [534, 387, 387, 387, 305] },
   culture: { main: [689, 354, 660], aside: [534, 387, 387, 387] },
   montagne: { main: [689, 237, 941], aside: [534, 387, 387, 551] },
