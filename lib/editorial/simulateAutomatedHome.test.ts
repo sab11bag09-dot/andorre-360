@@ -138,7 +138,7 @@ describe("simulateAutomatedHome", () => {
       hero: 1,
       feature: 1,
       "grand-format": 1,
-      card: 5,
+      card: 3,
       brief: 3,
     });
   });

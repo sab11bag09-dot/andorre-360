@@ -28,7 +28,7 @@ La structure attendue sur la page publique est :
 - une mise en avant ;
 - un grand format ;
 - trois brèves dans « L’essentiel » ;
-- cinq cartes au total : une grande carte centrale et quatre articles dans « Sélection ».
+- trois cartes, toutes dans « Sélection », avec une photo pleine largeur (cinq cartes jusqu’au 22 novembre 2026).
 
 ## 3. Ce qui est déjà terminé
 
@@ -401,7 +401,7 @@ Activer immédiatement l’arrêt d’urgence si l’un de ces événements appa
 - un article apparaît plusieurs fois ;
 - une publicité change de place de manière inattendue ;
 - plus de trois brèves apparaissent dans « L’essentiel » ;
-- moins de quatre articles apparaissent dans « Sélection » alors que cinq cartes sont disponibles ;
+- moins de trois articles apparaissent dans « Sélection » alors que trois cartes sont disponibles ;
 - une application se répète ;
 - une erreur de base de données apparaît ;
 - l’historique ou le run n’est pas enregistré ;
