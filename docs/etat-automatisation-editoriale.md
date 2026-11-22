@@ -38,7 +38,7 @@ La composition automatique respecte maintenant la structure réellement affiché
 - une mise en avant ;
 - un grand format ;
 - trois brèves dans « L’essentiel » ;
-- cinq cartes au total : une grande carte centrale et quatre articles dans « Sélection ».
+- trois cartes, toutes dans « Sélection », avec une photo pleine largeur (cinq cartes jusqu’au 22 novembre 2026).
 
 ## Protection des choix humains
 

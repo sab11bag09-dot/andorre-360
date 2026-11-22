@@ -310,46 +310,52 @@ function Editorial({ article }: { article: HomeArticle | null }) {
   );
 }
 
+/**
+ * Sélection : trois articles, photo sur toute la largeur de la colonne. Sur
+ * grand écran, le bloc garde sa hauteur figée et la partage en trois rangées
+ * égales ; la photo prend la place qui reste sous le titre réservé.
+ */
 function Selection({ articles }: { articles: HomeArticle[] }) {
   return (
-    <section data-layout-block="selection" className={`border-t-2 border-yellow-500 pt-5 ${XL_HEIGHT.selection}`}>
-      <div className="mb-4">
+    <section
+      data-layout-block="selection"
+      className={`flex flex-col border-t-2 border-yellow-500 pt-5 ${XL_HEIGHT.selection}`}
+    >
+      <div className="mb-2">
         <span className="text-xs uppercase tracking-[0.2em] text-gray-500">La rédaction</span>
 
         <h2 className="mt-1 font-serif text-2xl">Sélection</h2>
       </div>
 
-      <div className="divide-y divide-gray-800">
+      <div className="grid divide-y divide-gray-800 xl:min-h-0 xl:flex-1 xl:grid-rows-3">
         {articles.map((article, index) => (
-          <Link key={article.id} href={href(article)} className="group block py-6">
-            <article className="grid grid-cols-[110px_1fr] gap-4">
-              <div className="relative h-[110px] overflow-hidden">
+          <Link key={article.id} href={href(article)} className="group flex min-h-0 py-5">
+            <article className="flex w-full min-h-0 flex-col">
+              <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden xl:aspect-auto xl:min-h-0 xl:flex-1">
                 <SafeImage
                   src={article.image || FALLBACK_IMAGE}
                   alt={article.title}
                   fill
-                  sizes="110px"
+                  sizes="(max-width: 1280px) 100vw, 340px"
                   className="object-cover transition duration-500 group-hover:scale-[1.03]"
                 />
               </div>
 
-              <div>
-                <div className="flex items-start gap-3">
-                  <span className="font-serif text-2xl leading-none text-gray-700">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+              <div className="mt-4 flex items-start gap-3">
+                <span className="font-serif text-2xl leading-none text-gray-700">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
 
-                  <p className="pt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
-                    {article.category}
-                  </p>
-                </div>
-
-                <h3 className="mt-3 line-clamp-4 min-h-[4lh] font-serif text-lg leading-snug transition group-hover:text-yellow-500">
-                  {article.title}
-                </h3>
-
-                <p className={`mt-4 ${READ_MORE}`}>Lire l’article →</p>
+                <p className="pt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-yellow-500">
+                  {article.category}
+                </p>
               </div>
+
+              <h3 className="mt-3 line-clamp-3 min-h-[3lh] font-serif text-lg leading-snug transition group-hover:text-yellow-500">
+                {article.title}
+              </h3>
+
+              <p className={`mt-3 ${READ_MORE}`}>Lire l’article →</p>
             </article>
           </Link>
         ))}

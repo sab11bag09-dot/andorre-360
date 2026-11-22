@@ -26,13 +26,13 @@ function emptyLayout(overrides: Partial<HomeLayoutInput<TestArticle>> = {}): Hom
 
 describe("composeHomePage", () => {
   it("affiche autant de cartes que l’automatisation en place, première comprise", () => {
-    const placed = range(101, 105);
+    const placed = range(101, 103);
     const home = composeHomePage(emptyLayout({ hero: article(1), card: placed }), [], {
       hasActiveAutomatedComposition: true,
     });
 
     expect(HOME_PAGE_SLOTS.cards).toBe(HOME_VISIBLE_ZONE_CAPACITIES.card);
-    expect(ids(home.cards)).toEqual([101, 102, 103, 104, 105]);
+    expect(ids(home.cards)).toEqual([101, 102, 103]);
   });
 
   it("aligne le nombre de brèves sur la capacité de l’automatisation", () => {
@@ -50,8 +50,8 @@ describe("composeHomePage", () => {
     expect(home.feature?.id).toBe(50);
     expect(ids(home.briefs)).toEqual([60, 2, 3]);
     expect(home.grandFormat?.id).toBe(4);
-    expect(ids(home.cards)).toEqual([5, 6, 7, 8, 9]);
-    expect(ids(home.discover)).toEqual([10, 11, 12]);
+    expect(ids(home.cards)).toEqual([5, 6, 7]);
+    expect(ids(home.discover)).toEqual([8, 9, 10]);
   });
 
   it("n’affiche jamais deux fois le même article", () => {

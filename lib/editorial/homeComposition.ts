@@ -11,7 +11,9 @@ export const HOME_VISIBLE_ZONE_CAPACITIES = {
   hero: 1,
   feature: 1,
   "grand-format": 1,
-  card: 5,
+  // Sélection de la une : trois articles avec photo pleine largeur
+  // (22 novembre 2026, cinq vignettes auparavant).
+  card: 3,
   brief: 3,
 } as const;
 

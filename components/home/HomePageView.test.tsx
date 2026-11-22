@@ -133,7 +133,9 @@ describe("HomePageView : blocs figés et colonnes alignées en bas de page", () 
   });
 
   it("n’étire aucun bloc pour combler un écart", () => {
-    expect(html).not.toContain("xl:flex-1");
+    // Un bloc figé ne s’étire jamais ; à l’intérieur de la Sélection, seule
+    // la photo occupe la place laissée par le titre réservé.
+    expect(html).not.toMatch(/data-layout-block="[^"]*" class="[^"]*\bxl:flex-1\b/);
     expect(html).not.toMatch(/class="[^"]*\bxl:col-span-4\b[^"]*\bxl:self-stretch\b/);
   });
 

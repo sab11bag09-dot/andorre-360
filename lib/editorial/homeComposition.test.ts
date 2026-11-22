@@ -329,7 +329,7 @@ describe("composeAutomatedHome", () => {
     );
   });
 
-  it("complète les cinq cartes par secours même si une catégorie domine", () => {
+  it("complète les trois cartes par secours même si une catégorie domine", () => {
     const candidates = Array.from({ length: 5 }, (_, index) =>
       makeCandidate(index + 1, 50, {
         category: "POLITIQUE",
@@ -339,7 +339,7 @@ describe("composeAutomatedHome", () => {
     const result = composeAutomatedHome(candidates);
     const cards = result.placements.filter(({ zone }) => zone === "card");
 
-    expect(cards).toHaveLength(5);
+    expect(cards).toHaveLength(3);
     expect(cards.every(({ origin }) => origin === "FALLBACK")).toBe(true);
     expect(result.unfilledSlots.card).toBe(0);
   });
@@ -390,7 +390,7 @@ describe("composeAutomatedHome", () => {
       hero: 1,
       feature: 1,
       "grand-format": 1,
-      card: 5,
+      card: 3,
       brief: 3,
     });
   });
