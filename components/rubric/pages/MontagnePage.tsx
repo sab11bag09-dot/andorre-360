@@ -1,10 +1,11 @@
 import {
-  RubricBriefCard,
   RubricGrid,
   RubricHero,
   RubricImageCard,
   RubricMainCard,
   RubricPage,
+  RubricQuestionCard,
+  RubricTextCard,
   rubricColumn,
 } from "@/components/rubric/RubricCards";
 import { getArticlesByCategory } from "@/lib/articles";
@@ -13,56 +14,52 @@ import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Rubrique Culture, ajustée le 22 novembre 2026 à la demande de
- * l’utilisateur : photos du bas moins hautes, et la carte « Question à… »
- * retirée de la colonne latérale, remplacée par une quatrième carte.
- */
-export default async function CulturePageV2() {
-  const items = await getArticlesByCategory("CULTURE");
+export default async function MontagnePage() {
+  const items = await getArticlesByCategory("MONTAGNE");
 
   const {
     hero: [featured],
     main: [mainArticle],
+    question: [questionArticle],
     side,
-    briefs,
-    bottom,
+    textCards,
+    imageCards,
   } = allocateRubricSlots(items, {
     hero: 1,
     main: 1,
-    side: 4,
-    briefs: 6,
-    bottom: 2,
+    question: 1,
+    side: 3,
+    textCards: 2,
+    imageCards: 4,
   });
 
-  const heights = RUBRIC_XL_HEIGHTS.culture;
+  const heights = RUBRIC_XL_HEIGHTS.montagne;
 
   return (
     <RubricPage
       hero={featured && <RubricHero article={featured} />}
-      aside={rubricColumn(
-        heights.aside,
-        [0, 1, 2, 3].map(
-          (index) =>
-            side[index] && (
-              <RubricImageCard key={side[index].id} article={side[index]} size="side" />
-            ),
+      aside={rubricColumn(heights.aside, [
+        questionArticle && (
+          <RubricQuestionCard article={questionArticle} fallbackImage={featured?.image} />
         ),
-      )}
+        side[0] && <RubricImageCard article={side[0]} size="side" />,
+        side[1] && <RubricImageCard article={side[1]} size="side" />,
+        side[2] && <RubricImageCard article={side[2]} size="side" stretch />,
+      ], { fill: 3 })}
       main={rubricColumn(
         heights.main,
         [
           mainArticle && <RubricMainCard article={mainArticle} />,
-          briefs.length > 0 && (
-            <RubricGrid columns={3} rows={2}>
-              {briefs.map((article) => (
-                <RubricBriefCard key={article.id} article={article} />
+          textCards.length > 0 && (
+            <RubricGrid columns={2} rows={1}>
+              {textCards.map((article) => (
+                <RubricTextCard key={article.id} article={article} />
               ))}
             </RubricGrid>
           ),
-          bottom.length > 0 && (
-            <RubricGrid columns={2} rows={1} fill>
-              {bottom.map((article) => (
+          imageCards.length > 0 && (
+            <RubricGrid columns={2} rows={2} fill>
+              {imageCards.map((article) => (
                 <RubricImageCard
                   key={article.id}
                   article={article}

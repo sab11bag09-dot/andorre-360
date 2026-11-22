@@ -1,6 +1,6 @@
 import {
   parseContent,
-} from "@/components/admin/article-v5/content";
+} from "@/components/admin/article-content/content";
 import SafeImage from "@/components/SafeImage";
 
 type Props = {

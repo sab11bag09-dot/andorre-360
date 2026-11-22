@@ -273,8 +273,8 @@ Les actions humaines ont été sécurisées dans :
 - `actions/publications.ts`
 - `actions/publications.test.ts`
 - `actions/articles.ts`
-- `actions/article-v4.ts`
-- `actions/article-v4.test.ts`
+- `actions/article-editor.ts`
+- `actions/article-editor.test.ts`
 
 Lorsqu’un humain crée, déplace ou réactive une publication :
 

@@ -1,7 +1,3 @@
-import ImmobilierPageV2 from "@/components/ImmobilierPageV2";
+export { default } from "@/components/rubric/pages/IlsEnParlentPage";
 
 export const dynamic = "force-dynamic";
-
-export default function IlsEnParlentPage() {
-  return <ImmobilierPageV2 />;
-}

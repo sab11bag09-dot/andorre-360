@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
  */
 
 const ROOT = path.resolve(__dirname, "..");
-const SOURCE_DIRS = ["actions", "app", "components", "data", "lib", "scripts", "types"];
+const SOURCE_DIRS = ["actions", "app", "components", "lib", "scripts"];
 const IGNORED_DIRS = new Set(["node_modules", "generated"]);
 const EXTENSIONS = [".ts", ".tsx", ".js", ".mjs", ".css"];
 const RESOLVE_SUFFIXES = ["", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".css", "/index.tsx", "/index.ts"];

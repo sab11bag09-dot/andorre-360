@@ -1,7 +1,3 @@
-import MontagnePageV2 from "@/components/MontagnePageV2";
+export { default } from "@/components/rubric/pages/MontagnePage";
 
 export const dynamic = "force-dynamic";
-
-export default function MontagnePage() {
-  return <MontagnePageV2 />;
-}

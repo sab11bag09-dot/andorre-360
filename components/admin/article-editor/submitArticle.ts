@@ -1,4 +1,4 @@
-import { saveArticle } from "@/actions/article-v4";
+import { saveArticle } from "@/actions/article-editor";
 
 import type {
   ArticleDraft,

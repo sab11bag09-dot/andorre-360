@@ -2,7 +2,7 @@ import NewsRubricPage from "@/components/rubric/NewsRubricPage";
 
 export const dynamic = "force-dynamic";
 
-export default function SocietePageV2() {
+export default function SocietePage() {
   return (
     <NewsRubricPage
       category="SOCIÉTÉ"

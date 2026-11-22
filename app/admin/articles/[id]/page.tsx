@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
-import ArticleEditor from "@/components/admin/article-v4/ArticleEditor";
-import { mapArticleToDraft } from "@/components/admin/article-v4/mapArticleToDraft";
+import ArticleEditor from "@/components/admin/article-editor/ArticleEditor";
+import { mapArticleToDraft } from "@/components/admin/article-editor/mapArticleToDraft";
 import EditorialHistoryPanel from "@/components/admin/article/EditorialHistoryPanel";
 import EditorialWorkflowPanel from "@/components/admin/article/EditorialWorkflowPanel";
 import { prisma } from "@/lib/prisma";

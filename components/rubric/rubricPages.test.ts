@@ -18,15 +18,15 @@ const NEWS_RUBRIC_PAGE = "components/rubric/NewsRubricPage.tsx";
 
 const PAGES = {
   Actualité: "app/(public)/actualite/page.tsx",
-  Culture: "components/CulturePageV2.tsx",
-  Économie: "components/EconomiePageV2.tsx",
-  "Ils en parlent": "components/ImmobilierPageV2.tsx",
-  International: "components/InternationalPageV2.tsx",
-  Loisirs: "components/LifestylePageV2.tsx",
-  Montagne: "components/MontagnePageV2.tsx",
-  Politique: "components/PolitiquePageV2.tsx",
-  Société: "components/SocietePageV2.tsx",
-  Sports: "components/SportsPageV2.tsx",
+  Culture: "components/rubric/pages/CulturePage.tsx",
+  Économie: "components/rubric/pages/EconomiePage.tsx",
+  "Ils en parlent": "components/rubric/pages/IlsEnParlentPage.tsx",
+  International: "components/rubric/pages/InternationalPage.tsx",
+  Loisirs: "components/rubric/pages/LoisirsPage.tsx",
+  Montagne: "components/rubric/pages/MontagnePage.tsx",
+  Politique: "components/rubric/pages/PolitiquePage.tsx",
+  Société: "components/rubric/pages/SocietePage.tsx",
+  Sports: "components/rubric/pages/SportsPage.tsx",
 };
 
 describe("Économie, Société et Politique : photos du bas en format paysage", () => {
@@ -118,7 +118,7 @@ describe("pages de rubrique", () => {
     expect(page).toContain("side: 2,");
     expect(page).not.toContain("bottom");
     expect(page).toContain("RUBRIC_XL_HEIGHTS.ilsEnParlent;");
-    expect(source("app/(public)/ils-en-parlent/page.tsx")).toContain("<ImmobilierPageV2 />");
+    expect(source("app/(public)/ils-en-parlent/page.tsx")).toContain('from "@/components/rubric/pages/IlsEnParlentPage"');
     // Le nom de la catégorie s’affiche sans tirets bas.
     expect(page).toContain('featured.category === "ILS_EN_PARLENT"');
   });
