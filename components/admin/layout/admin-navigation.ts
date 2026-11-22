@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  Gauge,
   Images,
   History,
   LayoutDashboard,
@@ -64,6 +65,11 @@ export const adminNavigation: AdminNavigationItem[] = [
     label: "Diffusion",
     href: "/admin/diffusion",
     icon: Send,
+  },
+  {
+    label: "Qualité",
+    href: "/admin/qualite",
+    icon: Gauge,
   },
   {
     label: "Historique",

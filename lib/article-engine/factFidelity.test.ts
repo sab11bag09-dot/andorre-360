@@ -27,6 +27,17 @@ describe("checkFactFidelity — chiffres", () => {
     ).toEqual([]);
   });
 
+  it("reconnaît le point de milliers des sources catalanes et espagnoles", () => {
+    expect(
+      checkFactFidelity({
+        article: { title: "Le Gouvernement accorde 14 400 euros", description: "Chapô", content: "Chaque bourse coûte 2 200 euros." },
+        facts: ["El Govern aporta 14.400 euros. El cost de cada beca és de 2.200 euros."],
+        sourceName: "Govern d’Andorra",
+        contextDates: [],
+      }).unsupportedNumbers,
+    ).toEqual([]);
+  });
+
   it("accepte les dates fournies au rédacteur comme contexte", () => {
     expect(
       check("Selon les informations communiquées le 17 novembre 2026.").unsupportedNumbers,

@@ -55,13 +55,20 @@ function normalize(value: string): string {
     .replace(/’/g, "'");
 }
 
-/** Supprime les séparateurs de milliers : « 1 200 000 » devient « 1200000 ». */
+/**
+ * Supprime les séparateurs de milliers : « 1 200 000 » devient « 1200000 ».
+ * Le point de milliers des sources catalanes et espagnoles est aussi
+ * reconnu : « 14.400 euros » est le même nombre que « 14 400 euros ». Un
+ * point suivi de moins de trois chiffres (« 19.30 heures ») ne change pas.
+ */
 function joinThousands(value: string): string {
   let previous: string;
   let current = value;
   do {
     previous = current;
-    current = current.replace(/(\d)[   ](\d{3})(?!\d)/gu, "$1$2");
+    current = current
+      .replace(/(\d)[   ](\d{3})(?!\d)/gu, "$1$2")
+      .replace(/(\d)\.(\d{3})(?!\d)/gu, "$1$2");
   } while (current !== previous);
   return current;
 }
