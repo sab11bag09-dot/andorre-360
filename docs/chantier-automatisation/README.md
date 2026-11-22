@@ -24,6 +24,9 @@ Ce guide complète les documents techniques déjà présents dans le dossier `do
 
 ---
 
+> **Feuille de route à jour** : [jusqu’au lancement](../18-feuille-de-route-lancement.md) (22 novembre 2026).
+> La feuille de route ci-dessous (document 3) est historique.
+
 ## Sommaire
 
 1. [Vision, vocabulaire et chaîne éditoriale](01-vision-et-vocabulaire.md) — parties 2 à 4
