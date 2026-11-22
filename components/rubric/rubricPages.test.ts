@@ -29,9 +29,17 @@ const PAGES = {
   Sports: "components/SportsPageV2.tsx",
 };
 
-describe("Économie : photos du bas en format paysage", () => {
+describe("Économie, Société et Politique : photos du bas en format paysage", () => {
+  it.each(["Économie", "Société", "Politique"] as const)("%s utilise le bas compact", (page) => {
+    expect(source(PAGES[page])).toContain("compactBottom");
+  });
+
+  it("garde International inchangée", () => {
+    expect(source(PAGES.International)).not.toContain("compactBottom");
+  });
+
   it("utilise le bas compact et deux cartes latérales", () => {
-    expect(source(PAGES.Économie)).toContain("compactBottom");
+    expect(source(NEWS_RUBRIC_PAGE)).toContain("RUBRIC_XL_HEIGHTS.newsCompact");
     expect(source(NEWS_RUBRIC_PAGE)).toContain("RUBRIC_XL_HEIGHTS.newsWithPartnerCompact");
     expect(source(NEWS_RUBRIC_PAGE)).toContain("const sideCount = compactBottom ? 2 : 3;");
   });

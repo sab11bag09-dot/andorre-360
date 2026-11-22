@@ -387,10 +387,12 @@ export function RubricGoodToKnow({
   brief?: RubricArticle | null;
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900">
+    // Remplit son bloc : un bloc plus haut que l’encadré (Politique) garde
+    // un fond continu, la place en plus revenant à l’article principal.
+    <section className="flex h-full flex-col overflow-hidden rounded-xl border-t-2 border-yellow-500 bg-zinc-900">
       <Link
         href={articleHref(article)}
-        className="flex flex-col p-6 transition hover:bg-zinc-800"
+        className="flex flex-1 flex-col p-6 transition hover:bg-zinc-800"
       >
         <p className={KICKER}>Bon à savoir</p>
 

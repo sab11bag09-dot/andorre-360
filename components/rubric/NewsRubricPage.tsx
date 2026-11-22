@@ -28,7 +28,7 @@ export default async function NewsRubricPage({
 }: {
   category: string;
   partner?: { href: string; label: string };
-  /** Photos du bas moins hautes et deux cartes latérales au lieu de trois (Économie). */
+  /** Photos du bas moins hautes et deux cartes latérales au lieu de trois (Économie, Société, Politique). */
   compactBottom?: boolean;
 }) {
   const sideCount = compactBottom ? 2 : 3;
@@ -60,7 +60,9 @@ export default async function NewsRubricPage({
     ? compactBottom
       ? RUBRIC_XL_HEIGHTS.newsWithPartnerCompact
       : RUBRIC_XL_HEIGHTS.newsWithPartner
-    : RUBRIC_XL_HEIGHTS.news;
+    : compactBottom
+      ? RUBRIC_XL_HEIGHTS.newsCompact
+      : RUBRIC_XL_HEIGHTS.news;
   const sideCards = Array.from({ length: sideCount }, (_, index) => index).map(
     (index) =>
       side[index] && (
