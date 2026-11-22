@@ -27,6 +27,12 @@ export const RUBRIC_XL_HEIGHTS = {
   news: { main: [689, 354, 237, 722], aside: [534, 329, 329, 329, 481] },
   /** Économie et Société, avec le lien partenaire en tête de colonne. */
   newsWithPartner: { main: [689, 354, 237, 790], aside: [44, 534, 329, 329, 329, 481] },
+  /**
+   * Économie (22 novembre 2026) : photos du bas ramenées d’environ 613 à
+   * 260 px de haut, format paysage ; la colonne latérale garde deux cartes au
+   * lieu de trois pour rester alignée en bas.
+   */
+  newsWithPartnerCompact: { main: [689, 354, 237, 437], aside: [44, 534, 329, 329, 481] },
   ilsEnParlent: { main: [689, 354, 237, 459], aside: [534, 387, 387, 455] },
   ilsEnParlentSansMilieu: { main: [689, 354, 728], aside: [534, 387, 387, 455] },
   sports: { main: [689, 354, 989], aside: [534, 387, 387, 387, 305] },

@@ -6,6 +6,7 @@ export default function EconomiePageV2() {
   return (
     <NewsRubricPage
       category="ÉCONOMIE"
+      compactBottom
       partner={{
         href: "https://www.andorracorporate.com",
         label: "Visiter Andorra Corporate",

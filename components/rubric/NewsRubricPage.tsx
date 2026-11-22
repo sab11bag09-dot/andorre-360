@@ -24,10 +24,14 @@ import { RUBRIC_XL_HEIGHTS } from "@/lib/rubric/rubricXlHeights";
 export default async function NewsRubricPage({
   category,
   partner,
+  compactBottom = false,
 }: {
   category: string;
   partner?: { href: string; label: string };
+  /** Photos du bas moins hautes et deux cartes latérales au lieu de trois (Économie). */
+  compactBottom?: boolean;
 }) {
+  const sideCount = compactBottom ? 2 : 3;
   const items = await getArticlesByCategory(category);
 
   const {
@@ -44,7 +48,7 @@ export default async function NewsRubricPage({
     hero: 1,
     main: 1,
     question: 1,
-    side: 3,
+    side: sideCount,
     briefs: 6,
     middle: 2,
     bottom: 2,
@@ -52,8 +56,12 @@ export default async function NewsRubricPage({
     goodToKnowBrief: 1,
   });
 
-  const heights = partner ? RUBRIC_XL_HEIGHTS.newsWithPartner : RUBRIC_XL_HEIGHTS.news;
-  const sideCards = [0, 1, 2].map(
+  const heights = partner
+    ? compactBottom
+      ? RUBRIC_XL_HEIGHTS.newsWithPartnerCompact
+      : RUBRIC_XL_HEIGHTS.newsWithPartner
+    : RUBRIC_XL_HEIGHTS.news;
+  const sideCards = Array.from({ length: sideCount }, (_, index) => index).map(
     (index) =>
       side[index] && (
         <RubricImageCard key={side[index].id} article={side[index]} size="side" showDescription={false} />
