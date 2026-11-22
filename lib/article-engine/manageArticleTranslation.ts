@@ -237,6 +237,18 @@ export async function transitionArticleTranslation(
     );
   }
 
+  // Règle impérative : un article en ligne existe toujours en français,
+  // catalan et espagnol. Sa traduction publiée ne peut donc pas être retirée
+  // tant que l’article français reste publié.
+  if (
+    translation.status === "PUBLISHED" &&
+    translation.articlePublic
+  ) {
+    throw new Error(
+      "Cet article est en ligne : dépublie-le avant de retirer sa traduction, car chaque article publié doit exister en catalan et en espagnol.",
+    );
+  }
+
   await dependencies.translationRepository
     .transitionStatus(
       translation.id,

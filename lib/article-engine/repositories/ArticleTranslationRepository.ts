@@ -15,6 +15,8 @@ export interface ArticleTranslationRecord {
   publishedAt?: Date | null;
     articleAiRewrittenAt?: Date | null;
   articleContentType?: string | null;
+  /** L’article français est en ligne (publié et au statut PUBLISHED). */
+  articlePublic?: boolean;
 }
 
 export interface ArticleTranslationDraftInput {
