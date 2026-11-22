@@ -45,7 +45,11 @@ export const RUBRIC_XL_HEIGHTS = {
    */
   ilsEnParlent: { main: [689, 354, 249], aside: [534, 387, 387] },
   sports: { main: [689, 354, 989], aside: [534, 387, 387, 387, 305] },
-  culture: { main: [689, 354, 660], aside: [534, 387, 387, 387] },
+  /**
+   * Culture (22 novembre 2026) : photos du bas ramenées d’environ 426 à
+   * 280 px de haut ; à droite, quatre cartes, sans Question à….
+   */
+  culture: { main: [689, 354, 513], aside: [387, 387, 387, 387] },
   montagne: { main: [689, 237, 941], aside: [534, 387, 387, 551] },
   loisirs: { main: [689, 354, 941], aside: [534, 387, 387, 668] },
 } as const satisfies Record<string, RubricXlHeights>;
