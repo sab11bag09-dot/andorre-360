@@ -33,6 +33,12 @@ export const RUBRIC_XL_HEIGHTS = {
    * lieu de trois pour rester alignée en bas.
    */
   newsWithPartnerCompact: { main: [689, 354, 237, 437], aside: [44, 534, 329, 329, 481] },
+  /**
+   * Politique, même réglage, sans lien partenaire en tête de colonne : les
+   * 68 px de ce lien (44 + espacement) vont au Bon à savoir, pour garder des
+   * photos du bas de même format qu’en Économie et Société.
+   */
+  newsCompact: { main: [689, 354, 237, 437], aside: [534, 329, 329, 549] },
   ilsEnParlent: { main: [689, 354, 237, 459], aside: [534, 387, 387, 455] },
   ilsEnParlentSansMilieu: { main: [689, 354, 728], aside: [534, 387, 387, 455] },
   sports: { main: [689, 354, 989], aside: [534, 387, 387, 387, 305] },
