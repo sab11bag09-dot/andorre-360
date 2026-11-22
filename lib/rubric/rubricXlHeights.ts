@@ -34,7 +34,7 @@ export const RUBRIC_XL_HEIGHTS = {
    */
   newsWithPartnerCompact: { main: [689, 354, 237, 437], aside: [44, 534, 329, 329, 481] },
   /**
-   * Politique, même réglage, sans lien partenaire en tête de colonne : les
+   * Politique et International, même réglage, sans lien partenaire en tête de colonne : les
    * 68 px de ce lien (44 + espacement) vont au Bon à savoir, pour garder des
    * photos du bas de même format qu’en Économie et Société.
    */

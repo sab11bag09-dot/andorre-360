@@ -28,7 +28,7 @@ export default async function NewsRubricPage({
 }: {
   category: string;
   partner?: { href: string; label: string };
-  /** Photos du bas moins hautes et deux cartes latérales au lieu de trois (Économie, Société, Politique). */
+  /** Photos du bas moins hautes et deux cartes latérales au lieu de trois (Économie, Société, Politique, International). */
   compactBottom?: boolean;
 }) {
   const sideCount = compactBottom ? 2 : 3;
