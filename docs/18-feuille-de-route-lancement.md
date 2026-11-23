@@ -78,12 +78,18 @@ Défaut le plus fréquent : l’article omet une personne que la source ne cite 
 guillemets, la consigne interdisant les citations.
 Consigne `editorial-facts-v3` : les propos des personnes qui s’expriment sont résumés,
 nommés et attribués, sans guillemets, et l’article répond aux cinq questions. Les
-3 articles concernés, régénérés, sont conformes. Après régénération des 2 derniers
-articles rédigés avec l’ancienne consigne : 26 conformes sur les 30 observations (87 %),
-pour 0,45 dollar au total. L’objectif se mesure sur les 30 observations : une observation
-sans article (génération refusée) compte comme un échec. Restent les 2 articles sur le
-match contre Leganés, qui ne disent pas que c’est un club espagnol (la source ne le dit
-pas), et les 2 observations refusées.
+3 articles concernés, régénérés, sont conformes. L’objectif se mesure sur les
+30 observations : une observation sans article (génération refusée) compte comme un échec.
+
+Consigne `editorial-facts-v4` (accord de l’utilisateur) : à sa première mention, l’article
+peut préciser la nationalité ou la nature notoire d’un club, d’une organisation ou d’un
+lieu (« Leganés, club espagnol »), jamais un chiffre, une date, un nom ou des propos.
+Limite d’extraction relevée de 40 à 60 faits.
+
+**Critère de sortie atteint le 23 novembre 2026 : 29 observations conformes sur 30 (97 %),
+pour 0,54 dollar au total.** Une observation reste sans article : la génération est refusée
+par un contrôle (fait extrait de plus de 400 caractères, puis reprise trop proche de la
+source lors d’un premier essai).
 
 | | |
 |---|---|

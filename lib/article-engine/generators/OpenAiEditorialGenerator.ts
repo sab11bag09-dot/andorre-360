@@ -25,10 +25,14 @@ const DEFAULT_TIMEOUT_MS = 30_000;
  * presse : un avis juridique reste nécessaire avant toute mise en ligne.
  */
 export const OPENAI_EDITORIAL_PROMPT_VERSION =
-  "editorial-facts-v3";
+  "editorial-facts-v4";
 
-/** Nombre maximal de faits retenus pour un article. */
-export const MAX_FACTS = 40;
+/**
+ * Nombre maximal de faits retenus pour un article. Relevé de 40 à 60 le
+ * 23 novembre 2026 : une source longue et dense du jeu de référence (bilan de
+ * la Foire d’Andorre-la-Vieille par Grandvalira) dépassait 40 faits.
+ */
+export const MAX_FACTS = 60;
 /** Longueur maximale d’un fait, pour éviter la reprise de paragraphes entiers. */
 export const MAX_FACT_LENGTH = 400;
 /** Au-delà de ce nombre de mots, un passage entre guillemets est une citation. */
@@ -396,7 +400,8 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
         instructions: [
           "Rédige en français un article journalistique original, clair et factuel adapté à ANDORRE 360.",
           "Rédige uniquement à partir de la liste de faits fournie : tu n’as pas accès au texte d’origine et tu ne dois pas chercher à le reconstituer.",
-          "N’ajoute aucun fait absent de la liste, n’invente aucune information et n’ajoute aucune connaissance extérieure.",
+          "N’ajoute aucun fait absent de la liste et n’invente aucune information.",
+          "Seule exception : à sa première mention, tu peux préciser en quelques mots la nationalité ou la nature d’un club, d’une organisation ou d’un lieu cité, si elle est notoire et certaine (le club espagnol de Leganés) ; jamais un chiffre, une date, un nom de personne ou des propos.",
           "N’insère aucune citation entre guillemets et ne prête à personne des paroles qui ne figurent pas dans la liste.",
           "Nomme les personnes et organismes qui s’expriment dans la liste et rapporte leurs propos au discours indirect, en les leur attribuant.",
           "Le chapô et le premier paragraphe disent qui ou quoi, où et quand ; le corps dit comment et, si la liste le donne, pourquoi.",
