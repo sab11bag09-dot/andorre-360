@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import EditorialStatusBadge from "@/components/admin/article/EditorialStatusBadge";
-import { Badge, EmptyState, PageHeader, StatCard } from "@/components/admin/ui";
+import { Badge, Button, EmptyState, PageHeader, StatCard } from "@/components/admin/ui";
 import type { DraftQualityVerdict } from "@/lib/article-engine/draftQuality";
 import { DRAFT_QUALITY_PUBLISHABLE_SCORE } from "@/lib/article-engine/draftQuality";
 import {
@@ -40,6 +40,11 @@ export default async function DraftQualityPage() {
         backLabel="Retour au tableau de bord"
         title="Qualité des articles de l’IA"
         description={`Chaque article rédigé par l’IA est noté sur 100 à partir du texte de sa source, sans appel à l’IA. Publiable : ${DRAFT_QUALITY_PUBLISHABLE_SCORE} points et aucun défaut bloquant.`}
+        actions={
+          <Button href="/admin/qualite/reference" variant="outline">
+            Jeu de référence
+          </Button>
+        }
       />
 
       <section className="grid gap-4 border-b border-zinc-800 py-8 sm:grid-cols-2 lg:grid-cols-4">

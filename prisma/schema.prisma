@@ -389,8 +389,9 @@ model Observation {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  source  Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  article Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  source        Source         @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  article       Article?       @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  referenceCase ReferenceCase?
 
   @@unique([sourceId, url])
   @@index([sourceId])
@@ -566,4 +567,24 @@ model AiUsage {
   totalTokens  Int
 
   @@index([createdAt])
+}
+
+/// Jeu de référence de la qualité éditoriale (étape 1 de la feuille de route) :
+/// une observation réelle annotée par l’utilisateur avec ce qu’un bon article
+/// doit dire et les erreurs qu’il ne doit pas commettre. Un fait par ligne.
+model ReferenceCase {
+  id              Int       @id @default(autoincrement())
+  observationId   Int       @unique
+  requiredFacts   String    @default("")
+  forbiddenErrors String    @default("")
+  notes           String    @default("")
+  annotatedAt     DateTime?
+  /// Écartée par l’utilisateur : hors du jeu, jamais reproposée.
+  excludedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  observation Observation @relation(fields: [observationId], references: [id], onDelete: Cascade)
+
+  @@index([excludedAt])
 }
