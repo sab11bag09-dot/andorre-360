@@ -18,6 +18,8 @@ const ARTICLE = {
   content: "L’aide du Govern s’élève à 14.400 euros. Le coût de chaque bourse atteint 2,5 millions.",
 };
 
+const EMPTY = { whoFacts: "", whereFacts: "", whenFacts: "", howFacts: "", whyFacts: "", forbiddenErrors: "" };
+
 describe("faits du jeu de référence", () => {
   it("lit un fait par ligne, sans puces ni lignes vides", () => {
     expect(parseReferenceLines("- 14 400 euros\n\n• Xavier Espot\n  ")).toEqual(["14 400 euros", "Xavier Espot"]);
@@ -53,23 +55,34 @@ describe("faits du jeu de référence", () => {
     expect(textStatesFact(ARTICLE.content, "les des")).toBe(false);
   });
 
-  it("contrôle un article contre l’annotation", () => {
+  it("contrôle un article contre l’annotation, question par question", () => {
     const check = checkAgainstReference(ARTICLE, {
-      requiredFacts: "14 400 euros\nXavier Espot\nCroix-Rouge",
+      ...EMPTY,
+      whoFacts: "Xavier Espot\nCroix-Rouge",
+      howFacts: "14 400 euros",
       forbiddenErrors: "14 000 euros\nConsell General",
     });
-    expect(check).toEqual({ missingFacts: ["Croix-Rouge"], forbiddenFound: [], conforms: false });
+    expect(check.missingFacts).toEqual(["Qui ou quoi ? Croix-Rouge"]);
+    expect(check.forbiddenFound).toEqual([]);
+    expect(check.conforms).toBe(false);
+    expect(check.questions.map(({ key, facts, missing }) => [key, facts.length, missing])).toEqual([
+      ["who", 2, ["Croix-Rouge"]],
+      ["where", 0, []],
+      ["when", 0, []],
+      ["how", 1, []],
+      ["why", 0, []],
+    ]);
 
-    const wrong = checkAgainstReference(ARTICLE, { requiredFacts: "Xavier Espot", forbiddenErrors: "2,5 millions" });
+    const wrong = checkAgainstReference(ARTICLE, { ...EMPTY, whoFacts: "Xavier Espot", forbiddenErrors: "2,5 millions" });
     expect(wrong.forbiddenFound).toEqual(["2,5 millions"]);
     expect(wrong.conforms).toBe(false);
 
-    expect(checkAgainstReference(ARTICLE, { requiredFacts: "Xavier Espot", forbiddenErrors: "" }).conforms).toBe(true);
+    expect(checkAgainstReference(ARTICLE, { ...EMPTY, whoFacts: "Xavier Espot" }).conforms).toBe(true);
   });
 
-  it("une observation est annotée dès qu’elle a un fait obligatoire", () => {
-    expect(isReferenceAnnotated({ requiredFacts: "  \n", forbiddenErrors: "14 000 euros" })).toBe(false);
-    expect(isReferenceAnnotated({ requiredFacts: "Xavier Espot", forbiddenErrors: "" })).toBe(true);
+  it("une observation est annotée dès qu’une question a un fait", () => {
+    expect(isReferenceAnnotated({ ...EMPTY, whoFacts: "  \n", forbiddenErrors: "14 000 euros" })).toBe(false);
+    expect(isReferenceAnnotated({ ...EMPTY, whyFacts: "solidarité" })).toBe(true);
   });
 });
 

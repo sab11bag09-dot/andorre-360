@@ -50,7 +50,9 @@ Règles qui s’appliquent à toutes les étapes :
 Travaux :
 
 1. **Jeu de référence** : une trentaine d’observations réelles, réparties par rubrique et par type de source.
-   Pour chacune, l’utilisateur indique ce qu’un bon article doit dire (faits obligatoires, erreurs interdites).
+   Pour chacune, on indique ce qu’un bon article doit dire, selon les cinq questions
+   du journalisme (qui ou quoi ? où ? quand ? comment ? et, si la source le dit, pourquoi ?),
+   et les erreurs qu’il ne doit pas commettre.
 2. **Note de qualité automatique de chaque brouillon** :
    - fidélité aux faits de la source (déjà en partie en place) ;
    - lisibilité et longueur ;
@@ -60,10 +62,14 @@ Travaux :
 3. **Tableau de résultats dans l’administration** : note moyenne, brouillons refusés et pourquoi.
 
 État au 23 novembre 2026 : la note (2) et le tableau (3) sont en place dans *Administration → Qualité*.
-Le jeu de référence (1) se compose automatiquement dans *Qualité → Jeu de référence* :
-30 observations récentes réparties entre rubriques et types de source, chacune annotée
-par l’utilisateur (faits obligatoires, erreurs interdites), puis contrôlée contre l’article
-de l’IA qui en est tiré. Reste à annoter le jeu, puis à générer ses brouillons (coût annoncé avant).
+La note compte un critère « Qui, où, quand », contrôlé sur chaque article sans annotation :
+le début de l’article nomme un acteur, l’article cite un lieu de la source et la date dès
+que la source en donne une. Le jeu de référence (1) se compose automatiquement dans
+*Qualité → Jeu de référence* : 30 observations récentes réparties entre rubriques et types
+de source. Les 30 sont annotées question par question (préparées par Claude, l’utilisateur
+ne lisant pas le catalan, et relues par l’utilisateur), puis contrôlées contre l’article de
+l’IA qui en est tiré. 4 ont déjà un article, 3 sont conformes. Reste à générer les 26 autres
+brouillons (coût annoncé avant).
 
 | | |
 |---|---|

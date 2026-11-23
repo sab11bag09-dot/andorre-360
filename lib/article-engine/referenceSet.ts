@@ -2,12 +2,15 @@
  * Jeu de référence de la qualité éditoriale (étape 1 de la feuille de route).
  *
  * Une trentaine d’observations réelles, réparties par rubrique et par type de
- * source, sont annotées par l’utilisateur : faits qu’un bon article doit dire,
- * erreurs qu’il ne doit pas commettre. Un article rédigé à partir d’une de
+ * source, sont annotées : ce qu’un bon article doit dire, rangé selon les cinq
+ * questions (qui ou quoi, où, quand, comment, pourquoi), et les erreurs qu’il
+ * ne doit pas commettre. Un article rédigé à partir d’une de
  * ces observations est ensuite contrôlé automatiquement contre l’annotation.
  *
  * Fonctions pures et déterministes, sans appel à un modèle d’IA.
  */
+
+import { QUESTIONS, questionLabel, type QuestionKey } from "./fiveQuestions";
 
 /** Taille visée du jeu de référence. */
 export const REFERENCE_SET_SIZE = 30;
@@ -105,13 +108,36 @@ export function textStatesFact(text: string, fact: string): boolean {
     .some((alternative) => alternative.every((token) => tokenPresent(token, available, stems)));
 }
 
-export type ReferenceAnnotation = {
-  requiredFacts: string;
+/** Champ de l’annotation pour chacune des cinq questions. */
+export const REFERENCE_QUESTION_FIELDS = {
+  who: "whoFacts",
+  where: "whereFacts",
+  when: "whenFacts",
+  how: "howFacts",
+  why: "whyFacts",
+} as const satisfies Record<QuestionKey, string>;
+
+export type ReferenceFactField = (typeof REFERENCE_QUESTION_FIELDS)[QuestionKey];
+
+/**
+ * Ce qu’un bon article doit dire, rangé par question : qui ou quoi, où,
+ * quand, comment et, quand la source le dit, pourquoi.
+ */
+export type ReferenceAnnotation = Record<ReferenceFactField, string> & {
   forbiddenErrors: string;
 };
 
+export type ReferenceQuestionCheck = {
+  key: QuestionKey;
+  /** Faits attendus pour cette question ; vide quand la question est sans objet. */
+  facts: string[];
+  /** Faits attendus absents de l’article. */
+  missing: string[];
+};
+
 export type ReferenceCheck = {
-  /** Faits obligatoires absents de l’article. */
+  questions: ReferenceQuestionCheck[];
+  /** Faits absents, précédés de leur question : « Où ? Encamp ». */
   missingFacts: string[];
   /** Erreurs interdites présentes dans l’article. */
   forbiddenFound: string[];
@@ -124,14 +150,19 @@ export function checkAgainstReference(
   annotation: ReferenceAnnotation,
 ): ReferenceCheck {
   const text = [article.title, article.description, article.content].join("\n");
-  const missingFacts = parseReferenceLines(annotation.requiredFacts).filter(
-    (fact) => !textStatesFact(text, fact),
+  const questions = QUESTIONS.map(({ key }) => {
+    const facts = parseReferenceLines(annotation[REFERENCE_QUESTION_FIELDS[key]]);
+    return { key, facts, missing: facts.filter((fact) => !textStatesFact(text, fact)) };
+  });
+  const missingFacts = questions.flatMap(({ key, missing }) =>
+    missing.map((fact) => `${questionLabel(key)} ${fact}`),
   );
   const forbiddenFound = parseReferenceLines(annotation.forbiddenErrors).filter((error) =>
     textStatesFact(text, error),
   );
 
   return {
+    questions,
     missingFacts,
     forbiddenFound,
     conforms: missingFacts.length === 0 && forbiddenFound.length === 0,
@@ -139,7 +170,7 @@ export function checkAgainstReference(
 }
 
 export function isReferenceAnnotated(annotation: ReferenceAnnotation): boolean {
-  return parseReferenceLines(annotation.requiredFacts).length > 0;
+  return QUESTIONS.some(({ key }) => parseReferenceLines(annotation[REFERENCE_QUESTION_FIELDS[key]]).length > 0);
 }
 
 export type ReferenceCandidate = {

@@ -5,6 +5,7 @@ import {
   checkAgainstReference,
   isReferenceAnnotated,
   REFERENCE_SET_TARGET_RATIO,
+  type ReferenceAnnotation,
   type ReferenceCandidate,
   type ReferenceCheck,
 } from "./referenceSet";
@@ -25,8 +26,7 @@ export type ReferenceSetEntry = {
   sourceName: string;
   category: string;
   organizationType: string;
-  requiredFacts: string;
-  forbiddenErrors: string;
+  annotation: ReferenceAnnotation;
   notes: string;
   annotated: boolean;
   article: {
@@ -66,7 +66,11 @@ export function summarizeReferenceSet(entries: readonly ReferenceSetEntry[]): Re
 const ENTRY_SELECT = {
   id: true,
   observationId: true,
-  requiredFacts: true,
+  whoFacts: true,
+  whereFacts: true,
+  whenFacts: true,
+  howFacts: true,
+  whyFacts: true,
   forbiddenErrors: true,
   notes: true,
   observation: {
@@ -89,11 +93,9 @@ const ENTRY_SELECT = {
   },
 } as const;
 
-type ReferenceCaseRow = {
+type ReferenceCaseRow = ReferenceAnnotation & {
   id: number;
   observationId: number;
-  requiredFacts: string;
-  forbiddenErrors: string;
   notes: string;
   observation: {
     title: string;
@@ -113,7 +115,14 @@ type ReferenceCaseRow = {
 
 export function toReferenceSetEntry(row: ReferenceCaseRow): ReferenceSetEntry {
   const { observation } = row;
-  const annotation = { requiredFacts: row.requiredFacts, forbiddenErrors: row.forbiddenErrors };
+  const annotation: ReferenceAnnotation = {
+    whoFacts: row.whoFacts,
+    whereFacts: row.whereFacts,
+    whenFacts: row.whenFacts,
+    howFacts: row.howFacts,
+    whyFacts: row.whyFacts,
+    forbiddenErrors: row.forbiddenErrors,
+  };
   const annotated = isReferenceAnnotated(annotation);
   const source = observation.content ?? "";
   const article = observation.article?.aiRewrittenAt ? observation.article : null;
@@ -150,8 +159,7 @@ export function toReferenceSetEntry(row: ReferenceCaseRow): ReferenceSetEntry {
     sourceName: observation.source.name,
     category: observation.source.category ?? "Sans rubrique",
     organizationType: observation.source.organizationType,
-    requiredFacts: row.requiredFacts,
-    forbiddenErrors: row.forbiddenErrors,
+    annotation,
     notes: row.notes,
     annotated,
     article: evaluated,

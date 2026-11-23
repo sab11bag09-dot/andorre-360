@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import { excludeReferenceCaseAction, saveReferenceAnnotationAction } from "@/actions/reference-set";
 import { Badge, Button, PageHeader, Textarea } from "@/components/admin/ui";
+import { QUESTIONS, type QuestionKey } from "@/lib/article-engine/fiveQuestions";
+import { REFERENCE_QUESTION_FIELDS } from "@/lib/article-engine/referenceSet";
 import { loadReferenceCase } from "@/lib/article-engine/referenceSetReport";
 
 import { organizationTypeLabel } from "../labels";
@@ -15,6 +17,20 @@ const dateFormat = new Intl.DateTimeFormat("fr-FR", {
   year: "numeric",
   timeZone: "Europe/Andorra",
 });
+
+const QUESTION_HELP: Record<QuestionKey, string> = {
+  who: "La personne, l’organisme ou la chose dont parle l’article.",
+  where: "Le lieu : commune, bâtiment, pays.",
+  when: "La date, le jour, l’heure ou la période.",
+  how: "Ce qui se passe concrètement : chiffres, étapes, moyens.",
+  why: "La raison ou le but, si la source le donne.",
+};
+
+const STATUS_STYLE = {
+  répond: "border-emerald-500/30 text-emerald-300",
+  manque: "border-amber-500/30 text-amber-300",
+  "sans objet": "border-zinc-800 text-zinc-500",
+} as const;
 
 /** Annotation d’une observation du jeu de référence. */
 export default async function ReferenceCasePage({
@@ -59,20 +75,28 @@ export default async function ReferenceCasePage({
           <form action={saveReferenceAnnotationAction} className="space-y-5">
             <input type="hidden" name="id" value={entry.id} />
 
-            <label className="block text-sm font-semibold">
-              Faits obligatoires
-              <span className="mt-1 block font-normal text-zinc-500">
-                Un fait par ligne, en quelques mots clés français : « 14 400 euros », « Xavier Espot ». Séparez les formulations équivalentes par « | » : « Govern | Gouvernement ».
-              </span>
-              <Textarea name="requiredFacts" rows={8} defaultValue={entry.requiredFacts} />
-            </label>
+            <p className="text-sm text-zinc-500">
+              Pour chaque question, les mots clés français que l’article doit contenir, un fait par ligne : « 14 400 euros », « Xavier Espot ». Séparez les formulations équivalentes par « | » : « Govern | Gouvernement ». Laissez vide une question à laquelle la source ne répond pas.
+            </p>
+
+            {QUESTIONS.map(({ key, label, optional }) => {
+              const field = REFERENCE_QUESTION_FIELDS[key];
+              return (
+                <label key={key} className="block text-sm font-semibold">
+                  {label}
+                  {optional && <span className="font-normal text-zinc-500"> (facultatif)</span>}
+                  <span className="mt-1 block font-normal text-zinc-500">{QUESTION_HELP[key]}</span>
+                  <Textarea name={field} rows={2} defaultValue={entry.annotation[field]} />
+                </label>
+              );
+            })}
 
             <label className="block text-sm font-semibold">
               Erreurs interdites
               <span className="mt-1 block font-normal text-zinc-500">
                 Une par ligne : ce que l’article ne doit pas affirmer (mauvais chiffre, mauvaise commune, confusion de personne).
               </span>
-              <Textarea name="forbiddenErrors" rows={5} defaultValue={entry.forbiddenErrors} />
+              <Textarea name="forbiddenErrors" rows={3} defaultValue={entry.annotation.forbiddenErrors} />
             </label>
 
             <label className="block text-sm font-semibold">
@@ -95,11 +119,20 @@ export default async function ReferenceCasePage({
               <Link href={`/admin/articles/${entry.article.id}`} className="mt-2 block hover:text-yellow-500">
                 {entry.article.title}
               </Link>
-              {entry.article.check.missingFacts.length > 0 && (
-                <p className="mt-2 text-sm text-amber-300">
-                  Faits absents : {entry.article.check.missingFacts.join(" ; ")}
-                </p>
-              )}
+              <ul className="mt-4 space-y-2 text-sm">
+                {entry.article.check.questions.map(({ key, facts, missing }) => {
+                  const automatic = entry.article?.quality.questions.find((answer) => answer.key === key);
+                  const status = facts.length > 0 ? (missing.length > 0 ? "manque" : "répond") : (automatic?.status ?? "sans objet");
+                  return (
+                    <li key={key} className={`rounded-md border px-3 py-2 ${STATUS_STYLE[status]}`}>
+                      <span className="font-semibold">{QUESTIONS.find((question) => question.key === key)?.label}</span>{" "}
+                      {status}
+                      {missing.length > 0 && ` — absent : ${missing.join(" ; ")}`}
+                      {facts.length === 0 && automatic && ` — ${automatic.detail}`}
+                    </li>
+                  );
+                })}
+              </ul>
               {entry.article.check.forbiddenFound.length > 0 && (
                 <p className="mt-2 text-sm text-red-400">
                   Erreurs présentes : {entry.article.check.forbiddenFound.join(" ; ")}

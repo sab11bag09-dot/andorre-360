@@ -74,14 +74,19 @@ describe("actions du jeu de référence", () => {
     expect(revalidatePath).toHaveBeenCalledWith("/admin/qualite/reference");
   });
 
-  it("enregistre l’annotation et la date seulement s’il y a un fait obligatoire", async () => {
-    await saveReferenceAnnotationAction(form({ id: "7", requiredFacts: " 14 400 euros \n", forbiddenErrors: "", notes: "" }));
+  it("enregistre les cinq questions et la date seulement s’il y a un fait", async () => {
+    await saveReferenceAnnotationAction(form({ id: "7", howFacts: " 14 400 euros \n", whoFacts: "Govern | Gouvernement", forbiddenErrors: "", notes: "" }));
     expect(update).toHaveBeenLastCalledWith({
       where: { id: 7, excludedAt: null },
-      data: expect.objectContaining({ requiredFacts: "14 400 euros", annotatedAt: expect.any(Date) }),
+      data: expect.objectContaining({
+        whoFacts: "Govern | Gouvernement",
+        whereFacts: "",
+        howFacts: "14 400 euros",
+        annotatedAt: expect.any(Date),
+      }),
     });
 
-    await saveReferenceAnnotationAction(form({ id: "7", requiredFacts: "", forbiddenErrors: "x", notes: "" }));
+    await saveReferenceAnnotationAction(form({ id: "7", forbiddenErrors: "x", notes: "" }));
     expect(update).toHaveBeenLastCalledWith(expect.objectContaining({ data: expect.objectContaining({ annotatedAt: null }) }));
     expect(redirect).toHaveBeenCalledWith("/admin/qualite/reference");
   });

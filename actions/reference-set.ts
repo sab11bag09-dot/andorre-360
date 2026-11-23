@@ -4,7 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/admin/requireAdmin";
-import { isReferenceAnnotated, REFERENCE_SET_SIZE, selectReferenceObservations } from "@/lib/article-engine/referenceSet";
+import { QUESTIONS } from "@/lib/article-engine/fiveQuestions";
+import {
+  isReferenceAnnotated,
+  REFERENCE_QUESTION_FIELDS,
+  REFERENCE_SET_SIZE,
+  type ReferenceAnnotation,
+  selectReferenceObservations,
+} from "@/lib/article-engine/referenceSet";
 import { loadReferenceCandidates } from "@/lib/article-engine/referenceSetReport";
 import { prisma } from "@/lib/prisma";
 
@@ -52,17 +59,21 @@ export async function saveReferenceAnnotationAction(formData: FormData): Promise
   await requireAdmin();
 
   const id = readId(formData);
-  const requiredFacts = readText(formData, "requiredFacts");
-  const forbiddenErrors = readText(formData, "forbiddenErrors");
+  const annotation = Object.fromEntries([
+    ...QUESTIONS.map(({ key }) => {
+      const field = REFERENCE_QUESTION_FIELDS[key];
+      return [field, readText(formData, field)];
+    }),
+    ["forbiddenErrors", readText(formData, "forbiddenErrors")],
+  ]) as ReferenceAnnotation;
   const notes = readText(formData, "notes");
 
   await prisma.referenceCase.update({
     where: { id, excludedAt: null },
     data: {
-      requiredFacts,
-      forbiddenErrors,
+      ...annotation,
       notes,
-      annotatedAt: isReferenceAnnotated({ requiredFacts, forbiddenErrors }) ? new Date() : null,
+      annotatedAt: isReferenceAnnotated(annotation) ? new Date() : null,
     },
   });
 
