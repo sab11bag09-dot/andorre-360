@@ -2,6 +2,7 @@ import ArticleRenderer from "@/components/article/ArticleRenderer";
 import SafeImage from "@/components/SafeImage";
 import { getVideoEmbedUrl } from "@/lib/media/videoEmbed";
 import { imageCreditLabel } from "@/lib/media/imageCredit";
+import { categoryLabel } from "@/lib/article-engine/categoryLabels";
 import {
   type ArticleSourceCredit,
   sourceAttributionLead,
@@ -106,7 +107,7 @@ export default function PublicArticleView({
 
           <div className="absolute bottom-0 left-0 p-10">
             <p className="tracking-widest text-yellow-500">
-              {article.category}
+              {categoryLabel(article.category, contentLanguage)}
             </p>
 
             <h1 className="mt-4 max-w-4xl font-serif text-5xl md:text-6xl">
@@ -137,7 +138,7 @@ export default function PublicArticleView({
 
           <div className="absolute bottom-0 left-0 p-10">
             <p className="tracking-widest text-yellow-500">
-              {article.category}
+              {categoryLabel(article.category, contentLanguage)}
             </p>
 
             <h1 className="mt-4 max-w-4xl font-serif text-5xl md:text-6xl">
@@ -149,7 +150,7 @@ export default function PublicArticleView({
         <div className="border-b border-gray-800 bg-zinc-950 px-8 py-16">
           <div className="mx-auto max-w-4xl">
             <p className="tracking-widest text-yellow-500">
-              {article.category}
+              {categoryLabel(article.category, contentLanguage)}
             </p>
 
             <h1 className="mt-4 font-serif text-5xl md:text-6xl">
