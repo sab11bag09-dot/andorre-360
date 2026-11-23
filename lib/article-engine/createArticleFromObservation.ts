@@ -1,3 +1,4 @@
+import { withAiUsageContext } from "../ai/aiUsageContext";
 import { AUTOMATED_ARTICLE_AUTHOR } from "./editorialSignature";
 import { assertMultilingualPublicationEnabled } from "../config/multilingualPublication";
 import type { ObservationRepository } from "../source-engine/repositories/ObservationRepository";
@@ -134,14 +135,19 @@ export async function createArticleFromObservation(
   const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
   const generatedAt = new Date();
 
-  const { factSheet, ...draft } = await editorialGenerator.prepareArticle({
-    originalTitle: observation.title,
-    originalContent: content,
-    sourcePublishedAt: observation.publishedAt,
-    generatedAt,
-    sourceName: observation.source.name,
-    sourceCategory: observation.source.category,
-  });
+  // Les jetons de l’extraction et de la rédaction sont rattachés à l’observation.
+  const { factSheet, ...draft } = await withAiUsageContext(
+    { observationId: observation.id },
+    () =>
+      editorialGenerator.prepareArticle({
+        originalTitle: observation.title,
+        originalContent: content,
+        sourcePublishedAt: observation.publishedAt,
+        generatedAt,
+        sourceName: observation.source.name,
+        sourceCategory: observation.source.category,
+      }),
+  );
 
   // Contrôle de ressemblance : un article trop proche de sa source n’est
   // jamais enregistré, ni comme nouveau brouillon ni en remplacement.

@@ -10,6 +10,7 @@ import {
   type AiUsageEntry,
   type AiUsageLedger,
 } from "./aiUsageBudget";
+import { withAiUsageContext } from "./aiUsageContext";
 
 const NOW = new Date("2026-11-20T18:00:00.000Z");
 // Typographie française : espace fine insécable entre les milliers.
@@ -78,6 +79,21 @@ describe("meterAiCall", () => {
 
     expect(response.output_text).toBe("{}");
     expect(usage.recorded).toEqual([{ ...META, inputTokens: 1_200, outputTokens: 300 }]);
+  });
+
+  it("rattache l’appel à l’observation ou à l’article en cours", async () => {
+    const usage = ledger(0);
+    const call = async () => ({ output_text: "{}", usage: { input_tokens: 10, output_tokens: 5 } });
+
+    await withAiUsageContext({ observationId: 7 }, () => meterAiCall(usage, META, call, { env: {}, now: NOW }));
+    await withAiUsageContext({ articleId: 3 }, () => meterAiCall(usage, META, call, { env: {}, now: NOW }));
+    await meterAiCall(usage, META, call, { env: {}, now: NOW });
+
+    expect(usage.recorded.map(({ observationId, articleId }) => ({ observationId, articleId }))).toEqual([
+      { observationId: 7, articleId: undefined },
+      { observationId: undefined, articleId: 3 },
+      { observationId: undefined, articleId: undefined },
+    ]);
   });
 
   it("enregistre zéro jeton quand la réponse ne les indique pas", async () => {

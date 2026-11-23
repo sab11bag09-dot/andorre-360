@@ -1,3 +1,4 @@
+import { withAiUsageContext } from "../ai/aiUsageContext";
 import { DeterministicEditorialGenerator } from "./generators/DeterministicEditorialGenerator";
 import type {
   EditorialGenerator,
@@ -161,14 +162,17 @@ export async function prepareArticleTranslations(
       continue;
     }
 
-    const prepared =
-      await dependencies.editorialGenerator
-        .translateArticle({
+    // Les jetons de la traduction sont rattachés à l’article.
+    const prepared = await withAiUsageContext(
+      { articleId: article.id },
+      () =>
+        dependencies.editorialGenerator.translateArticle({
           locale,
           title: article.title,
           description: article.description,
           content: article.content,
-        });
+        }),
+    );
 
     const draft = {
       articleId: article.id,

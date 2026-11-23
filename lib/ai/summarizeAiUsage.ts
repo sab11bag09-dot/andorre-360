@@ -41,6 +41,24 @@ const dayLabelFormat = new Intl.DateTimeFormat("fr-FR", {
   month: "long",
 });
 
+/** Jour civil à Andorre, au format AAAA-MM-JJ. */
+export function andorraDayKey(date: Date): string {
+  return dayKeyFormat.format(date);
+}
+
+/**
+ * Les `count` derniers jours civils à Andorre, du plus récent au plus ancien.
+ * On recule d’un jour à midi UTC : la date reste juste quel que soit le
+ * changement d’heure.
+ */
+export function andorraDays(now: Date, count: number): Array<{ day: string; label: string }> {
+  const [year, month, day] = dayKeyFormat.format(now).split("-").map(Number);
+  return Array.from({ length: count }, (_, index) => {
+    const reference = new Date(Date.UTC(year, month - 1, day - index, 12));
+    return { day: dayKeyFormat.format(reference), label: dayLabelFormat.format(reference) };
+  });
+}
+
 export function summarizeAiUsage(
   rows: readonly AiUsageRow[],
   options: { now: Date; limit: number },
@@ -60,21 +78,10 @@ export function summarizeAiUsage(
     operations.set(row.operation, entry);
   }
 
-  // On part du jour d’aujourd’hui à Andorre et on recule d’un jour civil, à
-  // midi UTC : la date reste juste quel que soit le changement d’heure.
-  const [year, month, day] = dayKeyFormat.format(now).split("-").map(Number);
-  const byDay = Array.from({ length: USAGE_DAYS }, (_, index) => {
-    const reference = new Date(Date.UTC(year, month - 1, day - index, 12));
-    return {
-      day: dayKeyFormat.format(reference),
-      label: dayLabelFormat.format(reference),
-      calls: 0,
-      tokens: 0,
-    };
-  });
+  const byDay = andorraDays(now, USAGE_DAYS).map((entry) => ({ ...entry, calls: 0, tokens: 0 }));
   const days = new Map(byDay.map((entry) => [entry.day, entry]));
   for (const row of rows) {
-    const entry = days.get(dayKeyFormat.format(row.createdAt));
+    const entry = days.get(andorraDayKey(row.createdAt));
     if (!entry) continue;
     entry.calls += 1;
     entry.tokens += row.totalTokens;

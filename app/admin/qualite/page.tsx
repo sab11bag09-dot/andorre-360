@@ -41,9 +41,14 @@ export default async function DraftQualityPage() {
         title="Qualité des articles de l’IA"
         description={`Chaque article rédigé par l’IA est noté sur 100 à partir du texte de sa source, sans appel à l’IA. Publiable : ${DRAFT_QUALITY_PUBLISHABLE_SCORE} points et aucun défaut bloquant.`}
         actions={
-          <Button href="/admin/qualite/reference" variant="outline">
-            Jeu de référence
-          </Button>
+          <>
+            <Button href="/admin/qualite/pilote" variant="outline">
+              Mesures du pilote
+            </Button>
+            <Button href="/admin/qualite/reference" variant="outline">
+              Jeu de référence
+            </Button>
+          </>
         }
       />
 
