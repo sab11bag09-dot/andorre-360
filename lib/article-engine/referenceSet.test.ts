@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   checkAgainstReference,
+  textContainsExpression,
   isReferenceAnnotated,
   looksLikeArticle,
   parseReferenceLines,
@@ -78,6 +79,14 @@ describe("faits du jeu de référence", () => {
     expect(wrong.conforms).toBe(false);
 
     expect(checkAgainstReference(ARTICLE, { ...EMPTY, whoFacts: "Xavier Espot" }).conforms).toBe(true);
+  });
+
+  it("cherche une erreur interdite comme une expression, pas comme des mots épars", () => {
+    const text = "Le marché ouvre jusqu’au 20 décembre. L’entrée coûte 5 euros. Le groupe social-démocrate approuve.";
+    expect(textContainsExpression(text, "20 euros")).toBe(false);
+    expect(textContainsExpression(text, "5 euros")).toBe(true);
+    expect(textContainsExpression(text, "Demòcrates per Andorra")).toBe(false);
+    expect(textContainsExpression("Demòcrates per Andorra s’abstient.", "Demòcrates per Andorra | DA")).toBe(true);
   });
 
   it("une observation est annotée dès qu’une question a un fait", () => {

@@ -76,6 +76,10 @@ Premier passage complet, le 23 novembre 2026 : 27 brouillons générés pour 0,3
 une reprise trop proche de la source, une source trop longue (plus de 40 faits).
 Défaut le plus fréquent : l’article omet une personne que la source ne cite qu’entre
 guillemets, la consigne interdisant les citations.
+Consigne `editorial-facts-v3` : les propos des personnes qui s’expriment sont résumés,
+nommés et attribués, sans guillemets, et l’article répond aux cinq questions. Les
+3 articles concernés, régénérés, sont conformes : 24 sur 28 (86 %), pour 0,42 dollar
+au total.
 
 | | |
 |---|---|
