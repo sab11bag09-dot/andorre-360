@@ -340,7 +340,7 @@ describe("OpenAiEditorialGenerator", () => {
       expect(generator.auditMetadata).toEqual({
         provider: "openai",
         model: "test-model",
-        promptVersion: "editorial-facts-v3",
+        promptVersion: "editorial-facts-v4",
       });
     });
 
