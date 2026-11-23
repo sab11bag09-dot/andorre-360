@@ -300,7 +300,7 @@ describe("OpenAiEditorialGenerator", () => {
         generatedAt: "2026-09-20T12:00:00.000Z",
       });
       expect(extraction?.instructions).toContain("aucune citation");
-      expect(extraction?.instructions).toContain("aucun témoignage");
+      expect(extraction?.instructions).toContain("résume les propos de chaque personne");
 
       expect(drafting?.model).toBe("test-model");
       expect(drafting?.schemaName).toBe("article_from_facts");
@@ -340,7 +340,7 @@ describe("OpenAiEditorialGenerator", () => {
       expect(generator.auditMetadata).toEqual({
         provider: "openai",
         model: "test-model",
-        promptVersion: "editorial-facts-v2",
+        promptVersion: "editorial-facts-v3",
       });
     });
 

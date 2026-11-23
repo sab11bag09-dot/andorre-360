@@ -108,6 +108,30 @@ export function textStatesFact(text: string, fact: string): boolean {
     .some((alternative) => alternative.every((token) => tokenPresent(token, available, stems)));
 }
 
+/**
+ * Une erreur interdite est présente quand ses mots clés se suivent dans le
+ * texte, comme une expression : « 20 euros » n’est pas trouvé dans « le
+ * 20 décembre […] 5 euros ». Les formulations équivalentes se séparent par « | ».
+ */
+export function textContainsExpression(text: string, expression: string): boolean {
+  const words = keyTokens(text);
+  const stems = words.map(stem);
+
+  return expression
+    .split("|")
+    .map((alternative) => keyTokens(alternative))
+    .filter((alternative) => alternative.length > 0)
+    .some((alternative) =>
+      words.some((_, start) =>
+        alternative.every((token, offset) => {
+          const index = start + offset;
+          if (index >= words.length) return false;
+          return tokenPresent(token, new Set([words[index], stems[index]]), [stems[index]]);
+        }),
+      ),
+    );
+}
+
 /** Champ de l’annotation pour chacune des cinq questions. */
 export const REFERENCE_QUESTION_FIELDS = {
   who: "whoFacts",
@@ -158,7 +182,7 @@ export function checkAgainstReference(
     missing.map((fact) => `${questionLabel(key)} ${fact}`),
   );
   const forbiddenFound = parseReferenceLines(annotation.forbiddenErrors).filter((error) =>
-    textStatesFact(text, error),
+    textContainsExpression(text, error),
   );
 
   return {

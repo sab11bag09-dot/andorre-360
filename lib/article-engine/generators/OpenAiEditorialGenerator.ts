@@ -17,7 +17,7 @@ const DEFAULT_TIMEOUT_MS = 30_000;
 
 /**
  * Rédaction en deux temps : un premier appel extrait une liste de faits de
- * la source, sans citations ni témoignages ; un second appel rédige l’article
+ * la source, sans citations (les propos sont résumés et attribués) ; un second appel rédige l’article
  * à partir de cette liste seulement, sans jamais voir le texte source.
  *
  * Cette méthode éloigne le texte produit de la formulation de la source.
@@ -25,7 +25,7 @@ const DEFAULT_TIMEOUT_MS = 30_000;
  * presse : un avis juridique reste nécessaire avant toute mise en ligne.
  */
 export const OPENAI_EDITORIAL_PROMPT_VERSION =
-  "editorial-facts-v2";
+  "editorial-facts-v3";
 
 /** Nombre maximal de faits retenus pour un article. */
 export const MAX_FACTS = 40;
@@ -398,6 +398,8 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
           "Rédige uniquement à partir de la liste de faits fournie : tu n’as pas accès au texte d’origine et tu ne dois pas chercher à le reconstituer.",
           "N’ajoute aucun fait absent de la liste, n’invente aucune information et n’ajoute aucune connaissance extérieure.",
           "N’insère aucune citation entre guillemets et ne prête à personne des paroles qui ne figurent pas dans la liste.",
+          "Nomme les personnes et organismes qui s’expriment dans la liste et rapporte leurs propos au discours indirect, en les leur attribuant.",
+          "Le chapô et le premier paragraphe disent qui ou quoi, où et quand ; le corps dit comment et, si la liste le donne, pourquoi.",
           "Indique une fois, de façon naturelle, l’origine de l’information à partir du nom de la source fourni.",
           "Crée un titre informatif, un chapô synthétique et un article entièrement rédigé, organisé selon ton propre plan.",
           `Le titre compte au plus ${MAX_TITLE_LENGTH} caractères, espaces compris : va à l’essentiel, sans détail secondaire.`,
@@ -500,11 +502,11 @@ export class OpenAiEditorialGenerator implements EditorialGenerator {
       output = await this.client.create({
         model: this.model,
         instructions: [
-          "Extrais de cet article la liste des faits vérifiables, en français : qui, quoi, où, quand, combien.",
+          "Extrais de cet article la liste des faits vérifiables, en français : qui ou quoi, où, quand, comment, combien et, si la source le dit, pourquoi.",
           "Rédige chaque fait sous la forme d’une phrase courte, neutre et autonome, avec tes propres mots, sans reprendre la formulation de la source.",
           "Conserve exactement les noms propres, fonctions, lieux, chiffres, montants et dates.",
           "Remplace les dates relatives par une date absolue lorsqu’elle peut être déterminée grâce aux dates fournies.",
-          "Ne retiens aucune citation, même courte, et aucun témoignage : une prise de position officielle peut seulement être résumée en un fait neutre et attribué, sans guillemets.",
+          "Ne retiens aucune citation, même courte : résume les propos de chaque personne ou organisme qui s’exprime dans la source en un fait neutre, sans guillemets, qui nomme la personne, sa fonction si elle est donnée, et ce qu’elle affirme, annonce ou propose.",
           "Écris les noms d’événements, d’œuvres ou de programmes sans guillemets.",
           "N’inclus ni opinion, ni commentaire, ni anecdote, ni description de style, et n’ajoute aucune information absente de la source.",
           "Ignore les menus, mentions légales, liens de partage et autres éléments étrangers à l’article.",
