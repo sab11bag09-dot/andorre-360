@@ -44,6 +44,22 @@ describe("checkFactFidelity — chiffres", () => {
     ).toEqual([]);
   });
 
+  it("accepte les dates déduites d’un mot relatif ou d’une date sans année", () => {
+    // Contexte : 17 novembre 2026. « Ce samedi », « la semaine dernière », « le 11 mars ».
+    expect(
+      check(
+        "Le samedi 14 novembre 2026, puis entre le 8 et le 15 novembre 2026, et du 20 au 24 novembre. " +
+          "Les propositions seront présentées en mars 2027.",
+      ).unsupportedNumbers,
+    ).toEqual([]);
+  });
+
+  it("refuse un jour éloigné du contexte ou une année sans rapport", () => {
+    expect(check("La séance aura lieu le 3 février 2026.").unsupportedNumbers).toEqual(["3"]);
+    expect(check("Comme le 2 novembre 2019.").unsupportedNumbers).toEqual(["2019"]);
+    expect(check("Il y a 16 conseillers.").unsupportedNumbers).toEqual(["16"]);
+  });
+
   it("signale un chiffre absent des faits, y compris dans le titre et le chapô", () => {
     expect(
       check("Le budget atteint 1 500 000 euros.", "Un plan à 75 millions", "Hausse de 9 %")
