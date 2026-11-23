@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { cn } from "@/lib/utils";
+import { siteUrl } from "@/lib/seo/siteUrl";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -12,10 +13,7 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ??
-      "http://localhost:3000",
-  ),
+  metadataBase: siteUrl(),
   title: "ANDORRA 360",
   description: "Actualités, économie et lifestyle en Andorre",
 };

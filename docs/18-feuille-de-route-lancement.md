@@ -201,6 +201,13 @@ plus récentes sont gardées (`BACKUP_KEEP`), dans `BACKUP_DIR`. Un échec rend 
 pour que le planificateur alerte. `npm run db:backup -- <fichier>` vérifie une sauvegarde.
 Reste, avec l’hébergeur : la lancer chaque nuit et envoyer `BACKUP_DIR` hors du serveur.
 
+Le référencement (5) est prêt pour sa partie technique. `/sitemap.xml` liste la une,
+le fil info en trois langues, les rubriques et chaque article publié. Chaque version
+publiée d'un article y figure avec ses autres langues (`hreflang`) et sa photo.
+`/robots.txt` ferme l'admin, l'API et la connexion, et annonce le plan du site. Les
+pages d'article portaient déjà leurs balises de langue. À la mise en ligne, il faudra
+régler `NEXT_PUBLIC_SITE_URL` sur l'adresse publique du site.
+
 | | |
 |---|---|
 | **Décision de l’utilisateur** | Hébergeur et budget, date de lancement, textes légaux. |
