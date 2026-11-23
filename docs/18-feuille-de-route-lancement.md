@@ -78,8 +78,12 @@ Défaut le plus fréquent : l’article omet une personne que la source ne cite 
 guillemets, la consigne interdisant les citations.
 Consigne `editorial-facts-v3` : les propos des personnes qui s’expriment sont résumés,
 nommés et attribués, sans guillemets, et l’article répond aux cinq questions. Les
-3 articles concernés, régénérés, sont conformes : 24 sur 28 (86 %), pour 0,42 dollar
-au total.
+3 articles concernés, régénérés, sont conformes. Après régénération des 2 derniers
+articles rédigés avec l’ancienne consigne : 26 conformes sur les 30 observations (87 %),
+pour 0,45 dollar au total. L’objectif se mesure sur les 30 observations : une observation
+sans article (génération refusée) compte comme un échec. Restent les 2 articles sur le
+match contre Leganés, qui ne disent pas que c’est un club espagnol (la source ne le dit
+pas), et les 2 observations refusées.
 
 | | |
 |---|---|
