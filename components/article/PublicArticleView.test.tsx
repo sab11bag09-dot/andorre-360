@@ -78,3 +78,18 @@ describe("PublicArticleView — mention de la source et mots fixes", () => {
     expect(renderToStaticMarkup(<PublicArticleView article={ARTICLE} dateLocale="fr-FR" contentLanguage="fr" />)).not.toContain("D’après");
   });
 });
+
+describe("PublicArticleView — rubrique", () => {
+  it("affiche la rubrique dans la langue de l’article", () => {
+    const render = (contentLanguage: "fr" | "ca" | "es", category: string) =>
+      renderToStaticMarkup(
+        <PublicArticleView article={{ ...ARTICLE, category }} dateLocale="fr-FR" contentLanguage={contentLanguage} />,
+      );
+
+    expect(render("fr", "SOCIÉTÉ")).toContain(">SOCIÉTÉ<");
+    expect(render("ca", "SOCIÉTÉ")).toContain(">SOCIETAT<");
+    expect(render("es", "POLITIQUE")).toContain(">POLÍTICA<");
+    expect(render("fr", "ILS_EN_PARLENT")).toContain(">ILS EN PARLENT<");
+    expect(render("ca", "RUBRIQUE_INCONNUE")).toContain(">RUBRIQUE INCONNUE<");
+  });
+});
