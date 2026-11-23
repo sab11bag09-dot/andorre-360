@@ -2,6 +2,7 @@ import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 
 import { fetchOrExplain } from "../http/networkError";
+import { robotsPolicy, type RobotsPolicy } from "../robots/robotsPolicy";
 import { HtmlClient } from "./HtmlClient";
 
 const REQUEST_TIMEOUT_MS = 15_000;
@@ -91,10 +92,16 @@ async function assertSafeUrl(value: string): Promise<URL> {
 }
 
 export class FetchHtmlClient implements HtmlClient {
+  constructor(
+    /** Lecture du `robots.txt` du site avant chaque page, redirections comprises. */
+    private readonly robots: Pick<RobotsPolicy, "assertAllowed"> = robotsPolicy,
+  ) {}
+
   async get(initialUrl: string): Promise<string> {
     let url = await assertSafeUrl(initialUrl);
 
     for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
+      await this.robots.assertAllowed(url);
       const response = await fetchOrExplain(url, {
         headers: HTML_REQUEST_HEADERS,
         redirect: "manual",

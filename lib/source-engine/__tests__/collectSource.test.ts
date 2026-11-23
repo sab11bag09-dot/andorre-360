@@ -1,4 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// Aucun appel réseau : le robots.txt de chaque source est réputé permissif.
+const robots = vi.hoisted(() => ({ assertAiInputAllowed: vi.fn(async () => {}) }));
+vi.mock("../robots/robotsPolicy", () => ({ robotsPolicy: robots }));
 
 import { Source } from "@/lib/generated/prisma/client";
 
@@ -234,6 +238,22 @@ describe("collectSource", () => {
       checkedAt: expect.any(Date),
       message: "Collecte impossible",
     });
+  });
+
+  it("ne collecte pas une source qui refuse l’usage de ses contenus par l’IA", async () => {
+    const source = createSource();
+    const repository = new FakeCollectionSourceRepository(source);
+    const factory = new FakeCollectorFactory(new FakeCollector([]));
+    const refuse = {
+      assertAiInputAllowed: async () => {
+        throw new Error("example.com refuse l’usage de ses contenus par l’IA (robots.txt : Content-Signal ai-input=no).");
+      },
+    };
+
+    await expect(collectSource(1, repository, factory, undefined, refuse)).rejects.toThrow("ai-input=no");
+
+    expect(factory.receivedSource).toBeNull();
+    expect(repository.failure?.message).toContain("ai-input=no");
   });
 
   it("compte les observations sans date et les dates futures refusées", async () => {

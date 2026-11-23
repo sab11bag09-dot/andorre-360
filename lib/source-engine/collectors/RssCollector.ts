@@ -3,6 +3,7 @@ import { XMLParser } from "fast-xml-parser";
 
 import { extractRssItemImage } from "../articleImage";
 import { fetchOrExplain } from "../http/networkError";
+import { robotsPolicy, type RobotsPolicy } from "../robots/robotsPolicy";
 
 import {
   Collector,
@@ -174,9 +175,15 @@ function parseAtomEntry(
 }
 
 export class RssCollector implements Collector {
+  constructor(
+    private readonly robots: Pick<RobotsPolicy, "assertAllowed"> = robotsPolicy,
+  ) {}
+
   async collect(
     source: Source,
   ): Promise<ObservationInput[]> {
+    await this.robots.assertAllowed(source.url);
+
     const response = await fetchOrExplain(source.url, {
       headers: {
         accept:

@@ -1,6 +1,7 @@
 import sharp from "sharp";
 
 import { prisma } from "@/lib/prisma";
+import { robotsPolicy } from "@/lib/source-engine/robots/robotsPolicy";
 
 import {
   importSourceImage,
@@ -17,6 +18,8 @@ import { saveMediaFile } from "./storage";
 const DOWNLOAD_TIMEOUT_MS = 10_000;
 
 async function download(url: string): Promise<{ buffer: Buffer; contentType: string }> {
+  await robotsPolicy.assertAllowed(url);
+
   const response = await fetch(url, {
     signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
     headers: { "User-Agent": "ANDORRE360-collecte/1.0", Accept: "image/jpeg,image/png,image/webp" },

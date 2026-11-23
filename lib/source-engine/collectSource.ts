@@ -5,6 +5,7 @@ import { PrismaCollectionSourceRepository } from "./repositories/PrismaCollectio
 import { CollectionSourceRepository } from "./repositories/CollectionSourceRepository";
 import { PrismaObservationRepository } from "./repositories/PrismaObservationRepository";
 import { ObservationRepository } from "./repositories/ObservationRepository";
+import { robotsPolicy, type RobotsPolicy } from "./robots/robotsPolicy";
 
 export type CollectionResult = {
   collected: number;
@@ -37,6 +38,7 @@ export async function collectSource(
     new CollectorFactory(),
   observationRepository: ObservationRepository =
     new PrismaObservationRepository(),
+  robots: Pick<RobotsPolicy, "assertAiInputAllowed"> = robotsPolicy,
 ): Promise<CollectionResult> {
   if (!Number.isInteger(sourceId) || sourceId < 1) {
     throw new Error("Identifiant de source invalide.");
@@ -49,6 +51,10 @@ export async function collectSource(
   }
 
   try {
+    // Une source qui refuse l’usage de ses contenus par l’IA n’est pas
+    // collectée : ses textes serviraient à rédiger des articles.
+    await robots.assertAiInputAllowed(source.url);
+
     const collector = factory.create(source);
     const observations = await collector.collect(source);
     const created = await observationRepository.saveMany(

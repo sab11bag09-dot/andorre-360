@@ -39,7 +39,7 @@ describe("erreurs réseau lisibles", () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(fetchFailed("CERT_HAS_EXPIRED")));
 
     // Adresse IP publique : aucune résolution DNS, aucun appel réseau réel.
-    await expect(new FetchHtmlClient().get("https://93.184.216.34/news")).rejects.toThrow(
+    await expect(new FetchHtmlClient({ assertAllowed: async () => {} }).get("https://93.184.216.34/news")).rejects.toThrow(
       "Impossible de joindre https://93.184.216.34/news : le certificat de sécurité (HTTPS) du site a expiré (CERT_HAS_EXPIRED).",
     );
   });

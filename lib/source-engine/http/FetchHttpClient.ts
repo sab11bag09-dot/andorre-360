@@ -1,3 +1,4 @@
+import { robotsPolicy, type RobotsPolicy } from "../robots/robotsPolicy";
 import {
   type HttpClient,
   type HttpRequest,
@@ -5,9 +6,15 @@ import {
 } from "./HttpClient";
 
 export class FetchHttpClient implements HttpClient {
+  constructor(
+    private readonly robots: Pick<RobotsPolicy, "assertAllowed"> = robotsPolicy,
+  ) {}
+
   async get(
     request: HttpRequest,
   ): Promise<HttpResponse> {
+    await this.robots.assertAllowed(request.url);
+
     const response = await fetch(request.url, {
       method: "GET",
       cache: "no-store",
