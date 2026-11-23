@@ -103,6 +103,76 @@ function contextDateNumbers(date: Date): string[] {
   return numbers;
 }
 
+const FRENCH_MONTHS = [
+  "janvier", "fevrier", "mars", "avril", "mai", "juin",
+  "juillet", "aout", "septembre", "octobre", "novembre", "decembre",
+];
+
+const DAY = 24 * 60 * 60 * 1000;
+
+/** Écart maximal entre une date déduite d’un mot relatif et la date de contexte. */
+const RELATIVE_DATE_WINDOW_DAYS = 10;
+
+const ARTICLE_DATE = new RegExp(
+  "(?:(?<!\\d)(\\d{1,2})(?:er)?(?:\\s*(?:,|et|au|a|-)\\s*(?:le\\s+)?(\\d{1,2})(?:er)?)?\\s+)?" +
+    `(?<!\\p{L})(${FRENCH_MONTHS.join("|")})(?!\\p{L})(?:\\s+(\\d{4})(?!\\d))?`,
+  "gu",
+);
+
+/**
+ * Chiffres des dates absolues que le rédacteur a déduites, comme on le lui
+ * demande, d’une expression relative ou d’une date sans année :
+ * « ce samedi » → « 16 mai 2026 », « l’11 de març » → « 11 mars 2027 ».
+ *
+ * - Une année accolée à un mois est admise si elle est celle d’une date de
+ *   contexte, la précédente ou la suivante.
+ * - Un jour est admis si la date qu’il forme tombe à moins de dix jours
+ *   d’une date de contexte.
+ *
+ * Tout autre chiffre, y compris un jour éloigné, doit figurer dans les faits.
+ */
+function inferredDateNumbers(input: FactFidelityInput): Set<string> {
+  const allowed = new Set<string>();
+  const contexts = input.contextDates.filter(
+    (date): date is Date => date !== null && !Number.isNaN(date.getTime()),
+  );
+  if (contexts.length === 0) return allowed;
+
+  const years = new Set(
+    contexts.flatMap((date) => {
+      const year = date.getUTCFullYear();
+      return [year - 1, year, year + 1];
+    }),
+  );
+
+  for (const text of articleText(input)) {
+    for (const match of normalize(text).matchAll(ARTICLE_DATE)) {
+      const [, firstDay, secondDay, monthName, yearText] = match;
+      const month = FRENCH_MONTHS.indexOf(monthName);
+      const year = yearText ? Number(yearText) : null;
+      if (year !== null && years.has(year)) allowed.add(String(year));
+
+      for (const dayText of [firstDay, secondDay]) {
+        if (!dayText) continue;
+        const day = Number(dayText);
+        const close = contexts.some((context) => {
+          const candidates = year !== null
+            ? [year]
+            : [context.getUTCFullYear() - 1, context.getUTCFullYear(), context.getUTCFullYear() + 1];
+          return candidates.some(
+            (candidate) =>
+              Math.abs(Date.UTC(candidate, month, day) - context.getTime()) <=
+              RELATIVE_DATE_WINDOW_DAYS * DAY,
+          );
+        });
+        if (close) allowed.add(canonicalNumber(dayText));
+      }
+    }
+  }
+
+  return allowed;
+}
+
 function allowedNumbers(input: FactFidelityInput): Set<string> {
   const allowed = new Set<string>();
 
@@ -119,6 +189,8 @@ function allowedNumbers(input: FactFidelityInput): Set<string> {
       for (const number of contextDateNumbers(date)) allowed.add(number);
     }
   }
+
+  for (const number of inferredDateNumbers(input)) allowed.add(number);
 
   return allowed;
 }

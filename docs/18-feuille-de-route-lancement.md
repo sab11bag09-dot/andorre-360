@@ -68,8 +68,14 @@ que la source en donne une. Le jeu de référence (1) se compose automatiquement
 *Qualité → Jeu de référence* : 30 observations récentes réparties entre rubriques et types
 de source. Les 30 sont annotées question par question (préparées par Claude, l’utilisateur
 ne lisant pas le catalan, et relues par l’utilisateur), puis contrôlées contre l’article de
-l’IA qui en est tiré. 4 ont déjà un article, 3 sont conformes. Reste à générer les 26 autres
-brouillons (coût annoncé avant).
+l’IA qui en est tiré.
+
+Premier passage complet, le 23 novembre 2026 : 27 brouillons générés pour 0,36 dollar
+(53 appels à `gpt-5.6-terra`, sans les traductions). 28 observations ont un article ;
+21 sont conformes (75 %), loin des 9 sur 10 visés. Deux observations restent sans article :
+une reprise trop proche de la source, une source trop longue (plus de 40 faits).
+Défaut le plus fréquent : l’article omet une personne que la source ne cite qu’entre
+guillemets, la consigne interdisant les citations.
 
 | | |
 |---|---|
