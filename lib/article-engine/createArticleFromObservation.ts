@@ -26,6 +26,7 @@ import type { ArticleRepository } from "./repositories/ArticleRepository";
 import { PrismaArticleRepository } from "./repositories/PrismaArticleRepository";
 import { PrismaArticleTranslationRepository } from "./repositories/PrismaArticleTranslationRepository";
 import { prisma } from "../prisma";
+import { robotsPolicy } from "../source-engine/robots/robotsPolicy";
 import { prismaSourceImages, type SourceImageService } from "../media/sourceImages";
 import { prismaBankImages, type BankImageService } from "../media/bankImages";
 
@@ -123,6 +124,12 @@ export async function createArticleFromObservation(
         });
       })()
     : null;
+
+  // Le site peut avoir refusé l’usage de ses contenus par l’IA depuis la
+  // collecte : on relit son robots.txt avant d’envoyer le texte à l’IA.
+  if (usesProductionPipeline) {
+    await robotsPolicy.assertAiInputAllowed(observation.url);
+  }
 
   const editorialGenerator = aiGenerator ?? dependencies.editorialGenerator;
   const generatedAt = new Date();

@@ -111,6 +111,15 @@ Travaux :
 3. **Mention « D’après… »** sur chaque article, avec lien vers la source, en trois langues.
 4. **Sources par rubrique** : trouver des sources pour International, Culture et Loisirs, ou décider de les regrouper. Retirer des sources les médias concurrents si l’avocat le demande.
 
+État au 23 novembre 2026 : le respect des refus (2) est en place. Avant chaque
+téléchargement (pages, flux, vérification des sources, photos), la collecte lit le
+`robots.txt` du site : une page interdite n’est pas téléchargée, et un site injoignable
+suspend la collecte par prudence. Une source dont le site refuse l’usage par l’IA
+(`Content-Signal: ai-input=no`) n’est ni collectée ni envoyée à l’IA. Aucune des
+39 sources actives n’est touchée. Pour l’avocat : la RTVA et le Diari d’Andorra
+interdisent nommément les robots d’IA (GPTBot, ClaudeBot, ChatGPT-User pour le Diari…),
+sans `Content-Signal` ; la règle ne les écarte pas, la décision revient à l’utilisateur.
+
 | | |
 |---|---|
 | **Décision de l’utilisateur** | Réponses de l’avocat, liste des sources autorisées, sort des rubriques sans source. |
