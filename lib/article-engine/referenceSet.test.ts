@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   checkAgainstReference,
   isReferenceAnnotated,
+  looksLikeArticle,
   parseReferenceLines,
+  referenceFingerprints,
   REFERENCE_SET_SIZE,
   selectReferenceObservations,
   textStatesFact,
@@ -29,6 +31,17 @@ describe("faits du jeu de référence", () => {
     expect(textStatesFact(ARTICLE.title, "organisme")).toBe(true);
     expect(textStatesFact(ARTICLE.content, "2,5 millions")).toBe(true);
     expect(textStatesFact(ARTICLE.content, "2 millions")).toBe(false);
+  });
+
+  it("reconnaît les nombres écrits en lettres et les mots de même racine", () => {
+    const text = "Douze nouveaux conseillers ont prêté serment. Chaque conseiller votera pour deux initiatives. Noa Godoy, cinquième de la finale.";
+    expect(textStatesFact(text, "12 conseillers")).toBe(true);
+    expect(textStatesFact(text, "vote")).toBe(true);
+    expect(textStatesFact(text, "2 initiatives")).toBe(true);
+    expect(textStatesFact(text, "5e")).toBe(true);
+    expect(textStatesFact(text, "5ème")).toBe(true);
+    expect(textStatesFact(text, "13 conseillers")).toBe(false);
+    expect(textStatesFact(text, "quatrième")).toBe(false);
   });
 
   it("accepte des formulations équivalentes séparées par « | »", () => {
@@ -68,7 +81,8 @@ function candidate(overrides: Partial<ReferenceCandidate>): ReferenceCandidate {
     sourceId: 1,
     category: "Société",
     organizationType: "GOVERNMENT",
-    contentLength: 1200,
+    title: `Le Comú présente le projet numéro ${id}`,
+    content: `Texte ${id} ${"mot ".repeat(300)}`,
     publishedAt: new Date(Date.UTC(2026, 10, 1) + id * 60_000),
     collectedAt: new Date("2026-11-20T00:00:00Z"),
     ...overrides,
@@ -102,8 +116,8 @@ describe("composition automatique du jeu", () => {
   });
 
   it("écarte les textes trop courts ou trop longs", () => {
-    const short = candidate({ contentLength: 120 });
-    const long = candidate({ contentLength: 50_000 });
+    const short = candidate({ content: "Texte court ".repeat(10) });
+    const long = candidate({ content: "mot ".repeat(12_500) });
     const good = candidate({});
     expect(selectReferenceObservations([short, long, good])).toEqual([good.id]);
   });
@@ -116,5 +130,34 @@ describe("composition automatique du jeu", () => {
 
     expect(selectReferenceObservations([media, sport, police], existing).sort()).toEqual([sport.id, police.id].sort());
     expect(selectReferenceObservations([media], [...existing, sport, police])).toEqual([]);
+  });
+
+  it("écarte les pages de service, les extraits tronqués et le HTML", () => {
+    const body = "Un texte d’actualité assez long. ".repeat(20);
+    expect(looksLikeArticle({ title: "Col·laboradors", content: body })).toBe(false);
+    expect(looksLikeArticle({ title: "Fes Voluntariat", content: body })).toBe(false);
+    expect(looksLikeArticle({ title: "Aaron Ganal inicia una nova etapa", content: `<p>${body} [&#8230;]</p>` })).toBe(false);
+    expect(looksLikeArticle({ title: "Aaron Ganal inicia una nova etapa", content: `${body} The post first appeared on BC` })).toBe(false);
+    expect(looksLikeArticle({ title: "Aaron Ganal inicia una nova etapa", content: body })).toBe(true);
+  });
+
+  it("ne retient pas deux fois le même communiqué, même traduit", () => {
+    const catalan = candidate({
+      sourceId: 1,
+      title: "Grandvalira Resorts referma les bones perspectives a la 47a Fira",
+      content: `La 47a Fira, promoció fins al 9 de desembre, estalvis de 400 €, descompte del 5% i obertura el 4 de desembre. ${"text ".repeat(200)}`,
+    });
+    const french = candidate({
+      sourceId: 2,
+      title: "Grandvalira Resorts confirme les bonnes perspectives à la 47e Foire",
+      content: `La 47e Foire, promotion jusqu’au 9 décembre, économies de 400 €, remise de 5 % et ouverture le 4 décembre. ${"texte ".repeat(200)}`,
+    });
+    const copy = candidate({ sourceId: 3, title: french.title, content: french.content });
+    const other = candidate({ sourceId: 4 });
+
+    expect(referenceFingerprints(catalan)).toContain("chiffres:47 9 400 5 4");
+    // La version la plus récente est gardée, les deux autres sont des doublons.
+    expect(selectReferenceObservations([catalan, french, copy, other]).sort()).toEqual([copy.id, other.id].sort());
+    expect(selectReferenceObservations([french, copy], [catalan])).toEqual([]);
   });
 });

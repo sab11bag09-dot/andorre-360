@@ -30,7 +30,8 @@ function observation(id: number, referenceCase: { excludedAt: Date | null } | nu
   return {
     id,
     sourceId: id,
-    content: "x".repeat(1000),
+    title: `Le Comú présente le projet numéro ${id}`,
+    content: `Texte ${id} ${"mot ".repeat(300)}`,
     publishedAt: new Date(Date.UTC(2026, 10, id)),
     collectedAt: new Date("2026-11-20T00:00:00Z"),
     referenceCase,
