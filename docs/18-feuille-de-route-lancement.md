@@ -193,6 +193,14 @@ Travaux :
 4. **Base de lancement** : effacement des données de chantier, puis départ avec les seuls articles du pilote et les sources validées.
 5. **Contrôles finaux** : référencement (plan du site, balises par langue), mentions légales, politique de confidentialité, test complet sur le serveur.
 
+État au 23 novembre 2026 : la sauvegarde (2) est prête, indépendante de l’hébergeur.
+`npm run db:backup` copie la base à chaud, vérifie la copie (`integrity_check`, dernière
+migration), la restaure à l’essai ailleurs et relit chaque table, puis ne la garde qu’une
+fois tout vérifié, sous un nom daté (`backups/andorre-360-AAAAMMJJTHHMMSSZ.db`). Les 14
+plus récentes sont gardées (`BACKUP_KEEP`), dans `BACKUP_DIR`. Un échec rend le code 1,
+pour que le planificateur alerte. `npm run db:backup -- <fichier>` vérifie une sauvegarde.
+Reste, avec l’hébergeur : la lancer chaque nuit et envoyer `BACKUP_DIR` hors du serveur.
+
 | | |
 |---|---|
 | **Décision de l’utilisateur** | Hébergeur et budget, date de lancement, textes légaux. |
