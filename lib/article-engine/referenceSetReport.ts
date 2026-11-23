@@ -182,6 +182,7 @@ export async function loadReferenceCandidates(): Promise<{
     select: {
       id: true,
       sourceId: true,
+      title: true,
       content: true,
       publishedAt: true,
       collectedAt: true,
@@ -195,7 +196,8 @@ export async function loadReferenceCandidates(): Promise<{
     sourceId: row.sourceId,
     category: row.source.category ?? "Sans rubrique",
     organizationType: row.source.organizationType,
-    contentLength: row.content?.length ?? 0,
+    title: row.title,
+    content: row.content ?? "",
     publishedAt: row.publishedAt,
     collectedAt: row.collectedAt,
     referenceCase: row.referenceCase,
