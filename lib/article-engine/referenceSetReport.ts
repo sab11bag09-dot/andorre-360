@@ -45,7 +45,7 @@ export type ReferenceSetSummary = {
   /** Observations annotées qui ont un article de l’IA. */
   evaluated: number;
   passing: number;
-  /** Critère de sortie de l’étape 1 atteint. */
+  /** Critère de sortie de l’étape 1 atteint : 9 observations annotées sur 10 conformes. */
   targetReached: boolean;
 };
 
@@ -59,7 +59,9 @@ export function summarizeReferenceSet(entries: readonly ReferenceSetEntry[]): Re
     annotated: annotated.length,
     evaluated: evaluated.length,
     passing,
-    targetReached: evaluated.length > 0 && passing / evaluated.length >= REFERENCE_SET_TARGET_RATIO,
+    // Mesuré sur toutes les observations annotées : une observation sans
+    // article (génération refusée ou pas encore lancée) compte comme un échec.
+    targetReached: annotated.length > 0 && passing / annotated.length >= REFERENCE_SET_TARGET_RATIO,
   };
 }
 

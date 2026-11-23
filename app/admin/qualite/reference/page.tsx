@@ -35,9 +35,9 @@ export default async function ReferenceSetPage() {
         <StatCard title="Avec un article de l’IA" value={summary.evaluated} description="parmi les observations annotées" />
         <StatCard
           title="Conformes"
-          value={summary.evaluated === 0 ? "—" : `${summary.passing}/${summary.evaluated}`}
+          value={summary.annotated === 0 ? "—" : `${summary.passing}/${summary.annotated}`}
           valueClassName={summary.targetReached ? "text-emerald-400" : undefined}
-          description={`publiables et fidèles à l’annotation — objectif ${TARGET}`}
+          description={`publiables et fidèles à l’annotation, sur les observations annotées ; une observation sans article compte comme un échec — objectif ${TARGET}`}
         />
       </section>
 

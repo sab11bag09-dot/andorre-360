@@ -75,6 +75,9 @@ describe("jeu de référence", () => {
       targetReached: false,
     });
     expect(summarizeReferenceSet([ENTRIES[0]]).targetReached).toBe(true);
+    // Une observation annotée sans article compte comme un échec.
+    const withoutArticle = { ...ENTRIES[0], id: 99, article: null };
+    expect(summarizeReferenceSet([ENTRIES[0], withoutArticle]).targetReached).toBe(false);
     expect(summarizeReferenceSet([]).targetReached).toBe(false);
   });
 
