@@ -4,7 +4,8 @@ import { getVideoEmbedUrl } from "@/lib/media/videoEmbed";
 import { imageCreditLabel } from "@/lib/media/imageCredit";
 import {
   type ArticleSourceCredit,
-  sourceCreditLabel,
+  sourceAttributionLead,
+  sourceAttributionSeparator,
 } from "@/lib/article-engine/articleSourceCredits";
 
 export interface PublicArticleViewData {
@@ -18,7 +19,7 @@ export interface PublicArticleViewData {
   videoUrl: string | null;
   publishedAt: Date;
   languageVariants?: Array<{ locale: string; label: string; href: string }>;
-  /** Sources dont l’article est tiré, créditées sous la signature. */
+  /** Sources dont l’article est tiré : « D’après… » sous le titre. */
   sourceCredits?: ArticleSourceCredit[];
   /** Crédit de la photo (médiathèque), par exemple le nom de la source. */
   imageCredit?: string | null;
@@ -29,6 +30,34 @@ type Props = {
   dateLocale: "ca-ES" | "es-ES" | "fr-FR";
   contentLanguage: "ca" | "es" | "fr";
 };
+
+/** Mots fixes de la page, dans la langue de l’article. */
+const LABELS = {
+  fr: {
+    by: "Par",
+    readingTime: "TEMPS DE LECTURE :",
+    signed: "Article signé",
+    languages: "Versions linguistiques",
+    video: "Vidéo",
+    noVideo: "Votre navigateur ne prend pas en charge la lecture vidéo.",
+  },
+  ca: {
+    by: "Per",
+    readingTime: "TEMPS DE LECTURA:",
+    signed: "Article signat",
+    languages: "Versions lingüístiques",
+    video: "Vídeo",
+    noVideo: "El vostre navegador no permet reproduir el vídeo.",
+  },
+  es: {
+    by: "Por",
+    readingTime: "TIEMPO DE LECTURA:",
+    signed: "Artículo firmado",
+    languages: "Versiones lingüísticas",
+    video: "Vídeo",
+    noVideo: "Su navegador no permite reproducir el vídeo.",
+  },
+} as const;
 
 function isUploadedVideo(url: string) {
   return url.startsWith("/") || /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
@@ -42,6 +71,8 @@ export default function PublicArticleView({
   const videoEmbedUrl = article.videoUrl
     ? getVideoEmbedUrl(article.videoUrl)
     : null;
+  const labels = LABELS[contentLanguage];
+  const credits = article.sourceCredits ?? [];
 
   return (
     <main
@@ -59,12 +90,12 @@ export default function PublicArticleView({
               preload="metadata"
               className="h-full w-full object-contain"
             >
-              Votre navigateur ne prend pas en charge la lecture vidéo.
+              {labels.noVideo}
             </video>
           ) : (
             <iframe
               src={videoEmbedUrl ?? undefined}
-              title={`Vidéo : ${article.title}`}
+              title={`${labels.video}${contentLanguage === "fr" ? " : " : ": "}${article.title}`}
               className="h-full w-full border-0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -130,7 +161,7 @@ export default function PublicArticleView({
 
       <article className="mx-auto max-w-4xl p-8">
         {article.languageVariants && article.languageVariants.length > 0 && (
-          <nav className="mb-6 flex flex-wrap gap-2" aria-label="Versions linguistiques">
+          <nav className="mb-6 flex flex-wrap gap-2" aria-label={labels.languages}>
             {article.languageVariants.map((variant) => (
               <a
                 key={variant.locale}
@@ -145,31 +176,13 @@ export default function PublicArticleView({
 
         <div className="flex flex-wrap gap-4 text-gray-400">
           <p>{article.publishedAt.toLocaleDateString(dateLocale)}</p>
-          <p>• Par {article.author}</p>
-        </div>
-
-        <p className="mt-4 text-sm tracking-widest text-yellow-500">
-          TEMPS DE LECTURE : {article.readingTime}
-        </p>
-
-        <p className="mt-8 text-xl leading-relaxed text-gray-200">
-          {article.description}
-        </p>
-
-        <div className="mt-10">
-          <ArticleRenderer content={article.content} />
-        </div>
-
-        <div className="mt-12 border-t border-gray-800 pt-6">
-          <p className="text-gray-400">Article signé</p>
-          <p className="mt-2 text-xl text-yellow-500">{article.author}</p>
-          {article.sourceCredits && article.sourceCredits.length > 0 && (
-            <p className="mt-4 text-gray-400">
-              {sourceCreditLabel(contentLanguage, article.sourceCredits.length)}
-              {contentLanguage === "fr" ? "\u00a0: " : ": "}
-              {article.sourceCredits.map((credit, index) => (
+          <p>• {labels.by} {article.author}</p>
+          {credits.length > 0 && (
+            <p>
+              • {sourceAttributionLead(contentLanguage)}
+              {credits.map((credit, index) => (
                 <span key={`${index}-${credit.name}`}>
-                  {index > 0 && ", "}
+                  {sourceAttributionSeparator(contentLanguage, index, credits.length)}
                   {credit.url ? (
                     <a
                       href={credit.url}
@@ -186,6 +199,23 @@ export default function PublicArticleView({
               ))}
             </p>
           )}
+        </div>
+
+        <p className="mt-4 text-sm tracking-widest text-yellow-500">
+          {labels.readingTime} {article.readingTime}
+        </p>
+
+        <p className="mt-8 text-xl leading-relaxed text-gray-200">
+          {article.description}
+        </p>
+
+        <div className="mt-10">
+          <ArticleRenderer content={article.content} />
+        </div>
+
+        <div className="mt-12 border-t border-gray-800 pt-6">
+          <p className="text-gray-400">{labels.signed}</p>
+          <p className="mt-2 text-xl text-yellow-500">{article.author}</p>
         </div>
       </article>
     </main>

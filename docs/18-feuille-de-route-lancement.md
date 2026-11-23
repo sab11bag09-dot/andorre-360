@@ -120,6 +120,10 @@ suspend la collecte par prudence. Une source dont le site refuse l’usage par l
 interdisent nommément les robots d’IA (GPTBot, ClaudeBot, ChatGPT-User pour le Diari…),
 sans `Content-Signal` ; la règle ne les écarte pas, la décision revient à l’utilisateur.
 
+La mention (3) est en place : sous le titre de chaque article, « D’après Govern d’Andorra »
+(« Segons », « Según »), avec un lien vers l’article d’origine. Les mots fixes de la page
+article (« Par », « Temps de lecture », « Article signé ») suivent la langue de l’article.
+
 | | |
 |---|---|
 | **Décision de l’utilisateur** | Réponses de l’avocat, liste des sources autorisées, sort des rubriques sans source. |
