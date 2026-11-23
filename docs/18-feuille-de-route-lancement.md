@@ -59,6 +59,12 @@ Travaux :
    - absence de reprise mot pour mot.
 3. **Tableau de résultats dans l’administration** : note moyenne, brouillons refusés et pourquoi.
 
+État au 23 novembre 2026 : la note (2) et le tableau (3) sont en place dans *Administration → Qualité*.
+Le jeu de référence (1) se compose automatiquement dans *Qualité → Jeu de référence* :
+30 observations récentes réparties entre rubriques et types de source, chacune annotée
+par l’utilisateur (faits obligatoires, erreurs interdites), puis contrôlée contre l’article
+de l’IA qui en est tiré. Reste à annoter le jeu, puis à générer ses brouillons (coût annoncé avant).
+
 | | |
 |---|---|
 | **Décision de l’utilisateur** | Choisir et annoter le jeu de référence. Accepter le coût de génération de ces brouillons, annoncé avant. |
