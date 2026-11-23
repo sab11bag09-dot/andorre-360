@@ -3,7 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import {
   buildArticleSourceCredits,
   loadArticleSourceCredits,
-  sourceCreditLabel,
+  sourceAttributionLead,
+  sourceAttributionSeparator,
 } from "./articleSourceCredits";
 
 const govern = { id: 3, name: "Govern d’Andorra" };
@@ -58,14 +59,22 @@ describe("buildArticleSourceCredits", () => {
   });
 });
 
-describe("sourceCreditLabel", () => {
-  it("donne l’intitulé dans la langue de l’article, au singulier et au pluriel", () => {
-    expect(sourceCreditLabel("fr", 1)).toBe("Source");
-    expect(sourceCreditLabel("fr", 2)).toBe("Sources");
-    expect(sourceCreditLabel("ca", 1)).toBe("Font");
-    expect(sourceCreditLabel("ca", 2)).toBe("Fonts");
-    expect(sourceCreditLabel("es", 1)).toBe("Fuente");
-    expect(sourceCreditLabel("es", 2)).toBe("Fuentes");
+describe("mention « D’après… »", () => {
+  it("donne la mention dans la langue de l’article", () => {
+    expect(sourceAttributionLead("fr")).toBe("D’après");
+    expect(sourceAttributionLead("ca")).toBe("Segons");
+    expect(sourceAttributionLead("es")).toBe("Según");
+  });
+
+  it("sépare les sources par des virgules, puis « et » devant la dernière", () => {
+    const names = ["Govern", "CASS", "Comú d’Encamp"];
+    const phrase = (language: "fr" | "ca" | "es") =>
+      sourceAttributionLead(language) +
+      names.map((name, index) => sourceAttributionSeparator(language, index, names.length) + name).join("");
+
+    expect(phrase("fr")).toBe("D’après Govern, CASS et Comú d’Encamp");
+    expect(phrase("ca")).toBe("Segons Govern, CASS i Comú d’Encamp");
+    expect(phrase("es")).toBe("Según Govern, CASS y Comú d’Encamp");
   });
 });
 

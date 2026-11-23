@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
  * Crédit public des sources d’un article.
  *
  * Un article rédigé à partir d’une observation est signé par la rédaction
- * (`editorialSignature.ts`) ; la page publique indique en plus la source
- * dont il est tiré, avec un lien vers l’article d’origine. Chaque source
+ * (`editorialSignature.ts`) ; la page publique indique en plus, sous le
+ * titre, la source dont il est tiré, avec un lien vers l’article d’origine :
+ * « D’après Govern d’Andorra » (étape 2 de la feuille de route). Chaque source
  * n’est créditée qu’une fois, dans l’ordre des observations rattachées.
  */
 export type ArticleSourceCredit = {
@@ -22,17 +23,25 @@ export type ObservationForSourceCredit = {
 
 export type SourceCreditLanguage = "fr" | "ca" | "es";
 
-const LABELS: Record<SourceCreditLanguage, { one: string; many: string }> = {
-  fr: { one: "Source", many: "Sources" },
-  ca: { one: "Font", many: "Fonts" },
-  es: { one: "Fuente", many: "Fuentes" },
+const ATTRIBUTION: Record<SourceCreditLanguage, { lead: string; and: string }> = {
+  fr: { lead: "D’après", and: "et" },
+  ca: { lead: "Segons", and: "i" },
+  es: { lead: "Según", and: "y" },
 };
 
-export function sourceCreditLabel(
+/** Début de la mention : « D’après », « Segons », « Según ». */
+export function sourceAttributionLead(language: SourceCreditLanguage): string {
+  return ATTRIBUTION[language].lead;
+}
+
+/** Séparateur avant le crédit de rang `index` : « , » puis « et » devant le dernier. */
+export function sourceAttributionSeparator(
   language: SourceCreditLanguage,
+  index: number,
   count: number,
 ): string {
-  return count > 1 ? LABELS[language].many : LABELS[language].one;
+  if (index === 0) return " ";
+  return index === count - 1 ? ` ${ATTRIBUTION[language].and} ` : ", ";
 }
 
 function webAddress(value: string): string | null {
