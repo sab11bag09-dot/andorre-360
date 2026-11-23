@@ -146,6 +146,19 @@ Travaux :
    - coût par article ;
    - temps entre la publication de la source et celle du site.
 
+État au 23 novembre 2026 : les mesures (3) sont prêtes, sur la page « Mesures du pilote »
+de l’admin (Qualité). Elles couvrent les 7 derniers jours, à l’heure d’Andorre, sans appel à l’IA :
+- articles rédigés, par rubrique, et publiables selon la note ;
+- articles publiés, et publiés sans retouche du texte ;
+- noms à vérifier et générations refusées ;
+- coût estimé du jour et coût moyen d’un article ;
+- délai médian entre la source et le site.
+
+Chaque appel à l’IA est désormais rattaché à son observation ou à son article :
+le coût d’un article compte sa rédaction, ses régénérations et ses traductions.
+Les appels d’avant ce rattachement n’ont pas d’article. Le coût est estimé au tarif
+relevé (2 $ et 12 $ le million de jetons d’entrée et de sortie) ; la facture OpenAI fait foi.
+
 | | |
 |---|---|
 | **Décision de l’utilisateur** | Allumer l’orchestrateur et les traductions pour la durée du pilote, avec un budget annoncé et un plafond. |

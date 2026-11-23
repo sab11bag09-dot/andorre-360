@@ -1,3 +1,5 @@
+import { currentAiUsageContext } from "./aiUsageContext";
+
 /**
  * Suivi de la consommation OpenAI et plafond de dépense.
  *
@@ -23,6 +25,9 @@ export type AiUsageEntry = {
   operation: string;
   inputTokens: number;
   outputTokens: number;
+  /** Observation ou article traité, quand l’appel est lancé dans `withAiUsageContext`. */
+  observationId?: number;
+  articleId?: number;
 };
 
 export interface AiUsageLedger {
@@ -95,6 +100,7 @@ export async function meterAiCall<T extends ResponseWithUsage>(
   const response = await call();
 
   await ledger.record({
+    ...currentAiUsageContext(),
     ...meta,
     inputTokens: response.usage?.input_tokens ?? 0,
     outputTokens: response.usage?.output_tokens ?? 0,

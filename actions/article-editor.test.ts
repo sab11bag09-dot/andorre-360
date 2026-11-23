@@ -308,6 +308,33 @@ describe("durcissement de la sauvegarde principale", () => {
     });
   });
 
+  it("indique si la rédaction a retouché le texte de l’article", async () => {
+    const draft = createDraft();
+    articleUpdate.mockResolvedValue({
+      id: 7,
+      slug: "nouveau-titre",
+      category: "POLITIQUE",
+      title: draft.title,
+      published: true,
+      editorialStatus: "PUBLISHED",
+    });
+
+    const recordedTextEdited = async (existing: Record<string, unknown>) => {
+      findUnique.mockReset();
+      editorialEventCreate.mockClear();
+      findUnique
+        .mockResolvedValueOnce({ ...existingArticle, editorialStatus: "APPROVED", ...existing })
+        .mockResolvedValueOnce({ id: 7 });
+      await saveArticle({ mode: "update", intent: "publish", article: draft });
+      const details = editorialEventCreate.mock.calls[0][0].data.details;
+      return JSON.parse(details).textEdited;
+    };
+
+    const untouched = { title: draft.title, description: draft.description, content: draft.content };
+    expect(await recordedTextEdited(untouched)).toBe(false);
+    expect(await recordedTextEdited({ ...untouched, content: "Texte rédigé par l’IA" })).toBe(true);
+  });
+
   it("crée une publication humaine verrouillée lors de la publication", async () => {
     articleUpdate.mockResolvedValue({
       id: 7,

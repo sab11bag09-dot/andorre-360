@@ -557,16 +557,23 @@ enum SourceImageReuse {
 /// Jetons consommés par chaque appel réel à OpenAI : sert au suivi du coût
 /// et au plafond de dépense sur 24 heures (`AI_DAILY_TOKEN_LIMIT`).
 model AiUsage {
-  id           Int      @id @default(autoincrement())
-  createdAt    DateTime @default(now())
-  provider     String
-  model        String
-  operation    String
-  inputTokens  Int
-  outputTokens Int
-  totalTokens  Int
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  provider      String
+  model         String
+  operation     String
+  inputTokens   Int
+  outputTokens  Int
+  totalTokens   Int
+  /// Observation rédigée par l’appel (extraction des faits, rédaction).
+  /// Sans lien en base : la consommation reste comptée si l’observation disparaît.
+  observationId Int?
+  /// Article traduit par l’appel.
+  articleId     Int?
 
   @@index([createdAt])
+  @@index([observationId])
+  @@index([articleId])
 }
 
 /// Jeu de référence de la qualité éditoriale (étape 1 de la feuille de route) :

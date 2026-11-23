@@ -311,6 +311,9 @@ async function updateArticle(
       category: true,
       editorialStatus: true,
       publishedAt: true,
+      title: true,
+      description: true,
+      content: true,
     },
   });
 
@@ -367,6 +370,13 @@ async function updateArticle(
   }
 
   const slug = await createUniqueSlug(draft.slug, draft.id);
+
+  // Retouche du texte par la rédaction : sert à mesurer, pendant le pilote,
+  // les articles publiés tels que l’IA les a rédigés.
+  const textEdited =
+    draft.title !== existingArticle.title ||
+    draft.description !== existingArticle.description ||
+    draft.content !== existingArticle.content;
 
   const updatedArticle = await prisma.$transaction(async (transaction) => {
     const article = await transaction.article.update({
@@ -472,6 +482,7 @@ async function updateArticle(
         details: {
           slug: article.slug,
           category: article.category,
+          textEdited,
         },
       });
 
@@ -579,6 +590,7 @@ async function updateArticle(
       details: {
         slug: article.slug,
         category: article.category,
+        textEdited,
       },
     });
 
