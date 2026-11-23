@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "test:mise-en-page": "playwright test"
+    "test:mise-en-page": "playwright test",
+    "db:backup": "tsx scripts/backup-database.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.3",
