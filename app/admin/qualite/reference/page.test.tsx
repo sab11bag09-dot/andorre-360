@@ -12,11 +12,15 @@ vi.mock("@/actions/reference-set", () => ({
 const SOURCE_TEXT =
   "El Govern aporta 14.400 euros a dos organismes humanitaris. El ministre Xavier Espot ha presentat l’ajut aquest dimarts.";
 
-function row(id: number, requiredFacts: string, articleContent: string | null) {
+function row(id: number, whoFacts: string, articleContent: string | null) {
   return {
     id,
     observationId: 100 + id,
-    requiredFacts,
+    whoFacts,
+    whereFacts: "",
+    whenFacts: "",
+    howFacts: "",
+    whyFacts: "",
     forbiddenErrors: "14 000 euros",
     notes: "",
     observation: {
@@ -59,7 +63,7 @@ describe("jeu de référence", () => {
   it("contrôle chaque article contre l’annotation et résume le jeu", () => {
     expect(ENTRIES[0].article?.quality.verdict).toBe("publiable");
     expect(ENTRIES[0].article?.passes).toBe(true);
-    expect(ENTRIES[1].article?.check.missingFacts).toEqual(["Croix-Rouge"]);
+    expect(ENTRIES[1].article?.check.missingFacts).toEqual(["Qui ou quoi ? Croix-Rouge"]);
     expect(ENTRIES[1].article?.passes).toBe(false);
     expect(ENTRIES[2].annotated).toBe(false);
 
@@ -82,7 +86,7 @@ describe("jeu de référence", () => {
     expect(html).toContain("3/30");
     expect(html).toContain("1/2");
     expect(html).toContain('href="/admin/qualite/reference/1"');
-    expect(html).toContain("Faits absents de l’article : Croix-Rouge");
+    expect(html).toContain("Faits absents de l’article : Qui ou quoi ? Croix-Rouge");
     expect(html).toContain("à annoter");
     expect(html).toContain("Compléter le jeu");
   });

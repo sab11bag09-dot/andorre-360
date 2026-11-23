@@ -7,12 +7,15 @@
  * sans coût. Elle réutilise les deux contrôles de la génération : fidélité
  * des chiffres et des noms propres, et absence de reprise mot pour mot.
  *
- * Note sur 100, en six critères. Un défaut bloquant (chiffre absent de la
+ * Note sur 100, en sept critères, dont « Qui, où, quand » : les trois
+ * questions d’un bon article contrôlables sans annotation (voir
+ * `fiveQuestions.ts`). Un défaut bloquant (chiffre absent de la
  * source, reprise de passages, texte de remplissage, corps trop court) rend
  * le brouillon « refusé » quelle que soit sa note.
  */
 
 import { checkFactFidelity } from "./factFidelity";
+import { answerAutomaticQuestions, questionLabel, type QuestionAnswer } from "./fiveQuestions";
 import {
   evaluateSourceSimilarity,
   measureSourceSimilarity,
@@ -31,7 +34,7 @@ export type DraftQualityInput = {
 };
 
 export type DraftQualityCriterion = {
-  key: "fidelity" | "originality" | "body" | "title" | "description" | "cleanliness";
+  key: "fidelity" | "originality" | "questions" | "body" | "title" | "description" | "cleanliness";
   label: string;
   points: number;
   max: number;
@@ -47,6 +50,8 @@ export type DraftQuality = {
   /** Raisons d’un refus, vides sinon. */
   blockers: string[];
   criteria: DraftQualityCriterion[];
+  /** Qui ou quoi, où, quand : réponse de l’article, comparé à sa source. */
+  questions: QuestionAnswer[];
 };
 
 /** Note minimale d’un brouillon publiable sans retouche. */
@@ -128,7 +133,7 @@ function originality(input: DraftQualityInput, blockers: string[]): DraftQuality
   const evaluation = evaluateSourceSimilarity(measure);
   const percent = Math.round(measure.sharedShingleRatio * 100);
   const notes: string[] = [];
-  let points = 20 - measure.sharedShingleRatio * 50;
+  let points = 15 - measure.sharedShingleRatio * 40;
 
   if (evaluation.blocked) {
     const detail = `reprise de la source : ${percent} % de passages communs, plus long passage de ${measure.longestSharedRun} mots`;
@@ -137,10 +142,10 @@ function originality(input: DraftQualityInput, blockers: string[]): DraftQuality
     points = 0;
   } else if (percent > 0 || measure.longestSharedRun > 8) {
     notes.push(`${percent} % de passages communs, plus long passage de ${measure.longestSharedRun} mots`);
-    if (measure.longestSharedRun > 8) points -= 3;
+    if (measure.longestSharedRun > 8) points -= 2;
   }
 
-  return { key: "originality", label: "Rédaction propre (pas de copie)", points: clamp(points, 20), max: 20, notes };
+  return { key: "originality", label: "Rédaction propre (pas de copie)", points: clamp(points, 15), max: 15, notes };
 }
 
 function body(input: DraftQualityInput, blockers: string[]): DraftQualityCriterion {
@@ -155,12 +160,12 @@ function body(input: DraftQualityInput, blockers: string[]): DraftQualityCriteri
     notes.push(detail);
   } else if (words < 120 || words > 1000) {
     notes.push(`longueur inhabituelle : ${words} mots (120 à 1 000 attendus)`);
-    points += 6;
+    points += 4;
   } else {
-    points += 10;
+    points += 7;
   }
 
-  if (parts.length >= 2) points += 5;
+  if (parts.length >= 2) points += 3;
   else notes.push("un seul paragraphe");
 
   const seen = new Set<string>();
@@ -174,7 +179,7 @@ function body(input: DraftQualityInput, blockers: string[]): DraftQualityCriteri
     points -= 3;
   }
 
-  return { key: "body", label: "Corps de l’article", points: clamp(points, 15), max: 15, notes };
+  return { key: "body", label: "Corps de l’article", points: clamp(points, 10), max: 10, notes };
 }
 
 function title(input: DraftQualityInput): DraftQualityCriterion {
@@ -249,11 +254,27 @@ function cleanliness(input: DraftQualityInput, blockers: string[]): DraftQuality
   return { key: "cleanliness", label: "Propreté du texte", points: clamp(points, 10), max: 10, notes };
 }
 
+function questions(answers: readonly QuestionAnswer[]): DraftQualityCriterion {
+  const applicable = answers.filter((answer) => answer.status !== "sans objet");
+  const missing = applicable.filter((answer) => answer.status === "manque");
+  const points = applicable.length === 0 ? 10 : (10 * (applicable.length - missing.length)) / applicable.length;
+
+  return {
+    key: "questions",
+    label: "Qui, où, quand",
+    points: clamp(points, 10),
+    max: 10,
+    notes: missing.map((answer) => `${questionLabel(answer.key)} ${answer.detail}`),
+  };
+}
+
 export function assessDraftQuality(input: DraftQualityInput): DraftQuality {
   const blockers: string[] = [];
+  const answers = answerAutomaticQuestions(input.article, input.source);
   const criteria = [
     fidelity(input, blockers),
     originality(input, blockers),
+    questions(answers),
     body(input, blockers),
     title(input),
     description(input),
@@ -267,5 +288,5 @@ export function assessDraftQuality(input: DraftQualityInput): DraftQuality {
         ? "publiable"
         : "à revoir";
 
-  return { score, verdict, blockers, criteria };
+  return { score, verdict, blockers, criteria, questions: answers };
 }

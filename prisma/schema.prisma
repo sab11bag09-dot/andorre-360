@@ -575,7 +575,13 @@ model AiUsage {
 model ReferenceCase {
   id              Int       @id @default(autoincrement())
   observationId   Int       @unique
-  requiredFacts   String    @default("")
+  /// Ce qu’un bon article doit dire, une question par champ, un fait par ligne.
+  whoFacts        String    @default("")
+  whereFacts      String    @default("")
+  whenFacts       String    @default("")
+  howFacts        String    @default("")
+  /// Facultatif : vide quand la source ne dit pas pourquoi.
+  whyFacts        String    @default("")
   forbiddenErrors String    @default("")
   notes           String    @default("")
   annotatedAt     DateTime?
